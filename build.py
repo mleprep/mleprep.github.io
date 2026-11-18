@@ -318,10 +318,9 @@ def main():
         if p["id"] in by_id:
             sys.exit(f"duplicate problem {p['id']}")
         by_id[p["id"]] = p
-    for p in problems:
-        for r in p["related"]:
-            if r not in by_id:
-                print(f"! problem {p['id']}: related {r} is not in the set")
+    missing = sorted({r for p in problems for r in p["related"] if r not in by_id})
+    if missing:
+        print(f"! related problems not in the set (not linked): {missing}")
     manifest["counts"] = {d: sum(p["difficulty"] == d for p in problems) for d in ("Easy", "Medium", "Hard")}
     (ROOT / "data" / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, separators=(",", ":")),
                                                  encoding="utf-8")
