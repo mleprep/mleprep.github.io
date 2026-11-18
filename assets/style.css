@@ -133,7 +133,14 @@ table.list .tags { display: inline-flex; gap: 4px; margin-left: 8px; }
   #sections a { padding: 6px 6px; font-size: 13px; }
 }
 @media (max-width: 560px) {
+  .top { gap: 6px; padding: 0 10px; }
   .brand { display: none; }
-  #sections { margin-left: 0; }
+  #sections { margin-left: 0; min-width: 0; flex: 1; overflow-x: auto; scrollbar-width: none; }
+  #sections::-webkit-scrollbar { display: none; }
+  #q { width: 84px; flex-shrink: 0; }
+  #q:focus { width: 150px; }
   table.list .tags { display: none; }
+  h1 { font-size: 22px; }
+  .pager { flex-direction: column; }
+  .pager a { max-width: 100%; }
 }
