@@ -1496,7 +1496,9 @@ func (interp *Interpreter) cfg(root *node, sc *scope, importPath, pkgName string
 			init, body := n.child[0], n.child[1]
 			n.start = init.start
 			init.tnext = body.start
-			body.tnext = n.start
+			// Patched for the LeetCode Review judge: loop back to the body, not to the init
+			// statement (upstream re-ran init on every iteration, so the loop never ended).
+			body.tnext = body.start
 			sc = sc.pop()
 
 		case forStmt2: // for cond {}

@@ -62,6 +62,19 @@ class Solution {
 check(new Solution().invertTree(TreeNode.of(4, 2, 7, 1, 3, 6, 9)), TreeNode.of(4, 7, 2, 9, 6, 3, 1));
 ```
 
+```go
+func invertTree(root *TreeNode) *TreeNode {
+	if root != nil {
+		root.Left, root.Right = invertTree(root.Right), invertTree(root.Left)
+	}
+	return root
+}
+// test
+assertEq(invertTree(makeTree(4, 2, 7, 1, 3, 6, 9)), []any{4, 7, 2, 9, 6, 3, 1})
+assertEq(invertTree(makeTree()), []any{})
+assertEq(invertTree(makeTree(2, 1, 3)), []any{2, 3, 1})
+```
+
 ## 104. Maximum Depth of Binary Tree | Easy
 related: 110, 543, 111
 tags: blind75, dfs
@@ -89,6 +102,18 @@ class Solution {
 }
 // test
 check(new Solution().maxDepth(TreeNode.of(3, 9, 20, null, null, 15, 7)), 3);
+```
+
+```go
+func maxDepth(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+	return 1 + max(maxDepth(root.Left), maxDepth(root.Right))
+}
+// test
+assertEq(maxDepth(makeTree(3, 9, 20, nil, nil, 15, 7)), 3)
+assertEq(maxDepth(nil), 0)
 ```
 
 ## 543. Diameter of Binary Tree | Easy
@@ -139,6 +164,26 @@ class Solution {
 check(new Solution().diameterOfBinaryTree(TreeNode.of(1, 2, 3, 4, 5)), 3);
 ```
 
+```go
+func diameterOfBinaryTree(root *TreeNode) int {
+	best := 0
+	var height func(*TreeNode) int
+	height = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		l, r := height(node.Left), height(node.Right)
+		best = max(best, l+r) // longest path through node
+		return 1 + max(l, r)
+	}
+	height(root)
+	return best
+}
+// test
+assertEq(diameterOfBinaryTree(makeTree(1, 2, 3, 4, 5)), 3)
+assertEq(diameterOfBinaryTree(makeTree(1, 2)), 1)
+```
+
 ## 110. Balanced Binary Tree | Easy
 related: 104
 tags: dfs
@@ -180,6 +225,26 @@ check(new Solution().isBalanced(TreeNode.of(3, 9, 20, null, null, 15, 7)), true)
 check(new Solution().isBalanced(TreeNode.of(1, 2, 2, 3, 3, null, null, 4, 4)), false);
 ```
 
+```go
+func isBalanced(root *TreeNode) bool {
+	var h func(*TreeNode) int // height, or -1 if unbalanced
+	h = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		l, r := h(node.Left), h(node.Right)
+		if l < 0 || r < 0 || l-r > 1 || r-l > 1 {
+			return -1
+		}
+		return 1 + max(l, r)
+	}
+	return h(root) >= 0
+}
+// test
+assertEq(isBalanced(makeTree(3, 9, 20, nil, nil, 15, 7)), true)
+assertEq(isBalanced(makeTree(1, 2, 2, 3, 3, nil, nil, 4, 4)), false)
+```
+
 ## 100. Same Tree | Easy
 related: 101, 572
 tags: blind75, dfs
@@ -209,6 +274,18 @@ class Solution {
 // test
 check(new Solution().isSameTree(TreeNode.of(1, 2, 3), TreeNode.of(1, 2, 3)), true);
 check(new Solution().isSameTree(TreeNode.of(1, 2), TreeNode.of(1, null, 2)), false);
+```
+
+```go
+func isSameTree(p *TreeNode, q *TreeNode) bool {
+	if p == nil || q == nil {
+		return p == q
+	}
+	return p.Val == q.Val && isSameTree(p.Left, q.Left) && isSameTree(p.Right, q.Right)
+}
+// test
+assertEq(isSameTree(makeTree(1, 2, 3), makeTree(1, 2, 3)), true)
+assertEq(isSameTree(makeTree(1, 2), makeTree(1, nil, 2)), false)
 ```
 
 ## 101. Symmetric Tree | Easy
@@ -245,6 +322,22 @@ class Solution {
 // test
 check(new Solution().isSymmetric(TreeNode.of(1, 2, 2, 3, 4, 4, 3)), true);
 check(new Solution().isSymmetric(TreeNode.of(1, 2, 2, null, 3, null, 3)), false);
+```
+
+```go
+func isSymmetric(root *TreeNode) bool {
+	var mirror func(a, b *TreeNode) bool
+	mirror = func(a, b *TreeNode) bool {
+		if a == nil || b == nil {
+			return a == b
+		}
+		return a.Val == b.Val && mirror(a.Left, b.Right) && mirror(a.Right, b.Left)
+	}
+	return mirror(root.Left, root.Right)
+}
+// test
+assertEq(isSymmetric(makeTree(1, 2, 2, 3, 4, 4, 3)), true)
+assertEq(isSymmetric(makeTree(1, 2, 2, nil, 3, nil, 3)), false)
 ```
 
 ## 572. Subtree of Another Tree | Easy
@@ -285,6 +378,25 @@ class Solution {
 }
 // test
 check(new Solution().isSubtree(TreeNode.of(3, 4, 5, 1, 2), TreeNode.of(4, 1, 2)), true);
+```
+
+```go
+func isSubtree(root *TreeNode, subRoot *TreeNode) bool {
+	if root == nil {
+		return false
+	}
+	return same(root, subRoot) || isSubtree(root.Left, subRoot) || isSubtree(root.Right, subRoot)
+}
+
+func same(a, b *TreeNode) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+	return a.Val == b.Val && same(a.Left, b.Left) && same(a.Right, b.Right)
+}
+// test
+assertEq(isSubtree(makeTree(3, 4, 5, 1, 2), makeTree(4, 1, 2)), true)
+assertEq(isSubtree(makeTree(3, 4, 5, 1, 2, nil, nil, nil, nil, 0), makeTree(4, 1, 2)), false)
 ```
 
 ## 235. Lowest Common Ancestor of a Binary Search Tree | Medium
@@ -328,6 +440,26 @@ check(new Solution().lowestCommonAncestor(t, TreeNode.find(t, 2), TreeNode.find(
 check(new Solution().lowestCommonAncestor(t, TreeNode.find(t, 2), TreeNode.find(t, 4)).val, 2);
 ```
 
+```go
+func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+	for root != nil {
+		switch {
+		case p.Val < root.Val && q.Val < root.Val:
+			root = root.Left
+		case p.Val > root.Val && q.Val > root.Val:
+			root = root.Right
+		default: // p and q split here (or one of them is root)
+			return root
+		}
+	}
+	return nil
+}
+// test
+t := makeTree(6, 2, 8, 0, 4, 7, 9, nil, nil, 3, 5)
+assertEq(lowestCommonAncestor(t, findNode(t, 2), findNode(t, 8)).Val, 6)
+assertEq(lowestCommonAncestor(t, findNode(t, 2), findNode(t, 4)).Val, 2)
+```
+
 ## 236. Lowest Common Ancestor of a Binary Tree | Medium
 related: 235, 863
 tags: dfs
@@ -362,6 +494,27 @@ class Solution {
 // test
 TreeNode t = TreeNode.of(3, 5, 1, 6, 2, 0, 8, null, null, 7, 4);
 check(new Solution().lowestCommonAncestor(t, TreeNode.find(t, 5), TreeNode.find(t, 4)).val, 5);
+```
+
+```go
+func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+	if root == nil || root == p || root == q {
+		return root
+	}
+	l := lowestCommonAncestor(root.Left, p, q)
+	r := lowestCommonAncestor(root.Right, p, q)
+	if l != nil && r != nil { // one on each side
+		return root
+	}
+	if l != nil {
+		return l
+	}
+	return r
+}
+// test
+t := makeTree(3, 5, 1, 6, 2, 0, 8, nil, nil, 7, 4)
+assertEq(lowestCommonAncestor(t, findNode(t, 5), findNode(t, 1)).Val, 3)
+assertEq(lowestCommonAncestor(t, findNode(t, 5), findNode(t, 4)).Val, 5)
 ```
 
 ## 102. Binary Tree Level Order Traversal | Medium
@@ -411,6 +564,35 @@ class Solution {
 }
 // test
 check(new Solution().levelOrder(TreeNode.of(3, 9, 20, null, null, 15, 7)), "[[3], [9, 20], [15, 7]]");
+```
+
+```go
+func levelOrder(root *TreeNode) [][]int {
+	res := [][]int{}
+	if root == nil {
+		return res
+	}
+	q := []*TreeNode{root}
+	for len(q) > 0 {
+		level := []int{}
+		for n := len(q); n > 0; n-- {
+			node := q[0]
+			q = q[1:]
+			level = append(level, node.Val)
+			if node.Left != nil {
+				q = append(q, node.Left)
+			}
+			if node.Right != nil {
+				q = append(q, node.Right)
+			}
+		}
+		res = append(res, level)
+	}
+	return res
+}
+// test
+assertEq(levelOrder(makeTree(3, 9, 20, nil, nil, 15, 7)), [][]int{{3}, {9, 20}, {15, 7}})
+assertEq(levelOrder(nil), [][]int{})
 ```
 
 ## 103. Binary Tree Zigzag Level Order Traversal | Medium
@@ -465,6 +647,42 @@ class Solution {
 check(new Solution().zigzagLevelOrder(TreeNode.of(3, 9, 20, null, null, 15, 7)), "[[3], [20, 9], [15, 7]]");
 ```
 
+```go
+func zigzagLevelOrder(root *TreeNode) [][]int {
+	res := [][]int{}
+	if root == nil {
+		return res
+	}
+	q := []*TreeNode{root}
+	for len(q) > 0 {
+		level := []int{}
+		for n := len(q); n > 0; n-- {
+			node := q[0]
+			q = q[1:]
+			level = append(level, node.Val)
+			if node.Left != nil {
+				q = append(q, node.Left)
+			}
+			if node.Right != nil {
+				q = append(q, node.Right)
+			}
+		}
+		if len(res)%2 == 1 { // odd levels read right to left
+			for i, j := 0, len(level)-1; i < j; i, j = i+1, j-1 {
+				level[i], level[j] = level[j], level[i]
+			}
+		}
+		res = append(res, level)
+	}
+	return res
+}
+// test
+assertEq(zigzagLevelOrder(makeTree(3, 9, 20, nil, nil, 15, 7)), [][]int{{3}, {20, 9}, {15, 7}})
+assertEq(zigzagLevelOrder(makeTree(1)), [][]int{{1}})
+assertEq(zigzagLevelOrder(makeTree()), [][]int{})
+assertEq(zigzagLevelOrder(makeTree(1, 2, 3, 4, nil, nil, 5)), [][]int{{1}, {3, 2}, {4, 5}})
+```
+
 ## 199. Binary Tree Right Side View | Medium
 related: 102
 tags: bfs
@@ -509,6 +727,33 @@ check(new Solution().rightSideView(TreeNode.of(1, 2, 3, null, 5, null, 4)), "[1,
 check(new Solution().rightSideView(TreeNode.of(1, 2, 3, 4)), "[1, 3, 4]");
 ```
 
+```go
+func rightSideView(root *TreeNode) []int {
+	res := []int{}
+	if root == nil {
+		return res
+	}
+	q := []*TreeNode{root}
+	for len(q) > 0 {
+		res = append(res, q[len(q)-1].Val) // last node of each level
+		for n := len(q); n > 0; n-- {
+			node := q[0]
+			q = q[1:]
+			if node.Left != nil {
+				q = append(q, node.Left)
+			}
+			if node.Right != nil {
+				q = append(q, node.Right)
+			}
+		}
+	}
+	return res
+}
+// test
+assertEq(rightSideView(makeTree(1, 2, 3, nil, 5, nil, 4)), []int{1, 3, 4})
+assertEq(rightSideView(makeTree(1, 2, 3, 4)), []int{1, 3, 4})
+```
+
 ## 1448. Count Good Nodes in Binary Tree | Medium
 related: 98
 tags: dfs
@@ -546,6 +791,27 @@ class Solution {
 }
 // test
 check(new Solution().goodNodes(TreeNode.of(3, 1, 4, 3, null, 1, 5)), 4);
+```
+
+```go
+func goodNodes(root *TreeNode) int {
+	var dfs func(node *TreeNode, mx int) int
+	dfs = func(node *TreeNode, mx int) int {
+		if node == nil {
+			return 0
+		}
+		good := 0
+		if node.Val >= mx { // nothing bigger on the path from the root
+			good = 1
+		}
+		mx = max(mx, node.Val)
+		return good + dfs(node.Left, mx) + dfs(node.Right, mx)
+	}
+	return dfs(root, root.Val)
+}
+// test
+assertEq(goodNodes(makeTree(3, 1, 4, 3, nil, 1, 5)), 4)
+assertEq(goodNodes(makeTree(3, 3, nil, 4, 2)), 3)
 ```
 
 ## 98. Validate Binary Search Tree | Medium
@@ -593,6 +859,25 @@ check(new Solution().isValidBST(TreeNode.of(2, 1, 3)), true);
 check(new Solution().isValidBST(TreeNode.of(5, 1, 6, null, null, 3, 7)), false);
 ```
 
+```go
+func isValidBST(root *TreeNode) bool {
+	var ok func(node *TreeNode, lo, hi int) bool // every value must lie in (lo, hi)
+	ok = func(node *TreeNode, lo, hi int) bool {
+		if node == nil {
+			return true
+		}
+		if node.Val <= lo || node.Val >= hi {
+			return false
+		}
+		return ok(node.Left, lo, node.Val) && ok(node.Right, node.Val, hi)
+	}
+	return ok(root, math.MinInt, math.MaxInt)
+}
+// test
+assertEq(isValidBST(makeTree(2, 1, 3)), true)
+assertEq(isValidBST(makeTree(5, 1, 6, nil, nil, 3, 7)), false)
+```
+
 ## 230. Kth Smallest Element in a BST | Medium
 related: 98, 173
 tags: blind75, bst, inorder
@@ -634,6 +919,27 @@ class Solution {
 }
 // test
 check(new Solution().kthSmallest(TreeNode.of(5, 3, 6, 2, 4, null, null, 1), 3), 3);
+```
+
+```go
+func kthSmallest(root *TreeNode, k int) int {
+	st, node := []*TreeNode{}, root // iterative in-order traversal
+	for {
+		for node != nil {
+			st = append(st, node)
+			node = node.Left
+		}
+		node = st[len(st)-1]
+		st = st[:len(st)-1]
+		if k--; k == 0 {
+			return node.Val
+		}
+		node = node.Right
+	}
+}
+// test
+assertEq(kthSmallest(makeTree(3, 1, 4, nil, 2), 1), 1)
+assertEq(kthSmallest(makeTree(5, 3, 6, 2, 4, nil, nil, 1), 3), 3)
 ```
 
 ## 105. Construct Binary Tree from Preorder and Inorder Traversal | Medium
@@ -694,6 +1000,33 @@ class Solution {
 check(new Solution().buildTree(new int[]{3, 9, 20, 15, 7}, new int[]{9, 3, 15, 20, 7}), TreeNode.of(3, 9, 20, null, null, 15, 7));
 ```
 
+```go
+func buildTree(preorder []int, inorder []int) *TreeNode {
+	pos := map[int]int{}
+	for i, v := range inorder {
+		pos[v] = i
+	}
+	next := 0 // next preorder value = next subtree root
+	var build func(lo, hi int) *TreeNode
+	build = func(lo, hi int) *TreeNode { // inorder range [lo, hi)
+		if lo >= hi {
+			return nil
+		}
+		root := &TreeNode{Val: preorder[next]}
+		next++
+		m := pos[root.Val]
+		root.Left = build(lo, m) // the left subtree comes first in preorder
+		root.Right = build(m+1, hi)
+		return root
+	}
+	return build(0, len(inorder))
+}
+// test
+assertEq(buildTree([]int{3, 9, 20, 15, 7}, []int{9, 3, 15, 20, 7}), []any{3, 9, 20, nil, nil, 15, 7})
+assertEq(buildTree([]int{-1}, []int{-1}), []any{-1})
+assertEq(buildTree([]int{1, 2, 3}, []int{3, 2, 1}), []any{1, 2, nil, 3})
+```
+
 ## 124. Binary Tree Maximum Path Sum | Hard
 related: 543, 687
 tags: blind75, dfs, global-answer
@@ -750,6 +1083,27 @@ class Solution {
 // test
 check(new Solution().maxPathSum(TreeNode.of(-10, 9, 20, null, null, 15, 7)), 42);
 check(new Solution().maxPathSum(TreeNode.of(-3)), -3);
+```
+
+```go
+func maxPathSum(root *TreeNode) int {
+	best := math.MinInt
+	var gain func(*TreeNode) int // best downward path starting at node
+	gain = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		l, r := max(gain(node.Left), 0), max(gain(node.Right), 0)
+		best = max(best, node.Val+l+r)
+		return node.Val + max(l, r)
+	}
+	gain(root)
+	return best
+}
+// test
+assertEq(maxPathSum(makeTree(1, 2, 3)), 6)
+assertEq(maxPathSum(makeTree(-10, 9, 20, nil, nil, 15, 7)), 42)
+assertEq(maxPathSum(makeTree(-3)), -3)
 ```
 
 ## 297. Serialize and Deserialize Binary Tree | Hard
@@ -840,6 +1194,55 @@ check(c.serialize(t), "1,2,#,#,3,4,#,#,5,#,#");
 check(c.deserialize(c.serialize(t)), t);
 ```
 
+```go
+type Codec struct{}
+
+func Constructor() Codec {
+	return Codec{}
+}
+
+// serialize writes the preorder with "#" for missing children.
+func (this *Codec) serialize(root *TreeNode) string {
+	out := []string{}
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			out = append(out, "#")
+			return
+		}
+		out = append(out, strconv.Itoa(node.Val))
+		dfs(node.Left)
+		dfs(node.Right)
+	}
+	dfs(root)
+	return strings.Join(out, ",")
+}
+
+func (this *Codec) deserialize(data string) *TreeNode {
+	vals, i := strings.Split(data, ","), 0
+	var build func() *TreeNode
+	build = func() *TreeNode {
+		v := vals[i]
+		i++
+		if v == "#" {
+			return nil
+		}
+		n, _ := strconv.Atoi(v)
+		node := &TreeNode{Val: n}
+		node.Left = build()
+		node.Right = build()
+		return node
+	}
+	return build()
+}
+// test
+c := Constructor()
+t := makeTree(1, 2, 3, nil, nil, 4, 5)
+assertEq(c.serialize(t), "1,2,#,#,3,4,#,#,5,#,#")
+assertEq(c.deserialize(c.serialize(t)), []any{1, 2, 3, nil, nil, 4, 5})
+assertEq(c.serialize(c.deserialize(c.serialize(nil))), "#")
+```
+
 ## 112. Path Sum | Easy
 related: 113, 437
 tags: dfs
@@ -874,6 +1277,22 @@ class Solution {
 }
 // test
 check(new Solution().hasPathSum(TreeNode.of(5, 4, 8, 11, null, 13, 4, 7, 2, null, null, null, 1), 22), true);
+```
+
+```go
+func hasPathSum(root *TreeNode, targetSum int) bool {
+	if root == nil {
+		return false
+	}
+	if root.Left == nil && root.Right == nil {
+		return root.Val == targetSum
+	}
+	rest := targetSum - root.Val
+	return hasPathSum(root.Left, rest) || hasPathSum(root.Right, rest)
+}
+// test
+assertEq(hasPathSum(makeTree(5, 4, 8, 11, nil, 13, 4, 7, 2, nil, nil, nil, 1), 22), true)
+assertEq(hasPathSum(makeTree(1, 2, 3), 5), false)
 ```
 
 ## 113. Path Sum II | Medium
@@ -932,6 +1351,34 @@ class Solution {
 check(new Solution().pathSum(TreeNode.of(5, 4, 8, 11, null, 13, 4, 7, 2, null, null, 5, 1), 22), "[[5, 4, 11, 2], [5, 8, 4, 5]]");
 ```
 
+```go
+func pathSum(root *TreeNode, targetSum int) [][]int {
+	res, path := [][]int{}, []int{}
+	var dfs func(node *TreeNode, rest int)
+	dfs = func(node *TreeNode, rest int) {
+		if node == nil {
+			return
+		}
+		path = append(path, node.Val)
+		rest -= node.Val
+		if node.Left == nil && node.Right == nil && rest == 0 {
+			res = append(res, append([]int{}, path...)) // copy: path keeps changing
+		}
+		dfs(node.Left, rest)
+		dfs(node.Right, rest)
+		path = path[:len(path)-1]
+	}
+	dfs(root, targetSum)
+	return res
+}
+// test
+t := makeTree(5, 4, 8, 11, nil, 13, 4, 7, 2, nil, nil, 5, 1)
+assertUnordered(pathSum(t, 22), [][]int{{5, 4, 11, 2}, {5, 8, 4, 5}})
+assertEq(pathSum(makeTree(1, 2, 3), 5), [][]int{})
+assertEq(pathSum(makeTree(1, 2), 0), [][]int{})
+assertEq(pathSum(makeTree(-2, nil, -3), -5), [][]int{{-2, -3}})
+```
+
 ## 437. Path Sum III | Medium
 related: 560, 112, 113
 tags: prefix-sum, dfs
@@ -982,6 +1429,28 @@ class Solution {
 }
 // test
 check(new Solution().pathSum(TreeNode.of(10, 5, -3, 3, 2, null, 11, 3, -2, null, 1), 8), 3);
+```
+
+```go
+func pathSum(root *TreeNode, targetSum int) int {
+	seen := map[int]int{0: 1} // prefix sums on the current root-to-node path
+	var dfs func(node *TreeNode, cur int) int
+	dfs = func(node *TreeNode, cur int) int {
+		if node == nil {
+			return 0
+		}
+		cur += node.Val
+		cnt := seen[cur-targetSum]
+		seen[cur]++
+		cnt += dfs(node.Left, cur) + dfs(node.Right, cur)
+		seen[cur]-- // backtrack
+		return cnt
+	}
+	return dfs(root, 0)
+}
+// test
+assertEq(pathSum(makeTree(10, 5, -3, 3, 2, nil, 11, 3, -2, nil, 1), 8), 3)
+assertEq(pathSum(makeTree(5, 4, 8, 11, nil, 13, 4, 7, 2, nil, nil, 5, 1), 22), 3)
 ```
 
 ## 114. Flatten Binary Tree to Linked List | Medium
@@ -1038,6 +1507,29 @@ class Solution {
 TreeNode t = TreeNode.of(1, 2, 5, 3, 4, null, 6);
 new Solution().flatten(t);
 check(t, TreeNode.of(1, null, 2, null, 3, null, 4, null, 5, null, 6));
+```
+
+```go
+func flatten(root *TreeNode) {
+	for cur := root; cur != nil; cur = cur.Right {
+		if cur.Left != nil {
+			p := cur.Left // rightmost node of the left subtree
+			for p.Right != nil {
+				p = p.Right
+			}
+			p.Right = cur.Right
+			cur.Right, cur.Left = cur.Left, nil
+		}
+	}
+}
+// test
+t := makeTree(1, 2, 5, 3, 4, nil, 6)
+flatten(t)
+assertEq(t, []any{1, nil, 2, nil, 3, nil, 4, nil, 5, nil, 6})
+t2 := makeTree(0)
+flatten(t2)
+assertEq(t2, []any{0})
+flatten(nil)
 ```
 
 ## 116. Populating Next Right Pointers in Each Node | Medium
@@ -1098,6 +1590,38 @@ new Solution().connect(n[1]);
 check(n[4].next == n[5] && n[5].next == n[6] && n[6].next == n[7] && n[7].next == null, true);
 ```
 
+```go
+type Node struct { // provided by LeetCode
+	Val   int
+	Left  *Node
+	Right *Node
+	Next  *Node
+}
+
+func connect(root *Node) *Node {
+	for leftmost := root; leftmost != nil && leftmost.Left != nil; leftmost = leftmost.Left {
+		for node := leftmost; node != nil; node = node.Next { // walk this level with the links built so far
+			node.Left.Next = node.Right
+			if node.Next != nil {
+				node.Right.Next = node.Next.Left
+			}
+		}
+	}
+	return root
+}
+// test
+n := make([]*Node, 8) // 1..7 used, heap layout
+for i := range n {
+	n[i] = &Node{Val: i}
+}
+for i := 1; i < 4; i++ {
+	n[i].Left, n[i].Right = n[2*i], n[2*i+1]
+}
+connect(n[1])
+assertEq([]bool{n[4].Next == n[5], n[5].Next == n[6], n[6].Next == n[7], n[7].Next == nil, n[2].Next == n[3]}, []bool{true, true, true, true, true})
+assertEq(connect(nil) == nil, true)
+```
+
 ## 108. Convert Sorted Array to Binary Search Tree | Easy
 related: 109, 98
 tags: divide-and-conquer
@@ -1144,6 +1668,37 @@ class Solution {
 }
 // test
 check(new Solution().sortedArrayToBST(new int[]{-10, -3, 0, 5, 9}), TreeNode.of(0, -10, 5, null, -3, null, 9));
+```
+
+```go
+func sortedArrayToBST(nums []int) *TreeNode {
+	var build func(lo, hi int) *TreeNode
+	build = func(lo, hi int) *TreeNode {
+		if lo > hi {
+			return nil
+		}
+		mid := (lo + hi) / 2 // the middle element keeps both sides balanced
+		return &TreeNode{Val: nums[mid], Left: build(lo, mid-1), Right: build(mid+1, hi)}
+	}
+	return build(0, len(nums)-1)
+}
+// test
+// any height-balanced BST with the same in-order sequence is accepted
+var walk func(n *TreeNode) ([]int, int, bool) // in-order values, height, balanced
+walk = func(n *TreeNode) ([]int, int, bool) {
+	if n == nil {
+		return []int{}, 0, true
+	}
+	lv, lh, lok := walk(n.Left)
+	rv, rh, rok := walk(n.Right)
+	vals := append(append(lv, n.Val), rv...)
+	return vals, 1 + max(lh, rh), lok && rok && lh-rh <= 1 && rh-lh <= 1
+}
+for _, vals := range [][]int{{-10, -3, 0, 5, 9}, {1, 3}, {0}, {1, 2, 3, 4, 5, 6, 7, 8}} {
+	got, _, balanced := walk(sortedArrayToBST(vals))
+	assertEq(balanced, true)
+	assertEq(got, vals)
+}
 ```
 
 ## 173. Binary Search Tree Iterator | Medium
@@ -1203,6 +1758,46 @@ BSTIterator it = new BSTIterator(TreeNode.of(7, 3, 15, null, null, 9, 20));
 List<Integer> out = new ArrayList<>();
 while (it.hasNext()) out.add(it.next());
 check(out, "[3, 7, 9, 15, 20]");
+```
+
+```go
+type BSTIterator struct {
+	st []*TreeNode // the path of left children still to visit
+}
+
+func Constructor(root *TreeNode) BSTIterator {
+	it := BSTIterator{}
+	it.pushLeft(root)
+	return it
+}
+
+func (this *BSTIterator) pushLeft(node *TreeNode) {
+	for ; node != nil; node = node.Left {
+		this.st = append(this.st, node)
+	}
+}
+
+func (this *BSTIterator) Next() int {
+	node := this.st[len(this.st)-1]
+	this.st = this.st[:len(this.st)-1]
+	this.pushLeft(node.Right)
+	return node.Val
+}
+
+func (this *BSTIterator) HasNext() bool {
+	return len(this.st) > 0
+}
+// test
+it := Constructor(makeTree(7, 3, 15, nil, nil, 9, 20))
+out := []int{}
+for i := 0; i < 10 && it.HasNext(); i++ {
+	out = append(out, it.Next())
+}
+assertEq(out, []int{3, 7, 9, 15, 20})
+it2 := Constructor(makeTree(1))
+assertEq(it2.HasNext(), true)
+assertEq(it2.Next(), 1)
+assertEq(it2.HasNext(), false)
 ```
 
 ## 863. All Nodes Distance K in Binary Tree | Medium
@@ -1272,6 +1867,48 @@ Collections.sort(r);
 check(r, "[1, 4, 7]");
 ```
 
+```go
+func distanceK(root *TreeNode, target *TreeNode, k int) []int {
+	parent := map[*TreeNode]*TreeNode{}
+	st := []*TreeNode{root}
+	for len(st) > 0 { // record every node's parent, then BFS outward from target
+		node := st[len(st)-1]
+		st = st[:len(st)-1]
+		for _, c := range []*TreeNode{node.Left, node.Right} {
+			if c != nil {
+				parent[c] = node
+				st = append(st, c)
+			}
+		}
+	}
+	q, seen := []*TreeNode{target}, map[*TreeNode]bool{target: true}
+	for ; k > 0 && len(q) > 0; k-- {
+		next := []*TreeNode{}
+		for _, node := range q {
+			for _, nb := range []*TreeNode{node.Left, node.Right, parent[node]} {
+				if nb != nil && !seen[nb] {
+					seen[nb] = true
+					next = append(next, nb)
+				}
+			}
+		}
+		q = next
+	}
+	res := []int{}
+	for _, node := range q {
+		res = append(res, node.Val)
+	}
+	return res
+}
+// test
+t := makeTree(3, 5, 1, 6, 2, 0, 8, nil, nil, 7, 4)
+assertUnordered(distanceK(t, findNode(t, 5), 2), []int{1, 4, 7})
+assertEq(distanceK(t, findNode(t, 5), 0), []int{5})
+assertUnordered(distanceK(t, findNode(t, 7), 3), []int{3, 6})
+t1 := makeTree(1)
+assertEq(distanceK(t1, t1, 3), []int{})
+```
+
 
 ## 94. Binary Tree Inorder Traversal | Easy
 related: 230, 173, 144
@@ -1317,6 +1954,26 @@ class Solution {
 check(new Solution().inorderTraversal(TreeNode.of(1, null, 2, 3)), "[1, 3, 2]");
 ```
 
+```go
+func inorderTraversal(root *TreeNode) []int {
+	res, st, node := []int{}, []*TreeNode{}, root
+	for len(st) > 0 || node != nil {
+		for node != nil { // go left as far as possible
+			st = append(st, node)
+			node = node.Left
+		}
+		node = st[len(st)-1]
+		st = st[:len(st)-1]
+		res = append(res, node.Val)
+		node = node.Right
+	}
+	return res
+}
+// test
+assertEq(inorderTraversal(makeTree(1, nil, 2, 3)), []int{1, 3, 2})
+assertEq(inorderTraversal(makeTree(1, 2, 3, 4, 5, nil, 8, nil, nil, 6, 7, 9)), []int{4, 2, 6, 5, 7, 1, 3, 9, 8})
+```
+
 ## 111. Minimum Depth of Binary Tree | Easy
 related: 104
 tags: bfs
@@ -1354,6 +2011,33 @@ class Solution {
 }
 // test
 check(new Solution().minDepth(TreeNode.of(2, null, 3, null, 4, null, 5, null, 6)), 5);
+```
+
+```go
+func minDepth(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+	q, depth := []*TreeNode{root}, 1
+	for { // BFS: the first leaf found is the shallowest
+		next := []*TreeNode{}
+		for _, n := range q {
+			if n.Left == nil && n.Right == nil {
+				return depth
+			}
+			if n.Left != nil {
+				next = append(next, n.Left)
+			}
+			if n.Right != nil {
+				next = append(next, n.Right)
+			}
+		}
+		q, depth = next, depth+1
+	}
+}
+// test
+assertEq(minDepth(makeTree(3, 9, 20, nil, nil, 15, 7)), 2)
+assertEq(minDepth(makeTree(2, nil, 3, nil, 4, nil, 5, nil, 6)), 5)
 ```
 
 ## 106. Construct Binary Tree from Inorder and Postorder Traversal | Medium
@@ -1407,6 +2091,33 @@ class Solution {
 }
 // test
 check(new Solution().buildTree(new int[]{9, 3, 15, 20, 7}, new int[]{9, 15, 7, 20, 3}), TreeNode.of(3, 9, 20, null, null, 15, 7));
+```
+
+```go
+func buildTree(inorder []int, postorder []int) *TreeNode {
+	pos := map[int]int{}
+	for i, v := range inorder {
+		pos[v] = i
+	}
+	next := len(postorder) - 1 // postorder read backwards: root, right subtree, left subtree
+	var build func(lo, hi int) *TreeNode
+	build = func(lo, hi int) *TreeNode {
+		if lo >= hi {
+			return nil
+		}
+		root := &TreeNode{Val: postorder[next]}
+		next--
+		m := pos[root.Val]
+		root.Right = build(m+1, hi)
+		root.Left = build(lo, m)
+		return root
+	}
+	return build(0, len(inorder))
+}
+// test
+assertEq(buildTree([]int{9, 3, 15, 20, 7}, []int{9, 15, 7, 20, 3}), []any{3, 9, 20, nil, nil, 15, 7})
+assertEq(buildTree([]int{-1}, []int{-1}), []any{-1})
+assertEq(buildTree([]int{2, 1}, []int{2, 1}), []any{1, 2})
 ```
 
 ## 109. Convert Sorted List to Binary Search Tree | Medium
@@ -1480,6 +2191,47 @@ class Solution {
 check(new Solution().sortedListToBST(ListNode.of(-10, -3, 0, 5, 9)), TreeNode.of(0, -10, 5, null, -3, null, 9));
 ```
 
+```go
+func sortedListToBST(head *ListNode) *TreeNode {
+	n := 0
+	for p := head; p != nil; p = p.Next {
+		n++
+	}
+	cur := head // consumed in order while building in-order
+	var build func(lo, hi int) *TreeNode
+	build = func(lo, hi int) *TreeNode {
+		if lo > hi {
+			return nil
+		}
+		mid := (lo + hi) / 2
+		left := build(lo, mid-1)
+		root := &TreeNode{Val: cur.Val, Left: left}
+		cur = cur.Next
+		root.Right = build(mid+1, hi)
+		return root
+	}
+	return build(0, n-1)
+}
+// test
+// any height-balanced BST with the same in-order sequence is accepted
+var walk func(n *TreeNode) ([]int, int, bool) // in-order values, height, balanced
+walk = func(n *TreeNode) ([]int, int, bool) {
+	if n == nil {
+		return []int{}, 0, true
+	}
+	lv, lh, lok := walk(n.Left)
+	rv, rh, rok := walk(n.Right)
+	vals := append(append(lv, n.Val), rv...)
+	return vals, 1 + max(lh, rh), lok && rok && lh-rh <= 1 && rh-lh <= 1
+}
+for _, vals := range [][]int{{-10, -3, 0, 5, 9}, {1, 3}, {0}, {1, 2, 3, 4, 5, 6, 7, 8}} {
+	got, _, balanced := walk(sortedListToBST(makeList(vals...)))
+	assertEq(balanced, true)
+	assertEq(got, vals)
+}
+assertEq(sortedListToBST(nil) == nil, true)
+```
+
 ## 117. Populating Next Right Pointers in Each Node II | Medium
 related: 116, 102
 tags: bfs, level-linking
@@ -1542,6 +2294,42 @@ new Solution().connect(n[1]);
 check(n[4].next == n[5] && n[5].next == n[7] && n[7].next == null && n[2].next == n[3], true);
 ```
 
+```go
+type Node struct { // provided by LeetCode
+	Val   int
+	Left  *Node
+	Right *Node
+	Next  *Node
+}
+
+func connect(root *Node) *Node {
+	for level := root; level != nil; {
+		dummy := &Node{} // collects the next level through .Next
+		tail := dummy
+		for node := level; node != nil; node = node.Next {
+			for _, child := range []*Node{node.Left, node.Right} {
+				if child != nil {
+					tail.Next = child
+					tail = child
+				}
+			}
+		}
+		level = dummy.Next
+	}
+	return root
+}
+// test
+n := map[int]*Node{}
+for i := 1; i <= 7; i++ {
+	n[i] = &Node{Val: i}
+}
+n[1].Left, n[1].Right = n[2], n[3]
+n[2].Left, n[2].Right, n[3].Right = n[4], n[5], n[7]
+connect(n[1])
+assertEq([]bool{n[2].Next == n[3], n[4].Next == n[5], n[5].Next == n[7], n[7].Next == nil}, []bool{true, true, true, true})
+assertEq(connect(nil) == nil, true)
+```
+
 ## 129. Sum Root to Leaf Numbers | Medium
 related: 112, 257
 tags: dfs
@@ -1580,6 +2368,26 @@ class Solution {
 }
 // test
 check(new Solution().sumNumbers(TreeNode.of(4, 9, 0, 5, 1)), 1026);
+```
+
+```go
+func sumNumbers(root *TreeNode) int {
+	var dfs func(node *TreeNode, cur int) int
+	dfs = func(node *TreeNode, cur int) int {
+		if node == nil {
+			return 0
+		}
+		cur = cur*10 + node.Val
+		if node.Left == nil && node.Right == nil {
+			return cur
+		}
+		return dfs(node.Left, cur) + dfs(node.Right, cur)
+	}
+	return dfs(root, 0)
+}
+// test
+assertEq(sumNumbers(makeTree(1, 2, 3)), 25)
+assertEq(sumNumbers(makeTree(4, 9, 0, 5, 1)), 1026)
 ```
 
 ## 257. Binary Tree Paths | Easy
@@ -1631,6 +2439,30 @@ class Solution {
 check(new Solution().binaryTreePaths(TreeNode.of(1, 2, 3, null, 5)), "[1->2->5, 1->3]");
 ```
 
+```go
+func binaryTreePaths(root *TreeNode) []string {
+	res := []string{}
+	var dfs func(node *TreeNode, path string)
+	dfs = func(node *TreeNode, path string) {
+		if node == nil {
+			return
+		}
+		path += strconv.Itoa(node.Val)
+		if node.Left == nil && node.Right == nil {
+			res = append(res, path)
+			return
+		}
+		dfs(node.Left, path+"->")
+		dfs(node.Right, path+"->")
+	}
+	dfs(root, "")
+	return res
+}
+// test
+assertUnordered(binaryTreePaths(makeTree(1, 2, 3, nil, 5)), []string{"1->2->5", "1->3"})
+assertEq(binaryTreePaths(makeTree(1)), []string{"1"})
+```
+
 ## 222. Count Complete Tree Nodes | Medium
 related: 958
 tags: binary-search, complete-tree
@@ -1674,6 +2506,33 @@ class Solution {
 check(new Solution().countNodes(TreeNode.of(1, 2, 3, 4, 5, 6)), 6);
 ```
 
+```go
+func countNodes(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+	hl, hr := 0, 0
+	for l := root; l != nil; l = l.Left {
+		hl++
+	}
+	for r := root; r != nil; r = r.Right {
+		hr++
+	}
+	if hl == hr { // perfect tree
+		return 1<<hl - 1
+	}
+	return 1 + countNodes(root.Left) + countNodes(root.Right)
+}
+// test
+assertEq(countNodes(makeTree(1, 2, 3, 4, 5, 6)), 6)
+vals := []any{}
+for i := 1; i <= 15; i++ {
+	vals = append(vals, i)
+}
+assertEq(countNodes(makeTree(vals...)), 15)
+assertEq(countNodes(nil), 0)
+```
+
 ## 337. House Robber III | Medium
 related: 198, 213
 tags: tree-dp
@@ -1713,6 +2572,25 @@ class Solution {
 }
 // test
 check(new Solution().rob(TreeNode.of(3, 4, 5, 1, 3, null, 1)), 9);
+```
+
+```go
+func rob(root *TreeNode) int {
+	var dfs func(*TreeNode) (int, int) // (best if node is robbed, best if it is skipped)
+	dfs = func(node *TreeNode) (int, int) {
+		if node == nil {
+			return 0, 0
+		}
+		lr, ls := dfs(node.Left)
+		rr, rs := dfs(node.Right)
+		return node.Val + ls + rs, max(lr, ls) + max(rr, rs)
+	}
+	robbed, skipped := dfs(root)
+	return max(robbed, skipped)
+}
+// test
+assertEq(rob(makeTree(3, 2, 3, nil, 3, nil, 1)), 7)
+assertEq(rob(makeTree(3, 4, 5, 1, 3, nil, 1)), 9)
 ```
 
 ## 450. Delete Node in a BST | Medium
@@ -1767,6 +2645,37 @@ class Solution {
 check(new Solution().deleteNode(TreeNode.of(5, 3, 6, 2, 4, null, 7), 3), TreeNode.of(5, 4, 6, 2, null, null, 7));
 ```
 
+```go
+func deleteNode(root *TreeNode, key int) *TreeNode {
+	if root == nil {
+		return nil
+	}
+	switch {
+	case key < root.Val:
+		root.Left = deleteNode(root.Left, key)
+	case key > root.Val:
+		root.Right = deleteNode(root.Right, key)
+	default:
+		if root.Left == nil {
+			return root.Right
+		}
+		if root.Right == nil {
+			return root.Left
+		}
+		succ := root.Right // two children: take the in-order successor's value
+		for succ.Left != nil {
+			succ = succ.Left
+		}
+		root.Val = succ.Val
+		root.Right = deleteNode(root.Right, succ.Val)
+	}
+	return root
+}
+// test
+assertEq(deleteNode(makeTree(5, 3, 6, 2, 4, nil, 7), 3), []any{5, 4, 6, 2, nil, nil, 7})
+assertEq(deleteNode(makeTree(5, 3, 6, 2, 4, nil, 7), 0), []any{5, 3, 6, 2, 4, nil, 7})
+```
+
 ## 530. Minimum Absolute Difference in BST | Easy
 related: 98, 230
 tags: inorder
@@ -1819,6 +2728,29 @@ class Solution {
 check(new Solution().getMinimumDifference(TreeNode.of(4, 2, 6, 1, 3)), 1);
 ```
 
+```go
+func getMinimumDifference(root *TreeNode) int {
+	best, prev, havePrev := math.MaxInt, 0, false
+	var inorder func(*TreeNode) // in-order visits values sorted: compare neighbours
+	inorder = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		inorder(node.Left)
+		if havePrev {
+			best = min(best, node.Val-prev)
+		}
+		prev, havePrev = node.Val, true
+		inorder(node.Right)
+	}
+	inorder(root)
+	return best
+}
+// test
+assertEq(getMinimumDifference(makeTree(4, 2, 6, 1, 3)), 1)
+assertEq(getMinimumDifference(makeTree(1, 0, 48, nil, nil, 12, 49)), 1)
+```
+
 ## 637. Average of Levels in Binary Tree | Easy
 related: 102
 tags: bfs
@@ -1866,6 +2798,31 @@ class Solution {
 }
 // test
 check(new Solution().averageOfLevels(TreeNode.of(3, 9, 20, null, null, 15, 7)), "[3.0, 14.5, 11.0]");
+```
+
+```go
+func averageOfLevels(root *TreeNode) []float64 {
+	res, q := []float64{}, []*TreeNode{root}
+	for len(q) > 0 {
+		sum, next := 0, []*TreeNode{}
+		for _, n := range q {
+			sum += n.Val
+			if n.Left != nil {
+				next = append(next, n.Left)
+			}
+			if n.Right != nil {
+				next = append(next, n.Right)
+			}
+		}
+		res = append(res, float64(sum)/float64(len(q)))
+		q = next
+	}
+	return res
+}
+// test
+assertEq(averageOfLevels(makeTree(3, 9, 20, nil, nil, 15, 7)), []float64{3, 14.5, 11})
+assertEq(averageOfLevels(makeTree(1)), []float64{1})
+assertEq(averageOfLevels(makeTree(2147483647, 2147483647, 2147483647)), []float64{2147483647, 2147483647})
 ```
 
 ## 662. Maximum Width of Binary Tree | Medium
@@ -1921,6 +2878,35 @@ class Solution {
 check(new Solution().widthOfBinaryTree(TreeNode.of(1, 3, 2, 5, null, null, 9, 6, null, 7)), 7);
 ```
 
+```go
+func widthOfBinaryTree(root *TreeNode) int {
+	type item struct {
+		node *TreeNode
+		i    int // heap index within the level
+	}
+	best, q := 0, []item{{root, 0}}
+	for len(q) > 0 {
+		base := q[0].i
+		best = max(best, q[len(q)-1].i-base+1)
+		next := []item{}
+		for _, it := range q {
+			i := it.i - base // renumber from 0 so indices stay small
+			if it.node.Left != nil {
+				next = append(next, item{it.node.Left, 2 * i})
+			}
+			if it.node.Right != nil {
+				next = append(next, item{it.node.Right, 2*i + 1})
+			}
+		}
+		q = next
+	}
+	return best
+}
+// test
+assertEq(widthOfBinaryTree(makeTree(1, 3, 2, 5, 3, nil, 9)), 4)
+assertEq(widthOfBinaryTree(makeTree(1, 3, 2, 5, nil, nil, 9, 6, nil, 7)), 7)
+```
+
 ## 687. Longest Univalue Path | Medium
 related: 543, 124
 tags: dfs, global-answer
@@ -1973,6 +2959,36 @@ class Solution {
 check(new Solution().longestUnivaluePath(TreeNode.of(5, 4, 5, 1, 1, null, 5)), 2);
 ```
 
+```go
+func longestUnivaluePath(root *TreeNode) int {
+	best := 0
+	var arm func(*TreeNode) int // longest same-value path going down from node
+	arm = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		l, r := arm(node.Left), arm(node.Right)
+		if node.Left != nil && node.Left.Val == node.Val {
+			l++
+		} else {
+			l = 0
+		}
+		if node.Right != nil && node.Right.Val == node.Val {
+			r++
+		} else {
+			r = 0
+		}
+		best = max(best, l+r)
+		return max(l, r)
+	}
+	arm(root)
+	return best
+}
+// test
+assertEq(longestUnivaluePath(makeTree(5, 4, 5, 1, 1, nil, 5)), 2)
+assertEq(longestUnivaluePath(makeTree(1, 4, 5, 4, 4, nil, 5)), 2)
+```
+
 ## 958. Check Completeness of a Binary Tree | Medium
 related: 222, 662
 tags: bfs
@@ -2019,6 +3035,28 @@ class Solution {
 // test
 check(new Solution().isCompleteTree(TreeNode.of(1, 2, 3, 4, 5, 6)), true);
 check(new Solution().isCompleteTree(TreeNode.of(1, 2, 3, 4, 5, null, 7)), false);
+```
+
+```go
+func isCompleteTree(root *TreeNode) bool {
+	q, seenNil := []*TreeNode{root}, false
+	for len(q) > 0 { // BFS including nils: no node may come after a nil
+		node := q[0]
+		q = q[1:]
+		if node == nil {
+			seenNil = true
+			continue
+		}
+		if seenNil {
+			return false
+		}
+		q = append(q, node.Left, node.Right)
+	}
+	return true
+}
+// test
+assertEq(isCompleteTree(makeTree(1, 2, 3, 4, 5, 6)), true)
+assertEq(isCompleteTree(makeTree(1, 2, 3, 4, 5, nil, 7)), false)
 ```
 
 ## 987. Vertical Order Traversal of a Binary Tree | Hard
@@ -2081,6 +3119,42 @@ class Solution {
 check(new Solution().verticalTraversal(TreeNode.of(1, 2, 3, 4, 6, 5, 7)), "[[4], [2], [1, 5, 6], [3], [7]]");
 ```
 
+```go
+func verticalTraversal(root *TreeNode) [][]int {
+	cells := [][3]int{} // (col, row, val)
+	var dfs func(node *TreeNode, r, c int)
+	dfs = func(node *TreeNode, r, c int) {
+		if node != nil {
+			cells = append(cells, [3]int{c, r, node.Val})
+			dfs(node.Left, r+1, c-1)
+			dfs(node.Right, r+1, c+1)
+		}
+	}
+	dfs(root, 0, 0)
+	sort.Slice(cells, func(i, j int) bool {
+		a, b := cells[i], cells[j]
+		if a[0] != b[0] {
+			return a[0] < b[0]
+		}
+		if a[1] != b[1] {
+			return a[1] < b[1]
+		}
+		return a[2] < b[2]
+	})
+	res := [][]int{}
+	for i, cell := range cells {
+		if i == 0 || cell[0] != cells[i-1][0] {
+			res = append(res, []int{})
+		}
+		res[len(res)-1] = append(res[len(res)-1], cell[2])
+	}
+	return res
+}
+// test
+assertEq(verticalTraversal(makeTree(3, 9, 20, nil, nil, 15, 7)), [][]int{{9}, {3, 15}, {20}, {7}})
+assertEq(verticalTraversal(makeTree(1, 2, 3, 4, 6, 5, 7)), [][]int{{4}, {2}, {1, 5, 6}, {3}, {7}})
+```
+
 ## 872. Leaf-Similar Trees | Easy
 related: 100, 257
 tags: dfs
@@ -2127,6 +3201,37 @@ class Solution {
 // test
 check(new Solution().leafSimilar(TreeNode.of(1, 2, 3), TreeNode.of(1, 3, 2)), false);
 check(new Solution().leafSimilar(TreeNode.of(1), TreeNode.of(2, 1)), true);
+```
+
+```go
+func leafSimilar(root1 *TreeNode, root2 *TreeNode) bool {
+	var leaves func(node *TreeNode, out []int) []int
+	leaves = func(node *TreeNode, out []int) []int {
+		if node == nil {
+			return out
+		}
+		if node.Left == nil && node.Right == nil {
+			return append(out, node.Val)
+		}
+		return leaves(node.Right, leaves(node.Left, out))
+	}
+	a, b := leaves(root1, nil), leaves(root2, nil)
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+// test
+a := makeTree(3, 5, 1, 6, 2, 9, 8, nil, nil, 7, 4)
+b := makeTree(3, 5, 1, 6, 7, 4, 2, nil, nil, nil, nil, nil, nil, 9, 8)
+assertEq(leafSimilar(a, b), true)
+assertEq(leafSimilar(makeTree(1, 2, 3), makeTree(1, 3, 2)), false)
+assertEq(leafSimilar(makeTree(1), makeTree(2, 1)), true)
 ```
 
 ## 1372. Longest ZigZag Path in a Binary Tree | Medium
@@ -2177,6 +3282,29 @@ class Solution {
 }
 // test
 check(new Solution().longestZigZag(TreeNode.of(1, 1, 1, null, 1, null, null, 1, 1, null, 1)), 4);
+```
+
+```go
+func longestZigZag(root *TreeNode) int {
+	best := 0
+	var dfs func(*TreeNode) (int, int) // zigzag length (in edges) starting with a left / right step
+	dfs = func(node *TreeNode) (int, int) {
+		if node == nil {
+			return -1, -1
+		}
+		_, lr := dfs(node.Left)
+		rl, _ := dfs(node.Right)
+		left, right := lr+1, rl+1
+		best = max(best, left, right)
+		return left, right
+	}
+	dfs(root)
+	return best
+}
+// test
+assertEq(longestZigZag(makeTree(1, nil, 1, 1, 1, nil, nil, 1, 1, nil, 1, nil, nil, nil, 1)), 3)
+assertEq(longestZigZag(makeTree(1, 1, 1, nil, 1, nil, nil, 1, 1, nil, 1)), 4)
+assertEq(longestZigZag(makeTree(1)), 0)
 ```
 
 ## 1161. Maximum Level Sum of a Binary Tree | Medium
@@ -2232,6 +3360,34 @@ check(new Solution().maxLevelSum(TreeNode.of(1, 7, 0, 7, -8, null, null)), 2);
 check(new Solution().maxLevelSum(TreeNode.of(-1, -2, -3)), 1);
 ```
 
+```go
+func maxLevelSum(root *TreeNode) int {
+	best, bestLevel := math.MinInt, 0
+	q := []*TreeNode{root}
+	for level := 1; len(q) > 0; level++ {
+		total, next := 0, []*TreeNode{}
+		for _, n := range q {
+			total += n.Val
+			if n.Left != nil {
+				next = append(next, n.Left)
+			}
+			if n.Right != nil {
+				next = append(next, n.Right)
+			}
+		}
+		if total > best { // strictly greater: the smallest level wins ties
+			best, bestLevel = total, level
+		}
+		q = next
+	}
+	return bestLevel
+}
+// test
+assertEq(maxLevelSum(makeTree(1, 7, 0, 7, -8, nil, nil)), 2)
+assertEq(maxLevelSum(makeTree(989, nil, 10250, 98693, -89388, nil, nil, nil, -32127)), 2)
+assertEq(maxLevelSum(makeTree(-1, -2, -3)), 1)
+```
+
 ## 700. Search in a Binary Search Tree | Easy
 related: 701, 98
 tags: bst
@@ -2262,6 +3418,23 @@ class Solution {
 // test
 check(new Solution().searchBST(TreeNode.of(4, 2, 7, 1, 3), 2), "[2, 1, 3]");
 check(new Solution().searchBST(TreeNode.of(4, 2, 7, 1, 3), 5), null);
+```
+
+```go
+func searchBST(root *TreeNode, val int) *TreeNode {
+	for root != nil && root.Val != val {
+		if val < root.Val {
+			root = root.Left
+		} else {
+			root = root.Right
+		}
+	}
+	return root
+}
+// test
+assertEq(searchBST(makeTree(4, 2, 7, 1, 3), 2), []any{2, 1, 3})
+assertEq(searchBST(makeTree(4, 2, 7, 1, 3), 5) == nil, true)
+assertEq(searchBST(makeTree(4, 2, 7, 1, 3), 7), []any{7})
 ```
 
 ## 285. Inorder Successor in BST | Medium
@@ -2309,6 +3482,28 @@ class Solution {
 TreeNode t = TreeNode.of(5, 3, 6, 2, 4, null, null, 1);
 check(new Solution().inorderSuccessor(t, TreeNode.find(t, 4)).val, 5);
 check(new Solution().inorderSuccessor(t, TreeNode.find(t, 6)), null);
+```
+
+```go
+func inorderSuccessor(root *TreeNode, p *TreeNode) *TreeNode {
+	var succ *TreeNode
+	for root != nil {
+		if p.Val < root.Val { // root is a candidate; look for a smaller one on the left
+			succ, root = root, root.Left
+		} else {
+			root = root.Right
+		}
+	}
+	return succ
+}
+// test
+t := makeTree(2, 1, 3)
+assertEq(inorderSuccessor(t, findNode(t, 1)).Val, 2)
+t2 := makeTree(5, 3, 6, 2, 4, nil, nil, 1)
+assertEq(inorderSuccessor(t2, findNode(t2, 6)) == nil, true)
+assertEq(inorderSuccessor(t2, findNode(t2, 4)).Val, 5)
+assertEq(inorderSuccessor(t2, findNode(t2, 1)).Val, 2)
+assertEq(inorderSuccessor(t2, findNode(t2, 3)).Val, 4)
 ```
 
 ## 427. Construct Quad Tree | Medium
@@ -2400,6 +3595,63 @@ while (!q.isEmpty()) {
 check(sb.toString(), "*1011");
 ```
 
+```go
+type Node struct { // provided by LeetCode
+	Val         bool
+	IsLeaf      bool
+	TopLeft     *Node
+	TopRight    *Node
+	BottomLeft  *Node
+	BottomRight *Node
+}
+
+func construct(grid [][]int) *Node {
+	var build func(r, c, n int) *Node
+	build = func(r, c, n int) *Node {
+		if n == 1 {
+			return &Node{Val: grid[r][c] == 1, IsLeaf: true}
+		}
+		h := n / 2
+		kids := []*Node{build(r, c, h), build(r, c+h, h), build(r+h, c, h), build(r+h, c+h, h)}
+		merge := true // four leaves with the same value become one leaf
+		for _, k := range kids {
+			merge = merge && k.IsLeaf && k.Val == kids[0].Val
+		}
+		if merge {
+			return &Node{Val: kids[0].Val, IsLeaf: true}
+		}
+		return &Node{Val: true, TopLeft: kids[0], TopRight: kids[1], BottomLeft: kids[2], BottomRight: kids[3]}
+	}
+	return build(0, 0, len(grid))
+}
+// test
+quad := func(node *Node) string { // level order: "*" = internal node, "0"/"1" = leaf value
+	out, q := "", []*Node{node}
+	for len(q) > 0 {
+		n := q[0]
+		q = q[1:]
+		if n == nil {
+			return out + "?"
+		}
+		switch {
+		case !n.IsLeaf:
+			out += "*"
+			q = append(q, n.TopLeft, n.TopRight, n.BottomLeft, n.BottomRight)
+		case n.Val:
+			out += "1"
+		default:
+			out += "0"
+		}
+	}
+	return out
+}
+assertEq(quad(construct([][]int{{0, 1}, {1, 0}})), "*0110")
+assertEq(quad(construct([][]int{{1}})), "1")
+assertEq(quad(construct([][]int{{1, 1}, {1, 1}})), "1")
+assertEq(quad(construct([][]int{{1, 1, 0, 0}, {1, 1, 0, 0}, {1, 1, 1, 1}, {1, 1, 1, 1}})), "*1011")
+assertEq(quad(construct([][]int{{1, 1, 0, 0}, {1, 0, 0, 0}, {1, 1, 1, 1}, {1, 1, 1, 1}})), "**0111110")
+```
+
 ## 144. Binary Tree Preorder Traversal | Easy
 related: 94, 145, 589
 tags: preorder, stack
@@ -2445,6 +3697,31 @@ class Solution {
 check(new Solution().preorderTraversal(TreeNode.of(1, 2, 3, 4, 5, null, 8, null, null, 6, 7, 9)), List.of(1, 2, 4, 5, 6, 7, 3, 8, 9));
 ```
 
+```go
+func preorderTraversal(root *TreeNode) []int {
+	out, st := []int{}, []*TreeNode{}
+	if root != nil {
+		st = append(st, root)
+	}
+	for len(st) > 0 {
+		node := st[len(st)-1]
+		st = st[:len(st)-1]
+		out = append(out, node.Val)
+		if node.Right != nil { // push right first so left is visited first
+			st = append(st, node.Right)
+		}
+		if node.Left != nil {
+			st = append(st, node.Left)
+		}
+	}
+	return out
+}
+// test
+assertEq(preorderTraversal(makeTree(1, nil, 2, 3)), []int{1, 2, 3})
+assertEq(preorderTraversal(makeTree(1, 2, 3, 4, 5, nil, 8, nil, nil, 6, 7, 9)), []int{1, 2, 4, 5, 6, 7, 3, 8, 9})
+assertEq(preorderTraversal(makeTree()), []int{})
+```
+
 ## 145. Binary Tree Postorder Traversal | Easy
 related: 94, 144
 tags: stack, reverse-trick
@@ -2488,6 +3765,34 @@ class Solution {
 }
 // test
 check(new Solution().postorderTraversal(TreeNode.of(1, 2, 3, 4, 5, null, 8, null, null, 6, 7, 9)), List.of(4, 6, 7, 5, 2, 9, 8, 3, 1));
+```
+
+```go
+func postorderTraversal(root *TreeNode) []int {
+	out, st := []int{}, []*TreeNode{}
+	if root != nil {
+		st = append(st, root)
+	}
+	for len(st) > 0 { // root-right-left, then reversed = left-right-root
+		node := st[len(st)-1]
+		st = st[:len(st)-1]
+		out = append(out, node.Val)
+		if node.Left != nil {
+			st = append(st, node.Left)
+		}
+		if node.Right != nil {
+			st = append(st, node.Right)
+		}
+	}
+	for i, j := 0, len(out)-1; i < j; i, j = i+1, j-1 {
+		out[i], out[j] = out[j], out[i]
+	}
+	return out
+}
+// test
+assertEq(postorderTraversal(makeTree(1, nil, 2, 3)), []int{3, 2, 1})
+assertEq(postorderTraversal(makeTree(1, 2, 3, 4, 5, nil, 8, nil, nil, 6, 7, 9)), []int{4, 6, 7, 5, 2, 9, 8, 3, 1})
+assertEq(postorderTraversal(makeTree()), []int{})
 ```
 
 ## 701. Insert into a Binary Search Tree | Medium
@@ -2544,6 +3849,51 @@ class Solution {
 check(new Solution().insertIntoBST(TreeNode.of(4, 2, 7, 1, 3), 5), "[4, 2, 7, 1, 3, 5]");
 ```
 
+```go
+func insertIntoBST(root *TreeNode, val int) *TreeNode {
+	node := &TreeNode{Val: val}
+	if root == nil {
+		return node
+	}
+	for cur := root; ; {
+		if val < cur.Val {
+			if cur.Left == nil {
+				cur.Left = node
+				return root
+			}
+			cur = cur.Left
+		} else {
+			if cur.Right == nil {
+				cur.Right = node
+				return root
+			}
+			cur = cur.Right
+		}
+	}
+}
+// test
+var inorder func(n *TreeNode) []int
+inorder = func(n *TreeNode) []int {
+	if n == nil {
+		return []int{}
+	}
+	return append(append(inorder(n.Left), n.Val), inorder(n.Right)...)
+}
+for _, tc := range []struct {
+	vals []any
+	v    int
+}{{[]any{4, 2, 7, 1, 3}, 5}, {[]any{40, 20, 60, 10, 30, 50, 70}, 25}, {[]any{}, 5}, {[]any{4, 2, 7, 1, 3, nil, nil, nil, nil, nil, nil}, 0}} {
+	want := []int{tc.v}
+	for _, x := range tc.vals {
+		if x != nil {
+			want = append(want, x.(int))
+		}
+	}
+	sort.Ints(want)
+	assertEq(inorder(insertIntoBST(makeTree(tc.vals...), tc.v)), want) // still a BST holding every value
+}
+```
+
 ## 1325. Delete Leaves With a Given Value | Medium
 related: 814, 450
 tags: postorder
@@ -2581,4 +3931,23 @@ class Solution {
 // test
 check(new Solution().removeLeafNodes(TreeNode.of(1, 2, 3, 2, null, 2, 4), 2), "[1, null, 3, null, 4]");
 check(new Solution().removeLeafNodes(TreeNode.of(1, 1, 1), 1), null);
+```
+
+```go
+func removeLeafNodes(root *TreeNode, target int) *TreeNode {
+	if root == nil {
+		return nil
+	}
+	root.Left = removeLeafNodes(root.Left, target) // children first: a parent may become a leaf
+	root.Right = removeLeafNodes(root.Right, target)
+	if root.Left == nil && root.Right == nil && root.Val == target {
+		return nil
+	}
+	return root
+}
+// test
+assertEq(removeLeafNodes(makeTree(1, 2, 3, 2, nil, 2, 4), 2), []any{1, nil, 3, nil, 4})
+assertEq(removeLeafNodes(makeTree(1, 3, 3, 3, 2), 3), []any{1, 3, nil, nil, 2})
+assertEq(removeLeafNodes(makeTree(1, 2, nil, 2, nil, 2), 2), []any{1})
+assertEq(removeLeafNodes(makeTree(1, 1, 1), 1) == nil, true)
 ```

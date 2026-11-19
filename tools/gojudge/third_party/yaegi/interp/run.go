@@ -744,6 +744,11 @@ func assign(n *node) {
 		default:
 			t = typ.TypeOf()
 		}
+		if t == nil && n.child[i].typ != nil {
+			// Patched for the LeetCode Review judge: an untyped nil source has no type of its own,
+			// use the destination's (upstream, `a, b = x, nil` panicked with "reflect: New(nil)").
+			t = n.child[i].typ.TypeOf()
+		}
 		types[i] = t
 		index[i] = n.child[i].findex
 		level[i] = n.child[i].level
