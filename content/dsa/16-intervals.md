@@ -54,6 +54,24 @@ class Solution {
 check(new Solution().merge(new int[][]{{1, 3}, {2, 6}, {8, 10}, {15, 18}}), new int[][]{{1, 6}, {8, 10}, {15, 18}});
 ```
 
+```go
+func merge(intervals [][]int) [][]int {
+	sort.Slice(intervals, func(i, j int) bool { return intervals[i][0] < intervals[j][0] })
+	res := [][]int{}
+	for _, iv := range intervals {
+		if n := len(res); n > 0 && iv[0] <= res[n-1][1] { // overlaps the last merged interval
+			res[n-1][1] = max(res[n-1][1], iv[1])
+		} else {
+			res = append(res, []int{iv[0], iv[1]})
+		}
+	}
+	return res
+}
+// test
+assertEq(merge([][]int{{1, 3}, {2, 6}, {8, 10}, {15, 18}}), [][]int{{1, 6}, {8, 10}, {15, 18}})
+assertEq(merge([][]int{{1, 4}, {4, 5}}), [][]int{{1, 5}})
+```
+
 ## 57. Insert Interval | Medium
 related: 56
 tags: blind75, sweep-line
@@ -99,6 +117,25 @@ class Solution {
 check(new Solution().insert(new int[][]{{1, 2}, {3, 5}, {6, 7}, {8, 10}, {12, 16}}, new int[]{4, 8}), new int[][]{{1, 2}, {3, 10}, {12, 16}});
 ```
 
+```go
+func insert(intervals [][]int, newInterval []int) [][]int {
+	res, i, n := [][]int{}, 0, len(intervals)
+	s, e := newInterval[0], newInterval[1]
+	for ; i < n && intervals[i][1] < s; i++ { // entirely before
+		res = append(res, intervals[i])
+	}
+	for ; i < n && intervals[i][0] <= e; i++ { // overlapping: absorb
+		s, e = min(s, intervals[i][0]), max(e, intervals[i][1])
+	}
+	res = append(res, []int{s, e})
+	return append(res, intervals[i:]...) // entirely after
+}
+// test
+assertEq(insert([][]int{{1, 3}, {6, 9}}, []int{2, 5}), [][]int{{1, 5}, {6, 9}})
+assertEq(insert([][]int{{1, 2}, {3, 5}, {6, 7}, {8, 10}, {12, 16}}, []int{4, 8}), [][]int{{1, 2}, {3, 10}, {12, 16}})
+assertEq(insert([][]int{}, []int{5, 7}), [][]int{{5, 7}})
+```
+
 ## 435. Non-overlapping Intervals | Medium
 related: 452, 56
 tags: blind75, sort-by-end
@@ -134,6 +171,24 @@ class Solution {
 }
 // test
 check(new Solution().eraseOverlapIntervals(new int[][]{{1, 2}, {2, 3}, {3, 4}, {1, 3}}), 1);
+```
+
+```go
+func eraseOverlapIntervals(intervals [][]int) int {
+	sort.Slice(intervals, func(i, j int) bool { return intervals[i][1] < intervals[j][1] })
+	keep, end := 0, math.MinInt
+	for _, iv := range intervals { // keep the interval that ends first, as often as possible
+		if iv[0] >= end {
+			keep++
+			end = iv[1]
+		}
+	}
+	return len(intervals) - keep
+}
+// test
+assertEq(eraseOverlapIntervals([][]int{{1, 2}, {2, 3}, {3, 4}, {1, 3}}), 1)
+assertEq(eraseOverlapIntervals([][]int{{1, 2}, {1, 2}, {1, 2}}), 2)
+assertEq(eraseOverlapIntervals([][]int{{1, 2}, {2, 3}}), 0)
 ```
 
 ## 452. Minimum Number of Arrows to Burst Balloons | Medium
@@ -172,6 +227,23 @@ class Solution {
 check(new Solution().findMinArrowShots(new int[][]{{10, 16}, {2, 8}, {1, 6}, {7, 12}}), 2);
 ```
 
+```go
+func findMinArrowShots(points [][]int) int {
+	sort.Slice(points, func(i, j int) bool { return points[i][1] < points[j][1] })
+	arrows, pos := 0, math.MinInt
+	for _, p := range points { // shoot at the end of the first balloon not yet burst
+		if p[0] > pos {
+			arrows++
+			pos = p[1]
+		}
+	}
+	return arrows
+}
+// test
+assertEq(findMinArrowShots([][]int{{10, 16}, {2, 8}, {1, 6}, {7, 12}}), 2)
+assertEq(findMinArrowShots([][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}}), 4)
+```
+
 ## 252. Meeting Rooms | Easy
 related: 253, 56
 tags: blind75, premium
@@ -201,6 +273,21 @@ class Solution {
 // test
 check(new Solution().canAttendMeetings(new int[][]{{0, 30}, {5, 10}, {15, 20}}), false);
 check(new Solution().canAttendMeetings(new int[][]{{7, 10}, {2, 4}}), true);
+```
+
+```go
+func canAttendMeetings(intervals [][]int) bool {
+	sort.Slice(intervals, func(i, j int) bool { return intervals[i][0] < intervals[j][0] })
+	for i := 1; i < len(intervals); i++ {
+		if intervals[i][0] < intervals[i-1][1] { // starts before the previous one ends
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(canAttendMeetings([][]int{{0, 30}, {5, 10}, {15, 20}}), false)
+assertEq(canAttendMeetings([][]int{{7, 10}, {2, 4}}), true)
 ```
 
 ## 253. Meeting Rooms II | Medium
@@ -252,6 +339,31 @@ class Solution {
 check(new Solution().minMeetingRooms(new int[][]{{0, 30}, {5, 10}, {15, 20}}), 2);
 ```
 
+```go
+func minMeetingRooms(intervals [][]int) int {
+	n := len(intervals)
+	starts, ends := make([]int, n), make([]int, n)
+	for i, iv := range intervals {
+		starts[i], ends[i] = iv[0], iv[1]
+	}
+	sort.Ints(starts)
+	sort.Ints(ends)
+	rooms, best, j := 0, 0, 0
+	for _, s := range starts { // sweep: free the rooms whose meetings ended by s
+		for ends[j] <= s {
+			rooms--
+			j++
+		}
+		rooms++
+		best = max(best, rooms)
+	}
+	return best
+}
+// test
+assertEq(minMeetingRooms([][]int{{0, 30}, {5, 10}, {15, 20}}), 2)
+assertEq(minMeetingRooms([][]int{{7, 10}, {2, 4}}), 1)
+```
+
 ## 986. Interval List Intersections | Medium
 related: 56
 tags: two-pointers
@@ -299,6 +411,31 @@ class Solution {
 // test
 int[][] A = {{0, 2}, {5, 10}, {13, 23}, {24, 25}}, B = {{1, 5}, {8, 12}, {15, 24}, {25, 26}};
 check(new Solution().intervalIntersection(A, B), new int[][]{{1, 2}, {5, 5}, {8, 10}, {15, 23}, {24, 24}, {25, 25}});
+```
+
+```go
+func intervalIntersection(firstList [][]int, secondList [][]int) [][]int {
+	res := [][]int{}
+	for i, j := 0, 0; i < len(firstList) && j < len(secondList); {
+		lo := max(firstList[i][0], secondList[j][0])
+		hi := min(firstList[i][1], secondList[j][1])
+		if lo <= hi {
+			res = append(res, []int{lo, hi})
+		}
+		if firstList[i][1] < secondList[j][1] { // the one ending first cannot meet anything else
+			i++
+		} else {
+			j++
+		}
+	}
+	return res
+}
+// test
+A := [][]int{{0, 2}, {5, 10}, {13, 23}, {24, 25}}
+B := [][]int{{1, 5}, {8, 12}, {15, 24}, {25, 26}}
+assertEq(intervalIntersection(A, B), [][]int{{1, 2}, {5, 5}, {8, 10}, {15, 23}, {24, 24}, {25, 25}})
+assertEq(intervalIntersection([][]int{{1, 3}, {5, 9}}, [][]int{}), [][]int{})
+assertEq(intervalIntersection([][]int{{1, 7}}, [][]int{{3, 10}}), [][]int{{3, 7}})
 ```
 
 ## 1851. Minimum Interval to Include Each Query | Hard
@@ -354,6 +491,49 @@ class Solution {
 check(new Solution().minInterval(new int[][]{{1, 4}, {2, 4}, {3, 6}, {4, 4}}, new int[]{2, 3, 4, 5}), new int[]{3, 3, 1, 4});
 ```
 
+```go
+type sizeHeap [][2]int // (size, right end), smallest size first
+
+func (h sizeHeap) Len() int           { return len(h) }
+func (h sizeHeap) Less(i, j int) bool { return h[i][0] < h[j][0] }
+func (h sizeHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *sizeHeap) Push(x any)        { *h = append(*h, x.([2]int)) }
+func (h *sizeHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func minInterval(intervals [][]int, queries []int) []int {
+	sort.Slice(intervals, func(i, j int) bool { return intervals[i][0] < intervals[j][0] })
+	order := make([]int, len(queries)) // answer queries in increasing order
+	for i := range order {
+		order[i] = i
+	}
+	sort.Slice(order, func(a, b int) bool { return queries[order[a]] < queries[order[b]] })
+	res := make([]int, len(queries))
+	h, i := &sizeHeap{}, 0
+	for _, qi := range order {
+		q := queries[qi]
+		for ; i < len(intervals) && intervals[i][0] <= q; i++ { // intervals starting by q
+			heap.Push(h, [2]int{intervals[i][1] - intervals[i][0] + 1, intervals[i][1]})
+		}
+		for h.Len() > 0 && (*h)[0][1] < q { // drop those that ended before q
+			heap.Pop(h)
+		}
+		res[qi] = -1
+		if h.Len() > 0 {
+			res[qi] = (*h)[0][0]
+		}
+	}
+	return res
+}
+// test
+assertEq(minInterval([][]int{{1, 4}, {2, 4}, {3, 6}, {4, 4}}, []int{2, 3, 4, 5}), []int{3, 3, 1, 4})
+assertEq(minInterval([][]int{{2, 3}, {2, 5}, {1, 8}, {20, 25}}, []int{2, 19, 5, 22}), []int{2, -1, 4, 6})
+```
+
 
 ## 1288. Remove Covered Intervals | Medium
 related: 56, 435
@@ -388,6 +568,26 @@ class Solution {
 }
 // test
 check(new Solution().removeCoveredIntervals(new int[][]{{1, 4}, {3, 6}, {2, 8}}), 2);
+```
+
+```go
+func removeCoveredIntervals(intervals [][]int) int {
+	sort.Slice(intervals, func(i, j int) bool { // start up; for equal starts the longest first
+		a, b := intervals[i], intervals[j]
+		return a[0] < b[0] || a[0] == b[0] && a[1] > b[1]
+	})
+	keep, maxEnd := 0, -1
+	for _, iv := range intervals { // covered exactly when an earlier interval reaches as far
+		if iv[1] > maxEnd {
+			keep++
+			maxEnd = iv[1]
+		}
+	}
+	return keep
+}
+// test
+assertEq(removeCoveredIntervals([][]int{{1, 4}, {3, 6}, {2, 8}}), 2)
+assertEq(removeCoveredIntervals([][]int{{1, 4}, {2, 3}}), 1)
 ```
 
 ## 729. My Calendar I | Medium
@@ -436,6 +636,41 @@ MyCalendar c = new MyCalendar();
 check(c.book(10, 20), true);
 check(c.book(15, 25), false);
 check(c.book(20, 30), true);
+```
+
+```go
+type MyCalendar struct {
+	starts, ends []int // bookings sorted by start, never overlapping
+}
+
+func Constructor() MyCalendar {
+	return MyCalendar{}
+}
+
+func (this *MyCalendar) Book(start int, end int) bool {
+	i := sort.SearchInts(this.starts, start+1) // first booking starting after `start`
+	if i > 0 && this.ends[i-1] > start {       // the previous one runs into us
+		return false
+	}
+	if i < len(this.starts) && this.starts[i] < end { // we run into the next one
+		return false
+	}
+	this.starts = insertAt(this.starts, i, start)
+	this.ends = insertAt(this.ends, i, end)
+	return true
+}
+
+func insertAt(s []int, i, v int) []int {
+	s = append(s, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = v
+	return s
+}
+// test
+c := Constructor()
+assertEq([]bool{c.Book(10, 20), c.Book(15, 25), c.Book(20, 30)}, []bool{true, false, true})
+c2 := Constructor()
+assertEq([]bool{c2.Book(5, 10), c2.Book(10, 15), c2.Book(9, 11), c2.Book(0, 5), c2.Book(4, 6)}, []bool{true, true, false, true, false})
 ```
 
 ## 352. Data Stream as Disjoint Intervals | Hard
@@ -506,6 +741,56 @@ for (int v : new int[]{1, 3, 7, 2, 6}) sr.addNum(v);
 check(sr.getIntervals(), new int[][]{{1, 3}, {6, 7}});
 ```
 
+```go
+type SummaryRanges struct {
+	iv [][]int // sorted, disjoint [start, end]
+}
+
+func Constructor() SummaryRanges {
+	return SummaryRanges{}
+}
+
+func (this *SummaryRanges) AddNum(value int) {
+	iv := this.iv
+	i := sort.Search(len(iv), func(k int) bool { return iv[k][0] > value }) // first interval starting after value
+	if i > 0 && iv[i-1][1] >= value {
+		return // already covered
+	}
+	left := i > 0 && iv[i-1][1] == value-1
+	right := i < len(iv) && iv[i][0] == value+1
+	switch {
+	case left && right: // value bridges two intervals
+		iv[i-1][1] = iv[i][1]
+		this.iv = append(iv[:i], iv[i+1:]...)
+	case left:
+		iv[i-1][1] = value
+	case right:
+		iv[i][0] = value
+	default:
+		iv = append(iv, []int{value, value})
+		copy(iv[i+1:], iv[i:])
+		iv[i] = []int{value, value}
+		this.iv = iv
+	}
+}
+
+func (this *SummaryRanges) GetIntervals() [][]int {
+	out := make([][]int, len(this.iv))
+	for i, x := range this.iv {
+		out[i] = []int{x[0], x[1]}
+	}
+	return out
+}
+// test
+sr := Constructor()
+out := [][][]int{}
+for _, v := range []int{1, 3, 7, 2, 6} {
+	sr.AddNum(v)
+	out = append(out, sr.GetIntervals())
+}
+assertEq(out, [][][]int{{{1, 1}}, {{1, 1}, {3, 3}}, {{1, 1}, {3, 3}, {7, 7}}, {{1, 3}, {7, 7}}, {{1, 3}, {6, 7}}})
+```
+
 ## 759. Employee Free Time | Hard
 related: 56, 986, 253
 tags: sweep-line, sort-by-start, premium
@@ -568,6 +853,50 @@ List<Interval> fr = new Solution().employeeFreeTime(List.of(
 check(fr.stream().map(iv -> List.of(iv.start, iv.end)).collect(Collectors.toList()), List.of(List.of(5, 6), List.of(7, 9)));
 ```
 
+```go
+type Interval struct { // provided by LeetCode
+	Start int
+	End   int
+}
+
+func employeeFreeTime(schedule [][]*Interval) []*Interval {
+	ivs := []*Interval{}
+	for _, emp := range schedule { // whose interval it is does not matter
+		ivs = append(ivs, emp...)
+	}
+	sort.Slice(ivs, func(i, j int) bool { return ivs[i].Start < ivs[j].Start })
+	res := []*Interval{}
+	end := ivs[0].End // furthest busy time so far
+	for _, iv := range ivs[1:] {
+		if iv.Start > end {
+			res = append(res, &Interval{Start: end, End: iv.Start})
+		}
+		end = max(end, iv.End)
+	}
+	return res
+}
+// test
+free := func(s [][][]int) [][]int {
+	sched := [][]*Interval{}
+	for _, emp := range s {
+		row := []*Interval{}
+		for _, iv := range emp {
+			row = append(row, &Interval{Start: iv[0], End: iv[1]})
+		}
+		sched = append(sched, row)
+	}
+	out := [][]int{}
+	for _, iv := range employeeFreeTime(sched) {
+		out = append(out, []int{iv.Start, iv.End})
+	}
+	return out
+}
+assertEq(free([][][]int{{{1, 2}, {5, 6}}, {{1, 3}}, {{4, 10}}}), [][]int{{3, 4}})
+assertEq(free([][][]int{{{1, 3}, {6, 7}}, {{2, 4}}, {{2, 5}, {9, 12}}}), [][]int{{5, 6}, {7, 9}})
+assertEq(free([][][]int{{{1, 2}}, {{2, 3}}}), [][]int{})
+assertEq(free([][][]int{{{1, 2}, {8, 9}}, {{3, 4}}}), [][]int{{2, 3}, {4, 8}})
+```
+
 ## 2402. Meeting Rooms III | Hard
 related: 253, 1834
 tags: two-heaps, simulation
@@ -621,4 +950,70 @@ class Solution {
 // test
 check(new Solution().mostBooked(2, new int[][]{{0, 10}, {1, 5}, {2, 7}, {3, 4}}), 0);
 check(new Solution().mostBooked(3, new int[][]{{1, 20}, {2, 10}, {3, 5}, {4, 9}, {6, 8}}), 1);
+```
+
+```go
+type IntHeap []int // free rooms, lowest number first
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+type busyHeap [][2]int // (free-at time, room): earliest first, then the lowest room
+
+func (h busyHeap) Len() int { return len(h) }
+func (h busyHeap) Less(i, j int) bool {
+	return h[i][0] < h[j][0] || h[i][0] == h[j][0] && h[i][1] < h[j][1]
+}
+func (h busyHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+func (h *busyHeap) Push(x any)   { *h = append(*h, x.([2]int)) }
+func (h *busyHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func mostBooked(n int, meetings [][]int) int {
+	sort.Slice(meetings, func(i, j int) bool { return meetings[i][0] < meetings[j][0] })
+	free, busy, count := &IntHeap{}, &busyHeap{}, make([]int, n)
+	for r := 0; r < n; r++ {
+		heap.Push(free, r)
+	}
+	for _, m := range meetings {
+		s, e := m[0], m[1]
+		for busy.Len() > 0 && (*busy)[0][0] <= s { // release rooms free by s
+			heap.Push(free, heap.Pop(busy).([2]int)[1])
+		}
+		var room int
+		if free.Len() > 0 {
+			room = heap.Pop(free).(int)
+			heap.Push(busy, [2]int{e, room})
+		} else { // wait for the earliest room; the meeting keeps its duration
+			top := heap.Pop(busy).([2]int)
+			room = top[1]
+			heap.Push(busy, [2]int{top[0] + e - s, room})
+		}
+		count[room]++
+	}
+	best := 0
+	for r := range count {
+		if count[r] > count[best] {
+			best = r
+		}
+	}
+	return best
+}
+// test
+assertEq(mostBooked(2, [][]int{{0, 10}, {1, 5}, {2, 7}, {3, 4}}), 0)
+assertEq(mostBooked(3, [][]int{{1, 20}, {2, 10}, {3, 5}, {4, 9}, {6, 8}}), 1)
+assertEq(mostBooked(1, [][]int{{0, 1}}), 0)
+assertEq(mostBooked(4, [][]int{{18, 19}, {3, 12}, {17, 19}, {2, 13}, {7, 10}}), 0)
 ```
