@@ -52,6 +52,20 @@ check(new Solution().maxProfit(new int[]{7, 1, 5, 3, 6, 4}), 5);
 check(new Solution().maxProfit(new int[]{7, 6, 4, 3, 1}), 0);
 ```
 
+```go
+func maxProfit(prices []int) int {
+	lo, best := math.MaxInt, 0
+	for _, p := range prices {
+		lo = min(lo, p) // cheapest buy so far
+		best = max(best, p-lo)
+	}
+	return best
+}
+// test
+assertEq(maxProfit([]int{7, 1, 5, 3, 6, 4}), 5)
+assertEq(maxProfit([]int{7, 6, 4, 3, 1}), 0)
+```
+
 ## 3. Longest Substring Without Repeating Characters | Medium
 related: 424, 76, 159
 tags: blind75, variable-window
@@ -105,6 +119,26 @@ check(new Solution().lengthOfLongestSubstring("pwwkew"), 3);
 check(new Solution().lengthOfLongestSubstring("abba"), 2);
 ```
 
+```go
+func lengthOfLongestSubstring(s string) int {
+	last := map[byte]int{} // char -> last index
+	l, best := 0, 0
+	for r := 0; r < len(s); r++ {
+		if i, ok := last[s[r]]; ok && i >= l {
+			l = i + 1 // jump past the previous copy
+		}
+		last[s[r]] = r
+		best = max(best, r-l+1)
+	}
+	return best
+}
+// test
+assertEq(lengthOfLongestSubstring("abcabcbb"), 3)
+assertEq(lengthOfLongestSubstring("bbbbb"), 1)
+assertEq(lengthOfLongestSubstring("pwwkew"), 3)
+assertEq(lengthOfLongestSubstring("abba"), 2)
+```
+
 ## 424. Longest Repeating Character Replacement | Medium
 related: 3, 1004
 tags: blind75, variable-window
@@ -145,6 +179,25 @@ class Solution {
 // test
 check(new Solution().characterReplacement("ABAB", 2), 4);
 check(new Solution().characterReplacement("AABABBA", 1), 4);
+```
+
+```go
+func characterReplacement(s string, k int) int {
+	var cnt [26]int
+	l, maxf := 0, 0
+	for r := 0; r < len(s); r++ {
+		cnt[s[r]-'A']++
+		maxf = max(maxf, cnt[s[r]-'A'])
+		if r-l+1-maxf > k { // the window never shrinks, it only slides
+			cnt[s[l]-'A']--
+			l++
+		}
+	}
+	return len(s) - l
+}
+// test
+assertEq(characterReplacement("ABAB", 2), 4)
+assertEq(characterReplacement("AABABBA", 1), 4)
 ```
 
 ## 567. Permutation in String | Medium
@@ -198,6 +251,34 @@ class Solution {
 // test
 check(new Solution().checkInclusion("ab", "eidbaooo"), true);
 check(new Solution().checkInclusion("ab", "eidboaoo"), false);
+```
+
+```go
+func checkInclusion(s1 string, s2 string) bool {
+	k := len(s1)
+	if k > len(s2) {
+		return false
+	}
+	var need, win [26]int
+	for i := 0; i < k; i++ {
+		need[s1[i]-'a']++
+		win[s2[i]-'a']++
+	}
+	if need == win {
+		return true
+	}
+	for r := k; r < len(s2); r++ {
+		win[s2[r]-'a']++
+		win[s2[r-k]-'a']--
+		if win == need {
+			return true
+		}
+	}
+	return false
+}
+// test
+assertEq(checkInclusion("ab", "eidbaooo"), true)
+assertEq(checkInclusion("ab", "eidboaoo"), false)
 ```
 
 ## 76. Minimum Window Substring | Hard
@@ -260,6 +341,39 @@ check(new Solution().minWindow("ADOBECODEBANC", "ABC"), "BANC");
 check(new Solution().minWindow("a", "aa"), "");
 ```
 
+```go
+func minWindow(s string, t string) string {
+	var need [128]int
+	for i := 0; i < len(t); i++ {
+		need[t[i]]++
+	}
+	missing, l, start, best := len(t), 0, 0, math.MaxInt
+	for r := 0; r < len(s); r++ {
+		if need[s[r]] > 0 {
+			missing--
+		}
+		need[s[r]]--
+		for missing == 0 { // window covers t: shrink it
+			if r-l+1 < best {
+				start, best = l, r-l+1
+			}
+			need[s[l]]++
+			if need[s[l]] > 0 {
+				missing++
+			}
+			l++
+		}
+	}
+	if best == math.MaxInt {
+		return ""
+	}
+	return s[start : start+best]
+}
+// test
+assertEq(minWindow("ADOBECODEBANC", "ABC"), "BANC")
+assertEq(minWindow("a", "aa"), "")
+```
+
 ## 239. Sliding Window Maximum | Hard
 related: 155, 1438, 862
 tags: monotonic-deque
@@ -311,6 +425,28 @@ class Solution {
 check(new Solution().maxSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3), new int[]{3, 3, 5, 5, 6, 7});
 ```
 
+```go
+func maxSlidingWindow(nums []int, k int) []int {
+	dq, res := []int{}, []int{} // indices, values decreasing
+	for i, x := range nums {
+		for len(dq) > 0 && nums[dq[len(dq)-1]] <= x {
+			dq = dq[:len(dq)-1]
+		}
+		dq = append(dq, i)
+		if dq[0] <= i-k {
+			dq = dq[1:]
+		}
+		if i >= k-1 {
+			res = append(res, nums[dq[0]])
+		}
+	}
+	return res
+}
+// test
+assertEq(maxSlidingWindow([]int{1, 3, -1, -3, 5, 3, 6, 7}, 3), []int{3, 3, 5, 5, 6, 7})
+assertEq(maxSlidingWindow([]int{1}, 1), []int{1})
+```
+
 ## 209. Minimum Size Subarray Sum | Medium
 related: 76, 560, 862
 tags: variable-window
@@ -352,6 +488,27 @@ class Solution {
 }
 // test
 check(new Solution().minSubArrayLen(7, new int[]{2, 3, 1, 2, 4, 3}), 2);
+```
+
+```go
+func minSubArrayLen(target int, nums []int) int {
+	l, s, best := 0, 0, math.MaxInt
+	for r, x := range nums {
+		s += x
+		for s >= target {
+			best = min(best, r-l+1)
+			s -= nums[l]
+			l++
+		}
+	}
+	if best == math.MaxInt {
+		return 0
+	}
+	return best
+}
+// test
+assertEq(minSubArrayLen(7, []int{2, 3, 1, 2, 4, 3}), 2)
+assertEq(minSubArrayLen(11, []int{1, 1, 1, 1, 1, 1, 1, 1}), 0)
 ```
 
 ## 438. Find All Anagrams in a String | Medium
@@ -401,6 +558,29 @@ check(new Solution().findAnagrams("cbaebabacd", "abc"), "[0, 6]");
 check(new Solution().findAnagrams("abab", "ab"), "[0, 1, 2]");
 ```
 
+```go
+func findAnagrams(s string, p string) []int {
+	k, res := len(p), []int{}
+	var need, win [26]int
+	for i := 0; i < k; i++ {
+		need[p[i]-'a']++
+	}
+	for r := 0; r < len(s); r++ {
+		win[s[r]-'a']++
+		if r >= k {
+			win[s[r-k]-'a']--
+		}
+		if win == need {
+			res = append(res, r-k+1)
+		}
+	}
+	return res
+}
+// test
+assertUnordered(findAnagrams("cbaebabacd", "abc"), []int{0, 6})
+assertUnordered(findAnagrams("abab", "ab"), []int{0, 1, 2})
+```
+
 ## 1004. Max Consecutive Ones III | Medium
 related: 424, 487
 tags: variable-window
@@ -439,6 +619,28 @@ class Solution {
 }
 // test
 check(new Solution().longestOnes(new int[]{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0}, 2), 6);
+```
+
+```go
+func longestOnes(nums []int, k int) int {
+	l, zeros, best := 0, 0, 0
+	for r, x := range nums {
+		if x == 0 {
+			zeros++
+		}
+		for zeros > k {
+			if nums[l] == 0 {
+				zeros--
+			}
+			l++
+		}
+		best = max(best, r-l+1)
+	}
+	return best
+}
+// test
+assertEq(longestOnes([]int{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0}, 2), 6)
+assertEq(longestOnes([]int{0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1}, 3), 10)
 ```
 
 ## 713. Subarray Product Less Than K | Medium
@@ -484,6 +686,27 @@ class Solution {
 check(new Solution().numSubarrayProductLessThanK(new int[]{10, 5, 2, 6}, 100), 8);
 ```
 
+```go
+func numSubarrayProductLessThanK(nums []int, k int) int {
+	if k <= 1 {
+		return 0
+	}
+	prod, l, count := 1, 0, 0
+	for r, x := range nums {
+		prod *= x
+		for prod >= k {
+			prod /= nums[l]
+			l++
+		}
+		count += r - l + 1 // subarrays ending at r
+	}
+	return count
+}
+// test
+assertEq(numSubarrayProductLessThanK([]int{10, 5, 2, 6}, 100), 8)
+assertEq(numSubarrayProductLessThanK([]int{1, 2, 3}, 0), 0)
+```
+
 
 ## 643. Maximum Average Subarray I | Easy
 related: 209
@@ -520,6 +743,26 @@ class Solution {
 }
 // test
 check(new Solution().findMaxAverage(new int[]{1, 12, -5, -6, 50, 3}, 4), 12.75);
+```
+
+```go
+func findMaxAverage(nums []int, k int) float64 {
+	s := 0
+	for _, x := range nums[:k] {
+		s += x
+	}
+	best := s
+	for i := k; i < len(nums); i++ {
+		s += nums[i] - nums[i-k]
+		best = max(best, s)
+	}
+	return float64(best) / float64(k)
+}
+// test
+assertEq(findMaxAverage([]int{1, 12, -5, -6, 50, 3}, 4), 12.75)
+assertEq(findMaxAverage([]int{5}, 1), 5.0)
+assertEq(findMaxAverage([]int{0, 4, 0, 3, 2}, 1), 4.0)
+assertEq(findMaxAverage([]int{-1, -2, -3}, 3), -2.0)
 ```
 
 ## 904. Fruit Into Baskets | Medium
@@ -568,6 +811,29 @@ class Solution {
 }
 // test
 check(new Solution().totalFruit(new int[]{1, 2, 3, 2, 2}), 4);
+```
+
+```go
+func totalFruit(fruits []int) int {
+	cnt := map[int]int{}
+	l, best := 0, 0
+	for r, f := range fruits {
+		cnt[f]++
+		for len(cnt) > 2 {
+			cnt[fruits[l]]--
+			if cnt[fruits[l]] == 0 {
+				delete(cnt, fruits[l])
+			}
+			l++
+		}
+		best = max(best, r-l+1)
+	}
+	return best
+}
+// test
+assertEq(totalFruit([]int{1, 2, 1}), 3)
+assertEq(totalFruit([]int{0, 1, 2, 2}), 3)
+assertEq(totalFruit([]int{1, 2, 3, 2, 2}), 4)
 ```
 
 ## 992. Subarrays with K Different Integers | Hard
@@ -619,6 +885,31 @@ class Solution {
 }
 // test
 check(new Solution().subarraysWithKDistinct(new int[]{1, 2, 1, 2, 3}, 2), 7);
+```
+
+```go
+func subarraysWithKDistinct(nums []int, k int) int {
+	atMost := func(k int) int { // subarrays with at most k distinct values
+		cnt := map[int]int{}
+		l, res := 0, 0
+		for r, x := range nums {
+			cnt[x]++
+			for len(cnt) > k {
+				cnt[nums[l]]--
+				if cnt[nums[l]] == 0 {
+					delete(cnt, nums[l])
+				}
+				l++
+			}
+			res += r - l + 1
+		}
+		return res
+	}
+	return atMost(k) - atMost(k-1)
+}
+// test
+assertEq(subarraysWithKDistinct([]int{1, 2, 1, 2, 3}, 2), 7)
+assertEq(subarraysWithKDistinct([]int{1, 2, 1, 3, 4}, 3), 3)
 ```
 
 ## 30. Substring with Concatenation of All Words | Hard
@@ -688,6 +979,44 @@ class Solution {
 check(new Solution().findSubstring("barfoofoobarthefoobarman", new String[]{"bar", "foo", "the"}), "[6, 9, 12]");
 ```
 
+```go
+func findSubstring(s string, words []string) []int {
+	L, k := len(words[0]), len(words)
+	need := map[string]int{}
+	for _, w := range words {
+		need[w]++
+	}
+	res := []int{}
+	for off := 0; off < L; off++ { // one sliding window per alignment
+		l, used := off, 0
+		cnt := map[string]int{}
+		for r := off; r+L <= len(s); r += L {
+			w := s[r : r+L]
+			if need[w] == 0 {
+				l, used, cnt = r+L, 0, map[string]int{}
+				continue
+			}
+			cnt[w]++
+			used++
+			for cnt[w] > need[w] {
+				cnt[s[l:l+L]]--
+				used--
+				l += L
+			}
+			if used == k {
+				res = append(res, l)
+			}
+		}
+	}
+	sort.Ints(res)
+	return res
+}
+// test
+assertUnordered(findSubstring("barfoothefoobarman", []string{"foo", "bar"}), []int{0, 9})
+assertEq(findSubstring("wordgoodgoodgoodbestword", []string{"word", "good", "best", "word"}), []int{})
+assertUnordered(findSubstring("barfoofoobarthefoobarman", []string{"bar", "foo", "the"}), []int{6, 9, 12})
+```
+
 ## 1423. Maximum Points You Can Obtain from Cards | Medium
 related: 209
 tags: fixed-window, complement
@@ -723,6 +1052,28 @@ class Solution {
 }
 // test
 check(new Solution().maxScore(new int[]{1, 2, 3, 4, 5, 6, 1}, 3), 12);
+```
+
+```go
+func maxScore(cardPoints []int, k int) int {
+	n, w := len(cardPoints), len(cardPoints)-k // minimise the middle window of size n-k
+	total, s := 0, 0
+	for i, x := range cardPoints {
+		total += x
+		if i < w {
+			s += x
+		}
+	}
+	best := s
+	for i := w; i < n; i++ {
+		s += cardPoints[i] - cardPoints[i-w]
+		best = min(best, s)
+	}
+	return total - best
+}
+// test
+assertEq(maxScore([]int{1, 2, 3, 4, 5, 6, 1}, 3), 12)
+assertEq(maxScore([]int{9, 7, 7, 9, 7, 7, 9}, 7), 55)
 ```
 
 ## 1838. Frequency of the Most Frequent Element | Medium
@@ -768,6 +1119,25 @@ class Solution {
 check(new Solution().maxFrequency(new int[]{1, 4, 8, 13}, 5), 2);
 ```
 
+```go
+func maxFrequency(nums []int, k int) int {
+	sort.Ints(nums)
+	l, s, best := 0, 0, 0
+	for r, x := range nums {
+		s += x
+		for x*(r-l+1)-s > k { // cost to raise the window to x
+			s -= nums[l]
+			l++
+		}
+		best = max(best, r-l+1)
+	}
+	return best
+}
+// test
+assertEq(maxFrequency([]int{1, 2, 4}, 5), 3)
+assertEq(maxFrequency([]int{1, 4, 8, 13}, 5), 2)
+```
+
 ## 219. Contains Duplicate II | Easy
 related: 217, 220
 tags: fixed-window, hash-set
@@ -810,6 +1180,27 @@ check(new Solution().containsNearbyDuplicate(new int[]{1, 0, 1, 1}, 1), true);
 check(new Solution().containsNearbyDuplicate(new int[]{1, 2, 3, 1, 2, 3}, 2), false);
 ```
 
+```go
+func containsNearbyDuplicate(nums []int, k int) bool {
+	window := map[int]bool{} // the last k values
+	for i, x := range nums {
+		if window[x] {
+			return true
+		}
+		window[x] = true
+		if len(window) > k {
+			delete(window, nums[i-k])
+		}
+	}
+	return false
+}
+// test
+assertEq(containsNearbyDuplicate([]int{1, 2, 3, 1}, 3), true)
+assertEq(containsNearbyDuplicate([]int{1, 0, 1, 1}, 1), true)
+assertEq(containsNearbyDuplicate([]int{1, 2, 3, 1, 2, 3}, 2), false)
+assertEq(containsNearbyDuplicate([]int{1, 1}, 0), false)
+```
+
 ## 1456. Maximum Number of Vowels in a Substring of Given Length | Medium
 related: 643, 1004
 tags: fixed-window
@@ -849,6 +1240,32 @@ class Solution {
 // test
 check(new Solution().maxVowels("abciiidef", 3), 3);
 check(new Solution().maxVowels("leetcode", 3), 2);
+```
+
+```go
+func maxVowels(s string, k int) int {
+	vowel := func(c byte) int {
+		if strings.IndexByte("aeiou", c) >= 0 {
+			return 1
+		}
+		return 0
+	}
+	cur := 0
+	for i := 0; i < k; i++ {
+		cur += vowel(s[i])
+	}
+	best := cur
+	for i := k; i < len(s); i++ {
+		cur += vowel(s[i]) - vowel(s[i-k])
+		best = max(best, cur)
+	}
+	return best
+}
+// test
+assertEq(maxVowels("abciiidef", 3), 3)
+assertEq(maxVowels("aeiou", 2), 2)
+assertEq(maxVowels("leetcode", 3), 2)
+assertEq(maxVowels("tryhard", 4), 1)
 ```
 
 ## 1493. Longest Subarray of 1's After Deleting One Element | Medium
@@ -894,6 +1311,30 @@ check(new Solution().longestSubarray(new int[]{0, 1, 1, 1, 0, 1, 1, 0, 1}), 5);
 check(new Solution().longestSubarray(new int[]{1, 1, 1}), 2);
 ```
 
+```go
+func longestSubarray(nums []int) int {
+	lo, zeros, best := 0, 0, 0
+	for hi, x := range nums {
+		if x == 0 {
+			zeros++
+		}
+		for zeros > 1 {
+			if nums[lo] == 0 {
+				zeros--
+			}
+			lo++
+		}
+		best = max(best, hi-lo) // (hi - lo + 1) - 1 deleted element
+	}
+	return best
+}
+// test
+assertEq(longestSubarray([]int{1, 1, 0, 1}), 3)
+assertEq(longestSubarray([]int{0, 1, 1, 1, 0, 1, 1, 0, 1}), 5)
+assertEq(longestSubarray([]int{1, 1, 1}), 2)
+assertEq(longestSubarray([]int{0, 0, 0}), 0)
+```
+
 ## 978. Longest Turbulent Subarray | Medium
 related: 376, 53
 tags: kadane, state-machine
@@ -937,4 +1378,27 @@ class Solution {
 }
 // test
 check(new Solution().maxTurbulenceSize(new int[]{9, 4, 2, 10, 7, 8, 8, 1, 9}), 5);
+```
+
+```go
+func maxTurbulenceSize(arr []int) int {
+	best, up, down := 1, 1, 1 // longest run ending here going up / down
+	for i := 1; i < len(arr); i++ {
+		switch {
+		case arr[i] > arr[i-1]:
+			up, down = down+1, 1
+		case arr[i] < arr[i-1]:
+			up, down = 1, up+1
+		default:
+			up, down = 1, 1
+		}
+		best = max(best, up, down)
+	}
+	return best
+}
+// test
+assertEq(maxTurbulenceSize([]int{9, 4, 2, 10, 7, 8, 8, 1, 9}), 5)
+assertEq(maxTurbulenceSize([]int{4, 8, 12, 16}), 2)
+assertEq(maxTurbulenceSize([]int{100}), 1)
+assertEq(maxTurbulenceSize([]int{9, 9}), 1)
 ```

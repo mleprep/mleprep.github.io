@@ -61,6 +61,34 @@ check(new Solution().isPalindrome("A man, a plan, a canal: Panama"), true);
 check(new Solution().isPalindrome("race a car"), false);
 ```
 
+```go
+func isPalindrome(s string) bool {
+	alnum := func(c byte) bool { return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' }
+	lower := func(c byte) byte {
+		if c >= 'A' && c <= 'Z' {
+			return c + 'a' - 'A'
+		}
+		return c
+	}
+	for l, r := 0, len(s)-1; l < r; {
+		switch {
+		case !alnum(s[l]):
+			l++
+		case !alnum(s[r]):
+			r--
+		case lower(s[l]) != lower(s[r]):
+			return false
+		default:
+			l, r = l+1, r-1
+		}
+	}
+	return true
+}
+// test
+assertEq(isPalindrome("A man, a plan, a canal: Panama"), true)
+assertEq(isPalindrome("race a car"), false)
+```
+
 ## 167. Two Sum II - Input Array Is Sorted | Medium
 related: 1, 15
 tags: opposite-ends
@@ -108,6 +136,26 @@ class Solution {
 }
 // test
 check(new Solution().twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{1, 2});
+```
+
+```go
+func twoSum(numbers []int, target int) []int {
+	for l, r := 0, len(numbers)-1; l < r; {
+		s := numbers[l] + numbers[r]
+		if s == target {
+			return []int{l + 1, r + 1}
+		}
+		if s < target {
+			l++
+		} else {
+			r--
+		}
+	}
+	return nil
+}
+// test
+assertEq(twoSum([]int{2, 7, 11, 15}, 9), []int{1, 2})
+assertEq(twoSum([]int{-1, 0}, -1), []int{1, 2})
 ```
 
 ## 15. 3Sum | Medium
@@ -182,6 +230,38 @@ check(new Solution().threeSum(new int[]{-1, 0, 1, 2, -1, -4}), "[[-1, -1, 2], [-
 check(new Solution().threeSum(new int[]{0, 0, 0}), "[[0, 0, 0]]");
 ```
 
+```go
+func threeSum(nums []int) [][]int {
+	sort.Ints(nums)
+	res := [][]int{}
+	for i := 0; i < len(nums)-2 && nums[i] <= 0; i++ {
+		if i > 0 && nums[i] == nums[i-1] {
+			continue // same first number, same triples
+		}
+		for l, r := i+1, len(nums)-1; l < r; {
+			s := nums[i] + nums[l] + nums[r]
+			switch {
+			case s < 0:
+				l++
+			case s > 0:
+				r--
+			default:
+				res = append(res, []int{nums[i], nums[l], nums[r]})
+				l++
+				for l < r && nums[l] == nums[l-1] {
+					l++
+				}
+				r--
+			}
+		}
+	}
+	return res
+}
+// test
+assertUnorderedDeep(threeSum([]int{-1, 0, 1, 2, -1, -4}), [][]int{{-1, -1, 2}, {-1, 0, 1}})
+assertUnorderedDeep(threeSum([]int{0, 0, 0}), [][]int{{0, 0, 0}})
+```
+
 ## 11. Container With Most Water | Medium
 related: 42
 tags: blind75, opposite-ends, greedy
@@ -224,6 +304,24 @@ class Solution {
 }
 // test
 check(new Solution().maxArea(new int[]{1, 8, 6, 2, 5, 4, 8, 3, 7}), 49);
+```
+
+```go
+func maxArea(height []int) int {
+	best := 0
+	for l, r := 0, len(height)-1; l < r; {
+		best = max(best, min(height[l], height[r])*(r-l))
+		if height[l] < height[r] { // the shorter wall can only get better by moving
+			l++
+		} else {
+			r--
+		}
+	}
+	return best
+}
+// test
+assertEq(maxArea([]int{1, 8, 6, 2, 5, 4, 8, 3, 7}), 49)
+assertEq(maxArea([]int{1, 1}), 1)
 ```
 
 ## 42. Trapping Rain Water | Hard
@@ -283,6 +381,28 @@ check(new Solution().trap(new int[]{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), 6);
 check(new Solution().trap(new int[]{4, 2, 0, 3, 2, 5}), 9);
 ```
 
+```go
+func trap(height []int) int {
+	l, r := 0, len(height)-1
+	lmax, rmax, water := 0, 0, 0
+	for l < r {
+		if height[l] < height[r] { // the left side is bounded by lmax
+			lmax = max(lmax, height[l])
+			water += lmax - height[l]
+			l++
+		} else {
+			rmax = max(rmax, height[r])
+			water += rmax - height[r]
+			r--
+		}
+	}
+	return water
+}
+// test
+assertEq(trap([]int{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}), 6)
+assertEq(trap([]int{4, 2, 0, 3, 2, 5}), 9)
+```
+
 ## 283. Move Zeroes | Easy
 related: 26, 75
 tags: fast-slow
@@ -320,6 +440,28 @@ class Solution {
 int[] a = {0, 1, 0, 3, 12};
 new Solution().moveZeroes(a);
 check(a, new int[]{1, 3, 12, 0, 0});
+```
+
+```go
+func moveZeroes(nums []int) {
+	k := 0
+	for i := range nums {
+		if nums[i] != 0 {
+			nums[k], nums[i] = nums[i], nums[k]
+			k++
+		}
+	}
+}
+// test
+a := []int{0, 1, 0, 3, 12}
+moveZeroes(a)
+assertEq(a, []int{1, 3, 12, 0, 0})
+b := []int{0}
+moveZeroes(b)
+assertEq(b, []int{0})
+c := []int{1, 0, 0, 2}
+moveZeroes(c)
+assertEq(c, []int{1, 2, 0, 0})
 ```
 
 ## 16. 3Sum Closest | Medium
@@ -373,6 +515,40 @@ class Solution {
 }
 // test
 check(new Solution().threeSumClosest(new int[]{-1, 2, 1, -4}, 1), 2);
+```
+
+```go
+func threeSumClosest(nums []int, target int) int {
+	sort.Ints(nums)
+	best := nums[0] + nums[1] + nums[2]
+	for i := 0; i < len(nums)-2; i++ {
+		for l, r := i+1, len(nums)-1; l < r; {
+			s := nums[i] + nums[l] + nums[r]
+			if abs(s-target) < abs(best-target) {
+				best = s
+			}
+			switch {
+			case s < target:
+				l++
+			case s > target:
+				r--
+			default:
+				return s
+			}
+		}
+	}
+	return best
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+// test
+assertEq(threeSumClosest([]int{-1, 2, 1, -4}, 1), 2)
+assertEq(threeSumClosest([]int{0, 0, 0}, 1), 0)
 ```
 
 ## 18. 4Sum | Medium
@@ -446,6 +622,43 @@ class Solution {
 check(new Solution().fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0), "[[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]");
 ```
 
+```go
+func fourSum(nums []int, target int) [][]int {
+	sort.Ints(nums)
+	var ksum func(start, k, target int) [][]int
+	ksum = func(start, k, target int) [][]int {
+		res := [][]int{}
+		if k == 2 {
+			for l, r := start, len(nums)-1; l < r; {
+				s := nums[l] + nums[r]
+				if s < target || (l > start && nums[l] == nums[l-1]) {
+					l++
+				} else if s > target {
+					r--
+				} else {
+					res = append(res, []int{nums[l], nums[r]})
+					l, r = l+1, r-1
+				}
+			}
+			return res
+		}
+		for i := start; i <= len(nums)-k; i++ {
+			if i > start && nums[i] == nums[i-1] {
+				continue
+			}
+			for _, sub := range ksum(i+1, k-1, target-nums[i]) {
+				res = append(res, append([]int{nums[i]}, sub...))
+			}
+		}
+		return res
+	}
+	return ksum(0, 4, target)
+}
+// test
+assertUnorderedDeep(fourSum([]int{1, 0, -1, 0, -2, 2}, 0), [][]int{{-2, -1, 1, 2}, {-2, 0, 0, 2}, {-1, 0, 0, 1}})
+assertUnorderedDeep(fourSum([]int{2, 2, 2, 2, 2}, 8), [][]int{{2, 2, 2, 2}})
+```
+
 ## 75. Sort Colors | Medium
 related: 283
 tags: dutch-flag, three-pointers
@@ -502,6 +715,35 @@ new Solution().sortColors(a);
 check(a, new int[]{0, 0, 1, 1, 2, 2});
 ```
 
+```go
+func sortColors(nums []int) {
+	lo, i, hi := 0, 0, len(nums)-1 // [0,lo) = 0s, [lo,i) = 1s, (hi,end] = 2s
+	for i <= hi {
+		switch nums[i] {
+		case 0:
+			nums[lo], nums[i] = nums[i], nums[lo]
+			lo++
+			i++
+		case 2:
+			nums[hi], nums[i] = nums[i], nums[hi]
+			hi--
+		default:
+			i++
+		}
+	}
+}
+// test
+a := []int{2, 0, 2, 1, 1, 0}
+sortColors(a)
+assertEq(a, []int{0, 0, 1, 1, 2, 2})
+b := []int{2, 0, 1}
+sortColors(b)
+assertEq(b, []int{0, 1, 2})
+c := []int{1, 1, 0, 0, 2, 2, 1}
+sortColors(c)
+assertEq(c, []int{0, 0, 1, 1, 1, 2, 2})
+```
+
 ## 680. Valid Palindrome II | Easy
 related: 125
 tags: opposite-ends
@@ -550,6 +792,29 @@ check(new Solution().validPalindrome("abca"), true);
 check(new Solution().validPalindrome("abc"), false);
 ```
 
+```go
+func validPalindrome(s string) bool {
+	pal := func(l, r int) bool {
+		for ; l < r; l, r = l+1, r-1 {
+			if s[l] != s[r] {
+				return false
+			}
+		}
+		return true
+	}
+	for l, r := 0, len(s)-1; l < r; l, r = l+1, r-1 {
+		if s[l] != s[r] { // delete one of the two
+			return pal(l+1, r) || pal(l, r-1)
+		}
+	}
+	return true
+}
+// test
+assertEq(validPalindrome("aba"), true)
+assertEq(validPalindrome("abca"), true)
+assertEq(validPalindrome("abc"), false)
+```
+
 ## 392. Is Subsequence | Easy
 related: 1143, 115
 tags: greedy
@@ -584,6 +849,21 @@ class Solution {
 // test
 check(new Solution().isSubsequence("abc", "ahbgdc"), true);
 check(new Solution().isSubsequence("axc", "ahbgdc"), false);
+```
+
+```go
+func isSubsequence(s string, t string) bool {
+	i := 0
+	for j := 0; j < len(t) && i < len(s); j++ {
+		if s[i] == t[j] {
+			i++
+		}
+	}
+	return i == len(s)
+}
+// test
+assertEq(isSubsequence("abc", "ahbgdc"), true)
+assertEq(isSubsequence("axc", "ahbgdc"), false)
 ```
 
 
@@ -629,6 +909,28 @@ class Solution {
 check(new Solution().sortedSquares(new int[]{-7, -3, 2, 3, 11}), new int[]{4, 9, 9, 49, 121});
 ```
 
+```go
+func sortedSquares(nums []int) []int {
+	n := len(nums)
+	res := make([]int, n)
+	l, r := 0, n-1
+	for k := n - 1; k >= 0; k-- { // the biggest square is at one of the ends
+		if nums[l]*nums[l] > nums[r]*nums[r] {
+			res[k] = nums[l] * nums[l]
+			l++
+		} else {
+			res[k] = nums[r] * nums[r]
+			r--
+		}
+	}
+	return res
+}
+// test
+assertEq(sortedSquares([]int{-4, -1, 0, 3, 10}), []int{0, 1, 9, 16, 100})
+assertEq(sortedSquares([]int{-7, -3, 2, 3, 11}), []int{4, 9, 9, 49, 121})
+assertEq(sortedSquares([]int{-5, -3, -2, -1}), []int{1, 4, 9, 25})
+```
+
 ## 27. Remove Element | Easy
 related: 26, 283
 tags: fast-slow
@@ -671,6 +973,27 @@ int[] a = {3, 2, 2, 3};
 check(new Solution().removeElement(a, 3), 2);
 ```
 
+```go
+func removeElement(nums []int, val int) int {
+	k := 0
+	for _, x := range nums {
+		if x != val {
+			nums[k] = x
+			k++
+		}
+	}
+	return k
+}
+// test
+a := []int{0, 1, 2, 2, 3, 0, 4, 2}
+k := removeElement(a, 2)
+assertUnordered(a[:k], []int{0, 0, 1, 3, 4})
+b := []int{3, 2, 2, 3}
+k = removeElement(b, 3)
+assertUnordered(b[:k], []int{2, 2})
+assertEq(removeElement([]int{1}, 1), 0)
+```
+
 ## 80. Remove Duplicates from Sorted Array II | Medium
 related: 26
 tags: fast-slow
@@ -711,6 +1034,26 @@ int k = new Solution().removeDuplicates(a);
 check(Arrays.copyOf(a, k), new int[]{1, 1, 2, 2, 3});
 ```
 
+```go
+func removeDuplicates(nums []int) int {
+	k := 0
+	for _, x := range nums {
+		if k < 2 || x != nums[k-2] { // at most two copies
+			nums[k] = x
+			k++
+		}
+	}
+	return k
+}
+// test
+a := []int{0, 0, 1, 1, 1, 1, 2, 3, 3}
+k := removeDuplicates(a)
+assertEq(a[:k], []int{0, 0, 1, 1, 2, 3, 3})
+b := []int{1, 1, 1, 2, 2, 3}
+k = removeDuplicates(b)
+assertEq(b[:k], []int{1, 1, 2, 2, 3})
+```
+
 ## 151. Reverse Words in a String | Medium
 related: 344
 tags: string
@@ -739,6 +1082,20 @@ class Solution {
 }
 // test
 check(new Solution().reverseWords("  hello world  "), "world hello");
+```
+
+```go
+func reverseWords(s string) string {
+	words := strings.Fields(s)
+	for i, j := 0, len(words)-1; i < j; i, j = i+1, j-1 {
+		words[i], words[j] = words[j], words[i]
+	}
+	return strings.Join(words, " ")
+}
+// test
+assertEq(reverseWords("the sky is blue"), "blue is sky the")
+assertEq(reverseWords("  hello world  "), "world hello")
+assertEq(reverseWords("a good   example"), "example good a")
 ```
 
 ## 344. Reverse String | Easy
@@ -775,6 +1132,24 @@ class Solution {
 char[] a = "hello".toCharArray();
 new Solution().reverseString(a);
 check(new String(a), "olleh");
+```
+
+```go
+func reverseString(s []byte) {
+	for l, r := 0, len(s)-1; l < r; l, r = l+1, r-1 {
+		s[l], s[r] = s[r], s[l]
+	}
+}
+// test
+a := []byte("hello")
+reverseString(a)
+assertEq(string(a), "olleh")
+b := []byte("Hannah")
+reverseString(b)
+assertEq(string(b), "hannaH")
+c := []byte("x")
+reverseString(c)
+assertEq(string(c), "x")
 ```
 
 ## 881. Boats to Save People | Medium
@@ -816,6 +1191,23 @@ class Solution {
 }
 // test
 check(new Solution().numRescueBoats(new int[]{3, 2, 2, 1}, 3), 3);
+```
+
+```go
+func numRescueBoats(people []int, limit int) int {
+	sort.Ints(people)
+	boats := 0
+	for l, r := 0, len(people)-1; l <= r; r-- { // the heaviest always leaves
+		if people[l]+people[r] <= limit {
+			l++ // ...with the lightest if they fit
+		}
+		boats++
+	}
+	return boats
+}
+// test
+assertEq(numRescueBoats([]int{3, 2, 2, 1}, 3), 3)
+assertEq(numRescueBoats([]int{3, 5, 3, 4}, 5), 4)
 ```
 
 ## 844. Backspace String Compare | Easy
@@ -876,6 +1268,43 @@ check(new Solution().backspaceCompare("a#c", "b"), false);
 check(new Solution().backspaceCompare("bxj##tw", "bxo#j##tw"), true);
 ```
 
+```go
+func backspaceCompare(s string, t string) bool {
+	// next returns the index of the next surviving character at or before i (-1 if none)
+	next := func(x string, i int) int {
+		skip := 0
+		for ; i >= 0; i-- {
+			if x[i] == '#' {
+				skip++
+			} else if skip > 0 {
+				skip--
+			} else {
+				break
+			}
+		}
+		return i
+	}
+	i, j := len(s)-1, len(t)-1
+	for {
+		i, j = next(s, i), next(t, j)
+		if i < 0 || j < 0 {
+			return i < 0 && j < 0
+		}
+		if s[i] != t[j] {
+			return false
+		}
+		i, j = i-1, j-1
+	}
+}
+// test
+assertEq(backspaceCompare("ab#c", "ad#c"), true)
+assertEq(backspaceCompare("ab##", "c#d#"), true)
+assertEq(backspaceCompare("a#c", "b"), false)
+assertEq(backspaceCompare("a##c", "#a#c"), true)
+assertEq(backspaceCompare("bxj##tw", "bxo#j##tw"), true)
+assertEq(backspaceCompare("ab", "b"), false)
+```
+
 ## 1768. Merge Strings Alternately | Easy
 related: 88
 tags: two-pointers
@@ -908,6 +1337,25 @@ class Solution {
 // test
 check(new Solution().mergeAlternately("ab", "pqrs"), "apbqrs");
 check(new Solution().mergeAlternately("abcd", "pq"), "apbqcd");
+```
+
+```go
+func mergeAlternately(word1 string, word2 string) string {
+	var sb strings.Builder
+	for i := 0; i < len(word1) || i < len(word2); i++ {
+		if i < len(word1) {
+			sb.WriteByte(word1[i])
+		}
+		if i < len(word2) {
+			sb.WriteByte(word2[i])
+		}
+	}
+	return sb.String()
+}
+// test
+assertEq(mergeAlternately("abc", "pqr"), "apbqcr")
+assertEq(mergeAlternately("ab", "pqrs"), "apbqrs")
+assertEq(mergeAlternately("abcd", "pq"), "apbqcd")
 ```
 
 ## 345. Reverse Vowels of a String | Easy
@@ -954,6 +1402,30 @@ class Solution {
 // test
 check(new Solution().reverseVowels("IceCreAm"), "AceCreIm");
 check(new Solution().reverseVowels("leetcode"), "leotcede");
+```
+
+```go
+func reverseVowels(s string) string {
+	vowel := func(c byte) bool { return strings.IndexByte("aeiouAEIOU", c) >= 0 }
+	a := []byte(s)
+	for i, j := 0, len(a)-1; i < j; {
+		switch {
+		case !vowel(a[i]):
+			i++
+		case !vowel(a[j]):
+			j--
+		default:
+			a[i], a[j] = a[j], a[i]
+			i, j = i+1, j-1
+		}
+	}
+	return string(a)
+}
+// test
+assertEq(reverseVowels("IceCreAm"), "AceCreIm")
+assertEq(reverseVowels("leetcode"), "leotcede")
+assertEq(reverseVowels("bcd"), "bcd")
+assertEq(reverseVowels("aA"), "Aa")
 ```
 
 ## 443. String Compression | Medium
@@ -1010,6 +1482,38 @@ int k = new Solution().compress(a);
 check(new String(a, 0, k), "ab12");
 ```
 
+```go
+func compress(chars []byte) int {
+	w := 0
+	for i := 0; i < len(chars); {
+		j := i
+		for j < len(chars) && chars[j] == chars[i] {
+			j++
+		}
+		chars[w] = chars[i]
+		w++
+		if j-i > 1 {
+			for _, d := range strconv.Itoa(j - i) {
+				chars[w] = byte(d)
+				w++
+			}
+		}
+		i = j
+	}
+	return w
+}
+// test
+a := []byte("aabbccc")
+k := compress(a)
+assertEq(string(a[:k]), "a2b2c3")
+b := []byte("a")
+k = compress(b)
+assertEq(string(b[:k]), "a")
+c := []byte("abbbbbbbbbbbb")
+k = compress(c)
+assertEq(string(c[:k]), "ab12")
+```
+
 ## 1679. Max Number of K-Sum Pairs | Medium
 related: 1, 167
 tags: hash-map, two-sum
@@ -1052,4 +1556,24 @@ class Solution {
 // test
 check(new Solution().maxOperations(new int[]{1, 2, 3, 4}, 5), 2);
 check(new Solution().maxOperations(new int[]{3, 1, 3, 4, 3}, 6), 1);
+```
+
+```go
+func maxOperations(nums []int, k int) int {
+	waiting, ops := map[int]int{}, 0
+	for _, x := range nums {
+		if waiting[k-x] > 0 { // pair x with an earlier k-x
+			waiting[k-x]--
+			ops++
+		} else {
+			waiting[x]++
+		}
+	}
+	return ops
+}
+// test
+assertEq(maxOperations([]int{1, 2, 3, 4}, 5), 2)
+assertEq(maxOperations([]int{3, 1, 3, 4, 3}, 6), 1)
+assertEq(maxOperations([]int{2, 2, 2, 2}, 4), 2)
+assertEq(maxOperations([]int{1}, 2), 0)
 ```
