@@ -59,6 +59,32 @@ new Solution().rotate(m);
 check(m, new int[][]{{7, 4, 1}, {8, 5, 2}, {9, 6, 3}});
 ```
 
+```go
+func rotate(matrix [][]int) {
+	n := len(matrix)
+	for i := 0; i < n; i++ { // transpose...
+		for j := i + 1; j < n; j++ {
+			matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+		}
+	}
+	for _, row := range matrix { // ...then mirror each row
+		for l, r := 0, n-1; l < r; l, r = l+1, r-1 {
+			row[l], row[r] = row[r], row[l]
+		}
+	}
+}
+// test
+m := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+rotate(m)
+assertEq(m, [][]int{{7, 4, 1}, {8, 5, 2}, {9, 6, 3}})
+m = [][]int{{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}}
+rotate(m)
+assertEq(m, [][]int{{15, 13, 2, 5}, {14, 3, 4, 1}, {12, 6, 8, 9}, {16, 7, 10, 11}})
+m = [][]int{{1}}
+rotate(m)
+assertEq(m, [][]int{{1}})
+```
+
 ## 54. Spiral Matrix | Medium
 related: 59, 48
 tags: blind75, matrix, boundaries
@@ -112,6 +138,34 @@ class Solution {
 }
 // test
 check(new Solution().spiralOrder(new int[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}), "[1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7]");
+```
+
+```go
+func spiralOrder(matrix [][]int) []int {
+	res := []int{}
+	top, bottom, left, right := 0, len(matrix)-1, 0, len(matrix[0])-1
+	for top <= bottom && left <= right { // peel one ring per round
+		for c := left; c <= right; c++ {
+			res = append(res, matrix[top][c])
+		}
+		for r := top + 1; r <= bottom; r++ {
+			res = append(res, matrix[r][right])
+		}
+		if top < bottom && left < right { // a single row or column has no way back
+			for c := right - 1; c >= left; c-- {
+				res = append(res, matrix[bottom][c])
+			}
+			for r := bottom - 1; r > top; r-- {
+				res = append(res, matrix[r][left])
+			}
+		}
+		top, bottom, left, right = top+1, bottom-1, left+1, right-1
+	}
+	return res
+}
+// test
+assertEq(spiralOrder([][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}), []int{1, 2, 3, 6, 9, 8, 7, 4, 5})
+assertEq(spiralOrder([][]int{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}), []int{1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7})
 ```
 
 ## 73. Set Matrix Zeroes | Medium
@@ -170,6 +224,50 @@ new Solution().setZeroes(m);
 check(m, new int[][]{{1, 0, 1}, {0, 0, 0}, {1, 0, 1}});
 ```
 
+```go
+func setZeroes(matrix [][]int) {
+	R, C := len(matrix), len(matrix[0])
+	row0, col0 := false, false // the first row/column are reused as markers, so remember them
+	for c := 0; c < C; c++ {
+		row0 = row0 || matrix[0][c] == 0
+	}
+	for r := 0; r < R; r++ {
+		col0 = col0 || matrix[r][0] == 0
+	}
+	for r := 1; r < R; r++ {
+		for c := 1; c < C; c++ {
+			if matrix[r][c] == 0 {
+				matrix[r][0], matrix[0][c] = 0, 0
+			}
+		}
+	}
+	for r := 1; r < R; r++ {
+		for c := 1; c < C; c++ {
+			if matrix[r][0] == 0 || matrix[0][c] == 0 {
+				matrix[r][c] = 0
+			}
+		}
+	}
+	if row0 {
+		for c := 0; c < C; c++ {
+			matrix[0][c] = 0
+		}
+	}
+	if col0 {
+		for r := 0; r < R; r++ {
+			matrix[r][0] = 0
+		}
+	}
+}
+// test
+m := [][]int{{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}}
+setZeroes(m)
+assertEq(m, [][]int{{0, 0, 0, 0}, {0, 4, 5, 0}, {0, 3, 1, 0}})
+m = [][]int{{1, 1, 1}, {1, 0, 1}, {1, 1, 1}}
+setZeroes(m)
+assertEq(m, [][]int{{1, 0, 1}, {0, 0, 0}, {1, 0, 1}})
+```
+
 ## 202. Happy Number | Easy
 related: 141, 258
 tags: cycle-detection
@@ -212,6 +310,26 @@ check(new Solution().isHappy(19), true);
 check(new Solution().isHappy(2), false);
 ```
 
+```go
+func isHappy(n int) bool {
+	next := func(x int) int { // sum of the squares of the digits
+		s := 0
+		for ; x > 0; x /= 10 {
+			s += (x % 10) * (x % 10)
+		}
+		return s
+	}
+	slow, fast := n, next(n) // Floyd: either reach 1 or loop
+	for fast != 1 && slow != fast {
+		slow, fast = next(slow), next(next(fast))
+	}
+	return fast == 1
+}
+// test
+assertEq(isHappy(19), true)
+assertEq(isHappy(2), false)
+```
+
 ## 66. Plus One | Easy
 related: 2, 67
 tags: carry
@@ -248,6 +366,22 @@ class Solution {
 }
 // test
 check(new Solution().plusOne(new int[]{9, 9}), new int[]{1, 0, 0});
+```
+
+```go
+func plusOne(digits []int) []int {
+	for i := len(digits) - 1; i >= 0; i-- {
+		if digits[i] < 9 {
+			digits[i]++
+			return digits
+		}
+		digits[i] = 0 // 9 + 1: carry on
+	}
+	return append([]int{1}, digits...)
+}
+// test
+assertEq(plusOne([]int{1, 2, 3}), []int{1, 2, 4})
+assertEq(plusOne([]int{9, 9}), []int{1, 0, 0})
 ```
 
 ## 50. Pow(x, n) | Medium
@@ -301,6 +435,26 @@ class Solution {
 check(new Solution().myPow(2.0, 10), 1024.0);
 check(new Solution().myPow(2.0, -2), 0.25);
 check(new Solution().myPow(1.0, Integer.MIN_VALUE), 1.0);
+```
+
+```go
+func myPow(x float64, n int) float64 {
+	if n < 0 {
+		x, n = 1/x, -n
+	}
+	res := 1.0
+	for ; n > 0; n >>= 1 { // binary exponentiation
+		if n&1 == 1 {
+			res *= x
+		}
+		x *= x
+	}
+	return res
+}
+// test
+assertEq(myPow(2.0, 10), 1024.0)
+assertEq(myPow(2.1, 3), 9.261)
+assertEq(myPow(2.0, -2), 0.25)
 ```
 
 ## 43. Multiply Strings | Medium
@@ -358,6 +512,34 @@ check(new Solution().multiply("123", "456"), "56088");
 check(new Solution().multiply("0", "52"), "0");
 ```
 
+```go
+func multiply(num1 string, num2 string) string {
+	m, n := len(num1), len(num2)
+	pos := make([]int, m+n) // digit i*j lands in pos[i+j+1], its carry in pos[i+j]
+	for i := m - 1; i >= 0; i-- {
+		for j := n - 1; j >= 0; j-- {
+			s := int(num1[i]-'0')*int(num2[j]-'0') + pos[i+j+1]
+			pos[i+j+1] = s % 10
+			pos[i+j] += s / 10
+		}
+	}
+	var sb strings.Builder
+	for _, d := range pos {
+		if sb.Len() > 0 || d != 0 { // skip leading zeros
+			sb.WriteByte(byte('0' + d))
+		}
+	}
+	if sb.Len() == 0 {
+		return "0"
+	}
+	return sb.String()
+}
+// test
+assertEq(multiply("2", "3"), "6")
+assertEq(multiply("123", "456"), "56088")
+assertEq(multiply("0", "52"), "0")
+```
+
 ## 13. Roman to Integer | Easy
 related: 12
 tags: string
@@ -403,6 +585,26 @@ class Solution {
 check(new Solution().romanToInt("MCMXCIV"), 1994);
 ```
 
+```go
+func romanToInt(s string) int {
+	val := map[byte]int{'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
+	total := 0
+	for i := 0; i < len(s); i++ {
+		v := val[s[i]]
+		if i+1 < len(s) && val[s[i+1]] > v { // a smaller symbol before a larger one subtracts
+			total -= v
+		} else {
+			total += v
+		}
+	}
+	return total
+}
+// test
+assertEq(romanToInt("III"), 3)
+assertEq(romanToInt("LVIII"), 58)
+assertEq(romanToInt("MCMXCIV"), 1994)
+```
+
 ## 12. Integer to Roman | Medium
 related: 13
 tags: greedy
@@ -440,6 +642,25 @@ class Solution {
 }
 // test
 check(new Solution().intToRoman(1994), "MCMXCIV");
+```
+
+```go
+func intToRoman(num int) string {
+	vals := []int{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}
+	syms := []string{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"}
+	var sb strings.Builder
+	for i, v := range vals { // greedy: largest symbol first
+		for num >= v {
+			sb.WriteString(syms[i])
+			num -= v
+		}
+	}
+	return sb.String()
+}
+// test
+assertEq(intToRoman(3749), "MMMDCCXLIX")
+assertEq(intToRoman(58), "LVIII")
+assertEq(intToRoman(1994), "MCMXCIV")
 ```
 
 ## 204. Count Primes | Medium
@@ -484,6 +705,30 @@ class Solution {
 // test
 check(new Solution().countPrimes(10), 4);
 check(new Solution().countPrimes(100), 25);
+```
+
+```go
+func countPrimes(n int) int {
+	if n < 3 {
+		return 0
+	}
+	composite := make([]bool, n) // sieve of Eratosthenes below n
+	count := 0
+	for p := 2; p < n; p++ {
+		if composite[p] {
+			continue
+		}
+		count++
+		for j := p * p; j < n; j += p {
+			composite[j] = true
+		}
+	}
+	return count
+}
+// test
+assertEq(countPrimes(10), 4)
+assertEq(countPrimes(0), 0)
+assertEq(countPrimes(100), 25)
 ```
 
 ## 149. Max Points on a Line | Hard
@@ -535,6 +780,44 @@ class Solution {
 }
 // test
 check(new Solution().maxPoints(new int[][]{{1, 1}, {3, 2}, {5, 3}, {4, 1}, {2, 3}, {1, 4}}), 4);
+```
+
+```go
+func maxPoints(points [][]int) int {
+	best := 1
+	for i, p := range points {
+		slopes := map[[2]int]int{} // reduced direction -> points on that line through p
+		for _, q := range points[i+1:] {
+			dx, dy := q[0]-p[0], q[1]-p[1]
+			g := gcd(abs(dx), abs(dy))
+			dx, dy = dx/g, dy/g
+			if dx < 0 || dx == 0 && dy < 0 { // one sign convention per direction
+				dx, dy = -dx, -dy
+			}
+			key := [2]int{dx, dy}
+			slopes[key]++
+			best = max(best, slopes[key]+1)
+		}
+	}
+	return best
+}
+
+func gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+// test
+assertEq(maxPoints([][]int{{1, 1}, {2, 2}, {3, 3}}), 3)
+assertEq(maxPoints([][]int{{1, 1}, {3, 2}, {5, 3}, {4, 1}, {2, 3}, {1, 4}}), 4)
 ```
 
 ## 2013. Detect Squares | Medium
@@ -605,6 +888,49 @@ ds.add(new int[]{11, 2});
 check(ds.count(new int[]{11, 10}), 2);
 ```
 
+```go
+type DetectSquares struct {
+	cnt map[[2]int]int // point -> how many times it was added
+}
+
+func Constructor() DetectSquares {
+	return DetectSquares{cnt: map[[2]int]int{}}
+}
+
+func (this *DetectSquares) Add(point []int) {
+	this.cnt[[2]int{point[0], point[1]}]++
+}
+
+func (this *DetectSquares) Count(point []int) int {
+	x, y := point[0], point[1]
+	total := 0
+	for p, c := range this.cnt { // p is the corner diagonal to the query point
+		px, py := p[0], p[1]
+		if abs(px-x) != abs(py-y) || px == x {
+			continue
+		}
+		total += c * this.cnt[[2]int{x, py}] * this.cnt[[2]int{px, y}]
+	}
+	return total
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+// test
+ds := Constructor()
+for _, p := range [][]int{{3, 10}, {11, 2}, {3, 2}} {
+	ds.Add(p)
+}
+assertEq(ds.Count([]int{11, 10}), 1)
+assertEq(ds.Count([]int{14, 8}), 0)
+ds.Add([]int{11, 2})
+assertEq(ds.Count([]int{11, 10}), 2)
+```
+
 
 ## 9. Palindrome Number | Easy
 related: 125, 7
@@ -643,6 +969,25 @@ class Solution {
 // test
 check(new Solution().isPalindrome(121), true);
 check(new Solution().isPalindrome(10), false);
+```
+
+```go
+func isPalindrome(x int) bool {
+	if x < 0 || x%10 == 0 && x != 0 {
+		return false
+	}
+	rev := 0
+	for x > rev { // reverse only the second half
+		rev = rev*10 + x%10
+		x /= 10
+	}
+	return x == rev || x == rev/10 // odd length: drop the middle digit
+}
+// test
+assertEq(isPalindrome(121), true)
+assertEq(isPalindrome(-121), false)
+assertEq(isPalindrome(10), false)
+assertEq(isPalindrome(1221), true)
 ```
 
 ## 67. Add Binary | Easy
@@ -684,6 +1029,30 @@ class Solution {
 check(new Solution().addBinary("1010", "1011"), "10101");
 ```
 
+```go
+func addBinary(a string, b string) string {
+	out := []byte{}
+	for i, j, carry := len(a)-1, len(b)-1, 0; i >= 0 || j >= 0 || carry > 0; i, j = i-1, j-1 {
+		s := carry
+		if i >= 0 {
+			s += int(a[i] - '0')
+		}
+		if j >= 0 {
+			s += int(b[j] - '0')
+		}
+		out = append(out, byte('0'+s%2))
+		carry = s / 2
+	}
+	for l, r := 0, len(out)-1; l < r; l, r = l+1, r-1 {
+		out[l], out[r] = out[r], out[l]
+	}
+	return string(out)
+}
+// test
+assertEq(addBinary("11", "1"), "100")
+assertEq(addBinary("1010", "1011"), "10101")
+```
+
 ## 172. Factorial Trailing Zeroes | Medium
 related: 204
 tags: math
@@ -716,6 +1085,21 @@ class Solution {
 }
 // test
 check(new Solution().trailingZeroes(100), 24);
+```
+
+```go
+func trailingZeroes(n int) int {
+	count := 0
+	for n > 0 { // count the factors of 5 (there are always more 2s)
+		n /= 5
+		count += n
+	}
+	return count
+}
+// test
+assertEq(trailingZeroes(3), 0)
+assertEq(trailingZeroes(5), 1)
+assertEq(trailingZeroes(100), 24)
 ```
 
 ## 59. Spiral Matrix II | Medium
@@ -766,6 +1150,43 @@ class Solution {
 }
 // test
 check(new Solution().generateMatrix(3), new int[][]{{1, 2, 3}, {8, 9, 4}, {7, 6, 5}});
+```
+
+```go
+func generateMatrix(n int) [][]int {
+	m := make([][]int, n)
+	for i := range m {
+		m[i] = make([]int, n)
+	}
+	top, bottom, left, right, k := 0, n-1, 0, n-1, 1
+	for top <= bottom {
+		for c := left; c <= right; c++ {
+			m[top][c] = k
+			k++
+		}
+		for r := top + 1; r <= bottom; r++ {
+			m[r][right] = k
+			k++
+		}
+		if top < bottom {
+			for c := right - 1; c >= left; c-- {
+				m[bottom][c] = k
+				k++
+			}
+		}
+		if left < right {
+			for r := bottom - 1; r > top; r-- {
+				m[r][left] = k
+				k++
+			}
+		}
+		top, bottom, left, right = top+1, bottom-1, left+1, right-1
+	}
+	return m
+}
+// test
+assertEq(generateMatrix(3), [][]int{{1, 2, 3}, {8, 9, 4}, {7, 6, 5}})
+assertEq(generateMatrix(1), [][]int{{1}})
 ```
 
 ## 8. String to Integer (atoi) | Medium
@@ -819,6 +1240,36 @@ check(new Solution().myAtoi("-91283472332"), -2147483648);
 check(new Solution().myAtoi("2147483648"), 2147483647);
 ```
 
+```go
+func myAtoi(s string) int {
+	i, n := 0, len(s)
+	for i < n && s[i] == ' ' {
+		i++
+	}
+	sign := 1
+	if i < n && (s[i] == '+' || s[i] == '-') {
+		if s[i] == '-' {
+			sign = -1
+		}
+		i++
+	}
+	num := 0
+	for ; i < n && s[i] >= '0' && s[i] <= '9'; i++ {
+		num = num*10 + int(s[i]-'0')
+		if num > math.MaxInt32+1 { // already out of range: stop before int64 overflows too
+			break
+		}
+	}
+	return max(math.MinInt32, min(math.MaxInt32, sign*num))
+}
+// test
+assertEq(myAtoi("42"), 42)
+assertEq(myAtoi("   -042"), -42)
+assertEq(myAtoi("1337c0d3"), 1337)
+assertEq(myAtoi("0-1"), 0)
+assertEq(myAtoi("-91283472332"), -2147483648)
+```
+
 ## 29. Divide Two Integers | Medium
 related: 50, 371
 tags: bit-shifting
@@ -868,6 +1319,39 @@ check(new Solution().divide(7, -3), -2);
 check(new Solution().divide(-2147483648, -1), 2147483647);
 ```
 
+```go
+func divide(dividend int, divisor int) int {
+	if dividend == math.MinInt32 && divisor == -1 {
+		return math.MaxInt32 // the only overflowing case
+	}
+	neg := (dividend < 0) != (divisor < 0)
+	a, b, q := dividend, divisor, 0
+	if a < 0 {
+		a = -a
+	}
+	if b < 0 {
+		b = -b
+	}
+	for a >= b { // subtract the largest b * 2^k that fits
+		k := 0
+		for a >= b<<(k+1) {
+			k++
+		}
+		a -= b << k
+		q += 1 << k
+	}
+	if neg {
+		return -q
+	}
+	return q
+}
+// test
+assertEq(divide(10, 3), 3)
+assertEq(divide(7, -3), -2)
+assertEq(divide(-2147483648, -1), 2147483647)
+assertEq(divide(-2147483648, 2), -1073741824)
+```
+
 ## 470. Implement Rand10() Using Rand7() | Medium
 related: 528
 tags: rejection-sampling
@@ -913,6 +1397,33 @@ for (int d = 1; d <= 10; d++) ok &= cnt[d] > 1800 && cnt[d] < 2200;
 check(ok, true);
 ```
 
+```go
+var rng = rand.New(rand.NewSource(7)) // provided by LeetCode (a seeded stand-in)
+
+func rand7() int { // provided by LeetCode
+	return rng.Intn(7) + 1
+}
+
+func rand10() int {
+	for {
+		v := (rand7()-1)*7 + rand7() // uniform on 1..49
+		if v <= 40 {                 // rejection sampling keeps 1..40, four of each final value
+			return (v-1)%10 + 1
+		}
+	}
+}
+// test
+cnt := map[int]int{}
+for i := 0; i < 20000; i++ {
+	cnt[rand10()]++
+}
+ok := len(cnt) == 10
+for v := 1; v <= 10; v++ {
+	ok = ok && cnt[v] > 1800 && cnt[v] < 2200
+}
+assertEq(ok, true)
+```
+
 ## 1071. Greatest Common Divisor of Strings | Easy
 related: 459, 914
 tags: gcd, string
@@ -947,6 +1458,25 @@ class Solution {
 // test
 check(new Solution().gcdOfStrings("ABABAB", "ABAB"), "AB");
 check(new Solution().gcdOfStrings("LEET", "CODE"), "");
+```
+
+```go
+func gcdOfStrings(str1 string, str2 string) string {
+	if str1+str2 != str2+str1 { // no common repeating unit
+		return ""
+	}
+	a, b := len(str1), len(str2)
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return str1[:a]
+}
+// test
+assertEq(gcdOfStrings("ABCABC", "ABC"), "ABC")
+assertEq(gcdOfStrings("ABABAB", "ABAB"), "AB")
+assertEq(gcdOfStrings("LEET", "CODE"), "")
+assertEq(gcdOfStrings("ABABABAB", "ABAB"), "ABAB")
+assertEq(gcdOfStrings("AAAA", "AA"), "AA")
 ```
 
 ## 168. Excel Sheet Column Title | Easy
@@ -991,6 +1521,28 @@ check(new Solution().convertToTitle(701), "ZY");
 check(new Solution().convertToTitle(52), "AZ");
 ```
 
+```go
+func convertToTitle(columnNumber int) string {
+	out := []byte{}
+	for columnNumber > 0 { // bijective base 26: no zero digit, so shift by one first
+		columnNumber--
+		out = append(out, byte('A'+columnNumber%26))
+		columnNumber /= 26
+	}
+	for l, r := 0, len(out)-1; l < r; l, r = l+1, r-1 {
+		out[l], out[r] = out[r], out[l]
+	}
+	return string(out)
+}
+// test
+assertEq(convertToTitle(1), "A")
+assertEq(convertToTitle(28), "AB")
+assertEq(convertToTitle(701), "ZY")
+assertEq(convertToTitle(26), "Z")
+assertEq(convertToTitle(52), "AZ")
+assertEq(convertToTitle(2147483647), "FXSHRXW")
+```
+
 ## 867. Transpose Matrix | Easy
 related: 48, 54
 tags: matrix
@@ -1020,4 +1572,22 @@ class Solution {
 }
 // test
 check(new Solution().transpose(new int[][]{{1, 2, 3}, {4, 5, 6}}), new int[][]{{1, 4}, {2, 5}, {3, 6}});
+```
+
+```go
+func transpose(matrix [][]int) [][]int {
+	R, C := len(matrix), len(matrix[0])
+	t := make([][]int, C)
+	for c := range t {
+		t[c] = make([]int, R)
+		for r := 0; r < R; r++ {
+			t[c][r] = matrix[r][c]
+		}
+	}
+	return t
+}
+// test
+assertEq(transpose([][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}), [][]int{{1, 4, 7}, {2, 5, 8}, {3, 6, 9}})
+assertEq(transpose([][]int{{1, 2, 3}, {4, 5, 6}}), [][]int{{1, 4}, {2, 5}, {3, 6}})
+assertEq(transpose([][]int{{7}}), [][]int{{7}})
 ```
