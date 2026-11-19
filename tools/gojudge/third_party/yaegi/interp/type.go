@@ -426,6 +426,12 @@ func nodeType2(interp *Interpreter, sc *scope, n *node, seen []*node) (t *itype,
 		if err != nil {
 			return nil, err
 		}
+		if n.kind == starExpr && val.cat == ptrT && !n.child[0].isType(sc) {
+			// Patched for the LeetCode Review judge: *p dereferences a pointer value; only *T is a
+			// pointer type (upstream, `[]int{(*h)[0].v}` crashed the compiler).
+			t = val.val
+			break
+		}
 		t = ptrOf(val, withNode(n), withScope(sc))
 		t.incomplete = val.incomplete
 

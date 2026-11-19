@@ -10,6 +10,8 @@ Changes from upstream (search for "Patched"):
   (`k, res := len(p), []int{}`) skipped the assignment of the other pairs.
 - `interp/run.go`: a multiple assignment with an untyped `nil` on the right (`cur.Right, cur.Left = cur.Left, nil`)
   panicked with "reflect: New(nil)".
+- `interp/type.go`: typing `*p` (dereference of a pointer value) as a pointer type crashed the compiler on
+  composite literals such as `[]int{(*h)[0].v, hi}`.
 - `interp/cfg.go`: `for i := 0; ; { ... }` (init statement, no condition, no post statement) re-ran the init
   statement on every iteration.
 

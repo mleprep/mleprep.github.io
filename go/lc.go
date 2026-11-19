@@ -202,7 +202,9 @@ func lcNum(v reflect.Value) (float64, bool) {
 	return 0, false
 }
 
-func lcIsFloat(v reflect.Value) bool { return v.Kind() == reflect.Float32 || v.Kind() == reflect.Float64 }
+func lcIsFloat(v reflect.Value) bool {
+	return v.Kind() == reflect.Float32 || v.Kind() == reflect.Float64
+}
 
 func lcEq(a, b reflect.Value) bool {
 	a, b = lcDeref(a), lcDeref(b)

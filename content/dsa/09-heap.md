@@ -64,6 +64,55 @@ int[] got = {kl.add(3), kl.add(5), kl.add(10), kl.add(9), kl.add(4)};
 check(got, new int[]{4, 5, 5, 8, 8});
 ```
 
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+type KthLargest struct {
+	k int
+	h IntHeap // the k largest values; the root is the k-th largest
+}
+
+func Constructor(k int, nums []int) KthLargest {
+	kl := KthLargest{k: k}
+	for _, x := range nums {
+		kl.Add(x)
+	}
+	return kl
+}
+
+func (this *KthLargest) Add(val int) int {
+	heap.Push(&this.h, val)
+	if this.h.Len() > this.k {
+		heap.Pop(&this.h)
+	}
+	return this.h[0]
+}
+// test
+kl := Constructor(3, []int{4, 5, 8, 2})
+got := []int{}
+for _, v := range []int{3, 5, 10, 9, 4} {
+	got = append(got, kl.Add(v))
+}
+assertEq(got, []int{4, 5, 5, 8, 8})
+kl2 := Constructor(1, []int{})
+got2 := []int{}
+for _, v := range []int{-3, -2, -4, 0, 4} {
+	got2 = append(got2, kl2.Add(v))
+}
+assertEq(got2, []int{-3, -2, -2, 0, 4})
+```
+
 ## 1046. Last Stone Weight | Easy
 related: 215
 tags: max-heap
@@ -103,6 +152,39 @@ class Solution {
 check(new Solution().lastStoneWeight(new int[]{2, 7, 4, 1, 8, 1}), 1);
 ```
 
+```go
+type MaxHeap []int
+
+func (h MaxHeap) Len() int           { return len(h) }
+func (h MaxHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *MaxHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *MaxHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func lastStoneWeight(stones []int) int {
+	h := MaxHeap(append([]int{}, stones...))
+	heap.Init(&h)
+	for h.Len() > 1 { // smash the two heaviest
+		a, b := heap.Pop(&h).(int), heap.Pop(&h).(int)
+		if a != b {
+			heap.Push(&h, a-b)
+		}
+	}
+	if h.Len() == 0 {
+		return 0
+	}
+	return h[0]
+}
+// test
+assertEq(lastStoneWeight([]int{2, 7, 4, 1, 8, 1}), 1)
+assertEq(lastStoneWeight([]int{1}), 1)
+```
+
 ## 973. K Closest Points to Origin | Medium
 related: 215, 347
 tags: max-heap, quickselect
@@ -138,6 +220,40 @@ class Solution {
 }
 // test
 check(new Solution().kClosest(new int[][]{{1, 3}, {-2, 2}}, 1), new int[][]{{-2, 2}});
+```
+
+```go
+type point struct{ d, x, y int }
+type pointHeap []point // max-heap by distance
+
+func (h pointHeap) Len() int           { return len(h) }
+func (h pointHeap) Less(i, j int) bool { return h[i].d > h[j].d }
+func (h pointHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *pointHeap) Push(x any)        { *h = append(*h, x.(point)) }
+func (h *pointHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func kClosest(points [][]int, k int) [][]int {
+	h := &pointHeap{}
+	for _, p := range points {
+		heap.Push(h, point{p[0]*p[0] + p[1]*p[1], p[0], p[1]})
+		if h.Len() > k { // drop the farthest
+			heap.Pop(h)
+		}
+	}
+	res := [][]int{}
+	for _, p := range *h {
+		res = append(res, []int{p.x, p.y})
+	}
+	return res
+}
+// test
+assertEq(kClosest([][]int{{1, 3}, {-2, 2}}, 1), [][]int{{-2, 2}})
+assertUnordered(kClosest([][]int{{3, 3}, {5, -1}, {-2, 4}}, 2), [][]int{{-2, 4}, {3, 3}})
 ```
 
 ## 215. Kth Largest Element in an Array | Medium
@@ -189,6 +305,35 @@ check(new Solution().findKthLargest(new int[]{3, 2, 1, 5, 6, 4}, 2), 5);
 check(new Solution().findKthLargest(new int[]{3, 2, 3, 1, 2, 4, 5, 5, 6}, 4), 4);
 ```
 
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func findKthLargest(nums []int, k int) int {
+	h := &IntHeap{} // the k largest seen so far
+	for _, x := range nums {
+		heap.Push(h, x)
+		if h.Len() > k {
+			heap.Pop(h)
+		}
+	}
+	return (*h)[0]
+}
+// test
+assertEq(findKthLargest([]int{3, 2, 1, 5, 6, 4}, 2), 5)
+assertEq(findKthLargest([]int{3, 2, 3, 1, 2, 4, 5, 5, 6}, 4), 4)
+```
+
 ## 621. Task Scheduler | Medium
 related: 767, 358
 tags: greedy, counting
@@ -228,6 +373,29 @@ class Solution {
 // test
 check(new Solution().leastInterval("AAABBB".toCharArray(), 2), 8);
 check(new Solution().leastInterval("AAABBB".toCharArray(), 3), 10);
+```
+
+```go
+func leastInterval(tasks []byte, n int) int {
+	var cnt [26]int
+	for _, t := range tasks {
+		cnt[t-'A']++
+	}
+	maxf, tied := 0, 0
+	for _, c := range cnt {
+		if c > maxf {
+			maxf, tied = c, 1
+		} else if c == maxf {
+			tied++
+		}
+	}
+	// (maxf-1) full frames of n+1 slots, plus the tasks tied for most frequent
+	return max(len(tasks), (maxf-1)*(n+1)+tied)
+}
+// test
+assertEq(leastInterval([]byte("AAABBB"), 2), 8)
+assertEq(leastInterval([]byte("ACABDB"), 1), 6)
+assertEq(leastInterval([]byte("AAABBB"), 3), 10)
 ```
 
 ## 355. Design Twitter | Medium
@@ -331,6 +499,85 @@ tw.unfollow(1, 2);
 check(tw.getNewsFeed(1), "[5]");
 ```
 
+```go
+type tweet struct{ time, id int }
+
+type feedItem struct{ time, id, user, i int }
+type feedHeap []feedItem // newest first
+
+func (h feedHeap) Len() int           { return len(h) }
+func (h feedHeap) Less(i, j int) bool { return h[i].time > h[j].time }
+func (h feedHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *feedHeap) Push(x any)        { *h = append(*h, x.(feedItem)) }
+func (h *feedHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+type Twitter struct {
+	t       int
+	tweets  map[int][]tweet
+	follows map[int]map[int]bool
+}
+
+func Constructor() Twitter {
+	return Twitter{tweets: map[int][]tweet{}, follows: map[int]map[int]bool{}}
+}
+
+func (this *Twitter) PostTweet(userId int, tweetId int) {
+	this.t++
+	this.tweets[userId] = append(this.tweets[userId], tweet{this.t, tweetId})
+}
+
+func (this *Twitter) GetNewsFeed(userId int) []int {
+	h := &feedHeap{}
+	users := []int{userId}
+	for u := range this.follows[userId] {
+		if u != userId {
+			users = append(users, u)
+		}
+	}
+	for _, u := range users { // merge each user's newest tweets, k-way
+		if ts := this.tweets[u]; len(ts) > 0 {
+			i := len(ts) - 1
+			heap.Push(h, feedItem{ts[i].time, ts[i].id, u, i})
+		}
+	}
+	res := []int{}
+	for h.Len() > 0 && len(res) < 10 {
+		it := heap.Pop(h).(feedItem)
+		res = append(res, it.id)
+		if it.i > 0 {
+			prev := this.tweets[it.user][it.i-1]
+			heap.Push(h, feedItem{prev.time, prev.id, it.user, it.i - 1})
+		}
+	}
+	return res
+}
+
+func (this *Twitter) Follow(followerId int, followeeId int) {
+	if this.follows[followerId] == nil {
+		this.follows[followerId] = map[int]bool{}
+	}
+	this.follows[followerId][followeeId] = true
+}
+
+func (this *Twitter) Unfollow(followerId int, followeeId int) {
+	delete(this.follows[followerId], followeeId)
+}
+// test
+tw := Constructor()
+tw.PostTweet(1, 5)
+assertEq(tw.GetNewsFeed(1), []int{5})
+tw.Follow(1, 2)
+tw.PostTweet(2, 6)
+assertEq(tw.GetNewsFeed(1), []int{6, 5})
+tw.Unfollow(1, 2)
+assertEq(tw.GetNewsFeed(1), []int{5})
+```
+
 ## 295. Find Median from Data Stream | Hard
 related: 4, 480, 703
 tags: blind75, two-heaps, design
@@ -391,6 +638,52 @@ mf.addNum(3);
 check(mf.findMedian(), 2.0);
 ```
 
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+type MedianFinder struct {
+	lo IntHeap // smaller half, stored negated (a max-heap)
+	hi IntHeap // larger half
+}
+
+func Constructor() MedianFinder {
+	return MedianFinder{}
+}
+
+func (this *MedianFinder) AddNum(num int) {
+	heap.Push(&this.lo, -num)
+	heap.Push(&this.hi, -heap.Pop(&this.lo).(int)) // the largest of the small half moves up
+	if this.hi.Len() > this.lo.Len() {
+		heap.Push(&this.lo, -heap.Pop(&this.hi).(int))
+	}
+}
+
+func (this *MedianFinder) FindMedian() float64 {
+	if this.lo.Len() > this.hi.Len() {
+		return float64(-this.lo[0])
+	}
+	return float64(-this.lo[0]+this.hi[0]) / 2
+}
+// test
+mf := Constructor()
+mf.AddNum(1)
+mf.AddNum(2)
+assertEq(mf.FindMedian(), 1.5)
+mf.AddNum(3)
+assertEq(mf.FindMedian(), 2.0)
+```
+
 ## 378. Kth Smallest Element in a Sorted Matrix | Medium
 related: 23, 373, 240
 tags: k-way-merge, binary-search
@@ -430,6 +723,40 @@ class Solution {
 }
 // test
 check(new Solution().kthSmallest(new int[][]{{1, 5, 9}, {10, 11, 13}, {12, 13, 15}}, 8), 13);
+```
+
+```go
+type cell struct{ v, r, c int }
+type cellHeap []cell
+
+func (h cellHeap) Len() int           { return len(h) }
+func (h cellHeap) Less(i, j int) bool { return h[i].v < h[j].v }
+func (h cellHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *cellHeap) Push(x any)        { *h = append(*h, x.(cell)) }
+func (h *cellHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func kthSmallest(matrix [][]int, k int) int {
+	n := len(matrix)
+	h := &cellHeap{}
+	for r := 0; r < min(n, k); r++ { // the first column of each row
+		heap.Push(h, cell{matrix[r][0], r, 0})
+	}
+	for i := 0; i < k-1; i++ { // pop k-1 smallest, advancing along their rows
+		c := heap.Pop(h).(cell)
+		if c.c+1 < n {
+			heap.Push(h, cell{matrix[c.r][c.c+1], c.r, c.c + 1})
+		}
+	}
+	return (*h)[0].v
+}
+// test
+assertEq(kthSmallest([][]int{{1, 5, 9}, {10, 11, 13}, {12, 13, 15}}, 8), 13)
+assertEq(kthSmallest([][]int{{-5}}, 1), -5)
 ```
 
 ## 767. Reorganize String | Medium
@@ -482,6 +809,58 @@ check(new Solution().reorganizeString("aab"), "aba");
 check(new Solution().reorganizeString("aaab"), "");
 ```
 
+```go
+type charCount struct {
+	n  int
+	ch byte
+}
+type countHeap []charCount // most frequent first
+
+func (h countHeap) Len() int           { return len(h) }
+func (h countHeap) Less(i, j int) bool { return h[i].n > h[j].n }
+func (h countHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *countHeap) Push(x any)        { *h = append(*h, x.(charCount)) }
+func (h *countHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func reorganizeString(s string) string {
+	var cnt [26]int
+	for i := 0; i < len(s); i++ {
+		cnt[s[i]-'a']++
+	}
+	h := &countHeap{}
+	for i, n := range cnt {
+		if n > 0 {
+			heap.Push(h, charCount{n, byte('a' + i)})
+		}
+	}
+	res := []byte{}
+	var prev *charCount // the letter just used waits one turn
+	for h.Len() > 0 {
+		cur := heap.Pop(h).(charCount)
+		res = append(res, cur.ch)
+		if prev != nil {
+			heap.Push(h, *prev)
+			prev = nil
+		}
+		if cur.n--; cur.n > 0 {
+			prev = &cur
+		}
+	}
+	if prev != nil { // a letter is left over with nothing to separate it
+		return ""
+	}
+	return string(res)
+}
+// test
+assertEq(reorganizeString("aab"), "aba")
+assertEq(reorganizeString("aaab"), "")
+```
+
 ## 502. IPO | Hard
 related: 630
 tags: greedy, two-heaps
@@ -529,6 +908,44 @@ class Solution {
 check(new Solution().findMaximizedCapital(3, 0, new int[]{1, 2, 3}, new int[]{0, 1, 2}), 6);
 ```
 
+```go
+type MaxHeap []int
+
+func (h MaxHeap) Len() int           { return len(h) }
+func (h MaxHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *MaxHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *MaxHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func findMaximizedCapital(k int, w int, profits []int, capital []int) int {
+	idx := make([]int, len(profits))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.Slice(idx, func(a, b int) bool { return capital[idx[a]] < capital[idx[b]] })
+	h, i := &MaxHeap{}, 0
+	for ; k > 0; k-- {
+		for i < len(idx) && capital[idx[i]] <= w { // newly affordable projects
+			heap.Push(h, profits[idx[i]])
+			i++
+		}
+		if h.Len() == 0 {
+			break
+		}
+		w += heap.Pop(h).(int) // take the most profitable one
+	}
+	return w
+}
+// test
+assertEq(findMaximizedCapital(2, 0, []int{1, 2, 3}, []int{0, 1, 1}), 4)
+assertEq(findMaximizedCapital(3, 0, []int{1, 2, 3}, []int{0, 1, 2}), 6)
+```
+
 ## 373. Find K Pairs with Smallest Sums | Medium
 related: 378, 23
 tags: k-way-merge
@@ -573,6 +990,41 @@ class Solution {
 check(new Solution().kSmallestPairs(new int[]{1, 7, 11}, new int[]{2, 4, 6}, 3), "[[1, 2], [1, 4], [1, 6]]");
 ```
 
+```go
+type pair struct{ sum, i, j int }
+type pairHeap []pair
+
+func (h pairHeap) Len() int           { return len(h) }
+func (h pairHeap) Less(i, j int) bool { return h[i].sum < h[j].sum }
+func (h pairHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *pairHeap) Push(x any)        { *h = append(*h, x.(pair)) }
+func (h *pairHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func kSmallestPairs(nums1 []int, nums2 []int, k int) [][]int {
+	h := &pairHeap{}
+	for i := 0; i < min(k, len(nums1)); i++ { // (i, 0) for every row
+		heap.Push(h, pair{nums1[i] + nums2[0], i, 0})
+	}
+	res := [][]int{}
+	for h.Len() > 0 && len(res) < k {
+		p := heap.Pop(h).(pair)
+		res = append(res, []int{nums1[p.i], nums2[p.j]})
+		if p.j+1 < len(nums2) {
+			heap.Push(h, pair{nums1[p.i] + nums2[p.j+1], p.i, p.j + 1})
+		}
+	}
+	return res
+}
+// test
+assertUnordered(kSmallestPairs([]int{1, 7, 11}, []int{2, 4, 6}, 3), [][]int{{1, 2}, {1, 4}, {1, 6}})
+assertUnordered(kSmallestPairs([]int{1, 1, 2}, []int{1, 2, 3}, 2), [][]int{{1, 1}, {1, 1}})
+```
+
 ## 692. Top K Frequent Words | Medium
 related: 347
 tags: heap, sort
@@ -612,6 +1064,30 @@ class Solution {
 check(new Solution().topKFrequent(new String[]{"i", "love", "leetcode", "i", "love", "coding"}, 2), "[i, love]");
 ```
 
+```go
+func topKFrequent(words []string, k int) []string {
+	cnt := map[string]int{}
+	for _, w := range words {
+		cnt[w]++
+	}
+	keys := make([]string, 0, len(cnt))
+	for w := range cnt {
+		keys = append(keys, w)
+	}
+	sort.Slice(keys, func(i, j int) bool { // by count desc, then alphabetically
+		a, b := keys[i], keys[j]
+		if cnt[a] != cnt[b] {
+			return cnt[a] > cnt[b]
+		}
+		return a < b
+	})
+	return keys[:k]
+}
+// test
+assertEq(topKFrequent([]string{"i", "love", "leetcode", "i", "love", "coding"}, 2), []string{"i", "love"})
+assertEq(topKFrequent([]string{"the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"}, 4), []string{"the", "is", "sunny", "day"})
+```
+
 
 ## 451. Sort Characters By Frequency | Medium
 related: 347, 692
@@ -649,6 +1125,30 @@ class Solution {
 // test
 String r = new Solution().frequencySort("tree");
 check(r.equals("eert") || r.equals("eetr"), true);
+```
+
+```go
+func frequencySort(s string) string {
+	cnt := map[byte]int{}
+	for i := 0; i < len(s); i++ {
+		cnt[s[i]]++
+	}
+	chars := make([]byte, 0, len(cnt))
+	for c := range cnt {
+		chars = append(chars, c)
+	}
+	sort.Slice(chars, func(i, j int) bool { return cnt[chars[i]] > cnt[chars[j]] })
+	var sb strings.Builder
+	for _, c := range chars {
+		sb.WriteString(strings.Repeat(string(c), cnt[c]))
+	}
+	return sb.String()
+}
+// test
+r := frequencySort("tree")
+assertEq(r == "eert" || r == "eetr", true)
+r2 := frequencySort("Aabb")
+assertEq(r2 == "bbAa" || r2 == "bbaA", true)
 ```
 
 ## 658. Find K Closest Elements | Medium
@@ -691,6 +1191,25 @@ class Solution {
 }
 // test
 check(new Solution().findClosestElements(new int[]{1, 2, 3, 4, 5}, 4, 3), "[1, 2, 3, 4]");
+```
+
+```go
+func findClosestElements(arr []int, k int, x int) []int {
+	lo, hi := 0, len(arr)-k // left end of the window
+	for lo < hi {
+		mid := (lo + hi) / 2
+		if x-arr[mid] > arr[mid+k]-x { // arr[mid+k] is closer: move right
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	return arr[lo : lo+k]
+}
+// test
+assertEq(findClosestElements([]int{1, 2, 3, 4, 5}, 4, 3), []int{1, 2, 3, 4})
+assertEq(findClosestElements([]int{1, 1, 2, 3, 4, 5}, 4, -1), []int{1, 1, 2, 3})
+assertEq(findClosestElements([]int{1, 3}, 1, 2), []int{1})
 ```
 
 ## 1642. Furthest Building You Can Reach | Medium
@@ -736,6 +1255,43 @@ class Solution {
 }
 // test
 check(new Solution().furthestBuilding(new int[]{4, 12, 2, 7, 3, 18, 20, 3, 19}, 10, 2), 7);
+```
+
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func furthestBuilding(heights []int, bricks int, ladders int) int {
+	h := &IntHeap{} // climbs covered by ladders: the largest ones
+	for i := 0; i+1 < len(heights); i++ {
+		d := heights[i+1] - heights[i]
+		if d <= 0 {
+			continue
+		}
+		heap.Push(h, d)
+		if h.Len() > ladders { // the smallest climb pays with bricks
+			bricks -= heap.Pop(h).(int)
+			if bricks < 0 {
+				return i
+			}
+		}
+	}
+	return len(heights) - 1
+}
+// test
+assertEq(furthestBuilding([]int{4, 2, 7, 6, 9, 14, 12}, 5, 1), 4)
+assertEq(furthestBuilding([]int{4, 12, 2, 7, 3, 18, 20, 3, 19}, 10, 2), 7)
+assertEq(furthestBuilding([]int{14, 3, 19, 3}, 17, 0), 3)
 ```
 
 ## 871. Minimum Number of Refueling Stops | Hard
@@ -784,6 +1340,41 @@ class Solution {
 check(new Solution().minRefuelStops(100, 10, new int[][]{{10, 60}, {20, 30}, {30, 30}, {60, 40}}), 2);
 ```
 
+```go
+type MaxHeap []int
+
+func (h MaxHeap) Len() int           { return len(h) }
+func (h MaxHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *MaxHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *MaxHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func minRefuelStops(target int, startFuel int, stations [][]int) int {
+	h, reach, i, stops := &MaxHeap{}, startFuel, 0, 0
+	for reach < target {
+		for i < len(stations) && stations[i][0] <= reach { // stations we could have stopped at
+			heap.Push(h, stations[i][1])
+			i++
+		}
+		if h.Len() == 0 {
+			return -1
+		}
+		reach += heap.Pop(h).(int) // retroactively stop at the biggest one
+		stops++
+	}
+	return stops
+}
+// test
+assertEq(minRefuelStops(1, 1, [][]int{}), 0)
+assertEq(minRefuelStops(100, 1, [][]int{{10, 100}}), -1)
+assertEq(minRefuelStops(100, 10, [][]int{{10, 60}, {20, 30}, {30, 30}, {60, 40}}), 2)
+```
+
 ## 630. Course Schedule III | Hard
 related: 1642, 502
 tags: greedy, max-heap
@@ -824,6 +1415,38 @@ class Solution {
 }
 // test
 check(new Solution().scheduleCourse(new int[][]{{100, 200}, {200, 1300}, {1000, 1250}, {2000, 3200}}), 3);
+```
+
+```go
+type MaxHeap []int
+
+func (h MaxHeap) Len() int           { return len(h) }
+func (h MaxHeap) Less(i, j int) bool { return h[i] > h[j] }
+func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *MaxHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *MaxHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func scheduleCourse(courses [][]int) int {
+	sort.Slice(courses, func(i, j int) bool { return courses[i][1] < courses[j][1] }) // by deadline
+	h, t := &MaxHeap{}, 0
+	for _, c := range courses {
+		heap.Push(h, c[0])
+		t += c[0]
+		if t > c[1] { // over the deadline: drop the longest course taken
+			t -= heap.Pop(h).(int)
+		}
+	}
+	return h.Len()
+}
+// test
+assertEq(scheduleCourse([][]int{{100, 200}, {200, 1300}, {1000, 1250}, {2000, 3200}}), 3)
+assertEq(scheduleCourse([][]int{{1, 2}}), 1)
+assertEq(scheduleCourse([][]int{{3, 2}, {4, 3}}), 0)
 ```
 
 ## 1834. Single-Threaded CPU | Medium
@@ -879,6 +1502,52 @@ class Solution {
 check(new Solution().getOrder(new int[][]{{1, 2}, {2, 4}, {3, 2}, {4, 1}}), new int[]{0, 2, 3, 1});
 ```
 
+```go
+type job struct{ proc, idx int }
+type jobHeap []job // shortest processing time, then smallest index
+
+func (h jobHeap) Len() int { return len(h) }
+func (h jobHeap) Less(i, j int) bool {
+	if h[i].proc != h[j].proc {
+		return h[i].proc < h[j].proc
+	}
+	return h[i].idx < h[j].idx
+}
+func (h jobHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+func (h *jobHeap) Push(x any)   { *h = append(*h, x.(job)) }
+func (h *jobHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func getOrder(tasks [][]int) []int {
+	order := make([]int, len(tasks))
+	for i := range order {
+		order[i] = i
+	}
+	sort.Slice(order, func(a, b int) bool { return tasks[order[a]][0] < tasks[order[b]][0] })
+	h, res, time, i := &jobHeap{}, []int{}, 0, 0
+	for len(res) < len(tasks) {
+		if h.Len() == 0 && time < tasks[order[i]][0] { // idle until the next task arrives
+			time = tasks[order[i]][0]
+		}
+		for i < len(order) && tasks[order[i]][0] <= time {
+			heap.Push(h, job{tasks[order[i]][1], order[i]})
+			i++
+		}
+		j := heap.Pop(h).(job)
+		time += j.proc
+		res = append(res, j.idx)
+	}
+	return res
+}
+// test
+assertEq(getOrder([][]int{{1, 2}, {2, 4}, {3, 2}, {4, 1}}), []int{0, 2, 3, 1})
+assertEq(getOrder([][]int{{7, 10}, {7, 12}, {7, 5}, {7, 4}, {7, 2}}), []int{4, 3, 2, 0, 1})
+```
+
 ## 480. Sliding Window Median | Hard
 related: 295, 239
 tags: sorted-window, two-heaps
@@ -925,6 +1594,29 @@ class Solution {
 // test
 check(new Solution().medianSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3), new double[]{1.0, -1.0, -1.0, 3.0, 5.0, 6.0});
 check(new Solution().medianSlidingWindow(new int[]{1, 4, 2, 3}, 4), new double[]{2.5});
+```
+
+```go
+func medianSlidingWindow(nums []int, k int) []float64 {
+	win := append([]int{}, nums[:k]...) // the window, kept sorted
+	sort.Ints(win)
+	res := []float64{}
+	for i := k; ; i++ {
+		res = append(res, (float64(win[k/2])+float64(win[(k-1)/2]))/2)
+		if i == len(nums) {
+			return res
+		}
+		j := sort.SearchInts(win, nums[i-k]) // remove the outgoing value
+		win = append(win[:j], win[j+1:]...)
+		j = sort.SearchInts(win, nums[i]) // insert the incoming one
+		win = append(win, 0)
+		copy(win[j+1:], win[j:])
+		win[j] = nums[i]
+	}
+}
+// test
+assertEq(medianSlidingWindow([]int{1, 3, -1, -3, 5, 3, 6, 7}, 3), []float64{1, -1, -1, 3, 5, 6})
+assertEq(medianSlidingWindow([]int{1, 2, 3, 4, 2, 3, 1, 4, 2}, 3), []float64{2, 3, 3, 3, 2, 3, 2})
 ```
 
 ## 632. Smallest Range Covering Elements from K Lists | Hard
@@ -984,6 +1676,48 @@ check(new Solution().smallestRange(List.of(List.of(4, 10, 15, 24, 26), List.of(0
 check(new Solution().smallestRange(List.of(List.of(1, 2, 3), List.of(1, 2, 3), List.of(1, 2, 3))), new int[]{1, 1});
 ```
 
+```go
+type entry struct{ v, i, j int } // value, list, position
+type entryHeap []entry
+
+func (h entryHeap) Len() int           { return len(h) }
+func (h entryHeap) Less(i, j int) bool { return h[i].v < h[j].v }
+func (h entryHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *entryHeap) Push(x any)        { *h = append(*h, x.(entry)) }
+func (h *entryHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func smallestRange(nums [][]int) []int {
+	h, hi := &entryHeap{}, math.MinInt
+	for i, row := range nums { // one pointer per list; the range is [heap min, hi]
+		heap.Push(h, entry{row[0], i, 0})
+		hi = max(hi, row[0])
+	}
+	best := []int{(*h)[0].v, hi}
+	for {
+		e := heap.Pop(h).(entry)
+		if hi-e.v < best[1]-best[0] {
+			best = []int{e.v, hi}
+		}
+		if e.j+1 == len(nums[e.i]) { // a list is exhausted
+			return best
+		}
+		next := nums[e.i][e.j+1]
+		hi = max(hi, next)
+		heap.Push(h, entry{next, e.i, e.j + 1})
+	}
+}
+// test
+assertEq(smallestRange([][]int{{4, 10, 15, 24, 26}, {0, 9, 12, 20}, {5, 18, 22, 30}}), []int{20, 24})
+assertEq(smallestRange([][]int{{1, 2, 3}, {1, 2, 3}, {1, 2, 3}}), []int{1, 1})
+assertEq(smallestRange([][]int{{1}, {2}, {3}}), []int{1, 3})
+assertEq(smallestRange([][]int{{10, 10}, {11, 11}}), []int{10, 11})
+```
+
 ## 2336. Smallest Number in Infinite Set | Medium
 related: 1845, 703
 tags: min-heap, design
@@ -1039,6 +1773,60 @@ s.addBack(1);
 check(new int[]{s.popSmallest(), s.popSmallest(), s.popSmallest()}, new int[]{1, 4, 5});
 ```
 
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+type SmallestInfiniteSet struct {
+	next   int          // every number >= next is in the set
+	back   IntHeap      // numbers < next that were added back
+	inBack map[int]bool // ...and their membership
+}
+
+func Constructor() SmallestInfiniteSet {
+	return SmallestInfiniteSet{next: 1, inBack: map[int]bool{}}
+}
+
+func (this *SmallestInfiniteSet) PopSmallest() int {
+	if this.back.Len() > 0 {
+		x := heap.Pop(&this.back).(int)
+		delete(this.inBack, x)
+		return x
+	}
+	this.next++
+	return this.next - 1
+}
+
+func (this *SmallestInfiniteSet) AddBack(num int) {
+	if num < this.next && !this.inBack[num] {
+		this.inBack[num] = true
+		heap.Push(&this.back, num)
+	}
+}
+// test
+s := Constructor()
+s.AddBack(2)
+assertEq([]int{s.PopSmallest(), s.PopSmallest(), s.PopSmallest()}, []int{1, 2, 3})
+s.AddBack(1)
+assertEq([]int{s.PopSmallest(), s.PopSmallest(), s.PopSmallest()}, []int{1, 4, 5})
+s2 := Constructor()
+s2.PopSmallest()
+s2.PopSmallest()
+s2.AddBack(1)
+s2.AddBack(1)
+assertEq([]int{s2.PopSmallest(), s2.PopSmallest()}, []int{1, 3})
+```
+
 ## 2542. Maximum Subsequence Score | Medium
 related: 857, 1383
 tags: min-heap, sort, greedy
@@ -1086,6 +1874,45 @@ class Solution {
 // test
 check(new Solution().maxScore(new int[]{1, 3, 3, 2}, new int[]{2, 1, 3, 4}, 3), 12L);
 check(new Solution().maxScore(new int[]{4, 2, 3, 1, 1}, new int[]{7, 5, 10, 9, 6}, 1), 30L);
+```
+
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func maxScore(nums1 []int, nums2 []int, k int) int64 {
+	idx := make([]int, len(nums1))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.Slice(idx, func(a, b int) bool { return nums2[idx[a]] > nums2[idx[b]] }) // by nums2 desc
+	h, total, best := &IntHeap{}, 0, 0
+	for _, i := range idx { // nums2[i] is the minimum of the chosen set so far
+		heap.Push(h, nums1[i])
+		total += nums1[i]
+		if h.Len() > k { // keep the k largest nums1 values
+			total -= heap.Pop(h).(int)
+		}
+		if h.Len() == k {
+			best = max(best, total*nums2[i])
+		}
+	}
+	return int64(best)
+}
+// test
+assertEq(maxScore([]int{1, 3, 3, 2}, []int{2, 1, 3, 4}, 3), 12)
+assertEq(maxScore([]int{4, 2, 3, 1, 1}, []int{7, 5, 10, 9, 6}, 1), 30)
+assertEq(maxScore([]int{2, 1, 14, 12}, []int{11, 7, 13, 6}, 3), 168)
 ```
 
 ## 2462. Total Cost to Hire K Workers | Medium
@@ -1138,6 +1965,48 @@ class Solution {
 // test
 check(new Solution().totalCost(new int[]{17, 12, 10, 2, 7, 2, 11, 20, 8}, 3, 4), 11L);
 check(new Solution().totalCost(new int[]{1, 2, 4, 1}, 3, 3), 4L);
+```
+
+```go
+type IntHeap []int // min-heap
+
+func (h IntHeap) Len() int           { return len(h) }
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *IntHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func totalCost(costs []int, k int, candidates int) int64 {
+	i, j := 0, len(costs)-1
+	front, back := &IntHeap{}, &IntHeap{}
+	total := 0
+	for ; k > 0; k-- {
+		for front.Len() < candidates && i <= j {
+			heap.Push(front, costs[i])
+			i++
+		}
+		for back.Len() < candidates && i <= j {
+			heap.Push(back, costs[j])
+			j--
+		}
+		if back.Len() == 0 || (front.Len() > 0 && (*front)[0] <= (*back)[0]) { // ties go to the front
+			total += heap.Pop(front).(int)
+		} else {
+			total += heap.Pop(back).(int)
+		}
+	}
+	return int64(total)
+}
+// test
+assertEq(totalCost([]int{17, 12, 10, 2, 7, 2, 11, 20, 8}, 3, 4), 11)
+assertEq(totalCost([]int{1, 2, 4, 1}, 3, 3), 4)
+assertEq(totalCost([]int{5}, 1, 1), 5)
+assertEq(totalCost([]int{2, 2, 2, 2}, 2, 1), 4)
 ```
 
 ## 1405. Longest Happy String | Medium
@@ -1207,4 +2076,42 @@ class Solution {
 String hs = new Solution().longestDiverseString(1, 1, 7);
 check(hs.length() == 8 && !hs.contains("ccc"), true);
 check(new Solution().longestDiverseString(7, 1, 0).length(), 5);
+```
+
+```go
+func longestDiverseString(a int, b int, c int) string {
+	cnt := []int{a, b, c}
+	out := []byte{}
+	for {
+		order := []int{0, 1, 2} // letters by remaining count, most first
+		sort.Slice(order, func(i, j int) bool { return cnt[order[i]] > cnt[order[j]] })
+		placed := false
+		for _, x := range order {
+			ch := byte('a' + x)
+			n := len(out)
+			if cnt[x] == 0 || (n >= 2 && out[n-1] == ch && out[n-2] == ch) {
+				continue // would make three in a row
+			}
+			out = append(out, ch)
+			cnt[x]--
+			placed = true
+			break
+		}
+		if !placed {
+			return string(out)
+		}
+	}
+}
+// test
+happy := func(s string, a, b, c int) bool { // any valid answer of maximum length is accepted
+	v := []int{a, b, c}
+	sort.Sort(sort.Reverse(sort.IntSlice(v)))
+	x, y, z := v[0], v[1], v[2]
+	return !strings.Contains(s, "aaa") && !strings.Contains(s, "bbb") && !strings.Contains(s, "ccc") &&
+		strings.Count(s, "a") <= a && strings.Count(s, "b") <= b && strings.Count(s, "c") <= c &&
+		len(s) == y+z+min(x, 2*(y+z+1))
+}
+for _, tc := range [][3]int{{1, 1, 7}, {7, 1, 0}, {2, 2, 1}, {0, 0, 0}, {0, 8, 11}, {5, 5, 5}, {0, 0, 9}} {
+	assertEq(happy(longestDiverseString(tc[0], tc[1], tc[2]), tc[0], tc[1], tc[2]), true)
+}
 ```

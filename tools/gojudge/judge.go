@@ -27,9 +27,11 @@ import (
 	"go/parser"
 	"go/scanner"
 	"go/token"
+	"os"
 	"reflect"
 	"regexp"
 	"runtime"
+	"runtime/debug"
 	"sort"
 	"strconv"
 	"strings"
@@ -522,6 +524,9 @@ func judge(lcSrc, code, test string) (out string) {
 	res := Result{Cases: []Case{}}
 	defer func() { // the interpreter itself can panic on code it does not support
 		if v := recover(); v != nil {
+			if os.Getenv("GOJUDGE_DEBUG") != "" {
+				debug.PrintStack()
+			}
 			msg := fmt.Sprintf("the Go interpreter (Yaegi) failed on this code: %v", v)
 			res.Error, res.Cases = &msg, []Case{}
 			out = toJSON(res)

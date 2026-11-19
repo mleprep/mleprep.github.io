@@ -39,6 +39,8 @@ func TestJudge(t *testing.T) {
 			test: "assertEq(f(3), 3)", want: []bool{true}},
 		{name: "multiple assignment with nil (patched yaegi)", code: "func f() *TreeNode {\n\tt := makeTree(1, 2)\n\tt.Right, t.Left = t.Left, nil\n\treturn t\n}",
 			test: "assertEq(f(), []any{1, nil, 2})", want: []bool{true}},
+		{name: "dereference inside a composite literal (patched yaegi)", code: "type ent struct{ v, i int }\n\nfunc f() []int {\n\th := &[]ent{{5, 1}}\n\treturn []int{(*h)[0].v, 2}\n}",
+			test: "assertEq(f(), []int{5, 2})", want: []bool{true}},
 		{name: "panic in one case does not stop the others", code: "func f(a []int) int { return a[5] }",
 			test: "assertEq(f(nil), 0)\nassertEq(1, 1)", want: []bool{false, true}, errHas: "index out of range (in f(), your code)"},
 		{name: "setup statement panics", code: "type T struct{ m map[int]int }\n\nfunc (t *T) Put(k int) { t.m[k] = 1 }",
