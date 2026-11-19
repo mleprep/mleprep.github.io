@@ -784,3 +784,288 @@ class Solution {
 // test
 check(new Solution().reverseBetween(ListNode.of(1, 2, 3, 4, 5), 2, 4), ListNode.of(1, 4, 3, 2, 5));
 ```
+
+
+## 876. Middle of the Linked List | Easy
+related: 143, 234, 148
+tags: fast-slow
+
+Fast moves two steps, slow one; when fast runs out, slow is at the middle (the second middle for even lengths).
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def middleNode(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        slow = fast = head
+        while fast and fast.next:
+            slow, fast = slow.next, fast.next.next
+        return slow
+# test
+assert Solution().middleNode(make_list([1, 2, 3, 4, 5])).val == 3
+assert Solution().middleNode(make_list([1, 2, 3, 4, 5, 6])).val == 4
+```
+
+```java
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; }
+        return slow;
+    }
+}
+// test
+check(new Solution().middleNode(ListNode.of(1, 2, 3, 4, 5, 6)), ListNode.of(4, 5, 6));
+```
+
+## 83. Remove Duplicates from Sorted List | Easy
+related: 82, 26
+tags: in-place
+
+Sorted → duplicates are adjacent. Skip `cur.next` while it equals `cur`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        cur = head
+        while cur and cur.next:
+            if cur.next.val == cur.val:
+                cur.next = cur.next.next
+            else:
+                cur = cur.next
+        return head
+# test
+assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 2, 3, 3]))) == [1, 2, 3]
+```
+
+```java
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        for (ListNode cur = head; cur != null && cur.next != null; )
+            if (cur.next.val == cur.val) cur.next = cur.next.next; else cur = cur.next;
+        return head;
+    }
+}
+// test
+check(new Solution().deleteDuplicates(ListNode.of(1, 1, 2, 3, 3)), ListNode.of(1, 2, 3));
+```
+
+## 82. Remove Duplicates from Sorted List II | Medium
+related: 83
+tags: dummy-head
+
+Remove **every** value that repeats. With a dummy, `prev` points to the last kept node; if the run starting at `prev.next` has length > 1, skip the whole run.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = prev = ListNode(0, head)
+        while prev.next:
+            cur = prev.next
+            if cur.next and cur.next.val == cur.val:
+                while cur.next and cur.next.val == cur.val:
+                    cur = cur.next
+                prev.next = cur.next          # drop the whole run
+            else:
+                prev = cur
+        return dummy.next
+# test
+assert list_vals(Solution().deleteDuplicates(make_list([1, 2, 3, 3, 4, 4, 5]))) == [1, 2, 5]
+assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 1, 2, 3]))) == [2, 3]
+```
+
+```java
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode dummy = new ListNode(0, head), prev = dummy;
+        while (prev.next != null) {
+            ListNode cur = prev.next;
+            if (cur.next != null && cur.next.val == cur.val) {
+                while (cur.next != null && cur.next.val == cur.val) cur = cur.next;
+                prev.next = cur.next;
+            } else prev = cur;
+        }
+        return dummy.next;
+    }
+}
+// test
+check(new Solution().deleteDuplicates(ListNode.of(1, 2, 3, 3, 4, 4, 5)), ListNode.of(1, 2, 5));
+```
+
+## 24. Swap Nodes in Pairs | Medium
+related: 25
+tags: dummy-head
+
+With `prev` before each pair `a → b`: rewire to `prev → b → a → (rest)` and advance `prev = a`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = prev = ListNode(0, head)
+        while prev.next and prev.next.next:
+            a, b = prev.next, prev.next.next
+            prev.next, a.next, b.next = b, b.next, a
+            prev = a
+        return dummy.next
+# test
+assert list_vals(Solution().swapPairs(make_list([1, 2, 3, 4]))) == [2, 1, 4, 3]
+assert list_vals(Solution().swapPairs(make_list([1, 2, 3]))) == [2, 1, 3]
+```
+
+```java
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        ListNode dummy = new ListNode(0, head), prev = dummy;
+        while (prev.next != null && prev.next.next != null) {
+            ListNode a = prev.next, b = a.next;
+            a.next = b.next;
+            b.next = a;
+            prev.next = b;
+            prev = a;
+        }
+        return dummy.next;
+    }
+}
+// test
+check(new Solution().swapPairs(ListNode.of(1, 2, 3, 4)), ListNode.of(2, 1, 4, 3));
+```
+
+## 61. Rotate List | Medium
+related: 189
+tags: ring
+
+Find the length and tail; connect tail → head to form a ring; the new tail is `n − k % n − 1` steps from the head; break the ring after it.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        if not head:
+            return None
+        n, tail = 1, head
+        while tail.next:
+            tail, n = tail.next, n + 1
+        tail.next = head                      # ring
+        for _ in range(n - k % n - 1):
+            head = head.next
+        new_head, head.next = head.next, None
+        return new_head
+# test
+assert list_vals(Solution().rotateRight(make_list([1, 2, 3, 4, 5]), 2)) == [4, 5, 1, 2, 3]
+assert list_vals(Solution().rotateRight(make_list([0, 1, 2]), 4)) == [2, 0, 1]
+```
+
+```java
+class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null) return null;
+        int n = 1;
+        ListNode tail = head;
+        while (tail.next != null) { tail = tail.next; n++; }
+        tail.next = head;
+        ListNode newTail = head;
+        for (int i = 0; i < n - k % n - 1; i++) newTail = newTail.next;
+        ListNode newHead = newTail.next;
+        newTail.next = null;
+        return newHead;
+    }
+}
+// test
+check(new Solution().rotateRight(ListNode.of(1, 2, 3, 4, 5), 2), ListNode.of(4, 5, 1, 2, 3));
+```
+
+## 86. Partition List | Medium
+related: 75, 328
+tags: two-lists
+
+Build two chains (`< x` and `≥ x`) with dummy heads, preserving order, then join them. Terminate the second chain!
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def partition(self, head: Optional[ListNode], x: int) -> Optional[ListNode]:
+        small = s = ListNode()
+        big = b = ListNode()
+        while head:
+            if head.val < x:
+                s.next = s = head
+            else:
+                b.next = b = head
+            head = head.next
+        b.next = None
+        s.next = big.next
+        return small.next
+# test
+assert list_vals(Solution().partition(make_list([1, 4, 3, 2, 5, 2]), 3)) == [1, 2, 2, 4, 3, 5]
+```
+
+```java
+class Solution {
+    public ListNode partition(ListNode head, int x) {
+        ListNode small = new ListNode(), big = new ListNode(), s = small, b = big;
+        for (; head != null; head = head.next) {
+            if (head.val < x) s = s.next = head; else b = b.next = head;
+        }
+        b.next = null;
+        s.next = big.next;
+        return small.next;
+    }
+}
+// test
+check(new Solution().partition(ListNode.of(1, 4, 3, 2, 5, 2), 3), ListNode.of(1, 2, 2, 4, 3, 5));
+```
+
+## 445. Add Two Numbers II | Medium
+related: 2
+tags: stack
+
+Most-significant digit first → push both lists' digits onto stacks, pop and add from the least significant, **prepending** each result node.
+
+**Complexity:** O(m + n).
+
+```python
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        a, b = [], []
+        while l1:
+            a.append(l1.val); l1 = l1.next
+        while l2:
+            b.append(l2.val); l2 = l2.next
+        head, carry = None, 0
+        while a or b or carry:
+            s = carry + (a.pop() if a else 0) + (b.pop() if b else 0)
+            carry, d = divmod(s, 10)
+            head = ListNode(d, head)
+        return head
+# test
+assert list_vals(Solution().addTwoNumbers(make_list([7, 2, 4, 3]), make_list([5, 6, 4]))) == [7, 8, 0, 7]
+assert list_vals(Solution().addTwoNumbers(make_list([5]), make_list([5]))) == [1, 0]
+```
+
+```java
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        Deque<Integer> a = new ArrayDeque<>(), b = new ArrayDeque<>();
+        for (; l1 != null; l1 = l1.next) a.push(l1.val);
+        for (; l2 != null; l2 = l2.next) b.push(l2.val);
+        ListNode head = null;
+        int carry = 0;
+        while (!a.isEmpty() || !b.isEmpty() || carry != 0) {
+            int s = carry + (a.isEmpty() ? 0 : a.pop()) + (b.isEmpty() ? 0 : b.pop());
+            carry = s / 10;
+            head = new ListNode(s % 10, head);
+        }
+        return head;
+    }
+}
+// test
+check(new Solution().addTwoNumbers(ListNode.of(7, 2, 4, 3), ListNode.of(5, 6, 4)), ListNode.of(7, 8, 0, 7));
+```

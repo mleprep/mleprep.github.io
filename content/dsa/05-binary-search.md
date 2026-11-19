@@ -660,3 +660,353 @@ class Solution {
 check(new Solution().mySqrt(8), 2);
 check(new Solution().mySqrt(2147395599), 46339);
 ```
+
+
+## 278. First Bad Version | Easy
+related: 35, 704
+tags: lower-bound
+
+`isBadVersion` is monotonic (F…F T…T) → find the first `true` with the lower-bound template, using as few API calls as possible.
+
+**Complexity:** O(log n) API calls.
+
+```python
+class Solution:
+    def firstBadVersion(self, n: int) -> int:
+        lo, hi = 1, n
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if isBadVersion(mid):      # provided by LeetCode
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo
+# test
+BAD = 4
+def isBadVersion(v): return v >= BAD
+assert Solution().firstBadVersion(5) == 4
+BAD = 1
+assert Solution().firstBadVersion(1) == 1
+```
+
+```java
+class VersionControl { // provided by LeetCode
+    static int bad;
+    boolean isBadVersion(int v) { return v >= bad; }
+}
+
+class Solution extends VersionControl {
+    public int firstBadVersion(int n) {
+        int lo = 1, hi = n;
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;      // avoids int overflow for n near 2^31
+            if (isBadVersion(mid)) hi = mid; else lo = mid + 1;
+        }
+        return lo;
+    }
+}
+// test
+VersionControl.bad = 1702766719;
+check(new Solution().firstBadVersion(2126753390), 1702766719);
+```
+
+## 852. Peak Index in a Mountain Array | Medium
+related: 162, 1095
+tags: slope
+
+Find the first index where the array starts descending: `arr[mid] > arr[mid + 1]`.
+
+**Complexity:** O(log n).
+
+```python
+class Solution:
+    def peakIndexInMountainArray(self, arr: List[int]) -> int:
+        lo, hi = 0, len(arr) - 1
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if arr[mid] > arr[mid + 1]:
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo
+# test
+assert Solution().peakIndexInMountainArray([0, 1, 0]) == 1
+assert Solution().peakIndexInMountainArray([0, 10, 5, 2]) == 1
+assert Solution().peakIndexInMountainArray([3, 5, 3, 2, 0]) == 1
+```
+
+```java
+class Solution {
+    public int peakIndexInMountainArray(int[] arr) {
+        int lo = 0, hi = arr.length - 1;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (arr[mid] > arr[mid + 1]) hi = mid; else lo = mid + 1;
+        }
+        return lo;
+    }
+}
+// test
+check(new Solution().peakIndexInMountainArray(new int[]{0, 10, 5, 2}), 1);
+```
+
+## 81. Search in Rotated Sorted Array II | Medium
+related: 33, 154
+tags: rotated, duplicates
+
+Like 33, but duplicates can hide which half is sorted: when `nums[lo] == nums[mid] == nums[hi]`, shrink both ends by one. Worst case degrades to O(n).
+
+**Complexity:** O(log n) average, O(n) worst.
+
+```python
+class Solution:
+    def search(self, nums: List[int], target: int) -> bool:
+        lo, hi = 0, len(nums) - 1
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            if nums[mid] == target:
+                return True
+            if nums[lo] == nums[mid] == nums[hi]:
+                lo, hi = lo + 1, hi - 1
+            elif nums[lo] <= nums[mid]:
+                if nums[lo] <= target < nums[mid]:
+                    hi = mid - 1
+                else:
+                    lo = mid + 1
+            else:
+                if nums[mid] < target <= nums[hi]:
+                    lo = mid + 1
+                else:
+                    hi = mid - 1
+        return False
+# test
+assert Solution().search([2, 5, 6, 0, 0, 1, 2], 0) is True
+assert Solution().search([2, 5, 6, 0, 0, 1, 2], 3) is False
+assert Solution().search([1, 0, 1, 1, 1], 0) is True
+```
+
+```java
+class Solution {
+    public boolean search(int[] nums, int target) {
+        int lo = 0, hi = nums.length - 1;
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (nums[mid] == target) return true;
+            if (nums[lo] == nums[mid] && nums[mid] == nums[hi]) { lo++; hi--; }
+            else if (nums[lo] <= nums[mid]) {
+                if (nums[lo] <= target && target < nums[mid]) hi = mid - 1; else lo = mid + 1;
+            } else {
+                if (nums[mid] < target && target <= nums[hi]) lo = mid + 1; else hi = mid - 1;
+            }
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().search(new int[]{1, 0, 1, 1, 1}, 0), true);
+check(new Solution().search(new int[]{2, 5, 6, 0, 0, 1, 2}, 3), false);
+```
+
+## 240. Search a 2D Matrix II | Medium
+related: 74, 378
+tags: staircase
+
+Rows and columns sorted (but rows don't continue each other). Start at the **top-right**: if bigger than target move left (the whole column below is bigger too), if smaller move down.
+
+```viz
+ 1  4  7 [11] 15      target 5: 11 > 5 <-, 7 > 5 <-, 4 < 5 v, 5 found
+ 2  5  8  12  19
+ 3  6  9  16  22
+```
+
+**Complexity:** O(m + n).
+
+```python
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        r, c = 0, len(matrix[0]) - 1
+        while r < len(matrix) and c >= 0:
+            v = matrix[r][c]
+            if v == target:
+                return True
+            if v > target:
+                c -= 1
+            else:
+                r += 1
+        return False
+# test
+M = [[1, 4, 7, 11, 15], [2, 5, 8, 12, 19], [3, 6, 9, 16, 22], [10, 13, 14, 17, 24], [18, 21, 23, 26, 30]]
+assert Solution().searchMatrix(M, 5) is True
+assert Solution().searchMatrix(M, 20) is False
+```
+
+```java
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int r = 0, c = matrix[0].length - 1;
+        while (r < matrix.length && c >= 0) {
+            if (matrix[r][c] == target) return true;
+            if (matrix[r][c] > target) c--; else r++;
+        }
+        return false;
+    }
+}
+// test
+int[][] M = {{1, 4, 7, 11, 15}, {2, 5, 8, 12, 19}, {3, 6, 9, 16, 22}, {10, 13, 14, 17, 24}, {18, 21, 23, 26, 30}};
+check(new Solution().searchMatrix(M, 5), true);
+check(new Solution().searchMatrix(M, 20), false);
+```
+
+## 528. Random Pick with Weight | Medium
+related: 384, 380
+tags: prefix-sum, upper-bound
+
+Prefix sums turn weights into intervals on `[0, total)`. Draw `r` uniformly, binary-search the first prefix sum **greater than** `r`.
+
+```viz
+w = [1, 3]   prefix = [1, 4]
+r in [0,1) -> index 0 (25%)     r in [1,4) -> index 1 (75%)
+```
+
+**Complexity:** O(n) init, O(log n) per pick.
+
+```python
+class Solution:
+    def __init__(self, w: List[int]):
+        self.pre = list(itertools.accumulate(w))
+
+    def pickIndex(self) -> int:
+        r = random.random() * self.pre[-1]
+        return bisect.bisect_right(self.pre, r)
+# test
+random.seed(1)
+s = Solution([1, 3])
+picks = [s.pickIndex() for _ in range(4000)]
+assert set(picks) == {0, 1} and 0.70 < picks.count(1) / 4000 < 0.80
+assert Solution([5]).pickIndex() == 0
+```
+
+```java
+class Solution {
+    private final int[] pre;
+    private final Random rnd = new Random(1);
+
+    public Solution(int[] w) {
+        pre = new int[w.length];
+        for (int i = 0, s = 0; i < w.length; i++) pre[i] = s += w[i];
+    }
+
+    public int pickIndex() {
+        int r = rnd.nextInt(pre[pre.length - 1]);          // r in [0, total)
+        int lo = 0, hi = pre.length - 1;
+        while (lo < hi) {                                   // first prefix > r
+            int mid = (lo + hi) / 2;
+            if (pre[mid] > r) hi = mid; else lo = mid + 1;
+        }
+        return lo;
+    }
+}
+// test
+Solution s = new Solution(new int[]{1, 3});
+int ones = 0;
+for (int i = 0; i < 4000; i++) ones += s.pickIndex();
+check(ones > 2800 && ones < 3200, true);
+```
+
+## 1539. Kth Missing Positive Number | Easy
+related: 41, 268
+tags: binary-search
+
+Missing count before index `i` is `arr[i] − (i + 1)` (monotonic). Find the first index where it is ≥ k; the answer is `lo + k`.
+
+**Complexity:** O(log n).
+
+```python
+class Solution:
+    def findKthPositive(self, arr: List[int], k: int) -> int:
+        lo, hi = 0, len(arr)
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if arr[mid] - (mid + 1) >= k:
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo + k
+# test
+assert Solution().findKthPositive([2, 3, 4, 7, 11], 5) == 9
+assert Solution().findKthPositive([1, 2, 3, 4], 2) == 6
+```
+
+```java
+class Solution {
+    public int findKthPositive(int[] arr, int k) {
+        int lo = 0, hi = arr.length;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (arr[mid] - (mid + 1) >= k) hi = mid; else lo = mid + 1;
+        }
+        return lo + k;
+    }
+}
+// test
+check(new Solution().findKthPositive(new int[]{2, 3, 4, 7, 11}, 5), 9);
+```
+
+## 1482. Minimum Number of Days to Make m Bouquets | Medium
+related: 875, 1011
+tags: search-on-answer
+
+`canMake(day)` (count runs of `k` adjacent bloomed flowers ≥ m) is monotonic in `day` → binary search the day between `min` and `max` bloom day.
+
+**Complexity:** O(n log max).
+
+```python
+class Solution:
+    def minDays(self, bloomDay: List[int], m: int, k: int) -> int:
+        if m * k > len(bloomDay):
+            return -1
+
+        def ok(day):
+            made = run = 0
+            for b in bloomDay:
+                run = run + 1 if b <= day else 0
+                if run == k:
+                    made, run = made + 1, 0
+            return made >= m
+
+        lo, hi = min(bloomDay), max(bloomDay)
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if ok(mid):
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo
+# test
+assert Solution().minDays([1, 10, 3, 10, 2], 3, 1) == 3
+assert Solution().minDays([1, 10, 3, 10, 2], 3, 2) == -1
+assert Solution().minDays([7, 7, 7, 7, 12, 7, 7], 2, 3) == 12
+```
+
+```java
+class Solution {
+    public int minDays(int[] bloomDay, int m, int k) {
+        if ((long) m * k > bloomDay.length) return -1;
+        int lo = Integer.MAX_VALUE, hi = 0;
+        for (int b : bloomDay) { lo = Math.min(lo, b); hi = Math.max(hi, b); }
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            int made = 0, run = 0;
+            for (int b : bloomDay) {
+                run = b <= mid ? run + 1 : 0;
+                if (run == k) { made++; run = 0; }
+            }
+            if (made >= m) hi = mid; else lo = mid + 1;
+        }
+        return lo;
+    }
+}
+// test
+check(new Solution().minDays(new int[]{7, 7, 7, 7, 12, 7, 7}, 2, 3), 12);
+check(new Solution().minDays(new int[]{1, 10, 3, 10, 2}, 3, 2), -1);
+```

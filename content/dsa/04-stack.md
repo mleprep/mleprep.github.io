@@ -702,3 +702,398 @@ int[] out = new int[7], prices = {100, 80, 60, 70, 60, 75, 85};
 for (int i = 0; i < 7; i++) out[i] = sp.next(prices[i]);
 check(out, new int[]{1, 1, 1, 2, 1, 4, 6});
 ```
+
+
+## 1249. Minimum Remove to Make Valid Parentheses | Medium
+related: 20, 301, 921
+tags: stack
+
+Stack the indices of unmatched `(`; a `)` with an empty stack is invalid. Afterwards, every index still on the stack is an invalid `(`. Remove all invalid indices.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def minRemoveToMakeValid(self, s: str) -> str:
+        st, bad = [], set()
+        for i, ch in enumerate(s):
+            if ch == "(":
+                st.append(i)
+            elif ch == ")":
+                if st:
+                    st.pop()
+                else:
+                    bad.add(i)
+        bad.update(st)
+        return "".join(ch for i, ch in enumerate(s) if i not in bad)
+# test
+assert Solution().minRemoveToMakeValid("lee(t(c)o)de)") == "lee(t(c)o)de"
+assert Solution().minRemoveToMakeValid("a)b(c)d") == "ab(c)d"
+assert Solution().minRemoveToMakeValid("))((") == ""
+```
+
+```java
+class Solution {
+    public String minRemoveToMakeValid(String s) {
+        Deque<Integer> st = new ArrayDeque<>();
+        boolean[] bad = new boolean[s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') st.push(i);
+            else if (c == ')') { if (st.isEmpty()) bad[i] = true; else st.pop(); }
+        }
+        for (int i : st) bad[i] = true;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) if (!bad[i]) sb.append(s.charAt(i));
+        return sb.toString();
+    }
+}
+// test
+check(new Solution().minRemoveToMakeValid("lee(t(c)o)de)"), "lee(t(c)o)de");
+check(new Solution().minRemoveToMakeValid("))(("), "");
+```
+
+## 735. Asteroid Collision | Medium
+related: 20
+tags: stack, simulation
+
+Only a right-mover (stack top > 0) followed by a left-mover (x < 0) collide. While that happens, the smaller explodes; equal sizes both explode.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def asteroidCollision(self, asteroids: List[int]) -> List[int]:
+        st = []
+        for x in asteroids:
+            alive = True
+            while alive and x < 0 and st and st[-1] > 0:
+                if st[-1] < -x:
+                    st.pop()
+                    continue
+                if st[-1] == -x:
+                    st.pop()
+                alive = False
+            if alive:
+                st.append(x)
+        return st
+# test
+assert Solution().asteroidCollision([5, 10, -5]) == [5, 10]
+assert Solution().asteroidCollision([8, -8]) == []
+assert Solution().asteroidCollision([10, 2, -5]) == [10]
+assert Solution().asteroidCollision([-2, -1, 1, 2]) == [-2, -1, 1, 2]
+```
+
+```java
+class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+        Deque<Integer> st = new ArrayDeque<>();
+        for (int x : asteroids) {
+            boolean alive = true;
+            while (alive && x < 0 && !st.isEmpty() && st.peekLast() > 0) {
+                int top = st.peekLast();
+                if (top < -x) { st.pollLast(); continue; }
+                if (top == -x) st.pollLast();
+                alive = false;
+            }
+            if (alive) st.addLast(x);
+        }
+        return st.stream().mapToInt(Integer::intValue).toArray();
+    }
+}
+// test
+check(new Solution().asteroidCollision(new int[]{10, 2, -5}), new int[]{10});
+check(new Solution().asteroidCollision(new int[]{-2, -1, 1, 2}), new int[]{-2, -1, 1, 2});
+```
+
+## 402. Remove K Digits | Medium
+related: 316, 321
+tags: monotonic-stack, greedy
+
+To minimize the number, a larger digit followed by a smaller one should go. Keep an **increasing** stack; pop while the top is bigger than the incoming digit and removals remain. Remove leftovers from the end; strip leading zeros.
+
+```viz
+num 1432219, k=3
+1 -> 14 -> 13 (pop 4) -> 12 (pop 3) -> 122 -> 121 (pop 2) -> 1219
+```
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeKdigits(self, num: str, k: int) -> str:
+        st = []
+        for d in num:
+            while k and st and st[-1] > d:
+                st.pop()
+                k -= 1
+            st.append(d)
+        if k:
+            st = st[:-k]
+        return "".join(st).lstrip("0") or "0"
+# test
+assert Solution().removeKdigits("1432219", 3) == "1219"
+assert Solution().removeKdigits("10200", 1) == "200"
+assert Solution().removeKdigits("10", 2) == "0"
+```
+
+```java
+class Solution {
+    public String removeKdigits(String num, int k) {
+        StringBuilder st = new StringBuilder();
+        for (char d : num.toCharArray()) {
+            while (k > 0 && st.length() > 0 && st.charAt(st.length() - 1) > d) { st.deleteCharAt(st.length() - 1); k--; }
+            st.append(d);
+        }
+        st.setLength(st.length() - k);
+        int i = 0;
+        while (i < st.length() && st.charAt(i) == '0') i++;
+        return i == st.length() ? "0" : st.substring(i);
+    }
+}
+// test
+check(new Solution().removeKdigits("1432219", 3), "1219");
+check(new Solution().removeKdigits("10200", 1), "200");
+check(new Solution().removeKdigits("10", 2), "0");
+```
+
+## 316. Remove Duplicate Letters | Medium
+related: 402, 1081
+tags: monotonic-stack, greedy
+
+Smallest lexicographic result with each letter once. Keep an increasing stack; pop the top if it's larger than the current letter **and appears again later** (we can re-add it). Skip letters already in the stack.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeDuplicateLetters(self, s: str) -> str:
+        last = {ch: i for i, ch in enumerate(s)}
+        st, used = [], set()
+        for i, ch in enumerate(s):
+            if ch in used:
+                continue
+            while st and st[-1] > ch and last[st[-1]] > i:
+                used.remove(st.pop())
+            st.append(ch)
+            used.add(ch)
+        return "".join(st)
+# test
+assert Solution().removeDuplicateLetters("bcabc") == "abc"
+assert Solution().removeDuplicateLetters("cbacdcbc") == "acdb"
+```
+
+```java
+class Solution {
+    public String removeDuplicateLetters(String s) {
+        int[] last = new int[26];
+        for (int i = 0; i < s.length(); i++) last[s.charAt(i) - 'a'] = i;
+        boolean[] used = new boolean[26];
+        StringBuilder st = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (used[c - 'a']) continue;
+            while (st.length() > 0 && st.charAt(st.length() - 1) > c && last[st.charAt(st.length() - 1) - 'a'] > i) {
+                used[st.charAt(st.length() - 1) - 'a'] = false;
+                st.deleteCharAt(st.length() - 1);
+            }
+            st.append(c);
+            used[c - 'a'] = true;
+        }
+        return st.toString();
+    }
+}
+// test
+check(new Solution().removeDuplicateLetters("cbacdcbc"), "acdb");
+```
+
+## 456. 132 Pattern | Medium
+related: 496
+tags: monotonic-stack
+
+Scan from the right keeping a decreasing stack of candidates for "3" and `two` = the best "2" (largest value popped, i.e. smaller than some later-left "3"). If the current number is less than `two`, it's a valid "1".
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def find132pattern(self, nums: List[int]) -> bool:
+        st, two = [], float("-inf")
+        for x in reversed(nums):
+            if x < two:
+                return True
+            while st and st[-1] < x:
+                two = st.pop()          # x acts as "3", popped value as "2"
+            st.append(x)
+        return False
+# test
+assert Solution().find132pattern([1, 2, 3, 4]) is False
+assert Solution().find132pattern([3, 1, 4, 2]) is True
+assert Solution().find132pattern([-1, 3, 2, 0]) is True
+```
+
+```java
+class Solution {
+    public boolean find132pattern(int[] nums) {
+        Deque<Integer> st = new ArrayDeque<>();
+        long two = Long.MIN_VALUE;
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (nums[i] < two) return true;
+            while (!st.isEmpty() && st.peek() < nums[i]) two = st.pop();
+            st.push(nums[i]);
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().find132pattern(new int[]{3, 1, 4, 2}), true);
+check(new Solution().find132pattern(new int[]{1, 2, 3, 4}), false);
+```
+
+## 907. Sum of Subarray Minimums | Medium
+related: 84, 2104
+tags: monotonic-stack, contribution
+
+Count, for each element, how many subarrays it is the minimum of: `left[i]` = distance to the previous **smaller** element, `right[i]` = distance to the next **smaller-or-equal** (asymmetric to avoid double-counting ties). Contribution = `arr[i] · left · right`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def sumSubarrayMins(self, arr: List[int]) -> int:
+        MOD, n = 10 ** 9 + 7, len(arr)
+        left, right, st = [0] * n, [0] * n, []
+        for i in range(n):
+            while st and arr[st[-1]] > arr[i]:
+                st.pop()
+            left[i] = i - (st[-1] if st else -1)
+            st.append(i)
+        st = []
+        for i in range(n - 1, -1, -1):
+            while st and arr[st[-1]] >= arr[i]:
+                st.pop()
+            right[i] = (st[-1] if st else n) - i
+            st.append(i)
+        return sum(a * l * r for a, l, r in zip(arr, left, right)) % MOD
+# test
+assert Solution().sumSubarrayMins([3, 1, 2, 4]) == 17
+assert Solution().sumSubarrayMins([11, 81, 94, 43, 3]) == 444
+```
+
+```java
+class Solution {
+    public int sumSubarrayMins(int[] arr) {
+        int n = arr.length;
+        long MOD = 1_000_000_007L, res = 0;
+        int[] left = new int[n], right = new int[n];
+        Deque<Integer> st = new ArrayDeque<>();
+        for (int i = 0; i < n; i++) {
+            while (!st.isEmpty() && arr[st.peek()] > arr[i]) st.pop();
+            left[i] = i - (st.isEmpty() ? -1 : st.peek());
+            st.push(i);
+        }
+        st.clear();
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.isEmpty() && arr[st.peek()] >= arr[i]) st.pop();
+            right[i] = (st.isEmpty() ? n : st.peek()) - i;
+            st.push(i);
+        }
+        for (int i = 0; i < n; i++) res = (res + (long) arr[i] * left[i] % MOD * right[i]) % MOD;
+        return (int) res;
+    }
+}
+// test
+check(new Solution().sumSubarrayMins(new int[]{3, 1, 2, 4}), 17);
+check(new Solution().sumSubarrayMins(new int[]{11, 81, 94, 43, 3}), 444);
+```
+
+## 1047. Remove All Adjacent Duplicates In String | Easy
+related: 1209, 20
+tags: stack
+
+Use the output as a stack: if the incoming char equals the top, pop; else push.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeDuplicates(self, s: str) -> str:
+        st = []
+        for ch in s:
+            if st and st[-1] == ch:
+                st.pop()
+            else:
+                st.append(ch)
+        return "".join(st)
+# test
+assert Solution().removeDuplicates("abbaca") == "ca"
+assert Solution().removeDuplicates("azxxzy") == "ay"
+```
+
+```java
+class Solution {
+    public String removeDuplicates(String s) {
+        StringBuilder st = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (st.length() > 0 && st.charAt(st.length() - 1) == c) st.deleteCharAt(st.length() - 1);
+            else st.append(c);
+        }
+        return st.toString();
+    }
+}
+// test
+check(new Solution().removeDuplicates("azxxzy"), "ay");
+```
+
+## 225. Implement Stack using Queues | Easy
+related: 232
+tags: design, queue
+
+One queue: after pushing `x`, rotate the previous `n−1` elements behind it so `x` is at the front. Push O(n), pop/top O(1).
+
+**Complexity:** push O(n), others O(1).
+
+```python
+class MyStack:
+    def __init__(self):
+        self.q = deque()
+
+    def push(self, x: int) -> None:
+        self.q.append(x)
+        for _ in range(len(self.q) - 1):
+            self.q.append(self.q.popleft())
+
+    def pop(self) -> int:
+        return self.q.popleft()
+
+    def top(self) -> int:
+        return self.q[0]
+
+    def empty(self) -> bool:
+        return not self.q
+# test
+s = MyStack()
+s.push(1); s.push(2)
+assert s.top() == 2 and s.pop() == 2 and not s.empty() and s.pop() == 1 and s.empty()
+```
+
+```java
+class MyStack {
+    private final Deque<Integer> q = new ArrayDeque<>();
+
+    public void push(int x) {
+        q.addLast(x);
+        for (int i = 1; i < q.size(); i++) q.addLast(q.pollFirst());
+    }
+
+    public int pop() { return q.pollFirst(); }
+    public int top() { return q.peekFirst(); }
+    public boolean empty() { return q.isEmpty(); }
+}
+// test
+MyStack s = new MyStack();
+s.push(1); s.push(2);
+check(s.top(), 2);
+check(s.pop(), 2);
+check(s.empty(), false);
+```
