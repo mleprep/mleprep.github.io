@@ -1,6 +1,6 @@
 /* LeetCode Review – tiny hash-routed SPA.
    Routes: #/  #/browse?filters  #/<section>  #/<section>/<topic>?filters  #/<section>/<topic>/<slug>
-   Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  b75=1
+   Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  list=grind169 (b75=1 = list=blind75)
    co=Google  win=6m (company window: all time by default)  sort=num|diff|title|freq  q=text */
 const REPO = 'https://github.com/mleprep/mleprep.github.io/blob/main/';
 const DIFFS = ['Easy', 'Medium', 'Hard'];
@@ -34,6 +34,15 @@ function loadCompanies(d) {
   CO = { by, names: d.companies, source: d.source };
 }
 const coRows = it => (CO && CO.by[it.slug]) || [];
+
+// study lists (data/lists.json, optional): Blind 75, NeetCode 150, Grind 169, LeetCode 75, Top Interview 150
+let LISTS = [];
+function loadLists(d) {
+  LISTS = d.lists.map(l => ({ ...l, pos: new Map(l.slugs.map((s, i) => [s, i])) }));
+}
+const listById = id => LISTS.find(l => l.id === id);
+// membership; without lists.json, Blind 75 still works from the problem tags
+const inList = (id, it) => { const l = listById(id); return l ? l.pos.has(it.slug) : id === 'blind75' && (it.tags || []).includes('blind75'); };
 // frequency (0-100) of problem `it` at company `c` in window `win` ('' = all time, '6m' = last six months); 0 = not asked
 function coVal(it, c, win) {
   const r = coRows(it).find(x => x.c === c);
@@ -79,7 +88,7 @@ function readF(p) {
   return {
     d: new Set((p.get('d') || '').split(',').filter(x => DIFFS.includes(x))),
     st: ['todo', 'done'].includes(p.get('st')) ? p.get('st') : 'all',
-    tag: p.get('tag') || '', topic: p.get('topic') || '', b75: p.get('b75') === '1',
+    tag: p.get('tag') || '', topic: p.get('topic') || '', list: p.get('list') || (p.get('b75') === '1' ? 'blind75' : ''),
     co: CO ? p.get('co') || '' : '', win: p.get('win') === '6m' ? '6m' : '',
     sort: p.get('sort') || '', q: p.get('q') || '',
   };
@@ -89,7 +98,7 @@ function writeF(F) {
   if (F.q) p.set('q', F.q);
   if (F.d.size) p.set('d', DIFFS.filter(d => F.d.has(d)).join(','));
   if (F.st !== 'all') p.set('st', F.st);
-  if (F.b75) p.set('b75', '1');
+  if (F.list) p.set('list', F.list);
   if (F.tag) p.set('tag', F.tag);
   if (F.topic) p.set('topic', F.topic);
   if (F.co) p.set('co', F.co);
@@ -102,7 +111,7 @@ function passes(f, F, skip) {
   const it = f.it, tags = it.tags || [];
   if (skip !== 'd' && F.d.size && !F.d.has(it.difficulty)) return false;
   if (skip !== 'st' && F.st !== 'all' && (F.st === 'done') !== isDone(f.s, it)) return false;
-  if (skip !== 'b75' && F.b75 && !tags.includes('blind75')) return false;
+  if (skip !== 'list' && F.list && !inList(F.list, it)) return false;
   if (skip !== 'tag' && F.tag && !tags.includes(F.tag)) return false;
   if (skip !== 'topic' && F.topic && f.t !== F.topic) return false;
   if (skip !== 'co' && F.co && !coVal(it, F.co, F.win)) return false;
@@ -118,6 +127,10 @@ function sortItems(list, how, F = {}) {
   if (how === 'freq') {
     const score = F.co ? f => coVal(f.it, F.co, F.win) : f => coCount(f.it, F.win);
     a.sort((x, y) => score(y) - score(x) || x.order - y.order);
+  }
+  if (how === 'list' && listById(F.list)) {   // the list's own study order (e.g. Grind's week-by-week plan)
+    const pos = listById(F.list).pos;
+    a.sort((x, y) => (pos.get(x.it.slug) ?? 1e9) - (pos.get(y.it.slug) ?? 1e9));
   }
   if (how === 'num') a.sort((x, y) => (x.it.id || 0) - (y.it.id || 0));
   else if (how === 'diff') a.sort((x, y) => (DRANK[x.it.difficulty] ?? 9) - (DRANK[y.it.difficulty] ?? 9) || x.order - y.order);
@@ -139,7 +152,8 @@ function listView(container, scope, base, opts = {}) {
     const tagOpts = Object.keys(tagCounts).sort((x, y) => tagCounts[y] - tagCounts[x] || x.localeCompare(y));   // most used first
     if (F.tag && !tagOpts.includes(F.tag)) tagOpts.unshift(F.tag);
     const topics = opts.topicFacet ? S.m.sections[0].topics : [];
-    const active = F.d.size || F.st !== 'all' || F.b75 || F.tag || F.topic || F.co || F.win || F.q;
+    const lists = LISTS.length ? LISTS : scope.some(f => (f.it.tags || []).includes('blind75')) ? [{ id: 'blind75', name: 'Blind 75' }] : [];
+    const active = F.d.size || F.st !== 'all' || F.list || F.tag || F.topic || F.co || F.win || F.q;
     // company facet: counts per company among items passing every other filter, in the chosen window
     const hasCo = CO && hasDiff, coCounts = {};
     if (hasCo) scope.filter(f => passes(f, F, 'co')).forEach(f => coRows(f.it).forEach(x => {
@@ -158,12 +172,13 @@ function listView(container, scope, base, opts = {}) {
         ${hasDiff ? `<div class="fgroup"><span class="flabel">Level</span>${chip('d', '', 'All', !F.d.size)}${DIFFS.map(d =>
           chip('d', d, `<i class="dot ${d}"></i>${d}`, F.d.has(d), cnt('d', f => f.it.difficulty === d))).join('')}</div>` : ''}
         <div class="fgroup"><span class="flabel">Status</span>${chip('st', 'all', 'All', F.st === 'all')}${chip('st', 'todo', 'Todo', F.st === 'todo', cnt('st', f => !isDone(f.s, f.it)))}${chip('st', 'done', 'Done ✓', F.st === 'done', cnt('st', f => isDone(f.s, f.it)))}</div>
-        ${hasTags && scope.some(f => (f.it.tags || []).includes('blind75')) ? `<div class="fgroup">${chip('b75', '1', '★ Blind 75', F.b75, cnt('b75', f => (f.it.tags || []).includes('blind75')))}</div>` : ''}
+        ${hasDiff && lists.length ? `<div class="fgroup"><span class="flabel">List</span>${chip('list', '', 'All', !F.list)}${lists.map(l =>
+          chip('list', l.id, l.id === 'blind75' ? '★ Blind 75' : esc(l.name), F.list === l.id, cnt('list', f => inList(l.id, f.it)))).join('')}</div>` : ''}
         ${hasTags ? `<select class="fsel" data-f="tag" aria-label="Pattern tag"><option value="">All patterns</option>${tagOpts.map(t =>
           `<option value="${esc(t)}" ${t === F.tag ? 'selected' : ''}>${esc(t)} (${tagCounts[t] || 0})</option>`).join('')}</select>` : ''}
         ${topics.length ? `<select class="fsel" data-f="topic" aria-label="Topic"><option value="">All topics</option>${topics.map(t =>
           `<option value="${t.id}" ${t.id === F.topic ? 'selected' : ''}>${esc(t.title)}</option>`).join('')}</select>` : ''}
-        ${hasDiff ? `<select class="fsel" data-f="sort" aria-label="Sort"><option value="">Roadmap order</option>${[['num', 'Problem #'], ['diff', 'Difficulty'], ['title', 'Title A–Z'], ...(CO ? [['freq', F.co ? `${F.co} frequency` : 'Most asked']] : [])].map(([v, l]) =>
+        ${hasDiff ? `<select class="fsel" data-f="sort" aria-label="Sort"><option value="">Roadmap order</option>${[...(listById(F.list) ? [['list', `${listById(F.list).name} order`]] : []), ['num', 'Problem #'], ['diff', 'Difficulty'], ['title', 'Title A–Z'], ...(CO ? [['freq', F.co ? `${F.co} frequency` : 'Most asked']] : [])].map(([v, l]) =>
           `<option value="${v}" ${v === F.sort ? 'selected' : ''}>Sort: ${esc(l)}</option>`).join('')}</select>` : ''}
       </div>
       ${hasCo ? `<div class="fbar">
@@ -190,10 +205,14 @@ function listView(container, scope, base, opts = {}) {
       update();
     });
     container.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { F.st = b.dataset.st; update(); });
-    container.querySelectorAll('[data-b75]').forEach(b => b.onclick = () => { F.b75 = !F.b75; update(); });
+    container.querySelectorAll('[data-list]').forEach(b => b.onclick = () => {
+      F.list = b.dataset.list;
+      if (!F.list && F.sort === 'list') F.sort = '';
+      update();
+    });
     container.querySelectorAll('[data-tag]').forEach(b => b.onclick = e => {
       e.preventDefault();
-      if (b.dataset.tag === 'blind75') F.b75 = true; else F.tag = F.tag === b.dataset.tag ? '' : b.dataset.tag;
+      if (b.dataset.tag === 'blind75') F.list = 'blind75'; else F.tag = F.tag === b.dataset.tag ? '' : b.dataset.tag;
       update();
     });
     container.querySelectorAll('[data-topic]').forEach(b => b.onclick = e => { e.preventDefault(); F.topic = b.dataset.topic; update(); });
@@ -223,7 +242,7 @@ function rows(list, opts) {
       <td class="c"><input type="checkbox" data-k="${key(f.s, it)}" ${isDone(f.s, it) ? 'checked' : ''} aria-label="done"></td>
       ${dsa ? `<td class="n">${it.id || ''}</td>` : ''}
       <td class="t"><a href="${href(f.s, f.t, it.slug)}">${esc(it.title)}</a>
-        <span class="tags">${(it.tags || []).map(t => `<a href="${browse(t === 'blind75' ? { b75: 1 } : { tag: t })}" class="tag${tagClass(t)}" data-tag="${esc(t)}">${esc(tagLabel(t))}</a>`).join('')}</span></td>
+        <span class="tags">${(it.tags || []).map(t => `<a href="${browse(t === 'blind75' ? { list: 'blind75' } : { tag: t })}" class="tag${tagClass(t)}" data-tag="${esc(t)}">${esc(tagLabel(t))}</a>`).join('')}</span></td>
       ${opts.showTopic ? `<td class="tp"><a href="${href(f.s, f.t)}"${f.s === 'dsa' ? ` data-topic="${f.t}"` : ''}>${esc(f.tTitle)}</a></td>` : ''}
       ${opts.fcol ? (v => `<td class="fq" title="${esc(v.title)}"><span class="meter"><i style="width:${Math.max(2, Math.min(100, v.w))}%"></i></span><b>${v.txt}</b></td>`)(opts.fcol(f)) : ''}
       ${it.difficulty ? `<td class="d"><a href="${browse({ d: it.difficulty })}" class="${it.difficulty}" data-d="${it.difficulty}">${it.difficulty}</a></td>` : (dsa ? '<td></td>' : '')}
@@ -273,17 +292,22 @@ function viewHome() {
     Plus system design and ML / deep learning. Progress is saved in this browser.</p>
     <div class="meta big">
       ${DIFFS.map(d => `<a class="badge ${d}" href="${browse({ d })}">${c[d]} ${d}</a>`).join('')}
-      <a class="badge star" href="${browse({ b75: 1 })}">★ ${b75} Blind 75</a>
+      <a class="badge star" href="${browse({ list: 'blind75' })}">★ ${b75} Blind 75</a>
       <a href="${browse({ st: 'done' })}">${done}/${total} done</a>
       <a href="${browse({ st: 'todo' })}">Todo list →</a>
       <a href="#" id="rand">Random unsolved →</a>
     </div>
     <div class="cards">
-      <a class="card" href="#/browse"><b>Browse all problems</b><span>filter by difficulty, pattern, company, status</span></a>
+      <a class="card" href="#/browse"><b>Browse all problems</b><span>filter by difficulty, list, pattern, company, status</span></a>
       ${S.m.sections.map(s => {
         const n = s.topics.reduce((a, t) => a + t.items.length, 0);
         return `<a class="card" href="${href(s.id)}"><b>${esc(s.title)}</b><span>${s.topics.length} topics · ${n} ${s.id === 'dsa' ? 'problems' : 'articles'}</span></a>`;
       }).join('')}</div>
+    ${LISTS.length ? `<h2>Study lists</h2><div class="cards">${LISTS.map(l => {
+      const items = FLAT.filter(f => f.s === 'dsa' && l.pos.has(f.it.slug)), d = items.filter(f => isDone('dsa', f.it)).length;
+      return `<a class="card" href="${browse({ list: l.id, sort: 'list' })}"><b>${l.id === 'blind75' ? '★ ' : ''}${esc(l.name)}</b>
+        <span>${d}/${items.length} done · in the list's own order</span><div class="bar-prog"><i style="width:${items.length ? 100 * d / items.length : 0}%"></i></div></a>`;
+    }).join('')}</div>` : ''}
     ${CO ? `<h2>By company</h2><div class="cards">${BIG.map(c => {
       const all = FLAT.filter(f => f.s === 'dsa' && coVal(f.it, c, '')), recent = all.filter(f => coVal(f.it, c, '6m'));
       return `<a class="card" href="${browse({ co: c, sort: 'freq' })}"><b>${esc(c)}</b><span>${all.length} problems · ${recent.length} in the last 6 months</span></a>`;
@@ -343,7 +367,7 @@ async function viewItem(s, t, slug, stale) {
     <div class="meta">
       ${dsa ? `<a class="badge ${it.difficulty}" href="${browse({ d: it.difficulty })}" title="All ${it.difficulty} problems">${it.difficulty}</a>
         <a href="https://leetcode.com/problems/${it.slug}/" target="_blank" rel="noopener">LeetCode ↗</a>` : ''}
-      ${(it.tags || []).map(x => `<a class="tag${tagClass(x)}" href="${browse(x === 'blind75' ? { b75: 1 } : { tag: x })}" title="Browse problems tagged ${esc(x)}">${esc(tagLabel(x))}</a>`).join('')}
+      ${(it.tags || []).map(x => `<a class="tag${tagClass(x)}" href="${browse(x === 'blind75' ? { list: 'blind75' } : { tag: x })}" title="Browse problems tagged ${esc(x)}">${esc(tagLabel(x))}</a>`).join('')}
       <label class="done"><input type="checkbox" data-k="${k}" ${S.done[k] ? 'checked' : ''}> Done</label>
     </div>
     ${dsa ? askedAt(it) : ''}
@@ -673,6 +697,6 @@ $('#theme').onclick = () => {
 };
 window.addEventListener('hashchange', route);
 
-Promise.all([getJSON('data/manifest.json'), getJSON('data/companies.json').catch(() => null)])
-  .then(([m, co]) => { S.m = m; if (co) loadCompanies(co); index(); route(); })
+Promise.all([getJSON('data/manifest.json'), getJSON('data/companies.json').catch(() => null), getJSON('data/lists.json').catch(() => null)])
+  .then(([m, co, lists]) => { S.m = m; if (co) loadCompanies(co); if (lists) loadLists(lists); index(); route(); })
   .catch(e => { main.innerHTML = `<h1>Could not load data</h1><pre>${esc(e.message)}</pre>`; });

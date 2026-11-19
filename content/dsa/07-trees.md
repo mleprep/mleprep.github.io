@@ -2080,3 +2080,322 @@ class Solution {
 // test
 check(new Solution().verticalTraversal(TreeNode.of(1, 2, 3, 4, 6, 5, 7)), "[[4], [2], [1, 5, 6], [3], [7]]");
 ```
+
+## 872. Leaf-Similar Trees | Easy
+related: 100, 257
+tags: dfs
+
+Collect each tree's leaves left-to-right with a DFS and compare the sequences.
+
+**Complexity:** O(n + m).
+
+```python
+class Solution:
+    def leafSimilar(self, root1: Optional[TreeNode], root2: Optional[TreeNode]) -> bool:
+        def leaves(node):
+            if node:
+                if not node.left and not node.right:
+                    yield node.val
+                yield from leaves(node.left)
+                yield from leaves(node.right)
+
+        return list(leaves(root1)) == list(leaves(root2))
+# test
+a = make_tree([3, 5, 1, 6, 2, 9, 8, None, None, 7, 4])
+b = make_tree([3, 5, 1, 6, 7, 4, 2, None, None, None, None, None, None, 9, 8])
+assert Solution().leafSimilar(a, b) is True
+assert Solution().leafSimilar(make_tree([1, 2, 3]), make_tree([1, 3, 2])) is False
+assert Solution().leafSimilar(make_tree([1]), make_tree([2, 1])) is True
+```
+
+```java
+class Solution {
+    public boolean leafSimilar(TreeNode root1, TreeNode root2) {
+        List<Integer> a = new ArrayList<>(), b = new ArrayList<>();
+        leaves(root1, a);
+        leaves(root2, b);
+        return a.equals(b);
+    }
+
+    private void leaves(TreeNode n, List<Integer> out) {
+        if (n == null) return;
+        if (n.left == null && n.right == null) out.add(n.val);
+        leaves(n.left, out);
+        leaves(n.right, out);
+    }
+}
+// test
+check(new Solution().leafSimilar(TreeNode.of(1, 2, 3), TreeNode.of(1, 3, 2)), false);
+check(new Solution().leafSimilar(TreeNode.of(1), TreeNode.of(2, 1)), true);
+```
+
+## 1372. Longest ZigZag Path in a Binary Tree | Medium
+related: 124, 543
+tags: tree-dp
+
+For every node compute two values: the longest zigzag **starting here going left** (= 1 + the left child's "going right" value) and **going right** (= 1 + the right child's "going left"). A missing child contributes −1 so the step to it counts 0. The answer is the maximum over all nodes.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def longestZigZag(self, root: Optional[TreeNode]) -> int:
+        best = 0
+
+        def dfs(node):                       # -> (zigzag length going left, going right), in edges
+            nonlocal best
+            if not node:
+                return -1, -1
+            left = dfs(node.left)[1] + 1
+            right = dfs(node.right)[0] + 1
+            best = max(best, left, right)
+            return left, right
+
+        dfs(root)
+        return best
+# test
+assert Solution().longestZigZag(make_tree([1, None, 1, 1, 1, None, None, 1, 1, None, 1, None, None, None, 1])) == 3
+assert Solution().longestZigZag(make_tree([1, 1, 1, None, 1, None, None, 1, 1, None, 1])) == 4
+assert Solution().longestZigZag(make_tree([1])) == 0
+```
+
+```java
+class Solution {
+    private int best = 0;
+
+    public int longestZigZag(TreeNode root) {
+        dfs(root);
+        return best;
+    }
+
+    private int[] dfs(TreeNode n) {          // {going left, going right}
+        if (n == null) return new int[]{-1, -1};
+        int left = dfs(n.left)[1] + 1, right = dfs(n.right)[0] + 1;
+        best = Math.max(best, Math.max(left, right));
+        return new int[]{left, right};
+    }
+}
+// test
+check(new Solution().longestZigZag(TreeNode.of(1, 1, 1, null, 1, null, null, 1, 1, null, 1)), 4);
+```
+
+## 1161. Maximum Level Sum of a Binary Tree | Medium
+related: 102, 637
+tags: bfs
+
+Level-order BFS, summing each level; keep the first (smallest) level with the strictly largest sum. Values can be negative, so start from −∞.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def maxLevelSum(self, root: Optional[TreeNode]) -> int:
+        best, best_level, level, q = float("-inf"), 0, 0, deque([root])
+        while q:
+            level += 1
+            total = 0
+            for _ in range(len(q)):
+                n = q.popleft()
+                total += n.val
+                q.extend(c for c in (n.left, n.right) if c)
+            if total > best:
+                best, best_level = total, level
+        return best_level
+# test
+assert Solution().maxLevelSum(make_tree([1, 7, 0, 7, -8, None, None])) == 2
+assert Solution().maxLevelSum(make_tree([989, None, 10250, 98693, -89388, None, None, None, -32127])) == 2
+assert Solution().maxLevelSum(make_tree([-1, -2, -3])) == 1
+```
+
+```java
+class Solution {
+    public int maxLevelSum(TreeNode root) {
+        long best = Long.MIN_VALUE;
+        int bestLevel = 0, level = 0;
+        Deque<TreeNode> q = new ArrayDeque<>(List.of(root));
+        while (!q.isEmpty()) {
+            level++;
+            long total = 0;
+            for (int i = q.size(); i > 0; i--) {
+                TreeNode n = q.poll();
+                total += n.val;
+                if (n.left != null) q.add(n.left);
+                if (n.right != null) q.add(n.right);
+            }
+            if (total > best) { best = total; bestLevel = level; }
+        }
+        return bestLevel;
+    }
+}
+// test
+check(new Solution().maxLevelSum(TreeNode.of(1, 7, 0, 7, -8, null, null)), 2);
+check(new Solution().maxLevelSum(TreeNode.of(-1, -2, -3)), 1);
+```
+
+## 700. Search in a Binary Search Tree | Easy
+related: 701, 98
+tags: bst
+
+Walk down from the root: go left if the target is smaller, right if larger. No recursion needed.
+
+**Complexity:** O(h).
+
+```python
+class Solution:
+    def searchBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+        while root and root.val != val:
+            root = root.left if val < root.val else root.right
+        return root
+# test
+assert tree_vals(Solution().searchBST(make_tree([4, 2, 7, 1, 3]), 2)) == [2, 1, 3]
+assert Solution().searchBST(make_tree([4, 2, 7, 1, 3]), 5) is None
+assert tree_vals(Solution().searchBST(make_tree([4, 2, 7, 1, 3]), 7)) == [7]
+```
+
+```java
+class Solution {
+    public TreeNode searchBST(TreeNode root, int val) {
+        while (root != null && root.val != val) root = val < root.val ? root.left : root.right;
+        return root;
+    }
+}
+// test
+check(new Solution().searchBST(TreeNode.of(4, 2, 7, 1, 3), 2), "[2, 1, 3]");
+check(new Solution().searchBST(TreeNode.of(4, 2, 7, 1, 3), 5), null);
+```
+
+## 285. Inorder Successor in BST | Medium
+related: 230, 173, 98
+tags: bst, premium
+
+**Problem (Premium):** given a BST and one of its nodes `p`, return the node with the smallest key greater than `p.val`, or null.
+
+No in-order traversal needed: walk down from the root. Whenever `p.val < node.val`, this node is a **candidate** (it's bigger than p) — remember it and go left looking for a smaller one; otherwise go right.
+
+**Complexity:** O(h) time, O(1) space.
+
+```python
+class Solution:
+    def inorderSuccessor(self, root: TreeNode, p: TreeNode) -> Optional[TreeNode]:
+        succ = None
+        while root:
+            if p.val < root.val:
+                succ, root = root, root.left
+            else:
+                root = root.right
+        return succ
+# test
+t = make_tree([2, 1, 3])
+assert Solution().inorderSuccessor(t, find_node(t, 1)).val == 2
+t = make_tree([5, 3, 6, 2, 4, None, None, 1])
+assert Solution().inorderSuccessor(t, find_node(t, 6)) is None
+assert Solution().inorderSuccessor(t, find_node(t, 4)).val == 5
+assert Solution().inorderSuccessor(t, find_node(t, 1)).val == 2
+assert Solution().inorderSuccessor(t, find_node(t, 3)).val == 4
+```
+
+```java
+class Solution {
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        TreeNode succ = null;
+        while (root != null) {
+            if (p.val < root.val) { succ = root; root = root.left; }
+            else root = root.right;
+        }
+        return succ;
+    }
+}
+// test
+TreeNode t = TreeNode.of(5, 3, 6, 2, 4, null, null, 1);
+check(new Solution().inorderSuccessor(t, TreeNode.find(t, 4)).val, 5);
+check(new Solution().inorderSuccessor(t, TreeNode.find(t, 6)), null);
+```
+
+## 427. Construct Quad Tree | Medium
+related: 108, 54
+tags: divide-and-conquer
+
+Recursively build the four quadrants of an `n × n` square. If all four children are leaves with the same value, collapse them into one leaf; otherwise return an internal node holding the four children. (Internal nodes' `val` can be anything.)
+
+```viz
+1 1 0 0      TL = all 1 -> leaf(1)    TR = all 0 -> leaf(0)
+1 1 0 0
+1 1 1 1      BL = all 1 -> leaf(1)    BR = all 1 -> leaf(1)
+1 1 1 1      children differ -> root is internal
+```
+
+**Complexity:** O(n²) time — every cell is a base case exactly once and each merge is O(1) (the recursion tree has about 4/3·n² nodes); O(log n) recursion depth.
+
+```python
+class Node:  # provided by LeetCode
+    def __init__(self, val, isLeaf, topLeft, topRight, bottomLeft, bottomRight):
+        self.val = val
+        self.isLeaf = isLeaf
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
+
+
+class Solution:
+    def construct(self, grid: List[List[int]]) -> 'Node':
+        def build(r, c, n):
+            if n == 1:
+                return Node(grid[r][c] == 1, True, None, None, None, None)
+            h = n // 2
+            kids = [build(r, c, h), build(r, c + h, h), build(r + h, c, h), build(r + h, c + h, h)]
+            if all(k.isLeaf for k in kids) and len({k.val for k in kids}) == 1:
+                return Node(kids[0].val, True, None, None, None, None)
+            return Node(True, False, *kids)
+
+        return build(0, 0, len(grid))
+# test
+def quad(node: "Node"):  # level order: "*" = internal node, "0"/"1" = leaf value
+    out, q = [], deque([node])
+    while q:
+        n = q.popleft()
+        out.append(("1" if n.val else "0") if n.isLeaf else "*")
+        if not n.isLeaf:
+            q.extend([n.topLeft, n.topRight, n.bottomLeft, n.bottomRight])
+    return "".join(out)
+assert quad(Solution().construct([[0, 1], [1, 0]])) == "*0110"
+assert quad(Solution().construct([[1]])) == "1"
+assert quad(Solution().construct([[1, 1], [1, 1]])) == "1"
+assert quad(Solution().construct([[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1]])) == "*1011"
+assert quad(Solution().construct([[1, 1, 0, 0], [1, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1]])) == "**0111110"
+```
+
+```java
+class Node { // provided by LeetCode
+    public boolean val, isLeaf;
+    public Node topLeft, topRight, bottomLeft, bottomRight;
+    public Node() {}
+    public Node(boolean val, boolean isLeaf) { this.val = val; this.isLeaf = isLeaf; }
+    public Node(boolean val, boolean isLeaf, Node topLeft, Node topRight, Node bottomLeft, Node bottomRight) {
+        this.val = val; this.isLeaf = isLeaf;
+        this.topLeft = topLeft; this.topRight = topRight; this.bottomLeft = bottomLeft; this.bottomRight = bottomRight;
+    }
+}
+
+class Solution {
+    public Node construct(int[][] grid) { return build(grid, 0, 0, grid.length); }
+
+    private Node build(int[][] g, int r, int c, int n) {
+        if (n == 1) return new Node(g[r][c] == 1, true);
+        int h = n / 2;
+        Node tl = build(g, r, c, h), tr = build(g, r, c + h, h), bl = build(g, r + h, c, h), br = build(g, r + h, c + h, h);
+        if (tl.isLeaf && tr.isLeaf && bl.isLeaf && br.isLeaf && tl.val == tr.val && tr.val == bl.val && bl.val == br.val)
+            return new Node(tl.val, true);
+        return new Node(true, false, tl, tr, bl, br);
+    }
+}
+// test
+StringBuilder sb = new StringBuilder();
+Deque<Node> q = new ArrayDeque<>(List.of(new Solution().construct(new int[][]{{1, 1, 0, 0}, {1, 1, 0, 0}, {1, 1, 1, 1}, {1, 1, 1, 1}})));
+while (!q.isEmpty()) {
+    Node n = q.poll();
+    sb.append(n.isLeaf ? (n.val ? "1" : "0") : "*");
+    if (!n.isLeaf) q.addAll(List.of(n.topLeft, n.topRight, n.bottomLeft, n.bottomRight));
+}
+check(sb.toString(), "*1011");
+```

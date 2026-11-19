@@ -926,3 +926,216 @@ class Solution {
 check(new Solution().medianSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3), new double[]{1.0, -1.0, -1.0, 3.0, 5.0, 6.0});
 check(new Solution().medianSlidingWindow(new int[]{1, 4, 2, 3}, 4), new double[]{2.5});
 ```
+
+## 632. Smallest Range Covering Elements from K Lists | Hard
+related: 23, 76
+tags: k-way-merge, min-heap
+
+K-way merge with a min-heap holding one element from each list, plus the current **maximum** of those elements. The heap top and the max form a range containing one element of every list. Advance the list that holds the minimum (the only move that can shrink the range); stop when that list runs out.
+
+**Complexity:** O(N log k) for N total elements.
+
+```python
+class Solution:
+    def smallestRange(self, nums: List[List[int]]) -> List[int]:
+        heap = [(row[0], i, 0) for i, row in enumerate(nums)]
+        heapify(heap)
+        hi = max(row[0] for row in nums)
+        best = [heap[0][0], hi]
+        while True:
+            lo, i, j = heappop(heap)
+            if hi - lo < best[1] - best[0]:
+                best = [lo, hi]
+            if j + 1 == len(nums[i]):
+                return best
+            nxt = nums[i][j + 1]
+            hi = max(hi, nxt)
+            heappush(heap, (nxt, i, j + 1))
+# test
+assert Solution().smallestRange([[4, 10, 15, 24, 26], [0, 9, 12, 20], [5, 18, 22, 30]]) == [20, 24]
+assert Solution().smallestRange([[1, 2, 3], [1, 2, 3], [1, 2, 3]]) == [1, 1]
+assert Solution().smallestRange([[1], [2], [3]]) == [1, 3]
+assert Solution().smallestRange([[10, 10], [11, 11]]) == [10, 11]
+```
+
+```java
+class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0])); // {value, list, index}
+        int hi = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.size(); i++) {
+            pq.add(new int[]{nums.get(i).get(0), i, 0});
+            hi = Math.max(hi, nums.get(i).get(0));
+        }
+        int[] best = {pq.peek()[0], hi};
+        while (true) {
+            int[] top = pq.poll();
+            if (hi - top[0] < best[1] - best[0]) best = new int[]{top[0], hi};
+            List<Integer> row = nums.get(top[1]);
+            if (top[2] + 1 == row.size()) return best;
+            int nxt = row.get(top[2] + 1);
+            hi = Math.max(hi, nxt);
+            pq.add(new int[]{nxt, top[1], top[2] + 1});
+        }
+    }
+}
+// test
+check(new Solution().smallestRange(List.of(List.of(4, 10, 15, 24, 26), List.of(0, 9, 12, 20), List.of(5, 18, 22, 30))), new int[]{20, 24});
+check(new Solution().smallestRange(List.of(List.of(1, 2, 3), List.of(1, 2, 3), List.of(1, 2, 3))), new int[]{1, 1});
+```
+
+## 2336. Smallest Number in Infinite Set | Medium
+related: 1845, 703
+tags: min-heap, design
+
+Every integer `≥ nxt` is still present — no need to store them. Numbers added back **below** `nxt` go into a min-heap (with a set to avoid duplicates). Pop from the heap if it's non-empty, otherwise hand out `nxt` and increment it.
+
+**Complexity:** O(log n) per operation.
+
+```python
+class SmallestInfiniteSet:
+    def __init__(self):
+        self.nxt = 1
+        self.back, self.in_back = [], set()
+
+    def popSmallest(self) -> int:
+        if self.back:
+            x = heappop(self.back)
+            self.in_back.remove(x)
+            return x
+        self.nxt += 1
+        return self.nxt - 1
+
+    def addBack(self, num: int) -> None:
+        if num < self.nxt and num not in self.in_back:
+            self.in_back.add(num)
+            heappush(self.back, num)
+# test
+s = SmallestInfiniteSet()
+s.addBack(2)
+assert [s.popSmallest(), s.popSmallest(), s.popSmallest()] == [1, 2, 3]
+s.addBack(1)
+assert [s.popSmallest(), s.popSmallest(), s.popSmallest()] == [1, 4, 5]
+s2 = SmallestInfiniteSet()
+s2.popSmallest(); s2.popSmallest()
+s2.addBack(1); s2.addBack(1)
+assert [s2.popSmallest(), s2.popSmallest()] == [1, 3]
+```
+
+```java
+class SmallestInfiniteSet {
+    private int nxt = 1;
+    private final TreeSet<Integer> back = new TreeSet<>();   // re-added numbers below nxt
+
+    public int popSmallest() { return back.isEmpty() ? nxt++ : back.pollFirst(); }
+
+    public void addBack(int num) { if (num < nxt) back.add(num); }
+}
+// test
+SmallestInfiniteSet s = new SmallestInfiniteSet();
+s.addBack(2);
+check(new int[]{s.popSmallest(), s.popSmallest(), s.popSmallest()}, new int[]{1, 2, 3});
+s.addBack(1);
+check(new int[]{s.popSmallest(), s.popSmallest(), s.popSmallest()}, new int[]{1, 4, 5});
+```
+
+## 2542. Maximum Subsequence Score | Medium
+related: 857, 1383
+tags: min-heap, sort, greedy
+
+Sort pairs by `nums2` **descending**. When we reach pair `i`, `nums2[i]` is the minimum of everything seen so far — so fix it as the multiplier and pair it with the **k largest `nums1`** among the seen pairs, kept in a size-k min-heap with a running sum.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def maxScore(self, nums1: List[int], nums2: List[int], k: int) -> int:
+        heap, total, best = [], 0, 0
+        for b, a in sorted(zip(nums2, nums1), reverse=True):
+            heappush(heap, a)
+            total += a
+            if len(heap) > k:
+                total -= heappop(heap)
+            if len(heap) == k:
+                best = max(best, total * b)
+        return best
+# test
+assert Solution().maxScore([1, 3, 3, 2], [2, 1, 3, 4], 3) == 12
+assert Solution().maxScore([4, 2, 3, 1, 1], [7, 5, 10, 9, 6], 1) == 30
+assert Solution().maxScore([2, 1, 14, 12], [11, 7, 13, 6], 3) == 168
+```
+
+```java
+class Solution {
+    public long maxScore(int[] nums1, int[] nums2, int k) {
+        int n = nums1.length;
+        Integer[] idx = new Integer[n];
+        for (int i = 0; i < n; i++) idx[i] = i;
+        Arrays.sort(idx, (x, y) -> nums2[y] - nums2[x]);
+        PriorityQueue<Integer> heap = new PriorityQueue<>();
+        long total = 0, best = 0;
+        for (int i : idx) {
+            heap.add(nums1[i]);
+            total += nums1[i];
+            if (heap.size() > k) total -= heap.poll();
+            if (heap.size() == k) best = Math.max(best, total * nums2[i]);
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().maxScore(new int[]{1, 3, 3, 2}, new int[]{2, 1, 3, 4}, 3), 12L);
+check(new Solution().maxScore(new int[]{4, 2, 3, 1, 1}, new int[]{7, 5, 10, 9, 6}, 1), 30L);
+```
+
+## 2462. Total Cost to Hire K Workers | Medium
+related: 2542, 1046
+tags: two-heaps
+
+Two min-heaps: the first `candidates` workers and the last `candidates` workers (never overlapping — the pointers `i ≤ j` guarantee each worker is in at most one heap). Each round hire the cheaper top (front wins ties: smaller index), then refill that side from the middle.
+
+**Complexity:** O((k + candidates) log candidates).
+
+```python
+class Solution:
+    def totalCost(self, costs: List[int], k: int, candidates: int) -> int:
+        i, j = 0, len(costs) - 1
+        front, back, total = [], [], 0
+        for _ in range(k):
+            while len(front) < candidates and i <= j:
+                heappush(front, costs[i])
+                i += 1
+            while len(back) < candidates and i <= j:
+                heappush(back, costs[j])
+                j -= 1
+            if not back or (front and front[0] <= back[0]):
+                total += heappop(front)
+            else:
+                total += heappop(back)
+        return total
+# test
+assert Solution().totalCost([17, 12, 10, 2, 7, 2, 11, 20, 8], 3, 4) == 11
+assert Solution().totalCost([1, 2, 4, 1], 3, 3) == 4
+assert Solution().totalCost([5], 1, 1) == 5
+assert Solution().totalCost([2, 2, 2, 2], 2, 1) == 4
+```
+
+```java
+class Solution {
+    public long totalCost(int[] costs, int k, int candidates) {
+        PriorityQueue<Integer> front = new PriorityQueue<>(), back = new PriorityQueue<>();
+        int i = 0, j = costs.length - 1;
+        long total = 0;
+        while (k-- > 0) {
+            while (front.size() < candidates && i <= j) front.add(costs[i++]);
+            while (back.size() < candidates && i <= j) back.add(costs[j--]);
+            if (back.isEmpty() || (!front.isEmpty() && front.peek() <= back.peek())) total += front.poll();
+            else total += back.poll();
+        }
+        return total;
+    }
+}
+// test
+check(new Solution().totalCost(new int[]{17, 12, 10, 2, 7, 2, 11, 20, 8}, 3, 4), 11L);
+check(new Solution().totalCost(new int[]{1, 2, 4, 1}, 3, 3), 4L);
+```

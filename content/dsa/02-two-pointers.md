@@ -817,3 +817,239 @@ class Solution {
 // test
 check(new Solution().numRescueBoats(new int[]{3, 2, 2, 1}, 3), 3);
 ```
+
+## 844. Backspace String Compare | Easy
+related: 2390, 1047
+tags: two-pointers, reverse-scan
+
+A stack works (O(n) space). For O(1) space walk **both strings from the end**: count pending `#`s and skip that many characters; compare the surviving characters one by one.
+
+**Complexity:** O(n + m) time, O(1) space.
+
+```python
+class Solution:
+    def backspaceCompare(self, s: str, t: str) -> bool:
+        def survivors(x):                  # surviving characters, right to left
+            skip = 0
+            for ch in reversed(x):
+                if ch == "#":
+                    skip += 1
+                elif skip:
+                    skip -= 1
+                else:
+                    yield ch
+
+        return all(a == b for a, b in itertools.zip_longest(survivors(s), survivors(t)))
+# test
+assert Solution().backspaceCompare("ab#c", "ad#c") is True
+assert Solution().backspaceCompare("ab##", "c#d#") is True
+assert Solution().backspaceCompare("a#c", "b") is False
+assert Solution().backspaceCompare("a##c", "#a#c") is True
+assert Solution().backspaceCompare("bxj##tw", "bxo#j##tw") is True
+assert Solution().backspaceCompare("ab", "b") is False
+```
+
+```java
+class Solution {
+    public boolean backspaceCompare(String s, String t) {
+        int i = s.length() - 1, j = t.length() - 1;
+        while (true) {
+            i = next(s, i);
+            j = next(t, j);
+            if (i < 0 || j < 0) return i < 0 && j < 0;
+            if (s.charAt(i--) != t.charAt(j--)) return false;
+        }
+    }
+
+    private int next(String x, int i) {   // index of the next surviving char at or before i, or -1
+        for (int skip = 0; i >= 0; i--) {
+            if (x.charAt(i) == '#') skip++;
+            else if (skip > 0) skip--;
+            else break;
+        }
+        return i;
+    }
+}
+// test
+check(new Solution().backspaceCompare("ab##", "c#d#"), true);
+check(new Solution().backspaceCompare("a#c", "b"), false);
+check(new Solution().backspaceCompare("bxj##tw", "bxo#j##tw"), true);
+```
+
+## 1768. Merge Strings Alternately | Easy
+related: 88
+tags: two-pointers
+
+Take one character from each word in turn; when one runs out, append the rest of the other.
+
+**Complexity:** O(n + m).
+
+```python
+class Solution:
+    def mergeAlternately(self, word1: str, word2: str) -> str:
+        return "".join(a + b for a, b in itertools.zip_longest(word1, word2, fillvalue=""))
+# test
+assert Solution().mergeAlternately("abc", "pqr") == "apbqcr"
+assert Solution().mergeAlternately("ab", "pqrs") == "apbqrs"
+assert Solution().mergeAlternately("abcd", "pq") == "apbqcd"
+```
+
+```java
+class Solution {
+    public String mergeAlternately(String word1, String word2) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < Math.max(word1.length(), word2.length()); i++) {
+            if (i < word1.length()) sb.append(word1.charAt(i));
+            if (i < word2.length()) sb.append(word2.charAt(i));
+        }
+        return sb.toString();
+    }
+}
+// test
+check(new Solution().mergeAlternately("ab", "pqrs"), "apbqrs");
+check(new Solution().mergeAlternately("abcd", "pq"), "apbqcd");
+```
+
+## 345. Reverse Vowels of a String | Easy
+related: 344, 125
+tags: opposite-ends
+
+Opposite-end pointers: advance each pointer past consonants, swap when both sit on vowels (either case).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vowels = set("aeiouAEIOU")
+        a, i, j = list(s), 0, len(s) - 1
+        while i < j:
+            if a[i] not in vowels:
+                i += 1
+            elif a[j] not in vowels:
+                j -= 1
+            else:
+                a[i], a[j] = a[j], a[i]
+                i, j = i + 1, j - 1
+        return "".join(a)
+# test
+assert Solution().reverseVowels("IceCreAm") == "AceCreIm"
+assert Solution().reverseVowels("leetcode") == "leotcede"
+assert Solution().reverseVowels("bcd") == "bcd"
+assert Solution().reverseVowels("aA") == "Aa"
+```
+
+```java
+class Solution {
+    public String reverseVowels(String s) {
+        char[] a = s.toCharArray();
+        for (int i = 0, j = a.length - 1; i < j; ) {
+            if ("aeiouAEIOU".indexOf(a[i]) < 0) i++;
+            else if ("aeiouAEIOU".indexOf(a[j]) < 0) j--;
+            else { char t = a[i]; a[i++] = a[j]; a[j--] = t; }
+        }
+        return new String(a);
+    }
+}
+// test
+check(new Solution().reverseVowels("IceCreAm"), "AceCreIm");
+check(new Solution().reverseVowels("leetcode"), "leotcede");
+```
+
+## 443. String Compression | Medium
+related: 38, 271
+tags: read-write-pointers, in-place
+
+Read pointer finds each run `[i, j)`; write pointer writes the character and, if the run is longer than 1, the digits of its length. The write pointer never overtakes the read pointer, so it works in place.
+
+**Complexity:** O(n) time, O(1) extra space.
+
+```python
+class Solution:
+    def compress(self, chars: List[str]) -> int:
+        w = i = 0
+        while i < len(chars):
+            j = i
+            while j < len(chars) and chars[j] == chars[i]:
+                j += 1
+            chars[w] = chars[i]
+            w += 1
+            if j - i > 1:
+                for d in str(j - i):
+                    chars[w] = d
+                    w += 1
+            i = j
+        return w
+# test
+a = ["a", "a", "b", "b", "c", "c", "c"]
+k = Solution().compress(a)
+assert k == 6 and a[:k] == ["a", "2", "b", "2", "c", "3"]
+a = ["a"]
+k = Solution().compress(a)
+assert k == 1 and a[:k] == ["a"]
+a = ["a"] + ["b"] * 12
+k = Solution().compress(a)
+assert k == 4 and a[:k] == ["a", "b", "1", "2"]
+```
+
+```java
+class Solution {
+    public int compress(char[] chars) {
+        int w = 0;
+        for (int i = 0, j; i < chars.length; i = j) {
+            for (j = i; j < chars.length && chars[j] == chars[i]; j++) ;
+            chars[w++] = chars[i];
+            if (j - i > 1) for (char d : String.valueOf(j - i).toCharArray()) chars[w++] = d;
+        }
+        return w;
+    }
+}
+// test
+char[] a = {'a', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'};
+int k = new Solution().compress(a);
+check(new String(a, 0, k), "ab12");
+```
+
+## 1679. Max Number of K-Sum Pairs | Medium
+related: 1, 167
+tags: hash-map, two-sum
+
+Two Sum, counted: scan once; if a waiting partner `k − x` exists, pair them (use it up); otherwise leave `x` waiting. (Sorting + opposite-end pointers also works in O(n log n).)
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def maxOperations(self, nums: List[int], k: int) -> int:
+        waiting, ops = Counter(), 0
+        for x in nums:
+            if waiting[k - x]:
+                waiting[k - x] -= 1
+                ops += 1
+            else:
+                waiting[x] += 1
+        return ops
+# test
+assert Solution().maxOperations([1, 2, 3, 4], 5) == 2
+assert Solution().maxOperations([3, 1, 3, 4, 3], 6) == 1
+assert Solution().maxOperations([2, 2, 2, 2], 4) == 2
+assert Solution().maxOperations([1], 2) == 0
+```
+
+```java
+class Solution {
+    public int maxOperations(int[] nums, int k) {
+        Map<Integer, Integer> waiting = new HashMap<>();
+        int ops = 0;
+        for (int x : nums) {
+            int c = waiting.getOrDefault(k - x, 0);
+            if (c > 0) { waiting.put(k - x, c - 1); ops++; }
+            else waiting.merge(x, 1, Integer::sum);
+        }
+        return ops;
+    }
+}
+// test
+check(new Solution().maxOperations(new int[]{1, 2, 3, 4}, 5), 2);
+check(new Solution().maxOperations(new int[]{3, 1, 3, 4, 3}, 6), 1);
+```

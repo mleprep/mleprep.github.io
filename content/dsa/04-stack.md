@@ -1106,3 +1106,43 @@ check(s.top(), 2);
 check(s.pop(), 2);
 check(s.empty(), false);
 ```
+
+## 2390. Removing Stars From a String | Medium
+related: 844, 1047
+tags: stack
+
+Each `*` deletes the closest non-star character to its left — exactly a stack pop. Push letters, pop on `*`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeStars(self, s: str) -> str:
+        st = []
+        for ch in s:
+            if ch == "*":
+                st.pop()
+            else:
+                st.append(ch)
+        return "".join(st)
+# test
+assert Solution().removeStars("leet**cod*e") == "lecoe"
+assert Solution().removeStars("erase*****") == ""
+assert Solution().removeStars("abc") == "abc"
+```
+
+```java
+class Solution {
+    public String removeStars(String s) {
+        StringBuilder st = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == '*') st.setLength(st.length() - 1);
+            else st.append(c);
+        }
+        return st.toString();
+    }
+}
+// test
+check(new Solution().removeStars("leet**cod*e"), "lecoe");
+check(new Solution().removeStars("erase*****"), "");
+```

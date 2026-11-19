@@ -1283,3 +1283,465 @@ class Solution {
 // test
 check(new Solution().subarraysDivByK(new int[]{4, 5, 0, -2, -3, 1}, 5), 7);
 ```
+
+## 383. Ransom Note | Easy
+related: 242, 409
+tags: counting
+
+Count the magazine's letters once; every letter of the note must be available that many times.
+
+**Complexity:** O(m + n) time, O(1) space (26 letters).
+
+```python
+class Solution:
+    def canConstruct(self, ransomNote: str, magazine: str) -> bool:
+        have = Counter(magazine)
+        return all(have[c] >= k for c, k in Counter(ransomNote).items())
+# test
+assert Solution().canConstruct("a", "b") is False
+assert Solution().canConstruct("aa", "ab") is False
+assert Solution().canConstruct("aa", "aab") is True
+assert Solution().canConstruct("", "x") is True
+```
+
+```java
+class Solution {
+    public boolean canConstruct(String ransomNote, String magazine) {
+        int[] cnt = new int[26];
+        for (char c : magazine.toCharArray()) cnt[c - 'a']++;
+        for (char c : ransomNote.toCharArray()) if (--cnt[c - 'a'] < 0) return false;
+        return true;
+    }
+}
+// test
+check(new Solution().canConstruct("aa", "ab"), false);
+check(new Solution().canConstruct("aa", "aab"), true);
+```
+
+## 409. Longest Palindrome | Easy
+related: 383, 5, 266
+tags: counting, greedy
+
+A palindrome uses characters in **pairs** (one on each side) plus at most **one** odd character in the middle. Sum the pairs; add 1 if any character is left over.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> int:
+        pairs = sum(v // 2 * 2 for v in Counter(s).values())
+        return pairs + 1 if pairs < len(s) else pairs
+# test
+assert Solution().longestPalindrome("abccccdd") == 7
+assert Solution().longestPalindrome("a") == 1
+assert Solution().longestPalindrome("Aa") == 1
+assert Solution().longestPalindrome("bb") == 2
+```
+
+```java
+class Solution {
+    public int longestPalindrome(String s) {
+        int[] cnt = new int[128];
+        for (char c : s.toCharArray()) cnt[c]++;
+        int pairs = 0;
+        for (int v : cnt) pairs += v / 2 * 2;
+        return pairs < s.length() ? pairs + 1 : pairs;
+    }
+}
+// test
+check(new Solution().longestPalindrome("abccccdd"), 7);
+check(new Solution().longestPalindrome("Aa"), 1);
+```
+
+## 58. Length of Last Word | Easy
+related: 151, 14
+tags: string
+
+Scan from the end: skip trailing spaces, then count characters until the next space. No split, O(1) extra space.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        i = len(s) - 1
+        while i >= 0 and s[i] == " ":
+            i -= 1
+        j = i
+        while j >= 0 and s[j] != " ":
+            j -= 1
+        return i - j
+# test
+assert Solution().lengthOfLastWord("Hello World") == 5
+assert Solution().lengthOfLastWord("   fly me   to   the moon  ") == 4
+assert Solution().lengthOfLastWord("luffy is still joyboy") == 6
+assert Solution().lengthOfLastWord("a") == 1
+```
+
+```java
+class Solution {
+    public int lengthOfLastWord(String s) {
+        int i = s.length() - 1;
+        while (i >= 0 && s.charAt(i) == ' ') i--;
+        int j = i;
+        while (j >= 0 && s.charAt(j) != ' ') j--;
+        return i - j;
+    }
+}
+// test
+check(new Solution().lengthOfLastWord("   fly me   to   the moon  "), 4);
+check(new Solution().lengthOfLastWord("a"), 1);
+```
+
+## 6. Zigzag Conversion | Medium
+related: 54, 498
+tags: simulation, string
+
+Simulate writing the zigzag: keep one buffer per row and a cursor that moves down, bounces at the last row, moves up, bounces at row 0. Reading the rows top to bottom gives the answer.
+
+```viz
+"PAYPALISHIRING", numRows = 4        cursor: 0 1 2 3 2 1 0 1 2 3 ...
+row 0:  P     I     N
+row 1:  A   L S   I G
+row 2:  Y A   H R
+row 3:  P     I
+-> "PIN" + "ALSIG" + "YAHR" + "PI"
+```
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def convert(self, s: str, numRows: int) -> str:
+        if numRows == 1 or numRows >= len(s):
+            return s
+        rows = [[] for _ in range(numRows)]
+        r, step = 0, 1
+        for ch in s:
+            rows[r].append(ch)
+            if r == 0:
+                step = 1
+            elif r == numRows - 1:
+                step = -1
+            r += step
+        return "".join("".join(row) for row in rows)
+# test
+assert Solution().convert("PAYPALISHIRING", 3) == "PAHNAPLSIIGYIR"
+assert Solution().convert("PAYPALISHIRING", 4) == "PINALSIGYAHRPI"
+assert Solution().convert("A", 1) == "A"
+assert Solution().convert("AB", 1) == "AB"
+assert Solution().convert("ABC", 2) == "ACB"
+```
+
+```java
+class Solution {
+    public String convert(String s, int numRows) {
+        if (numRows == 1 || numRows >= s.length()) return s;
+        StringBuilder[] rows = new StringBuilder[numRows];
+        for (int i = 0; i < numRows; i++) rows[i] = new StringBuilder();
+        int r = 0, step = 1;
+        for (char c : s.toCharArray()) {
+            rows[r].append(c);
+            if (r == 0) step = 1;
+            else if (r == numRows - 1) step = -1;
+            r += step;
+        }
+        StringBuilder out = new StringBuilder();
+        for (StringBuilder row : rows) out.append(row);
+        return out.toString();
+    }
+}
+// test
+check(new Solution().convert("PAYPALISHIRING", 3), "PAHNAPLSIIGYIR");
+check(new Solution().convert("PAYPALISHIRING", 4), "PINALSIGYAHRPI");
+check(new Solution().convert("AB", 1), "AB");
+```
+
+## 28. Find the Index of the First Occurrence in a String | Easy
+related: 459, 214, 1392
+tags: string, kmp
+
+The brute force (try every start, compare up to m chars) is O(n·m) and fine for the given limits — say so, then offer **KMP** for O(n + m): precompute `lps[i]` = length of the longest proper prefix of `needle[:i+1]` that is also its suffix. On a mismatch, fall back to `lps[k-1]` instead of restarting, so the haystack pointer never moves backwards.
+
+```viz
+needle = "aab"  lps = [0, 1, 0]
+haystack a a a a a b
+           ^ mismatch at needle[2] after "aa" -> k = lps[1] = 1, keep i
+```
+
+**Complexity:** O(n + m) time, O(m) space.
+
+```python
+class Solution:
+    def strStr(self, haystack: str, needle: str) -> int:
+        lps, k = [0] * len(needle), 0
+        for i in range(1, len(needle)):
+            while k and needle[i] != needle[k]:
+                k = lps[k - 1]
+            if needle[i] == needle[k]:
+                k += 1
+            lps[i] = k
+        k = 0
+        for i, ch in enumerate(haystack):
+            while k and ch != needle[k]:
+                k = lps[k - 1]
+            if ch == needle[k]:
+                k += 1
+                if k == len(needle):
+                    return i - k + 1
+        return -1
+# test
+assert Solution().strStr("sadbutsad", "sad") == 0
+assert Solution().strStr("leetcode", "leeto") == -1
+assert Solution().strStr("aaaaab", "aab") == 3
+assert Solution().strStr("mississippi", "issip") == 4
+assert Solution().strStr("a", "a") == 0
+assert Solution().strStr("abc", "c") == 2
+```
+
+```java
+class Solution {
+    public int strStr(String haystack, String needle) {
+        int m = needle.length();
+        int[] lps = new int[m];
+        for (int i = 1, k = 0; i < m; i++) {
+            while (k > 0 && needle.charAt(i) != needle.charAt(k)) k = lps[k - 1];
+            if (needle.charAt(i) == needle.charAt(k)) k++;
+            lps[i] = k;
+        }
+        for (int i = 0, k = 0; i < haystack.length(); i++) {
+            while (k > 0 && haystack.charAt(i) != needle.charAt(k)) k = lps[k - 1];
+            if (haystack.charAt(i) == needle.charAt(k) && ++k == m) return i - m + 1;
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().strStr("sadbutsad", "sad"), 0);
+check(new Solution().strStr("aaaaab", "aab"), 3);
+check(new Solution().strStr("leetcode", "leeto"), -1);
+```
+
+## 290. Word Pattern | Easy
+related: 205, 242
+tags: hash-map, bijection
+
+Same idea as Isomorphic Strings: the mapping letter ↔ word must be a **bijection**, so keep both directions and reject any conflict. Also reject different lengths.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def wordPattern(self, pattern: str, s: str) -> bool:
+        words = s.split()
+        if len(words) != len(pattern):
+            return False
+        p2w, w2p = {}, {}
+        for p, w in zip(pattern, words):
+            if p2w.setdefault(p, w) != w or w2p.setdefault(w, p) != p:
+                return False
+        return True
+# test
+assert Solution().wordPattern("abba", "dog cat cat dog") is True
+assert Solution().wordPattern("abba", "dog cat cat fish") is False
+assert Solution().wordPattern("aaaa", "dog cat cat dog") is False
+assert Solution().wordPattern("abba", "dog dog dog dog") is False
+assert Solution().wordPattern("aaa", "aa aa aa aa") is False
+```
+
+```java
+class Solution {
+    public boolean wordPattern(String pattern, String s) {
+        String[] words = s.split(" ");
+        if (words.length != pattern.length()) return false;
+        Map<Character, String> p2w = new HashMap<>();
+        Map<String, Character> w2p = new HashMap<>();
+        for (int i = 0; i < words.length; i++) {
+            char p = pattern.charAt(i);
+            String w = words[i];
+            if (!p2w.computeIfAbsent(p, x -> w).equals(w)) return false;
+            if (w2p.computeIfAbsent(w, x -> p).charValue() != p) return false;
+        }
+        return true;
+    }
+}
+// test
+check(new Solution().wordPattern("abba", "dog cat cat dog"), true);
+check(new Solution().wordPattern("abba", "dog dog dog dog"), false);
+```
+
+## 1431. Kids With the Greatest Number of Candies | Easy
+related: 2215
+tags: array
+
+A kid can become the (tied) maximum iff `candies[i] + extra >= max(candies)`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def kidsWithCandies(self, candies: List[int], extraCandies: int) -> List[bool]:
+        best = max(candies)
+        return [c + extraCandies >= best for c in candies]
+# test
+assert Solution().kidsWithCandies([2, 3, 5, 1, 3], 3) == [True, True, True, False, True]
+assert Solution().kidsWithCandies([4, 2, 1, 1, 2], 1) == [True, False, False, False, False]
+assert Solution().kidsWithCandies([12, 1, 12], 10) == [True, False, True]
+```
+
+```java
+class Solution {
+    public List<Boolean> kidsWithCandies(int[] candies, int extraCandies) {
+        int best = Arrays.stream(candies).max().getAsInt();
+        List<Boolean> res = new ArrayList<>();
+        for (int c : candies) res.add(c + extraCandies >= best);
+        return res;
+    }
+}
+// test
+check(new Solution().kidsWithCandies(new int[]{2, 3, 5, 1, 3}, 3), List.of(true, true, true, false, true));
+```
+
+## 2215. Find the Difference of Two Arrays | Easy
+related: 349, 1431
+tags: hash-set
+
+Set difference both ways: `set1 − set2` and `set2 − set1` (duplicates collapse automatically). Either list may be returned in any order.
+
+**Complexity:** O(n + m).
+
+```python
+class Solution:
+    def findDifference(self, nums1: List[int], nums2: List[int]) -> List[List[int]]:
+        a, b = set(nums1), set(nums2)
+        return [list(a - b), list(b - a)]
+# test
+assert [sorted(x) for x in Solution().findDifference([1, 2, 3], [2, 4, 6])] == [[1, 3], [4, 6]]
+assert [sorted(x) for x in Solution().findDifference([1, 2, 3, 3], [1, 1, 2, 2])] == [[3], []]
+assert [sorted(x) for x in Solution().findDifference([-1], [-1])] == [[], []]
+```
+
+```java
+class Solution {
+    public List<List<Integer>> findDifference(int[] nums1, int[] nums2) {
+        Set<Integer> a = new HashSet<>(), b = new HashSet<>();
+        for (int x : nums1) a.add(x);
+        for (int x : nums2) b.add(x);
+        List<Integer> onlyA = new ArrayList<>(), onlyB = new ArrayList<>();
+        for (int x : a) if (!b.contains(x)) onlyA.add(x);
+        for (int x : b) if (!a.contains(x)) onlyB.add(x);
+        return List.of(onlyA, onlyB);
+    }
+}
+// test
+List<List<Integer>> d = new Solution().findDifference(new int[]{1, 2, 3}, new int[]{2, 4, 6});
+for (List<Integer> l : d) Collections.sort(l);
+check(d, List.of(List.of(1, 3), List.of(4, 6)));
+```
+
+## 1207. Unique Number of Occurrences | Easy
+related: 1657, 451
+tags: counting
+
+Count each value, then check that no two values share a count: the number of distinct counts must equal the number of distinct values.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def uniqueOccurrences(self, arr: List[int]) -> bool:
+        counts = list(Counter(arr).values())
+        return len(counts) == len(set(counts))
+# test
+assert Solution().uniqueOccurrences([1, 2, 2, 1, 1, 3]) is True
+assert Solution().uniqueOccurrences([1, 2]) is False
+assert Solution().uniqueOccurrences([-3, 0, 1, -3, 1, 1, 1, -3, 10, 0]) is True
+```
+
+```java
+class Solution {
+    public boolean uniqueOccurrences(int[] arr) {
+        Map<Integer, Integer> cnt = new HashMap<>();
+        for (int x : arr) cnt.merge(x, 1, Integer::sum);
+        return new HashSet<>(cnt.values()).size() == cnt.size();
+    }
+}
+// test
+check(new Solution().uniqueOccurrences(new int[]{1, 2, 2, 1, 1, 3}), true);
+check(new Solution().uniqueOccurrences(new int[]{1, 2}), false);
+```
+
+## 1657. Determine if Two Strings Are Close | Medium
+related: 242, 1207
+tags: counting
+
+Operation 1 (swap) means order doesn't matter; operation 2 (swap two letters' roles) means the **multiset of counts** can be reassigned among letters already present. So: same **set of letters** and same **sorted list of counts**.
+
+**Complexity:** O(n) (+ sorting 26 counts).
+
+```python
+class Solution:
+    def closeStrings(self, word1: str, word2: str) -> bool:
+        c1, c2 = Counter(word1), Counter(word2)
+        return c1.keys() == c2.keys() and sorted(c1.values()) == sorted(c2.values())
+# test
+assert Solution().closeStrings("abc", "bca") is True
+assert Solution().closeStrings("a", "aa") is False
+assert Solution().closeStrings("cabbba", "abbccc") is True
+assert Solution().closeStrings("uau", "ssx") is False
+```
+
+```java
+class Solution {
+    public boolean closeStrings(String word1, String word2) {
+        if (word1.length() != word2.length()) return false;
+        int[] a = new int[26], b = new int[26];
+        for (char c : word1.toCharArray()) a[c - 'a']++;
+        for (char c : word2.toCharArray()) b[c - 'a']++;
+        for (int i = 0; i < 26; i++) if ((a[i] == 0) != (b[i] == 0)) return false;
+        Arrays.sort(a);
+        Arrays.sort(b);
+        return Arrays.equals(a, b);
+    }
+}
+// test
+check(new Solution().closeStrings("cabbba", "abbccc"), true);
+check(new Solution().closeStrings("uau", "ssx"), false);
+```
+
+## 2352. Equal Row and Column Pairs | Medium
+related: 36
+tags: hash-map
+
+Hash every row as a tuple and count; then for each column (as a tuple) add how many rows equal it.
+
+**Complexity:** O(n²).
+
+```python
+class Solution:
+    def equalPairs(self, grid: List[List[int]]) -> int:
+        rows = Counter(tuple(r) for r in grid)
+        return sum(rows[col] for col in zip(*grid))
+# test
+assert Solution().equalPairs([[3, 2, 1], [1, 7, 6], [2, 7, 7]]) == 1
+assert Solution().equalPairs([[3, 1, 2, 2], [1, 4, 4, 5], [2, 4, 2, 2], [2, 4, 2, 2]]) == 3
+assert Solution().equalPairs([[1]]) == 1
+```
+
+```java
+class Solution {
+    public int equalPairs(int[][] grid) {
+        int n = grid.length, res = 0;
+        Map<String, Integer> rows = new HashMap<>();
+        for (int[] r : grid) rows.merge(Arrays.toString(r), 1, Integer::sum);
+        for (int c = 0; c < n; c++) {
+            int[] col = new int[n];
+            for (int r = 0; r < n; r++) col[r] = grid[r][c];
+            res += rows.getOrDefault(Arrays.toString(col), 0);
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().equalPairs(new int[][]{{3, 1, 2, 2}, {1, 4, 4, 5}, {2, 4, 2, 2}, {2, 4, 2, 2}}), 3);
+```

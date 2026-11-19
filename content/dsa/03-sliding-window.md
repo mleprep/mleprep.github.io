@@ -767,3 +767,129 @@ class Solution {
 // test
 check(new Solution().maxFrequency(new int[]{1, 4, 8, 13}, 5), 2);
 ```
+
+## 219. Contains Duplicate II | Easy
+related: 217, 220
+tags: fixed-window, hash-set
+
+Keep a set of the **last k values**. A value already in the set is a duplicate within distance k. Evict `nums[i − k]` once the window holds more than k values.
+
+**Complexity:** O(n) time, O(k) space.
+
+```python
+class Solution:
+    def containsNearbyDuplicate(self, nums: List[int], k: int) -> bool:
+        window = set()
+        for i, x in enumerate(nums):
+            if x in window:
+                return True
+            window.add(x)
+            if len(window) > k:
+                window.remove(nums[i - k])
+        return False
+# test
+assert Solution().containsNearbyDuplicate([1, 2, 3, 1], 3) is True
+assert Solution().containsNearbyDuplicate([1, 0, 1, 1], 1) is True
+assert Solution().containsNearbyDuplicate([1, 2, 3, 1, 2, 3], 2) is False
+assert Solution().containsNearbyDuplicate([1, 1], 0) is False
+```
+
+```java
+class Solution {
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+        Set<Integer> window = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (!window.add(nums[i])) return true;
+            if (window.size() > k) window.remove(nums[i - k]);
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().containsNearbyDuplicate(new int[]{1, 0, 1, 1}, 1), true);
+check(new Solution().containsNearbyDuplicate(new int[]{1, 2, 3, 1, 2, 3}, 2), false);
+```
+
+## 1456. Maximum Number of Vowels in a Substring of Given Length | Medium
+related: 643, 1004
+tags: fixed-window
+
+Fixed window of size k: add the entering character, subtract the leaving one, track the maximum.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def maxVowels(self, s: str, k: int) -> int:
+        vowels = set("aeiou")
+        cur = best = sum(c in vowels for c in s[:k])
+        for i in range(k, len(s)):
+            cur += (s[i] in vowels) - (s[i - k] in vowels)
+            best = max(best, cur)
+        return best
+# test
+assert Solution().maxVowels("abciiidef", 3) == 3
+assert Solution().maxVowels("aeiou", 2) == 2
+assert Solution().maxVowels("leetcode", 3) == 2
+assert Solution().maxVowels("tryhard", 4) == 1
+```
+
+```java
+class Solution {
+    public int maxVowels(String s, int k) {
+        int cur = 0, best = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if ("aeiou".indexOf(s.charAt(i)) >= 0) cur++;
+            if (i >= k && "aeiou".indexOf(s.charAt(i - k)) >= 0) cur--;
+            best = Math.max(best, cur);
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().maxVowels("abciiidef", 3), 3);
+check(new Solution().maxVowels("leetcode", 3), 2);
+```
+
+## 1493. Longest Subarray of 1's After Deleting One Element | Medium
+related: 1004, 487
+tags: variable-window
+
+Longest window containing **at most one zero**; the deleted element is inside it, so the answer is `window length − 1` (which also handles the all-ones case, where a 1 must be deleted).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def longestSubarray(self, nums: List[int]) -> int:
+        lo = zeros = best = 0
+        for hi, x in enumerate(nums):
+            zeros += x == 0
+            while zeros > 1:
+                zeros -= nums[lo] == 0
+                lo += 1
+            best = max(best, hi - lo)          # (hi - lo + 1) - 1 deleted element
+        return best
+# test
+assert Solution().longestSubarray([1, 1, 0, 1]) == 3
+assert Solution().longestSubarray([0, 1, 1, 1, 0, 1, 1, 0, 1]) == 5
+assert Solution().longestSubarray([1, 1, 1]) == 2
+assert Solution().longestSubarray([0, 0, 0]) == 0
+```
+
+```java
+class Solution {
+    public int longestSubarray(int[] nums) {
+        int lo = 0, zeros = 0, best = 0;
+        for (int hi = 0; hi < nums.length; hi++) {
+            if (nums[hi] == 0) zeros++;
+            while (zeros > 1) if (nums[lo++] == 0) zeros--;
+            best = Math.max(best, hi - lo);
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().longestSubarray(new int[]{0, 1, 1, 1, 0, 1, 1, 0, 1}), 5);
+check(new Solution().longestSubarray(new int[]{1, 1, 1}), 2);
+```

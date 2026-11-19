@@ -472,3 +472,71 @@ check(wf.f("a", "e"), 1);
 check(wf.f("", "le"), 2);
 check(wf.f("b", ""), -1);
 ```
+
+## 336. Palindrome Pairs | Hard
+related: 214, 5, 131
+tags: hash-map, palindrome
+
+Map each **reversed** word to its index. For every word `w` and every split `w = pre + suf`:
+- if `pre` is some other word reversed and `suf` is a palindrome → `w + that word` is a palindrome;
+- if `suf` is some other word reversed and `pre` is a palindrome → `that word + w` is a palindrome (skip the empty `pre` here so each pair is found once).
+
+A trie of reversed words gives the same complexity; the hash map is simpler to write.
+
+```viz
+w = "lls" split "" + "lls"? ...  "ll" + "s": pre "ll" is a palindrome, rev(suf) = "s" is a word
+    -> "s" + "lls" = "slls"  ✓
+```
+
+**Complexity:** O(n · k²) for n words of length ≤ k.
+
+```python
+class Solution:
+    def palindromePairs(self, words: List[str]) -> List[List[int]]:
+        rev = {w[::-1]: i for i, w in enumerate(words)}
+        res = []
+        for i, w in enumerate(words):
+            for j in range(len(w) + 1):
+                pre, suf = w[:j], w[j:]
+                if pre in rev and rev[pre] != i and suf == suf[::-1]:
+                    res.append([i, rev[pre]])
+                if j and suf in rev and rev[suf] != i and pre == pre[::-1]:
+                    res.append([rev[suf], i])
+        return res
+# test
+assert sorted(Solution().palindromePairs(["abcd", "dcba", "lls", "s", "sssll"])) == [[0, 1], [1, 0], [2, 4], [3, 2]]
+assert sorted(Solution().palindromePairs(["bat", "tab", "cat"])) == [[0, 1], [1, 0]]
+assert sorted(Solution().palindromePairs(["a", ""])) == [[0, 1], [1, 0]]
+assert sorted(Solution().palindromePairs(["a", "b", "c"])) == []
+assert sorted(Solution().palindromePairs(["ab", "ba", "aba"])) == [[0, 1], [0, 2], [1, 0], [2, 1]]  # "ababa" twice
+```
+
+```java
+class Solution {
+    public List<List<Integer>> palindromePairs(String[] words) {
+        Map<String, Integer> rev = new HashMap<>();
+        for (int i = 0; i < words.length; i++) rev.put(new StringBuilder(words[i]).reverse().toString(), i);
+        List<List<Integer>> res = new ArrayList<>();
+        for (int i = 0; i < words.length; i++) {
+            String w = words[i];
+            for (int j = 0; j <= w.length(); j++) {
+                String pre = w.substring(0, j), suf = w.substring(j);
+                Integer k = rev.get(pre);
+                if (k != null && k != i && isPal(suf)) res.add(List.of(i, k));
+                k = rev.get(suf);
+                if (j > 0 && k != null && k != i && isPal(pre)) res.add(List.of(k, i));
+            }
+        }
+        return res;
+    }
+
+    private boolean isPal(String s) {
+        for (int i = 0, j = s.length() - 1; i < j; i++, j--) if (s.charAt(i) != s.charAt(j)) return false;
+        return true;
+    }
+}
+// test
+List<List<Integer>> pp = new ArrayList<>(new Solution().palindromePairs(new String[]{"abcd", "dcba", "lls", "s", "sssll"}));
+pp.sort(Comparator.comparing((List<Integer> x) -> x.get(0)).thenComparing(x -> x.get(1)));
+check(pp, List.of(List.of(0, 1), List.of(1, 0), List.of(2, 4), List.of(3, 2)));
+```

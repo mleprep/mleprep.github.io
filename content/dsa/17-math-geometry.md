@@ -912,3 +912,39 @@ boolean ok = true;
 for (int d = 1; d <= 10; d++) ok &= cnt[d] > 1800 && cnt[d] < 2200;
 check(ok, true);
 ```
+
+## 1071. Greatest Common Divisor of Strings | Easy
+related: 459, 914
+tags: gcd, string
+
+If some string `x` divides both, then `str1 + str2 == str2 + str1` (both are repetitions of `x`); conversely, when that holds both are repetitions of a common block, and the longest divisor has length **gcd(len1, len2)**.
+
+**Complexity:** O(n + m).
+
+```python
+class Solution:
+    def gcdOfStrings(self, str1: str, str2: str) -> str:
+        if str1 + str2 != str2 + str1:
+            return ""
+        return str1[:math.gcd(len(str1), len(str2))]
+# test
+assert Solution().gcdOfStrings("ABCABC", "ABC") == "ABC"
+assert Solution().gcdOfStrings("ABABAB", "ABAB") == "AB"
+assert Solution().gcdOfStrings("LEET", "CODE") == ""
+assert Solution().gcdOfStrings("ABABABAB", "ABAB") == "ABAB"
+assert Solution().gcdOfStrings("AAAA", "AA") == "AA"
+```
+
+```java
+class Solution {
+    public String gcdOfStrings(String str1, String str2) {
+        if (!(str1 + str2).equals(str2 + str1)) return "";
+        return str1.substring(0, gcd(str1.length(), str2.length()));
+    }
+
+    private int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }
+}
+// test
+check(new Solution().gcdOfStrings("ABABAB", "ABAB"), "AB");
+check(new Solution().gcdOfStrings("LEET", "CODE"), "");
+```

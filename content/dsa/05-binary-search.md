@@ -1010,3 +1010,98 @@ class Solution {
 check(new Solution().minDays(new int[]{7, 7, 7, 7, 12, 7, 7}, 2, 3), 12);
 check(new Solution().minDays(new int[]{1, 10, 3, 10, 2}, 3, 2), -1);
 ```
+
+## 374. Guess Number Higher or Lower | Easy
+related: 278, 704
+tags: binary-search
+
+Classic binary search where the comparison is the provided `guess(num)` API: `-1` means the pick is lower than `num`, `1` higher, `0` found.
+
+**Complexity:** O(log n) calls.
+
+```python
+class Solution:
+    def guessNumber(self, n: int) -> int:
+        lo, hi = 1, n
+        while True:
+            mid = (lo + hi) // 2
+            g = guess(mid)          # provided by LeetCode
+            if g == 0:
+                return mid
+            if g < 0:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+# test
+for n, PICK in ((10, 6), (1, 1), (2, 1), (2, 2), (2126753390, 1702766719)):
+    def guess(num, pick=PICK):
+        return 0 if num == pick else (-1 if pick < num else 1)
+    assert Solution().guessNumber(n) == PICK
+```
+
+```java
+class GuessGame { // provided by LeetCode
+    static int pick;
+    int guess(int num) { return Integer.compare(pick, num); }
+}
+
+class Solution extends GuessGame {
+    public int guessNumber(int n) {
+        int lo = 1, hi = n;
+        while (true) {
+            int mid = lo + (hi - lo) / 2;          // avoids int overflow
+            int g = guess(mid);
+            if (g == 0) return mid;
+            if (g < 0) hi = mid - 1; else lo = mid + 1;
+        }
+    }
+}
+// test
+GuessGame.pick = 1702766719;
+check(new Solution().guessNumber(2126753390), 1702766719);
+GuessGame.pick = 6;
+check(new Solution().guessNumber(10), 6);
+```
+
+## 2300. Successful Pairs of Spells and Potions | Medium
+related: 35, 1855
+tags: lower-bound, sort
+
+Sort the potions once. A pair succeeds when `potion ≥ ⌈success / spell⌉`, so the count for each spell is `m − lower_bound(⌈success / spell⌉)`. Integer ceiling avoids floating-point trouble.
+
+**Complexity:** O((n + m) log m).
+
+```python
+class Solution:
+    def successfulPairs(self, spells: List[int], potions: List[int], success: int) -> List[int]:
+        potions = sorted(potions)
+        m = len(potions)
+        return [m - bisect.bisect_left(potions, (success + s - 1) // s) for s in spells]
+# test
+assert Solution().successfulPairs([5, 1, 3], [1, 2, 3, 4, 5], 7) == [4, 0, 3]
+assert Solution().successfulPairs([3, 1, 2], [8, 5, 8], 16) == [2, 0, 2]
+assert Solution().successfulPairs([100000], [100000], 10000000000) == [1]
+```
+
+```java
+class Solution {
+    public int[] successfulPairs(int[] spells, int[] potions, long success) {
+        Arrays.sort(potions);
+        int m = potions.length;
+        int[] res = new int[spells.length];
+        for (int i = 0; i < spells.length; i++) {
+            long need = (success + spells[i] - 1) / spells[i];
+            int lo = 0, hi = m;                       // first potion >= need
+            while (lo < hi) {
+                int mid = (lo + hi) / 2;
+                if (potions[mid] >= need) hi = mid; else lo = mid + 1;
+            }
+            res[i] = m - lo;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().successfulPairs(new int[]{5, 1, 3}, new int[]{1, 2, 3, 4, 5}, 7), new int[]{4, 0, 3});
+check(new Solution().successfulPairs(new int[]{100000}, new int[]{100000}, 10000000000L), new int[]{1});
+```

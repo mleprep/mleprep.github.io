@@ -1076,3 +1076,87 @@ class Solution {
 // test
 check(new Solution().addTwoNumbers(ListNode.of(7, 2, 4, 3), ListNode.of(5, 6, 4)), ListNode.of(7, 8, 0, 7));
 ```
+
+## 2095. Delete the Middle Node of a Linked List | Medium
+related: 876, 19
+tags: fast-slow
+
+Fast/slow pointers, but start `fast` two steps ahead so `slow` stops **just before** the middle (index ⌊n/2⌋), then unlink `slow.next`. A single node list becomes empty.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def deleteMiddle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if not head.next:
+            return None
+        slow, fast = head, head.next.next
+        while fast and fast.next:
+            slow, fast = slow.next, fast.next.next
+        slow.next = slow.next.next
+        return head
+# test
+assert list_vals(Solution().deleteMiddle(make_list([1, 3, 4, 7, 1, 2, 6]))) == [1, 3, 4, 1, 2, 6]
+assert list_vals(Solution().deleteMiddle(make_list([1, 2, 3, 4]))) == [1, 2, 4]
+assert list_vals(Solution().deleteMiddle(make_list([2, 1]))) == [2]
+assert list_vals(Solution().deleteMiddle(make_list([1]))) == []
+```
+
+```java
+class Solution {
+    public ListNode deleteMiddle(ListNode head) {
+        if (head.next == null) return null;
+        ListNode slow = head, fast = head.next.next;
+        while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; }
+        slow.next = slow.next.next;
+        return head;
+    }
+}
+// test
+check(new Solution().deleteMiddle(ListNode.of(1, 3, 4, 7, 1, 2, 6)), "[1, 3, 4, 1, 2, 6]");
+check(new Solution().deleteMiddle(ListNode.of(1)), null);
+```
+
+## 2130. Maximum Twin Sum of a Linked List | Medium
+related: 234, 143
+tags: fast-slow, reversal
+
+Same toolkit as Palindrome Linked List: find the middle with fast/slow, **reverse the second half**, then walk both halves together summing twins.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def pairSum(self, head: Optional[ListNode]) -> int:
+        slow = fast = head
+        while fast and fast.next:
+            slow, fast = slow.next, fast.next.next
+        prev = None                                  # reverse the second half
+        while slow:
+            slow.next, prev, slow = prev, slow, slow.next
+        best = 0
+        while prev:
+            best = max(best, head.val + prev.val)
+            head, prev = head.next, prev.next
+        return best
+# test
+assert Solution().pairSum(make_list([5, 4, 2, 1])) == 6
+assert Solution().pairSum(make_list([4, 2, 2, 3])) == 7
+assert Solution().pairSum(make_list([1, 100000])) == 100001
+```
+
+```java
+class Solution {
+    public int pairSum(ListNode head) {
+        ListNode slow = head, fast = head, prev = null;
+        while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; }
+        while (slow != null) { ListNode nxt = slow.next; slow.next = prev; prev = slow; slow = nxt; }
+        int best = 0;
+        for (; prev != null; prev = prev.next, head = head.next) best = Math.max(best, head.val + prev.val);
+        return best;
+    }
+}
+// test
+check(new Solution().pairSum(ListNode.of(5, 4, 2, 1)), 6);
+check(new Solution().pairSum(ListNode.of(4, 2, 2, 3)), 7);
+```

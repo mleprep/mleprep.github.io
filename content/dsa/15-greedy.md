@@ -795,3 +795,162 @@ class Solution {
 check(new Solution().minTaps(7, new int[]{1, 2, 1, 0, 2, 1, 0, 1}), 3);
 check(new Solution().minTaps(3, new int[]{0, 0, 0, 0}), -1);
 ```
+
+## 605. Can Place Flowers | Easy
+related: 495
+tags: greedy
+
+Planting as **early** as possible never hurts (an earlier flower blocks at most what a later one would). Pad both ends with 0 and plant wherever a spot and both neighbours are empty.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def canPlaceFlowers(self, flowerbed: List[int], n: int) -> bool:
+        bed = [0] + flowerbed + [0]
+        for i in range(1, len(bed) - 1):
+            if bed[i - 1] == bed[i] == bed[i + 1] == 0:
+                bed[i] = 1
+                n -= 1
+        return n <= 0
+# test
+assert Solution().canPlaceFlowers([1, 0, 0, 0, 1], 1) is True
+assert Solution().canPlaceFlowers([1, 0, 0, 0, 1], 2) is False
+assert Solution().canPlaceFlowers([0], 1) is True
+assert Solution().canPlaceFlowers([0, 0, 1, 0, 0], 2) is True
+assert Solution().canPlaceFlowers([1, 0, 1, 0, 1], 0) is True
+```
+
+```java
+class Solution {
+    public boolean canPlaceFlowers(int[] flowerbed, int n) {
+        int len = flowerbed.length;
+        for (int i = 0; i < len && n > 0; i++) {
+            boolean leftFree = i == 0 || flowerbed[i - 1] == 0, rightFree = i == len - 1 || flowerbed[i + 1] == 0;
+            if (flowerbed[i] == 0 && leftFree && rightFree) { flowerbed[i] = 1; n--; }
+        }
+        return n <= 0;
+    }
+}
+// test
+check(new Solution().canPlaceFlowers(new int[]{1, 0, 0, 0, 1}, 1), true);
+check(new Solution().canPlaceFlowers(new int[]{1, 0, 0, 0, 1}, 2), false);
+```
+
+## 334. Increasing Triplet Subsequence | Medium
+related: 300
+tags: greedy, lis
+
+Keep the smallest possible **first** element and the smallest possible **second** element of an increasing pair seen so far. Any number bigger than both completes a triplet. (Updating `first` after `second` is set is fine: `second` still certifies that some smaller element came before it.)
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def increasingTriplet(self, nums: List[int]) -> bool:
+        first = second = float("inf")
+        for x in nums:
+            if x <= first:
+                first = x
+            elif x <= second:
+                second = x
+            else:
+                return True
+        return False
+# test
+assert Solution().increasingTriplet([1, 2, 3, 4, 5]) is True
+assert Solution().increasingTriplet([5, 4, 3, 2, 1]) is False
+assert Solution().increasingTriplet([2, 1, 5, 0, 4, 6]) is True
+assert Solution().increasingTriplet([20, 100, 10, 12, 5, 13]) is True
+assert Solution().increasingTriplet([1, 1, 1]) is False
+assert Solution().increasingTriplet([1, 5, 0, 4, 1, 3]) is True
+```
+
+```java
+class Solution {
+    public boolean increasingTriplet(int[] nums) {
+        int first = Integer.MAX_VALUE, second = Integer.MAX_VALUE;
+        for (int x : nums) {
+            if (x <= first) first = x;
+            else if (x <= second) second = x;
+            else return true;
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().increasingTriplet(new int[]{2, 1, 5, 0, 4, 6}), true);
+check(new Solution().increasingTriplet(new int[]{5, 4, 3, 2, 1}), false);
+```
+
+## 68. Text Justification | Hard
+related: 6, 1592
+tags: simulation, string
+
+Greedy line packing: a word fits if `letters + len(word) + (number of words already on the line)` ≤ maxWidth (one space minimum per gap). When the line is full, distribute `maxWidth − letters` spaces over the gaps **round-robin from the left** (left gaps get the extras); a single-word line is left-justified. The last line is left-justified and padded.
+
+```viz
+maxWidth 16: "This" "is" "an"  letters 8, gaps 2, spaces 8 -> 4 + 4
+"This    is    an"
+"example  of text"   letters 13, gaps 2, spaces 3 -> 2 + 1
+"justification.  "   last line: single spaces, pad right
+```
+
+**Complexity:** O(total characters).
+
+```python
+class Solution:
+    def fullJustify(self, words: List[str], maxWidth: int) -> List[str]:
+        res, line, letters = [], [], 0
+        for w in words:
+            if letters + len(w) + len(line) > maxWidth:
+                gaps = len(line) - 1 or 1
+                for i in range(maxWidth - letters):
+                    line[i % gaps] += " "
+                res.append("".join(line))
+                line, letters = [], 0
+            line.append(w)
+            letters += len(w)
+        res.append(" ".join(line).ljust(maxWidth))
+        return res
+# test
+assert Solution().fullJustify(["This", "is", "an", "example", "of", "text", "justification."], 16) == [
+    "This    is    an", "example  of text", "justification.  "]
+assert Solution().fullJustify(["What", "must", "be", "acknowledgment", "shall", "be"], 16) == [
+    "What   must   be", "acknowledgment  ", "shall be        "]
+assert Solution().fullJustify(["Science", "is", "what", "we", "understand", "well", "enough", "to", "explain",
+                               "to", "a", "computer.", "Art", "is", "everything", "else", "we", "do"], 20) == [
+    "Science  is  what we", "understand      well", "enough to explain to", "a  computer.  Art is",
+    "everything  else  we", "do                  "]
+assert Solution().fullJustify(["a"], 1) == ["a"]
+```
+
+```java
+class Solution {
+    public List<String> fullJustify(String[] words, int maxWidth) {
+        List<String> res = new ArrayList<>();
+        int i = 0;
+        while (i < words.length) {
+            int j = i, letters = 0;
+            while (j < words.length && letters + words[j].length() + (j - i) <= maxWidth) letters += words[j++].length();
+            StringBuilder sb = new StringBuilder(words[i]);
+            int gaps = j - i - 1;
+            if (j == words.length || gaps == 0) {              // last line or single word: left-justify
+                for (int k = i + 1; k < j; k++) sb.append(' ').append(words[k]);
+                sb.append(" ".repeat(maxWidth - sb.length()));
+            } else {
+                int spaces = maxWidth - letters, each = spaces / gaps, extra = spaces % gaps;
+                for (int k = i + 1; k < j; k++) sb.append(" ".repeat(each + (k - i <= extra ? 1 : 0))).append(words[k]);
+            }
+            res.add(sb.toString());
+            i = j;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().fullJustify(new String[]{"This", "is", "an", "example", "of", "text", "justification."}, 16),
+      List.of("This    is    an", "example  of text", "justification.  "));
+check(new Solution().fullJustify(new String[]{"What", "must", "be", "acknowledgment", "shall", "be"}, 16),
+      List.of("What   must   be", "acknowledgment  ", "shall be        "));
+```

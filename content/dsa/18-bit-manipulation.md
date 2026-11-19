@@ -470,3 +470,40 @@ class Solution {
 // test
 check(new Solution().grayCode(2), "[0, 1, 3, 2]");
 ```
+
+## 1318. Minimum Flips to Make a OR b Equal to c | Medium
+related: 191, 461
+tags: bit-trick
+
+Bits are independent. For each position: if `c`'s bit is 1 we need at least one of `a`, `b` set (1 flip if both are 0); if it's 0, every set bit among `a`, `b` must be flipped. Equivalently `popcount((a | b) ^ c) + popcount(a & b & ~c)`.
+
+**Complexity:** O(log max(a, b, c)).
+
+```python
+class Solution:
+    def minFlips(self, a: int, b: int, c: int) -> int:
+        flips = 0
+        while a or b or c:
+            x, y, z = a & 1, b & 1, c & 1
+            flips += (x | y) ^ 1 if z else x + y
+            a, b, c = a >> 1, b >> 1, c >> 1
+        return flips
+# test
+assert Solution().minFlips(2, 6, 5) == 3
+assert Solution().minFlips(4, 2, 7) == 1
+assert Solution().minFlips(1, 2, 3) == 0
+assert Solution().minFlips(8, 3, 5) == 3
+assert all(Solution().minFlips(a, b, c) == bin((a | b) ^ c).count("1") + bin(a & b & ~c).count("1")
+           for a in range(16) for b in range(16) for c in range(16))
+```
+
+```java
+class Solution {
+    public int minFlips(int a, int b, int c) {
+        return Integer.bitCount((a | b) ^ c) + Integer.bitCount(a & b & ~c);
+    }
+}
+// test
+check(new Solution().minFlips(2, 6, 5), 3);
+check(new Solution().minFlips(4, 2, 7), 1);
+```

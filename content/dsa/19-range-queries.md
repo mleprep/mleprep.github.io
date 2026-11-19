@@ -451,3 +451,76 @@ class Solution {
 int[][] B = {{2, 9, 10}, {3, 7, 15}, {5, 12, 12}, {15, 20, 10}, {19, 24, 8}};
 check(new Solution().getSkyline(B), "[[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]]");
 ```
+
+## 1732. Find the Highest Altitude | Easy
+related: 724, 303
+tags: prefix-sum
+
+The altitudes are the prefix sums of `gain`, starting from 0; return the largest one (including the starting 0).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def largestAltitude(self, gain: List[int]) -> int:
+        return max(0, max(itertools.accumulate(gain)))
+# test
+assert Solution().largestAltitude([-5, 1, 5, 0, -7]) == 1
+assert Solution().largestAltitude([-4, -3, -2, -1, 4, 3, 2]) == 0
+assert Solution().largestAltitude([3]) == 3
+```
+
+```java
+class Solution {
+    public int largestAltitude(int[] gain) {
+        int alt = 0, best = 0;
+        for (int g : gain) best = Math.max(best, alt += g);
+        return best;
+    }
+}
+// test
+check(new Solution().largestAltitude(new int[]{-5, 1, 5, 0, -7}), 1);
+check(new Solution().largestAltitude(new int[]{-4, -3, -2, -1, 4, 3, 2}), 0);
+```
+
+## 724. Find Pivot Index | Easy
+related: 1732, 238, 560
+tags: prefix-sum
+
+With `total` known, the right sum at `i` is `total − left − nums[i]`. Scan once, maintaining `left`; return the first `i` where both sides match.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def pivotIndex(self, nums: List[int]) -> int:
+        total, left = sum(nums), 0
+        for i, x in enumerate(nums):
+            if left == total - left - x:
+                return i
+            left += x
+        return -1
+# test
+assert Solution().pivotIndex([1, 7, 3, 6, 5, 6]) == 3
+assert Solution().pivotIndex([1, 2, 3]) == -1
+assert Solution().pivotIndex([2, 1, -1]) == 0
+assert Solution().pivotIndex([0]) == 0
+assert Solution().pivotIndex([-1, -1, 0, 1, 1, 0]) == 5
+```
+
+```java
+class Solution {
+    public int pivotIndex(int[] nums) {
+        int total = 0, left = 0;
+        for (int x : nums) total += x;
+        for (int i = 0; i < nums.length; i++) {
+            if (left == total - left - nums[i]) return i;
+            left += nums[i];
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().pivotIndex(new int[]{1, 7, 3, 6, 5, 6}), 3);
+check(new Solution().pivotIndex(new int[]{2, 1, -1}), 0);
+```

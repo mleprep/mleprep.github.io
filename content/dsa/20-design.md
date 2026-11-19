@@ -1090,3 +1090,259 @@ check(a.getMinKey(), "leet");
 a.dec("hello"); a.dec("hello");
 check(a.getMaxKey(), "leet");
 ```
+
+## 895. Maximum Frequency Stack | Hard
+related: 460, 155, 716
+tags: design, stack, buckets
+
+Keep `freq[val]` and one **stack per frequency level**: when a value reaches frequency f, push it onto `group[f]` (it stays in the lower levels too). `pop` takes from `group[maxFreq]` — the most recent among the most frequent — decrements its frequency, and lowers `maxFreq` when that level empties.
+
+```viz
+push 5 7 5 7 4 5      group[1] = [5 7 4]   group[2] = [5 7]   group[3] = [5]
+pop -> 5 (group[3])   pop -> 7 (group[2], newest)   pop -> 5   pop -> 4
+```
+
+**Complexity:** O(1) per operation.
+
+```python
+class FreqStack:
+    def __init__(self):
+        self.freq = Counter()
+        self.group = defaultdict(list)
+        self.maxf = 0
+
+    def push(self, val: int) -> None:
+        f = self.freq[val] + 1
+        self.freq[val] = f
+        self.group[f].append(val)
+        self.maxf = max(self.maxf, f)
+
+    def pop(self) -> int:
+        val = self.group[self.maxf].pop()
+        self.freq[val] -= 1
+        if not self.group[self.maxf]:
+            self.maxf -= 1
+        return val
+# test
+fs = FreqStack()
+for v in (5, 7, 5, 7, 4, 5):
+    fs.push(v)
+assert [fs.pop(), fs.pop(), fs.pop(), fs.pop()] == [5, 7, 5, 4]
+fs.push(9)
+assert [fs.pop(), fs.pop(), fs.pop()] == [9, 7, 5]
+```
+
+```java
+class FreqStack {
+    private final Map<Integer, Integer> freq = new HashMap<>();
+    private final Map<Integer, Deque<Integer>> group = new HashMap<>();
+    private int maxf = 0;
+
+    public void push(int val) {
+        int f = freq.merge(val, 1, Integer::sum);
+        group.computeIfAbsent(f, k -> new ArrayDeque<>()).push(val);
+        maxf = Math.max(maxf, f);
+    }
+
+    public int pop() {
+        int val = group.get(maxf).pop();
+        freq.merge(val, -1, Integer::sum);
+        if (group.get(maxf).isEmpty()) maxf--;
+        return val;
+    }
+}
+// test
+FreqStack fs = new FreqStack();
+for (int v : new int[]{5, 7, 5, 7, 4, 5}) fs.push(v);
+check(new int[]{fs.pop(), fs.pop(), fs.pop(), fs.pop()}, new int[]{5, 7, 5, 4});
+```
+
+## 588. Design In-Memory File System | Hard
+related: 208, 71, 1166
+tags: design, trie, premium
+
+**Problem (Premium):** implement `ls(path)` (a file path → `[file name]`; a directory → its children's names sorted), `mkdir(path)` (creating missing parents), `addContentToFile(filePath, content)` (create or append) and `readContentFromFile(filePath)`. Paths are absolute, like `/a/b/c`.
+
+A **trie keyed by path components**: each node has a sorted map of children and, for files, a content buffer. Walking a path is O(depth); `ls` of a directory sorts its children (or keep a sorted map).
+
+**Complexity:** O(path length) per walk, plus O(k log k) for `ls` of a directory with k entries.
+
+```python
+class FileSystem:
+    def __init__(self):
+        self.root = {"kids": {}, "file": None}       # file: None for a directory, else its content
+
+    def _walk(self, path):
+        node = self.root
+        for part in filter(None, path.split("/")):
+            node = node["kids"].setdefault(part, {"kids": {}, "file": None})
+        return node
+
+    def ls(self, path: str) -> List[str]:
+        node = self._walk(path)
+        return [path.rsplit("/", 1)[1]] if node["file"] is not None else sorted(node["kids"])
+
+    def mkdir(self, path: str) -> None:
+        self._walk(path)
+
+    def addContentToFile(self, filePath: str, content: str) -> None:
+        node = self._walk(filePath)
+        node["file"] = (node["file"] or "") + content
+
+    def readContentFromFile(self, filePath: str) -> str:
+        return self._walk(filePath)["file"]
+# test
+fs = FileSystem()
+assert fs.ls("/") == []
+fs.mkdir("/a/b/c")
+fs.addContentToFile("/a/b/c/d", "hello")
+assert fs.ls("/") == ["a"]
+assert fs.readContentFromFile("/a/b/c/d") == "hello"
+fs.addContentToFile("/a/b/c/d", " world")
+assert fs.readContentFromFile("/a/b/c/d") == "hello world"
+assert fs.ls("/a/b/c/d") == ["d"]
+fs.mkdir("/a/b/e")
+fs.addContentToFile("/a/b/aa", "x")
+assert fs.ls("/a/b") == ["aa", "c", "e"]
+```
+
+```java
+class FileSystem {
+    private static class Node { TreeMap<String, Node> kids = new TreeMap<>(); StringBuilder file; }
+    private final Node root = new Node();
+
+    private Node walk(String path) {
+        Node node = root;
+        for (String part : path.split("/")) if (!part.isEmpty()) node = node.kids.computeIfAbsent(part, k -> new Node());
+        return node;
+    }
+
+    public List<String> ls(String path) {
+        Node node = walk(path);
+        if (node.file != null) return List.of(path.substring(path.lastIndexOf('/') + 1));
+        return new ArrayList<>(node.kids.keySet());
+    }
+
+    public void mkdir(String path) { walk(path); }
+
+    public void addContentToFile(String filePath, String content) {
+        Node node = walk(filePath);
+        if (node.file == null) node.file = new StringBuilder();
+        node.file.append(content);
+    }
+
+    public String readContentFromFile(String filePath) { return walk(filePath).file.toString(); }
+}
+// test
+FileSystem fs = new FileSystem();
+check(fs.ls("/"), List.of());
+fs.mkdir("/a/b/c");
+fs.addContentToFile("/a/b/c/d", "hello");
+check(fs.ls("/"), List.of("a"));
+check(fs.ls("/a/b/c/d"), List.of("d"));
+check(fs.readContentFromFile("/a/b/c/d"), "hello");
+```
+
+## 362. Design Hit Counter | Medium
+related: 933, 359, 1396
+tags: design, queue, premium
+
+**Problem (Premium):** `hit(timestamp)` records a hit (several may share a timestamp); `getHits(timestamp)` returns the hits in the past 5 minutes — timestamps in `(t − 300, t]`. Calls arrive in non-decreasing time order.
+
+A queue of `[timestamp, count]` buckets (collapsing equal timestamps) plus a running total: expire buckets from the front on read. For huge hit rates, the follow-up answer is a fixed ring of 300 one-second buckets (`times[t % 300]`, `counts[t % 300]`), O(300) memory regardless of traffic.
+
+**Complexity:** amortized O(1) per call.
+
+```python
+class HitCounter:
+    def __init__(self):
+        self.q = deque()          # [timestamp, count], oldest first
+        self.total = 0
+
+    def hit(self, timestamp: int) -> None:
+        if self.q and self.q[-1][0] == timestamp:
+            self.q[-1][1] += 1
+        else:
+            self.q.append([timestamp, 1])
+        self.total += 1
+
+    def getHits(self, timestamp: int) -> int:
+        while self.q and self.q[0][0] <= timestamp - 300:
+            self.total -= self.q.popleft()[1]
+        return self.total
+# test
+hc = HitCounter()
+hc.hit(1); hc.hit(2); hc.hit(3)
+assert hc.getHits(4) == 3
+hc.hit(300)
+assert hc.getHits(300) == 4 and hc.getHits(301) == 3
+hc2 = HitCounter()
+for _ in range(1000):
+    hc2.hit(1)
+assert hc2.getHits(300) == 1000 and hc2.getHits(301) == 0
+```
+
+```java
+class HitCounter {
+    private final int[] times = new int[300], counts = new int[300];   // ring of one-second buckets
+
+    public void hit(int timestamp) {
+        int i = timestamp % 300;
+        if (times[i] != timestamp) { times[i] = timestamp; counts[i] = 0; }
+        counts[i]++;
+    }
+
+    public int getHits(int timestamp) {
+        int total = 0;
+        for (int i = 0; i < 300; i++) if (timestamp - times[i] < 300) total += counts[i];
+        return total;
+    }
+}
+// test
+HitCounter hc = new HitCounter();
+hc.hit(1); hc.hit(2); hc.hit(3);
+check(hc.getHits(4), 3);
+hc.hit(300);
+check(hc.getHits(300), 4);
+check(hc.getHits(301), 3);
+```
+
+## 933. Number of Recent Calls | Easy
+related: 362, 346
+tags: queue, design
+
+Pings arrive in increasing time order, so a queue works: push `t`, pop from the front while it's older than `t − 3000`; the queue length is the answer.
+
+**Complexity:** amortized O(1) per ping.
+
+```python
+class RecentCounter:
+    def __init__(self):
+        self.q = deque()
+
+    def ping(self, t: int) -> int:
+        self.q.append(t)
+        while self.q[0] < t - 3000:
+            self.q.popleft()
+        return len(self.q)
+# test
+rc = RecentCounter()
+assert [rc.ping(t) for t in (1, 100, 3001, 3002)] == [1, 2, 3, 3]
+rc2 = RecentCounter()
+assert [rc2.ping(t) for t in (1, 3001, 3002, 6003)] == [1, 2, 2, 1]
+```
+
+```java
+class RecentCounter {
+    private final Deque<Integer> q = new ArrayDeque<>();
+
+    public int ping(int t) {
+        q.add(t);
+        while (q.peek() < t - 3000) q.poll();
+        return q.size();
+    }
+}
+// test
+RecentCounter rc = new RecentCounter();
+check(new int[]{rc.ping(1), rc.ping(100), rc.ping(3001), rc.ping(3002)}, new int[]{1, 2, 3, 3});
+```

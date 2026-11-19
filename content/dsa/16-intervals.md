@@ -505,3 +505,65 @@ SummaryRanges sr = new SummaryRanges();
 for (int v : new int[]{1, 3, 7, 2, 6}) sr.addNum(v);
 check(sr.getIntervals(), new int[][]{{1, 3}, {6, 7}});
 ```
+
+## 759. Employee Free Time | Hard
+related: 56, 986, 253
+tags: sweep-line, sort-by-start, premium
+
+**Problem (Premium):** each employee has a sorted list of non-overlapping working `Interval`s. Return the finite intervals (positive length) when **everyone** is free, sorted.
+
+Nobody's identity matters: flatten all intervals, sort by start and sweep while tracking the furthest end so far. Any start beyond that end leaves a common gap `(end, start)`. (A min-heap k-way merge avoids the full sort: O(N log k).)
+
+**Complexity:** O(N log N) for N intervals.
+
+```python
+class Interval:  # provided by LeetCode
+    def __init__(self, start: int = None, end: int = None):
+        self.start = start
+        self.end = end
+
+
+class Solution:
+    def employeeFreeTime(self, schedule: '[[Interval]]') -> '[Interval]':
+        ivs = sorted((iv for emp in schedule for iv in emp), key=lambda iv: iv.start)
+        res, end = [], ivs[0].end
+        for iv in ivs[1:]:
+            if iv.start > end:
+                res.append(Interval(end, iv.start))
+            end = max(end, iv.end)
+        return res
+# test
+def free(s):
+    return [[iv.start, iv.end] for iv in Solution().employeeFreeTime([[Interval(a, b) for a, b in emp] for emp in s])]
+assert free([[[1, 2], [5, 6]], [[1, 3]], [[4, 10]]]) == [[3, 4]]
+assert free([[[1, 3], [6, 7]], [[2, 4]], [[2, 5], [9, 12]]]) == [[5, 6], [7, 9]]
+assert free([[[1, 2]], [[2, 3]]]) == []
+assert free([[[1, 2], [8, 9]], [[3, 4]]]) == [[2, 3], [4, 8]]
+```
+
+```java
+class Interval { // provided by LeetCode
+    public int start, end;
+    public Interval() {}
+    public Interval(int _start, int _end) { start = _start; end = _end; }
+}
+
+class Solution {
+    public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
+        List<Interval> all = new ArrayList<>();
+        for (List<Interval> emp : schedule) all.addAll(emp);
+        all.sort((a, b) -> Integer.compare(a.start, b.start));
+        List<Interval> res = new ArrayList<>();
+        int end = all.get(0).end;
+        for (Interval iv : all) {
+            if (iv.start > end) res.add(new Interval(end, iv.start));
+            end = Math.max(end, iv.end);
+        }
+        return res;
+    }
+}
+// test
+List<Interval> fr = new Solution().employeeFreeTime(List.of(
+    List.of(new Interval(1, 3), new Interval(6, 7)), List.of(new Interval(2, 4)), List.of(new Interval(2, 5), new Interval(9, 12))));
+check(fr.stream().map(iv -> List.of(iv.start, iv.end)).collect(Collectors.toList()), List.of(List.of(5, 6), List.of(7, 9)));
+```

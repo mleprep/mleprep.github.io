@@ -1740,3 +1740,318 @@ class Solution {
 // test
 check(new Solution().shortestBridge(new int[][]{{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}), 2);
 ```
+
+## 733. Flood Fill | Easy
+related: 200, 695, 463
+tags: grid-dfs
+
+DFS/BFS from the start cell through 4-neighbours that have the **original** color, recoloring as you go. If the new color equals the original, return immediately — otherwise the search never terminates (recolored cells still match).
+
+**Complexity:** O(R·C).
+
+```python
+class Solution:
+    def floodFill(self, image: List[List[int]], sr: int, sc: int, color: int) -> List[List[int]]:
+        old = image[sr][sc]
+        if old == color:
+            return image
+        R, C = len(image), len(image[0])
+        image[sr][sc] = color
+        stack = [(sr, sc)]
+        while stack:
+            r, c = stack.pop()
+            for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                if 0 <= nr < R and 0 <= nc < C and image[nr][nc] == old:
+                    image[nr][nc] = color
+                    stack.append((nr, nc))
+        return image
+# test
+assert Solution().floodFill([[1, 1, 1], [1, 1, 0], [1, 0, 1]], 1, 1, 2) == [[2, 2, 2], [2, 2, 0], [2, 0, 1]]
+assert Solution().floodFill([[0, 0, 0], [0, 0, 0]], 0, 0, 0) == [[0, 0, 0], [0, 0, 0]]
+assert Solution().floodFill([[0, 0, 0], [0, 1, 1]], 1, 1, 1) == [[0, 0, 0], [0, 1, 1]]
+assert Solution().floodFill([[1]], 0, 0, 3) == [[3]]
+```
+
+```java
+class Solution {
+    public int[][] floodFill(int[][] image, int sr, int sc, int color) {
+        int old = image[sr][sc];
+        if (old != color) fill(image, sr, sc, old, color);
+        return image;
+    }
+
+    private void fill(int[][] g, int r, int c, int old, int color) {
+        if (r < 0 || c < 0 || r >= g.length || c >= g[0].length || g[r][c] != old) return;
+        g[r][c] = color;
+        fill(g, r + 1, c, old, color);
+        fill(g, r - 1, c, old, color);
+        fill(g, r, c + 1, old, color);
+        fill(g, r, c - 1, old, color);
+    }
+}
+// test
+check(new Solution().floodFill(new int[][]{{1, 1, 1}, {1, 1, 0}, {1, 0, 1}}, 1, 1, 2), new int[][]{{2, 2, 2}, {2, 2, 0}, {2, 0, 1}});
+check(new Solution().floodFill(new int[][]{{0, 0, 0}, {0, 0, 0}}, 0, 0, 0), new int[][]{{0, 0, 0}, {0, 0, 0}});
+```
+
+## 1730. Shortest Path to Get Food | Medium
+related: 1926, 994, 1091
+tags: bfs, grid, premium
+
+**Problem (Premium):** a grid has exactly one `'*'` (you), any number of `'#'` (food), `'O'` (free) and `'X'` (wall). Moving up/down/left/right, return the length of the shortest path to **any** food cell, or −1.
+
+Unweighted shortest path → BFS from `'*'`, layer by layer; the first food cell reached is the answer.
+
+**Complexity:** O(R·C).
+
+```python
+class Solution:
+    def getFood(self, grid: List[List[str]]) -> int:
+        R, C = len(grid), len(grid[0])
+        start = next((r, c) for r in range(R) for c in range(C) if grid[r][c] == "*")
+        seen, q, steps = {start}, deque([start]), 0
+        while q:
+            steps += 1
+            for _ in range(len(q)):
+                r, c = q.popleft()
+                for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                    if 0 <= nr < R and 0 <= nc < C and grid[nr][nc] != "X" and (nr, nc) not in seen:
+                        if grid[nr][nc] == "#":
+                            return steps
+                        seen.add((nr, nc))
+                        q.append((nr, nc))
+        return -1
+# test
+G = lambda rows: [list(r) for r in rows]
+assert Solution().getFood(G(["XXXXXX", "X*OOOX", "XOO#OX", "XXXXXX"])) == 3
+assert Solution().getFood(G(["XXXXX", "X*XOX", "XOX#X", "XXXXX"])) == -1
+assert Solution().getFood(G(["XXXXXXXX", "X*OXO#OX", "XOOXOOXX", "XOOOO#OX", "XXXXXXXX"])) == 6
+assert Solution().getFood(G(["*#"])) == 1
+```
+
+```java
+class Solution {
+    public int getFood(char[][] grid) {
+        int R = grid.length, C = grid[0].length;
+        Deque<int[]> q = new ArrayDeque<>();
+        boolean[][] seen = new boolean[R][C];
+        for (int r = 0; r < R; r++) for (int c = 0; c < C; c++) if (grid[r][c] == '*') { q.add(new int[]{r, c}); seen[r][c] = true; }
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int steps = 1; !q.isEmpty(); steps++) {
+            for (int i = q.size(); i > 0; i--) {
+                int[] cur = q.poll();
+                for (int[] d : dirs) {
+                    int r = cur[0] + d[0], c = cur[1] + d[1];
+                    if (r < 0 || c < 0 || r >= R || c >= C || seen[r][c] || grid[r][c] == 'X') continue;
+                    if (grid[r][c] == '#') return steps;
+                    seen[r][c] = true;
+                    q.add(new int[]{r, c});
+                }
+            }
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().getFood(new char[][]{"XXXXXX".toCharArray(), "X*OOOX".toCharArray(), "XOO#OX".toCharArray(), "XXXXXX".toCharArray()}), 3);
+check(new Solution().getFood(new char[][]{"*#".toCharArray()}), 1);
+```
+
+## 1197. Minimum Knight Moves | Medium
+related: 1730, 752
+tags: bfs, premium
+
+**Problem (Premium):** on an infinite chessboard a knight starts at `(0, 0)`. Return the minimum number of moves to reach `(x, y)` (`|x| + |y| ≤ 300`).
+
+BFS over squares. Two prunings make it fast: the board is **symmetric**, so solve for `(|x|, |y|)`; and an optimal path never needs to go more than 2 squares beyond the box `[0, x] × [0, y]`, so ignore squares outside `[−2, x+2] × [−2, y+2]`.
+
+**Complexity:** O(x · y).
+
+```python
+class Solution:
+    def minKnightMoves(self, x: int, y: int) -> int:
+        x, y = abs(x), abs(y)
+        seen, q = {(0, 0)}, deque([(0, 0, 0)])
+        while q:
+            a, b, d = q.popleft()
+            if (a, b) == (x, y):
+                return d
+            for da, db in ((1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)):
+                na, nb = a + da, b + db
+                if -2 <= na <= x + 2 and -2 <= nb <= y + 2 and (na, nb) not in seen:
+                    seen.add((na, nb))
+                    q.append((na, nb, d + 1))
+# test
+assert Solution().minKnightMoves(2, 1) == 1
+assert Solution().minKnightMoves(5, 5) == 4
+assert Solution().minKnightMoves(0, 0) == 0
+assert Solution().minKnightMoves(1, 1) == 2
+assert Solution().minKnightMoves(1, 0) == 3
+assert Solution().minKnightMoves(-1, -2) == 1
+assert Solution().minKnightMoves(300, 0) == 150
+```
+
+```java
+class Solution {
+    public int minKnightMoves(int x, int y) {
+        x = Math.abs(x); y = Math.abs(y);
+        int off = 2;                                   // shift so coordinates >= -2 index from 0
+        boolean[][] seen = new boolean[x + 5][y + 5];
+        Deque<int[]> q = new ArrayDeque<>();
+        q.add(new int[]{0, 0});
+        seen[off][off] = true;
+        int[][] moves = {{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}};
+        for (int d = 0; ; d++) {
+            for (int i = q.size(); i > 0; i--) {
+                int[] p = q.poll();
+                if (p[0] == x && p[1] == y) return d;
+                for (int[] m : moves) {
+                    int a = p[0] + m[0], b = p[1] + m[1];
+                    if (a < -2 || b < -2 || a > x + 2 || b > y + 2 || seen[a + off][b + off]) continue;
+                    seen[a + off][b + off] = true;
+                    q.add(new int[]{a, b});
+                }
+            }
+        }
+    }
+}
+// test
+check(new Solution().minKnightMoves(5, 5), 4);
+check(new Solution().minKnightMoves(1, 0), 3);
+check(new Solution().minKnightMoves(300, 0), 150);
+```
+
+## 815. Bus Routes | Hard
+related: 127, 1730
+tags: bfs, implicit-graph
+
+BFS where one "step" is **riding one bus**: from the current stops, board every not-yet-used route through them and reach all of that route's stops. Index `stop → routes` first; mark routes as used so each route is expanded once.
+
+```viz
+routes: 0:[1 2 7]  1:[3 6 7]      source 1, target 6
+bus 1: stop 1 -> route 0 -> stops {2, 7}
+bus 2: stop 7 -> route 1 -> stops {3, 6}  -> target reached, answer 2
+```
+
+**Complexity:** O(Σ route lengths).
+
+```python
+class Solution:
+    def numBusesToDestination(self, routes: List[List[int]], source: int, target: int) -> int:
+        if source == target:
+            return 0
+        at = defaultdict(list)                        # stop -> routes through it
+        for i, route in enumerate(routes):
+            for s in route:
+                at[s].append(i)
+        used, seen, q, buses = set(), {source}, deque([source]), 0
+        while q:
+            buses += 1
+            for _ in range(len(q)):
+                for r in at[q.popleft()]:
+                    if r in used:
+                        continue
+                    used.add(r)
+                    for s in routes[r]:
+                        if s == target:
+                            return buses
+                        if s not in seen:
+                            seen.add(s)
+                            q.append(s)
+        return -1
+# test
+assert Solution().numBusesToDestination([[1, 2, 7], [3, 6, 7]], 1, 6) == 2
+assert Solution().numBusesToDestination([[7, 12], [4, 5, 15], [6], [15, 19], [9, 12, 13]], 15, 12) == -1
+assert Solution().numBusesToDestination([[1, 2]], 1, 1) == 0
+assert Solution().numBusesToDestination([[1, 2]], 3, 1) == -1
+assert Solution().numBusesToDestination([[1, 7], [3, 5]], 5, 5) == 0
+```
+
+```java
+class Solution {
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        if (source == target) return 0;
+        Map<Integer, List<Integer>> at = new HashMap<>();
+        for (int i = 0; i < routes.length; i++) for (int s : routes[i]) at.computeIfAbsent(s, k -> new ArrayList<>()).add(i);
+        boolean[] used = new boolean[routes.length];
+        Set<Integer> seen = new HashSet<>(List.of(source));
+        Deque<Integer> q = new ArrayDeque<>(List.of(source));
+        for (int buses = 1; !q.isEmpty(); buses++) {
+            for (int i = q.size(); i > 0; i--) {
+                for (int r : at.getOrDefault(q.poll(), List.of())) {
+                    if (used[r]) continue;
+                    used[r] = true;
+                    for (int s : routes[r]) {
+                        if (s == target) return buses;
+                        if (seen.add(s)) q.add(s);
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().numBusesToDestination(new int[][]{{1, 2, 7}, {3, 6, 7}}, 1, 6), 2);
+check(new Solution().numBusesToDestination(new int[][]{{7, 12}, {4, 5, 15}, {6}, {15, 19}, {9, 12, 13}}, 15, 12), -1);
+```
+
+## 1926. Nearest Exit from Entrance in Maze | Medium
+related: 1730, 286
+tags: bfs, grid
+
+BFS from the entrance; the first **border** empty cell reached (other than the entrance itself) is the nearest exit.
+
+**Complexity:** O(R·C).
+
+```python
+class Solution:
+    def nearestExit(self, maze: List[List[str]], entrance: List[int]) -> int:
+        R, C = len(maze), len(maze[0])
+        start = tuple(entrance)
+        seen, q, steps = {start}, deque([start]), 0
+        while q:
+            steps += 1
+            for _ in range(len(q)):
+                r, c = q.popleft()
+                for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                    if 0 <= nr < R and 0 <= nc < C and maze[nr][nc] == "." and (nr, nc) not in seen:
+                        if nr in (0, R - 1) or nc in (0, C - 1):
+                            return steps
+                        seen.add((nr, nc))
+                        q.append((nr, nc))
+        return -1
+# test
+G = lambda rows: [list(r) for r in rows]
+assert Solution().nearestExit(G(["++.+", "...+", "+++."]), [1, 2]) == 1
+assert Solution().nearestExit(G(["+++", "...", "+++"]), [1, 0]) == 2
+assert Solution().nearestExit(G([".+"]), [0, 0]) == -1
+```
+
+```java
+class Solution {
+    public int nearestExit(char[][] maze, int[] entrance) {
+        int R = maze.length, C = maze[0].length;
+        boolean[][] seen = new boolean[R][C];
+        seen[entrance[0]][entrance[1]] = true;
+        Deque<int[]> q = new ArrayDeque<>(List.of(entrance));
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int steps = 1; !q.isEmpty(); steps++) {
+            for (int i = q.size(); i > 0; i--) {
+                int[] cur = q.poll();
+                for (int[] d : dirs) {
+                    int r = cur[0] + d[0], c = cur[1] + d[1];
+                    if (r < 0 || c < 0 || r >= R || c >= C || seen[r][c] || maze[r][c] != '.') continue;
+                    if (r == 0 || c == 0 || r == R - 1 || c == C - 1) return steps;
+                    seen[r][c] = true;
+                    q.add(new int[]{r, c});
+                }
+            }
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().nearestExit(new char[][]{"++.+".toCharArray(), "...+".toCharArray(), "+++.".toCharArray()}, new int[]{1, 2}), 1);
+check(new Solution().nearestExit(new char[][]{".+".toCharArray()}, new int[]{0, 0}), -1);
+```
