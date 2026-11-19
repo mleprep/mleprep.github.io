@@ -52,6 +52,21 @@ class Solution {
 check(new Solution().maxSubArray(new int[]{-2, 1, -3, 4, -1, 2, 1, -5, 4}), 6);
 ```
 
+```go
+func maxSubArray(nums []int) int {
+	best, cur := nums[0], nums[0] // cur = best sum ending here (Kadane)
+	for _, x := range nums[1:] {
+		cur = max(x, cur+x)
+		best = max(best, cur)
+	}
+	return best
+}
+// test
+assertEq(maxSubArray([]int{-2, 1, -3, 4, -1, 2, 1, -5, 4}), 6)
+assertEq(maxSubArray([]int{-1}), -1)
+```
+
+
 ## 918. Maximum Sum Circular Subarray | Medium
 related: 53
 tags: kadane
@@ -98,6 +113,29 @@ check(new Solution().maxSubarraySumCircular(new int[]{5, -3, 5}), 10);
 check(new Solution().maxSubarraySumCircular(new int[]{-3, -2, -3}), -2);
 ```
 
+```go
+func maxSubarraySumCircular(nums []int) int {
+	curMax, curMin, total := 0, 0, 0
+	bestMax, bestMin := nums[0], nums[0]
+	for _, x := range nums {
+		curMax = max(x, curMax+x)
+		bestMax = max(bestMax, curMax)
+		curMin = min(x, curMin+x)
+		bestMin = min(bestMin, curMin)
+		total += x
+	}
+	if bestMax < 0 {
+		return bestMax // all negative: the wrap-around case would be empty
+	}
+	return max(bestMax, total-bestMin) // a wrapping subarray = total minus a middle one
+}
+// test
+assertEq(maxSubarraySumCircular([]int{1, -2, 3, -2}), 3)
+assertEq(maxSubarraySumCircular([]int{5, -3, 5}), 10)
+assertEq(maxSubarraySumCircular([]int{-3, -2, -3}), -2)
+```
+
+
 ## 55. Jump Game | Medium
 related: 45
 tags: blind75, reach
@@ -135,6 +173,23 @@ class Solution {
 check(new Solution().canJump(new int[]{2, 3, 1, 1, 4}), true);
 check(new Solution().canJump(new int[]{3, 2, 1, 0, 4}), false);
 ```
+
+```go
+func canJump(nums []int) bool {
+	reach := 0 // farthest index reachable so far
+	for i, x := range nums {
+		if i > reach {
+			return false
+		}
+		reach = max(reach, i+x)
+	}
+	return true
+}
+// test
+assertEq(canJump([]int{2, 3, 1, 1, 4}), true)
+assertEq(canJump([]int{3, 2, 1, 0, 4}), false)
+```
+
 
 ## 45. Jump Game II | Medium
 related: 55
@@ -181,6 +236,25 @@ class Solution {
 check(new Solution().jump(new int[]{2, 3, 1, 1, 4}), 2);
 ```
 
+```go
+func jump(nums []int) int {
+	jumps, end, far := 0, 0, 0 // BFS by levels: [.., end] is reachable with `jumps` jumps
+	for i := 0; i < len(nums)-1; i++ {
+		far = max(far, i+nums[i])
+		if i == end {
+			jumps++
+			end = far
+		}
+	}
+	return jumps
+}
+// test
+assertEq(jump([]int{2, 3, 1, 1, 4}), 2)
+assertEq(jump([]int{2, 3, 0, 1, 4}), 2)
+assertEq(jump([]int{0}), 0)
+```
+
+
 ## 122. Best Time to Buy and Sell Stock II | Medium
 related: 121, 309, 714
 tags: greedy
@@ -209,6 +283,20 @@ class Solution {
 // test
 check(new Solution().maxProfit(new int[]{7, 1, 5, 3, 6, 4}), 7);
 ```
+
+```go
+func maxProfit(prices []int) int {
+	total := 0
+	for i := 1; i < len(prices); i++ {
+		total += max(0, prices[i]-prices[i-1]) // collect every rise
+	}
+	return total
+}
+// test
+assertEq(maxProfit([]int{7, 1, 5, 3, 6, 4}), 7)
+assertEq(maxProfit([]int{1, 2, 3, 4, 5}), 4)
+```
+
 
 ## 134. Gas Station | Medium
 related: 55
@@ -249,6 +337,27 @@ class Solution {
 // test
 check(new Solution().canCompleteCircuit(new int[]{1, 2, 3, 4, 5}, new int[]{3, 4, 5, 1, 2}), 3);
 ```
+
+```go
+func canCompleteCircuit(gas []int, cost []int) int {
+	total, tank, start := 0, 0, 0
+	for i := range gas {
+		total += gas[i] - cost[i]
+		tank += gas[i] - cost[i]
+		if tank < 0 { // cannot reach i+1 from start, nor from any station in between
+			start, tank = i+1, 0
+		}
+	}
+	if total < 0 {
+		return -1
+	}
+	return start
+}
+// test
+assertEq(canCompleteCircuit([]int{1, 2, 3, 4, 5}, []int{3, 4, 5, 1, 2}), 3)
+assertEq(canCompleteCircuit([]int{2, 3, 4}, []int{3, 4, 3}), -1)
+```
+
 
 ## 135. Candy | Hard
 related: 42
@@ -297,6 +406,33 @@ class Solution {
 check(new Solution().candy(new int[]{1, 0, 2}), 5);
 check(new Solution().candy(new int[]{1, 2, 2}), 4);
 ```
+
+```go
+func candy(ratings []int) int {
+	n := len(ratings)
+	c := make([]int, n)
+	for i := range c {
+		c[i] = 1
+	}
+	for i := 1; i < n; i++ { // left neighbour rule
+		if ratings[i] > ratings[i-1] {
+			c[i] = c[i-1] + 1
+		}
+	}
+	total := c[n-1]
+	for i := n - 2; i >= 0; i-- { // right neighbour rule
+		if ratings[i] > ratings[i+1] {
+			c[i] = max(c[i], c[i+1]+1)
+		}
+		total += c[i]
+	}
+	return total
+}
+// test
+assertEq(candy([]int{1, 0, 2}), 5)
+assertEq(candy([]int{1, 2, 2}), 4)
+```
+
 
 ## 846. Hand of Straights | Medium
 related: 659
@@ -349,6 +485,40 @@ check(new Solution().isNStraightHand(new int[]{1, 2, 3, 6, 2, 3, 4, 7, 8}, 3), t
 check(new Solution().isNStraightHand(new int[]{1, 2, 3, 4, 5}, 4), false);
 ```
 
+```go
+func isNStraightHand(hand []int, groupSize int) bool {
+	if len(hand)%groupSize != 0 {
+		return false
+	}
+	cnt := map[int]int{}
+	for _, x := range hand {
+		cnt[x]++
+	}
+	keys := make([]int, 0, len(cnt))
+	for x := range cnt {
+		keys = append(keys, x)
+	}
+	sort.Ints(keys)
+	for _, x := range keys { // the smallest card left must start a group
+		c := cnt[x]
+		if c == 0 {
+			continue
+		}
+		for y := x; y < x+groupSize; y++ {
+			if cnt[y] < c {
+				return false
+			}
+			cnt[y] -= c
+		}
+	}
+	return true
+}
+// test
+assertEq(isNStraightHand([]int{1, 2, 3, 6, 2, 3, 4, 7, 8}, 3), true)
+assertEq(isNStraightHand([]int{1, 2, 3, 4, 5}, 4), false)
+```
+
+
 ## 1899. Merge Triplets to Form Target Triplet | Medium
 related: 55
 tags: greedy
@@ -384,6 +554,27 @@ class Solution {
 // test
 check(new Solution().mergeTriplets(new int[][]{{2, 5, 3}, {1, 8, 4}, {1, 7, 5}}, new int[]{2, 7, 5}), true);
 ```
+
+```go
+func mergeTriplets(triplets [][]int, target []int) bool {
+	good := [3]bool{}
+	for _, t := range triplets {
+		if t[0] > target[0] || t[1] > target[1] || t[2] > target[2] {
+			continue // merging it would overshoot
+		}
+		for i := 0; i < 3; i++ {
+			if t[i] == target[i] {
+				good[i] = true
+			}
+		}
+	}
+	return good[0] && good[1] && good[2]
+}
+// test
+assertEq(mergeTriplets([][]int{{2, 5, 3}, {1, 8, 4}, {1, 7, 5}}, []int{2, 7, 5}), true)
+assertEq(mergeTriplets([][]int{{3, 4, 5}, {4, 5, 6}}, []int{3, 2, 5}), false)
+```
+
 
 ## 763. Partition Labels | Medium
 related: 56
@@ -431,6 +622,29 @@ class Solution {
 // test
 check(new Solution().partitionLabels("ababcbacadefegdehijhklij"), "[9, 7, 8]");
 ```
+
+```go
+func partitionLabels(s string) []int {
+	last := [26]int{}
+	for i := 0; i < len(s); i++ {
+		last[s[i]-'a'] = i
+	}
+	res := []int{}
+	start, end := 0, 0
+	for i := 0; i < len(s); i++ {
+		end = max(end, last[s[i]-'a']) // the part must reach every letter's last occurrence
+		if i == end {
+			res = append(res, end-start+1)
+			start = i + 1
+		}
+	}
+	return res
+}
+// test
+assertEq(partitionLabels("ababcbacadefegdehijhklij"), []int{9, 7, 8})
+assertEq(partitionLabels("eccbbbbdec"), []int{10})
+```
+
 
 ## 678. Valid Parenthesis String | Medium
 related: 20, 32
@@ -481,6 +695,33 @@ check(new Solution().checkValidString("(*))"), true);
 check(new Solution().checkValidString("(((*)"), false);
 ```
 
+```go
+func checkValidString(s string) bool {
+	lo, hi := 0, 0 // range of possible open-bracket counts
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
+		case '(':
+			lo, hi = lo+1, hi+1
+		case ')':
+			lo, hi = lo-1, hi-1
+		default: // '*' is ')', '' or '('
+			lo, hi = lo-1, hi+1
+		}
+		if hi < 0 {
+			return false
+		}
+		lo = max(lo, 0)
+	}
+	return lo == 0
+}
+// test
+assertEq(checkValidString("()"), true)
+assertEq(checkValidString("(*)"), true)
+assertEq(checkValidString("(*))"), true)
+assertEq(checkValidString("(((*)"), false)
+```
+
+
 ## 406. Queue Reconstruction by Height | Medium
 related: 315
 tags: sort-then-insert
@@ -526,6 +767,28 @@ int[][] P = {{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}};
 check(new Solution().reconstructQueue(P), new int[][]{{5, 0}, {7, 0}, {5, 2}, {6, 1}, {4, 4}, {7, 1}});
 ```
 
+```go
+func reconstructQueue(people [][]int) [][]int {
+	sort.Slice(people, func(i, j int) bool { // tallest first; fewer people in front first
+		a, b := people[i], people[j]
+		return a[0] > b[0] || a[0] == b[0] && a[1] < b[1]
+	})
+	res := [][]int{}
+	for _, p := range people { // everyone already placed is at least as tall: insert at index k
+		k := p[1]
+		res = append(res, p) // grow by one, then shift right from k
+		copy(res[k+1:], res[k:])
+		res[k] = p
+	}
+	return res
+}
+// test
+P := [][]int{{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}}
+assertEq(reconstructQueue(P), [][]int{{5, 0}, {7, 0}, {5, 2}, {6, 1}, {4, 4}, {7, 1}})
+assertEq(reconstructQueue([][]int{{6, 0}, {5, 0}, {4, 0}, {3, 2}, {2, 2}, {1, 4}}), [][]int{{4, 0}, {5, 0}, {2, 2}, {3, 2}, {1, 4}, {6, 0}})
+```
+
+
 
 ## 455. Assign Cookies | Easy
 related: 881
@@ -561,6 +824,24 @@ class Solution {
 // test
 check(new Solution().findContentChildren(new int[]{1, 2}, new int[]{1, 2, 3}), 2);
 ```
+
+```go
+func findContentChildren(g []int, s []int) int {
+	sort.Ints(g)
+	sort.Ints(s)
+	child := 0
+	for _, size := range s { // each cookie goes to the least greedy child it satisfies
+		if child < len(g) && size >= g[child] {
+			child++
+		}
+	}
+	return child
+}
+// test
+assertEq(findContentChildren([]int{1, 2, 3}, []int{1, 1}), 1)
+assertEq(findContentChildren([]int{1, 2}, []int{1, 2, 3}), 2)
+```
+
 
 ## 860. Lemonade Change | Easy
 related: 455
@@ -609,6 +890,32 @@ class Solution {
 check(new Solution().lemonadeChange(new int[]{5, 5, 10, 10, 20}), false);
 ```
 
+```go
+func lemonadeChange(bills []int) bool {
+	five, ten := 0, 0
+	for _, b := range bills {
+		switch {
+		case b == 5:
+			five++
+		case b == 10:
+			five, ten = five-1, ten+1
+		case ten > 0: // give 10 + 5 for a 20: keep fives, they are more useful
+			five, ten = five-1, ten-1
+		default:
+			five -= 3
+		}
+		if five < 0 {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(lemonadeChange([]int{5, 5, 5, 10, 20}), true)
+assertEq(lemonadeChange([]int{5, 5, 10, 10, 20}), false)
+```
+
+
 ## 1029. Two City Scheduling | Medium
 related: 406
 tags: sort, exchange-argument
@@ -640,6 +947,27 @@ class Solution {
 // test
 check(new Solution().twoCitySchedCost(new int[][]{{10, 20}, {30, 200}, {400, 50}, {30, 20}}), 110);
 ```
+
+```go
+func twoCitySchedCost(costs [][]int) int {
+	sort.Slice(costs, func(i, j int) bool { // most to gain from city A first
+		return costs[i][0]-costs[i][1] < costs[j][0]-costs[j][1]
+	})
+	n, total := len(costs)/2, 0
+	for i, c := range costs {
+		if i < n {
+			total += c[0]
+		} else {
+			total += c[1]
+		}
+	}
+	return total
+}
+// test
+assertEq(twoCitySchedCost([][]int{{10, 20}, {30, 200}, {400, 50}, {30, 20}}), 110)
+assertEq(twoCitySchedCost([][]int{{259, 770}, {448, 54}, {926, 667}, {184, 139}, {840, 118}, {577, 469}}), 1859)
+```
+
 
 ## 649. Dota2 Senate | Medium
 related: 1834
@@ -683,6 +1011,37 @@ class Solution {
 // test
 check(new Solution().predictPartyVictory("RDD"), "Dire");
 ```
+
+```go
+func predictPartyVictory(senate string) string {
+	n := len(senate)
+	r, d := []int{}, []int{} // turn indices of each party's active senators
+	for i := 0; i < n; i++ {
+		if senate[i] == 'R' {
+			r = append(r, i)
+		} else {
+			d = append(d, i)
+		}
+	}
+	for len(r) > 0 && len(d) > 0 {
+		a, b := r[0], d[0]
+		r, d = r[1:], d[1:]
+		if a < b { // the earlier senator bans the other and votes again next round
+			r = append(r, a+n)
+		} else {
+			d = append(d, b+n)
+		}
+	}
+	if len(r) > 0 {
+		return "Radiant"
+	}
+	return "Dire"
+}
+// test
+assertEq(predictPartyVictory("RD"), "Radiant")
+assertEq(predictPartyVictory("RDD"), "Dire")
+```
+
 
 ## 659. Split Array into Consecutive Subsequences | Medium
 related: 846
@@ -741,6 +1100,37 @@ check(new Solution().isPossible(new int[]{1, 2, 3, 3, 4, 4, 5, 5}), true);
 check(new Solution().isPossible(new int[]{1, 2, 3, 4, 4, 5}), false);
 ```
 
+```go
+func isPossible(nums []int) bool {
+	left, ends := map[int]int{}, map[int]int{} // unused counts; subsequences ending at x
+	for _, x := range nums {
+		left[x]++
+	}
+	for _, x := range nums {
+		if left[x] == 0 {
+			continue
+		}
+		left[x]--
+		if ends[x-1] > 0 { // extend an existing subsequence
+			ends[x-1]--
+			ends[x]++
+		} else if left[x+1] > 0 && left[x+2] > 0 { // or start a new one of length 3
+			left[x+1]--
+			left[x+2]--
+			ends[x+2]++
+		} else {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(isPossible([]int{1, 2, 3, 3, 4, 5}), true)
+assertEq(isPossible([]int{1, 2, 3, 3, 4, 4, 5, 5}), true)
+assertEq(isPossible([]int{1, 2, 3, 4, 4, 5}), false)
+```
+
+
 ## 1326. Minimum Number of Taps to Open to Water a Garden | Hard
 related: 45, 1024
 tags: greedy, reach
@@ -796,6 +1186,33 @@ check(new Solution().minTaps(7, new int[]{1, 2, 1, 0, 2, 1, 0, 1}), 3);
 check(new Solution().minTaps(3, new int[]{0, 0, 0, 0}), -1);
 ```
 
+```go
+func minTaps(n int, ranges []int) int {
+	reach := make([]int, n+1) // reach[lo] = farthest point a tap starting at lo covers
+	for i, r := range ranges {
+		lo, hi := max(0, i-r), min(n, i+r)
+		reach[lo] = max(reach[lo], hi)
+	}
+	taps, end, far := 0, 0, 0 // then it is Jump Game II
+	for i := 0; i < n; i++ {
+		far = max(far, reach[i])
+		if i == end {
+			if far <= i {
+				return -1 // a gap nothing covers
+			}
+			taps++
+			end = far
+		}
+	}
+	return taps
+}
+// test
+assertEq(minTaps(5, []int{3, 4, 1, 1, 0, 0}), 1)
+assertEq(minTaps(3, []int{0, 0, 0, 0}), -1)
+assertEq(minTaps(7, []int{1, 2, 1, 0, 2, 1, 0, 1}), 3)
+```
+
+
 ## 605. Can Place Flowers | Easy
 related: 495
 tags: greedy
@@ -836,6 +1253,26 @@ class Solution {
 check(new Solution().canPlaceFlowers(new int[]{1, 0, 0, 0, 1}, 1), true);
 check(new Solution().canPlaceFlowers(new int[]{1, 0, 0, 0, 1}, 2), false);
 ```
+
+```go
+func canPlaceFlowers(flowerbed []int, n int) bool {
+	bed := append(append([]int{0}, flowerbed...), 0) // pad both ends with empty plots
+	for i := 1; i < len(bed)-1; i++ {
+		if bed[i-1] == 0 && bed[i] == 0 && bed[i+1] == 0 { // planting as early as possible is optimal
+			bed[i] = 1
+			n--
+		}
+	}
+	return n <= 0
+}
+// test
+assertEq(canPlaceFlowers([]int{1, 0, 0, 0, 1}, 1), true)
+assertEq(canPlaceFlowers([]int{1, 0, 0, 0, 1}, 2), false)
+assertEq(canPlaceFlowers([]int{0}, 1), true)
+assertEq(canPlaceFlowers([]int{0, 0, 1, 0, 0}, 2), true)
+assertEq(canPlaceFlowers([]int{1, 0, 1, 0, 1}, 0), true)
+```
+
 
 ## 334. Increasing Triplet Subsequence | Medium
 related: 300
@@ -882,6 +1319,30 @@ class Solution {
 check(new Solution().increasingTriplet(new int[]{2, 1, 5, 0, 4, 6}), true);
 check(new Solution().increasingTriplet(new int[]{5, 4, 3, 2, 1}), false);
 ```
+
+```go
+func increasingTriplet(nums []int) bool {
+	first, second := math.MaxInt, math.MaxInt // smallest end of increasing runs of length 1 and 2
+	for _, x := range nums {
+		if x <= first {
+			first = x
+		} else if x <= second {
+			second = x
+		} else {
+			return true
+		}
+	}
+	return false
+}
+// test
+assertEq(increasingTriplet([]int{1, 2, 3, 4, 5}), true)
+assertEq(increasingTriplet([]int{5, 4, 3, 2, 1}), false)
+assertEq(increasingTriplet([]int{2, 1, 5, 0, 4, 6}), true)
+assertEq(increasingTriplet([]int{20, 100, 10, 12, 5, 13}), true)
+assertEq(increasingTriplet([]int{1, 1, 1}), false)
+assertEq(increasingTriplet([]int{1, 5, 0, 4, 1, 3}), true)
+```
+
 
 ## 68. Text Justification | Hard
 related: 6, 1592
@@ -955,6 +1416,38 @@ check(new Solution().fullJustify(new String[]{"What", "must", "be", "acknowledgm
       List.of("What   must   be", "acknowledgment  ", "shall be        "));
 ```
 
+```go
+func fullJustify(words []string, maxWidth int) []string {
+	res := []string{}
+	line, letters := []string{}, 0
+	for _, w := range words {
+		if letters+len(w)+len(line) > maxWidth { // w does not fit: justify the current line
+			gaps := max(len(line)-1, 1)
+			for i := 0; i < maxWidth-letters; i++ {
+				line[i%gaps] += " " // round-robin puts extra spaces on the left
+			}
+			res = append(res, strings.Join(line, ""))
+			line, letters = []string{}, 0
+		}
+		line = append(line, w)
+		letters += len(w)
+	}
+	last := strings.Join(line, " ") // the last line is left-justified
+	return append(res, last+strings.Repeat(" ", maxWidth-len(last)))
+}
+// test
+assertEq(fullJustify([]string{"This", "is", "an", "example", "of", "text", "justification."}, 16), []string{
+	"This    is    an", "example  of text", "justification.  "})
+assertEq(fullJustify([]string{"What", "must", "be", "acknowledgment", "shall", "be"}, 16), []string{
+	"What   must   be", "acknowledgment  ", "shall be        "})
+assertEq(fullJustify([]string{"Science", "is", "what", "we", "understand", "well", "enough", "to", "explain",
+	"to", "a", "computer.", "Art", "is", "everything", "else", "we", "do"}, 20), []string{
+	"Science  is  what we", "understand      well", "enough to explain to", "a  computer.  Art is",
+	"everything  else  we", "do                  "})
+assertEq(fullJustify([]string{"a"}, 1), []string{"a"})
+```
+
+
 ## 1871. Jump Game VII | Medium
 related: 55, 45, 1696
 tags: sliding-window, prefix-sum
@@ -1003,3 +1496,29 @@ class Solution {
 check(new Solution().canReach("011010", 2, 3), true);
 check(new Solution().canReach("01101110", 2, 3), false);
 ```
+
+```go
+func canReach(s string, minJump int, maxJump int) bool {
+	n := len(s)
+	ok := make([]bool, n) // ok[i]: index i is reachable
+	ok[0] = true
+	window := 0 // reachable indices in [i-maxJump, i-minJump]
+	for i := 1; i < n; i++ {
+		if i >= minJump && ok[i-minJump] {
+			window++
+		}
+		if i > maxJump && ok[i-maxJump-1] {
+			window--
+		}
+		ok[i] = window > 0 && s[i] == '0'
+	}
+	return ok[n-1]
+}
+// test
+assertEq(canReach("011010", 2, 3), true)
+assertEq(canReach("01101110", 2, 3), false)
+assertEq(canReach("00", 1, 1), true)
+assertEq(canReach("01", 1, 1), false)
+assertEq(canReach("0000000000", 8, 8), false)
+```
+
