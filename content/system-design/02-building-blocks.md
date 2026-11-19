@@ -90,7 +90,7 @@ Choosing a key: high cardinality, even access, and matching the dominant query (
 
 ## Consistent Hashing
 
-Place nodes and keys on a hash **ring**; a key belongs to the first node clockwise. Adding/removing a node moves only ~`1/N` of keys (vs almost all with `% N`). **Virtual nodes** (each server appears at many ring positions) smooth out load and heterogeneity.
+Place nodes and keys on a hash **ring**; a key belongs to the first node clockwise. Adding/removing a node moves only about `1/N` of the keys (with `hash % N`, almost all keys would move). **Virtual nodes** (each server appears at many ring positions) smooth out load and heterogeneity.
 
 ```viz
             0

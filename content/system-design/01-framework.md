@@ -1,4 +1,4 @@
-# Interview Framework & Estimation
+# Framework & Estimation
 
 How to run a 45-minute system design interview, and the numbers you should know by heart.
 
