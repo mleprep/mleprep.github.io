@@ -171,3 +171,85 @@ feedback: thumbs, resolution, CSAT, agent edits -> eval set -> prompt / retrieva
 ```
 
 Design points: **RAG** over curated docs (freshness pipeline when docs change); **tools** for personal data with strict auth scoping; guardrails (no unsupported promises, PII redaction, prompt-injection defenses); offline eval set of real conversations graded by rubric + LLM-as-judge validated by humans; online metrics: containment rate, CSAT, escalation quality, hallucination reports; cost and latency budgets (smaller model for routing, bigger for hard cases).
+
+## News Feed Ranking (Facebook / LinkedIn)
+
+**Goal**: order the posts from a user's network (and recommended content) to maximize meaningful engagement and long-term retention, not just clicks.
+
+```viz
+candidates: posts from friends/follows/groups since last visit (+ recommended, ads slots)  ~ thousands
+     -> light ranker (small model / GBDT)                                                  ~ hundreds
+     -> heavy ranker: multi-task DNN -> p(click), p(like), p(comment), p(share), p(hide), p(dwell > 10s)
+     -> value model: score = Σ w_i · p_i   (weights set by product goals; negative for hide/report)
+     -> re-rank: diversity (not 5 posts from one author), freshness, integrity demotions, ads blending
+```
+
+- **Features**: viewer–author affinity (past interactions, closeness), post features (type, age, early engagement velocity), viewer context (device, time, session depth), content embeddings.
+- **Labels**: implicit engagement events with weights; negative feedback (hide, unfollow, report) matters as much as positives; delayed signals (did the user come back tomorrow?) via long-term value models.
+- **Training**: logged impressions, time-based splits, frequent retraining (daily or streaming); handle **position bias** and the feedback loop (exploration slots, counterfactual evaluation).
+- **Serving**: the feed is computed on request (fresh) with a latency budget of a few hundred ms; heavy features precomputed in a feature store; cache candidates.
+- **Metrics**: offline AUC/NDCG per head and calibration; online time spent, meaningful interactions, retention, negative feedback rate, creator-side health.
+
+## Similar Listings (Airbnb / Item-to-Item Recommendations)
+
+**Goal**: on a listing page, show other listings the user is likely to book next ("similar homes"), for a large catalog with constant churn.
+
+```viz
+training: user browsing sessions  [l12, l7, l40, l3 (booked)]  -> skip-gram on sessions (listing2vec)
+          positives = co-viewed within a window; global context = the booked listing; negatives = same-market samples
+serving:  listing embedding -> ANN index per market -> top 100 nearby in embedding space
+          -> filters (dates available, capacity, location radius) -> light re-rank (price, quality) -> top 12
+```
+
+- **Session-based embeddings** (word2vec on click sessions) capture what users actually consider similar — better than raw attribute similarity. Airbnb's trick: add the eventually-booked listing as global context and sample negatives from the **same market** so embeddings learn within-city distinctions.
+- **Cold start** for new listings: average the embeddings of nearby listings with similar type/price/capacity until data accrues.
+- **Freshness**: retrain embeddings daily; index refresh; availability changes constantly → filter at query time, not in the embedding.
+- **Metrics**: offline — rank of the eventually booked listing among candidates (hit rate@k); online — CTR on the carousel, bookings, revenue.
+
+## Street View Blurring (Object Detection System)
+
+**Goal**: automatically blur faces and license plates in billions of street-level images, with **very high recall** (privacy) and acceptable precision (don't blur the whole image).
+
+```viz
+images (batch, petabytes) -> preprocessing (resize, tiles) -> detector (faces, plates) -> NMS
+                          -> blur regions -> publish; sampled images -> human review -> new labels -> retrain
+```
+
+- **Model**: a one-stage or two-stage detector with a feature pyramid (small, distant faces/plates); tiles for high-resolution panoramas; classes: face, license plate.
+- **Data**: human-annotated boxes, augmentations (blur, lighting, occlusion, weather), hard-negative mining (posters, statues), active learning on low-confidence cases.
+- **Thresholds**: tune for recall ≥ ~99% on a held-out set, accept extra false positives; per-class thresholds.
+- **Offline batch inference**: no latency constraint but huge throughput → GPU fleet, batching, quantized models; reprocess when the model improves.
+- **Metrics**: recall/precision per class at IoU ≥ 0.5, mAP; user reports of unblurred faces as an online signal.
+
+## Gmail Smart Compose (Text Autocomplete)
+
+**Goal**: suggest the rest of the sentence as the user types an email; suggestions must be fast (< ~100 ms per keystroke), useful, and safe.
+
+```viz
+context: subject + previous email (if reply) + text typed so far + (opt.) locale, time
+   -> tokenizer -> small transformer LM (decoder, or encoder for context + decoder)
+   -> beam search, few tokens, stop at phrase boundary -> confidence threshold -> show grey suggestion
+user presses Tab = accept (positive) / keeps typing = reject (negative)
+```
+
+- **Model**: a compact language model trained on (de-identified) email text; latency dominates → small model, quantization, caching per-keystroke state (KV cache / incremental decoding), run on TPU/GPU servers or on device.
+- **Decoding**: beam search for short, high-probability completions; only show when confidence is high (bad suggestions annoy more than none).
+- **Personalization**: user-level adaptation (e.g. a lightweight personalized n-gram/adapter blended with the global model).
+- **Safety & privacy**: never memorize/leak private data (differential privacy, de-duplication, filtering rare sequences), filter offensive or biased suggestions (e.g. gendered pronoun assumptions).
+- **Metrics**: offline perplexity, exact-match@k on held-out emails; online acceptance rate, characters saved per email, latency p99.
+
+## Text-to-Image Generation Service
+
+**Goal**: generate high-quality images from text prompts at scale, safely, with a few seconds of latency.
+
+```viz
+prompt -> safety filter (blocked concepts) -> text encoder (CLIP/T5) -> latent diffusion model (DiT / U-Net)
+       -> 20-50 denoising steps with classifier-free guidance -> VAE decoder -> (super-resolution)
+       -> output safety classifier (NSFW, likeness) -> watermark -> image
+```
+
+- **Model**: latent diffusion — train a VAE to compress images, then a diffusion transformer to denoise latents conditioned on text via cross-attention; trained on large filtered, recaptioned image–text data (better captions → better prompt following).
+- **Serving cost**: each image = dozens of network evaluations → step-reduction (DPM-Solver, distillation, consistency models), batching, fp16/fp8, smaller resolution + super-resolution, caching prompt embeddings; GPU autoscaling with queues and per-user quotas.
+- **Controls**: guidance scale, seed, negative prompts, image-to-image, inpainting, ControlNet-style conditioning (pose, edges).
+- **Safety**: prompt classifiers, output classifiers, block real-person likeness/IP misuse, invisible watermarking (C2PA provenance metadata).
+- **Evaluation**: FID / CLIP score offline, human preference win rates (side by side), prompt-adherence benchmarks; online: regeneration rate, downloads.

@@ -175,3 +175,47 @@ Large runs combine them ("3D parallelism"), plus mixed precision (bf16), activat
 **Message passing**: each node updates its embedding by aggregating its neighbours' messages: `h_v' = σ(W·h_v + Σ_{u∈N(v)} W'·h_u / |N(v)|)` (GCN, GraphSAGE; GAT uses attention weights). k layers ⇒ k-hop receptive field.
 Uses: fraud rings, recommendations (user–item graphs, PinSage), molecules/drug discovery, traffic/ETA, knowledge graphs.
 Issues: **over-smoothing** with many layers, neighbourhood explosion → **neighbour sampling** (GraphSAGE) or cluster batching for large graphs.
+
+## Object Detection & Segmentation
+
+**Q: How do object detectors work? How are they evaluated?**
+
+- **Two-stage** (Faster R-CNN): a region proposal network suggests boxes, then RoI Align crops features and a head classifies + refines each box. Accurate, slower.
+- **One-stage** (YOLO, SSD, RetinaNet): predict class scores and box offsets densely over a grid of anchors in one pass; RetinaNet's **focal loss** fixes the extreme foreground/background imbalance. Fast, the default for real time.
+- **Anchor-free** (FCOS, CenterNet) predict centers/distances directly; **DETR** treats detection as **set prediction** with a transformer and Hungarian matching between predictions and ground truth — no anchors, no NMS.
+- Post-processing: score threshold + **non-maximum suppression** (see ML Coding).
+- **Metrics**: IoU decides a true positive; **AP** = area under the precision–recall curve per class; **mAP** averages classes; COCO averages mAP over IoU thresholds 0.5:0.95.
+- **Segmentation**: semantic (a class per pixel: U-Net encoder–decoder with skip connections, DeepLab with atrous convolutions), instance (Mask R-CNN adds a mask head), panoptic (both); **SAM** segments anything from point/box prompts.
+- Practical: small objects (feature pyramids, higher resolution), class imbalance, label noise in boxes, deployment latency (quantization, smaller backbones).
+
+## Model Compression: Distillation, Quantization, Pruning
+
+**Q: Your model is too slow/big for production. What are your options?**
+
+- **Knowledge distillation**: train a small student on the teacher's **soft targets** (probabilities at temperature T) plus the true labels: `L = α·CE(y, s) + (1 − α)·T²·KL(softmax(t/T) ‖ softmax(s/T))`. Soft targets carry "dark knowledge" (which wrong classes are close). LLMs distill from teacher-generated data or logits.
+- **Quantization**: store/compute weights (and activations) in int8/int4/fp8 instead of fp32/bf16 → 2–8× smaller, faster on supporting hardware. **Post-training quantization** needs only calibration data; **quantization-aware training** simulates rounding during training for better accuracy. Per-channel scales, outlier handling (LLM.int8, SmoothQuant), GPTQ/AWQ for LLM weights.
+- **Pruning**: remove weights (unstructured magnitude pruning: sparse but rarely faster on GPUs) or whole channels/heads/layers (**structured**: real speedups); NVIDIA 2:4 sparsity is a hardware-supported middle ground. Fine-tune after pruning.
+- **Architecture**: efficient blocks (depthwise-separable convs, MobileNet/EfficientNet), smaller/shallower models, low-rank factorization, early exit, caching.
+- **Serving tricks**: batching, compiling (TensorRT, ONNX Runtime, torch.compile), mixed precision, caching embeddings/results.
+- Always measure the accuracy drop on the metric that matters and the real latency on the target hardware.
+
+## Diffusion Models in Depth
+
+**Q: How are diffusion models trained and sampled? What is classifier-free guidance?**
+
+- **Forward process**: gradually add Gaussian noise; in closed form `x_t = √ᾱ_t · x₀ + √(1 − ᾱ_t) · ε`.
+- **Training**: sample an image, a timestep t and noise ε; the network (U-Net or transformer/DiT) predicts ε from `(x_t, t, condition)`; loss = MSE between true and predicted noise. Simple and stable.
+- **Sampling**: start from pure noise and iteratively denoise. DDPM needs hundreds to ~1000 steps; **DDIM** and ODE solvers take 20–50; distillation / consistency models get to 1–4 steps.
+- **Conditioning**: text embeddings (CLIP/T5) injected via cross-attention. **Classifier-free guidance**: train with the condition randomly dropped, then sample with `ε = ε_uncond + w·(ε_cond − ε_uncond)`; larger w = closer prompt adherence, less diversity.
+- **Latent diffusion** (Stable Diffusion): diffuse in a VAE's compressed latent space (e.g. 8× smaller per side) — far cheaper at high resolution.
+- Newer: **flow matching / rectified flow** (straight-line paths, fewer steps), transformer backbones (DiT), video diffusion with temporal attention.
+- Evaluation: FID (realism vs a reference set), CLIP score (prompt alignment), human preference ratings.
+
+## Vision Transformers & CLIP
+
+**Q: How do transformers handle images? How does CLIP enable zero-shot classification?**
+
+- **ViT**: split the image into 16×16 patches, linearly embed each, add position embeddings and a [CLS] token, run a standard transformer encoder. Less inductive bias than CNNs → needs large data (or strong augmentation/distillation: DeiT); scales very well. Variants: Swin (windowed attention, hierarchical), MAE pretraining (mask 75% of patches, reconstruct).
+- **CLIP**: an image encoder and a text encoder trained **contrastively** on hundreds of millions of image–caption pairs (InfoNCE over the batch: matching pairs on the diagonal).
+- **Zero-shot classification**: embed prompts like "a photo of a {class}", embed the image, pick the most similar text — no task-specific training. Also powers image search, text-to-image conditioning and the vision side of many multimodal LLMs (SigLIP uses a sigmoid loss instead of softmax).
+- Limitations: biases from web data, weak at counting/spatial relations, prompt sensitivity (prompt ensembles help).

@@ -140,3 +140,56 @@ Reliability levers: clear tool descriptions and typed schemas; small, composable
 
 Techniques: RoPE scaling / position interpolation, training on long sequences, efficient attention (FlashAttention, sliding window + global tokens), KV-cache compression, ring/sequence parallelism.
 Failure modes: "lost in the middle" (information in the middle is used less), cost growing with length, distractors reducing accuracy. Mitigations: RAG to select relevant chunks, put key instructions at the start/end, summarize or structure long inputs, evaluate with needle-in-a-haystack *and* realistic multi-hop tasks.
+
+## Vector Search & ANN Indexes
+
+**Q: How do vector databases find nearest neighbours among a billion embeddings?**
+
+Exact search is O(N·d) per query — too slow at scale, so we trade a little recall for speed with **approximate nearest neighbour (ANN)** indexes:
+
+| Index | Idea | Trade-offs |
+|---|---|---|
+| **HNSW** | multi-layer proximity graph; greedy search from a sparse top layer down to a dense bottom layer | excellent recall/latency; memory heavy (vectors + graph); slow-ish inserts; the common default |
+| **IVF** | k-means "coarse" clusters; search only the `nprobe` closest clusters | fast, tunable; recall drops if neighbours sit in unprobed clusters |
+| **PQ** (product quantization) | split each vector into m sub-vectors, replace each by one of 256 centroids → m bytes per vector | 10–100× compression; approximate distances; combine as **IVF-PQ** for billions of vectors |
+| **DiskANN / ScaNN** | graph on SSD / anisotropic quantization | billion scale on one machine; high throughput |
+
+- Knobs: `efSearch` (HNSW) and `nprobe` (IVF) trade recall for latency; measure **recall@k** against exact search.
+- **Cosine similarity** = dot product on L2-normalized vectors — normalize at index and query time.
+- **Filtering** (tenant, date, ACL): pre-filtering can break graph search; post-filtering can return too few results → filtered-HNSW variants, partitioning by tenant, or over-fetching.
+- **Hybrid search**: combine BM25 and vector scores (reciprocal rank fusion) — better than either alone for RAG.
+- Updates/deletes: HNSW tombstones and periodic rebuilds; keep the raw vectors elsewhere so indexes can be rebuilt with new parameters or embedding models (re-embedding everything when the model changes!).
+
+## Reasoning Models & Test-Time Compute
+
+**Q: What makes "reasoning" models different, and how do you spend more compute at inference?**
+
+- **Chain-of-thought**: generating intermediate steps before the answer improves multi-step problems (math, code, planning).
+- **Test-time compute scaling**: accuracy keeps rising with more inference compute — longer thinking, **self-consistency** (sample many solutions, majority vote), **best-of-N** with a verifier/reward model, tree search over partial solutions.
+- **Training reasoners**: reinforcement learning with **verifiable rewards** (unit tests pass, math answer correct) teaches models to produce long, self-correcting reasoning (e.g. PPO or GRPO — group-relative advantages over several samples per prompt, no separate value model). **Outcome** reward models score final answers; **process** reward models score each step.
+- **Distillation**: reasoning traces from a large model fine-tune smaller ones cheaply.
+- Trade-offs: latency and cost grow with thinking tokens → route easy queries to fast models, cap reasoning budgets; reasoning can still be wrong — verify with tools (code execution, search) where possible.
+
+## LLM Safety & Guardrails
+
+**Q: How do you make an LLM application safe and robust?**
+
+- **Threats**: harmful content requests and **jailbreaks** (role-play, obfuscation, many-shot), **prompt injection** — direct, or *indirect* via retrieved documents, emails, web pages and tool outputs that contain instructions — data exfiltration through tools/links, PII leakage, hallucinated facts.
+- **Model-level**: safety fine-tuning (RLHF, constitutional AI / RLAIF), refusal training balanced against over-refusal.
+- **System-level** (defense in depth):
+  - treat all retrieved/tool content as **data, not instructions**; keep a clear instruction hierarchy (system > developer > user > tool output);
+  - input and output **classifiers** (toxicity, PII, policy violations); structured outputs validated against schemas;
+  - **least privilege** for tools, sandboxed code execution, allow-lists for URLs/actions, **human confirmation** for side-effecting actions (payments, emails, deletes);
+  - rate limiting, abuse monitoring, audit logs.
+- **Evaluation**: red-teaming (human + automated), jailbreak and injection benchmarks, regression suites run on every model/prompt change; track both harmful-output rate and false refusals.
+
+## Multimodal LLMs
+
+**Q: How do LLMs understand images (and audio)?**
+
+- **Late-fusion recipe** (LLaVA-style): a pretrained vision encoder (CLIP/SigLIP ViT) turns the image into patch embeddings → a small **projector** (MLP, or a Q-Former/perceiver that compresses to fewer tokens) maps them into the LLM's embedding space → the LLM reads them like text tokens.
+- **Training**: (1) align — train the projector on image–caption pairs with the encoder and LLM frozen; (2) **visual instruction tuning** — fine-tune on image + instruction → answer data (often LLM-generated), unfreezing more of the model.
+- **Early fusion / native multimodal** models tokenize images (and audio) and train jointly from the start — better cross-modal reasoning, can also *generate* images as tokens.
+- High-resolution images: tile into crops plus a global thumbnail; token count (cost) grows with resolution.
+- Audio: speech encoders (Whisper-style) feeding the LLM, or end-to-end speech models for low-latency voice.
+- Evaluation: VQA, document/chart understanding (OCR-heavy), grounding, hallucination of objects not in the image.
