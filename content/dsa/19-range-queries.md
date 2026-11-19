@@ -70,6 +70,29 @@ NumArray na = new NumArray(new int[]{-2, 0, 3, -5, 2, -1});
 check(na.sumRange(2, 5), -1);
 ```
 
+```go
+type NumArray struct {
+	pre []int // pre[i] = sum of nums[:i]
+}
+
+func Constructor(nums []int) NumArray {
+	pre := make([]int, len(nums)+1)
+	for i, x := range nums {
+		pre[i+1] = pre[i] + x
+	}
+	return NumArray{pre: pre}
+}
+
+func (this *NumArray) SumRange(left int, right int) int {
+	return this.pre[right+1] - this.pre[left]
+}
+// test
+na := Constructor([]int{-2, 0, 3, -5, 2, -1})
+assertEq([]int{na.SumRange(0, 2), na.SumRange(2, 5), na.SumRange(0, 5)}, []int{1, -1, -3})
+one := Constructor([]int{5})
+assertEq(one.SumRange(0, 0), 5)
+```
+
 ## 304. Range Sum Query 2D - Immutable | Medium
 related: 303, 221
 tags: prefix-sum, 2d
@@ -124,6 +147,37 @@ class NumMatrix {
 NumMatrix nm = new NumMatrix(new int[][]{{3, 0, 1, 4, 2}, {5, 6, 3, 2, 1}, {1, 2, 0, 1, 5}, {4, 1, 0, 1, 7}, {1, 0, 3, 0, 5}});
 check(nm.sumRegion(2, 1, 4, 3), 8);
 check(nm.sumRegion(1, 2, 2, 4), 12);
+```
+
+```go
+type NumMatrix struct {
+	P [][]int // P[r][c] = sum of the r x c top-left block
+}
+
+func Constructor(matrix [][]int) NumMatrix {
+	R, C := len(matrix), len(matrix[0])
+	P := make([][]int, R+1)
+	for r := range P {
+		P[r] = make([]int, C+1)
+	}
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			P[r+1][c+1] = matrix[r][c] + P[r][c+1] + P[r+1][c] - P[r][c]
+		}
+	}
+	return NumMatrix{P: P}
+}
+
+func (this *NumMatrix) SumRegion(row1 int, col1 int, row2 int, col2 int) int {
+	P := this.P // inclusion-exclusion on four prefix blocks
+	return P[row2+1][col2+1] - P[row1][col2+1] - P[row2+1][col1] + P[row1][col1]
+}
+// test
+nm := Constructor([][]int{{3, 0, 1, 4, 2}, {5, 6, 3, 2, 1}, {1, 2, 0, 1, 5}, {4, 1, 0, 1, 7}, {1, 0, 3, 0, 5}})
+assertEq([]int{nm.SumRegion(2, 1, 4, 3), nm.SumRegion(1, 1, 2, 2), nm.SumRegion(1, 2, 2, 4)}, []int{8, 11, 12})
+small := Constructor([][]int{{1, 2}, {3, 4}})
+assertEq(small.SumRegion(0, 0, 1, 1), 10)
+assertEq(small.SumRegion(1, 1, 1, 1), 4)
 ```
 
 ## 307. Range Sum Query - Mutable | Medium
@@ -194,6 +248,49 @@ na.update(1, 2);
 check(na.sumRange(0, 2), 8);
 ```
 
+```go
+type NumArray struct {
+	nums []int
+	tree []int // Fenwick tree, 1-indexed
+}
+
+func Constructor(nums []int) NumArray {
+	na := NumArray{nums: append([]int(nil), nums...), tree: make([]int, len(nums)+1)}
+	for i, x := range nums {
+		na.add(i+1, x)
+	}
+	return na
+}
+
+func (this *NumArray) add(i, v int) {
+	for ; i < len(this.tree); i += i & -i {
+		this.tree[i] += v
+	}
+}
+
+func (this *NumArray) prefix(i int) int { // sum of nums[:i]
+	s := 0
+	for ; i > 0; i -= i & -i {
+		s += this.tree[i]
+	}
+	return s
+}
+
+func (this *NumArray) Update(index int, val int) {
+	this.add(index+1, val-this.nums[index])
+	this.nums[index] = val
+}
+
+func (this *NumArray) SumRange(left int, right int) int {
+	return this.prefix(right+1) - this.prefix(left)
+}
+// test
+na := Constructor([]int{1, 3, 5})
+assertEq(na.SumRange(0, 2), 9)
+na.Update(1, 2)
+assertEq([]int{na.SumRange(0, 2), na.SumRange(1, 1)}, []int{8, 2})
+```
+
 ## 1109. Corporate Flight Bookings | Medium
 related: 1094, 370
 tags: difference-array
@@ -227,6 +324,26 @@ class Solution {
 }
 // test
 check(new Solution().corpFlightBookings(new int[][]{{1, 2, 10}, {2, 3, 20}, {2, 5, 25}}, 5), new int[]{10, 55, 45, 25, 25});
+```
+
+```go
+func corpFlightBookings(bookings [][]int, n int) []int {
+	d := make([]int, n+1) // difference array: +seats at first, -seats after last
+	for _, b := range bookings {
+		d[b[0]-1] += b[2]
+		d[b[1]] -= b[2]
+	}
+	res := make([]int, n)
+	run := 0
+	for i := 0; i < n; i++ {
+		run += d[i]
+		res[i] = run
+	}
+	return res
+}
+// test
+assertEq(corpFlightBookings([][]int{{1, 2, 10}, {2, 3, 20}, {2, 5, 25}}, 5), []int{10, 55, 45, 25, 25})
+assertEq(corpFlightBookings([][]int{{1, 2, 10}, {2, 2, 15}}, 2), []int{10, 25})
 ```
 
 ## 1094. Car Pooling | Medium
@@ -269,6 +386,28 @@ class Solution {
 // test
 check(new Solution().carPooling(new int[][]{{2, 1, 5}, {3, 3, 7}}, 4), false);
 check(new Solution().carPooling(new int[][]{{2, 1, 5}, {3, 5, 7}}, 3), true);
+```
+
+```go
+func carPooling(trips [][]int, capacity int) bool {
+	d := make([]int, 1001) // passenger change at each location
+	for _, t := range trips {
+		d[t[1]] += t[0]
+		d[t[2]] -= t[0] // they leave at t[2], before anyone boards there
+	}
+	load := 0
+	for _, x := range d {
+		load += x
+		if load > capacity {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(carPooling([][]int{{2, 1, 5}, {3, 3, 7}}, 4), false)
+assertEq(carPooling([][]int{{2, 1, 5}, {3, 3, 7}}, 5), true)
+assertEq(carPooling([][]int{{2, 1, 5}, {3, 5, 7}}, 3), true)
 ```
 
 ## 315. Count of Smaller Numbers After Self | Hard
@@ -327,6 +466,35 @@ class Solution {
 }
 // test
 check(new Solution().countSmaller(new int[]{5, 2, 6, 1}), "[2, 1, 1, 0]");
+```
+
+```go
+func countSmaller(nums []int) []int {
+	vals := append([]int(nil), nums...)
+	sort.Ints(vals)
+	rank := map[int]int{} // value -> 1-based rank among distinct values
+	for _, v := range vals {
+		if _, ok := rank[v]; !ok {
+			rank[v] = len(rank) + 1
+		}
+	}
+	tree := make([]int, len(rank)+1) // Fenwick tree of counts by rank, filled right to left
+	res := make([]int, len(nums))
+	for k := len(nums) - 1; k >= 0; k-- {
+		s := 0
+		for i := rank[nums[k]] - 1; i > 0; i -= i & -i { // how many smaller values are to the right
+			s += tree[i]
+		}
+		res[k] = s
+		for i := rank[nums[k]]; i < len(tree); i += i & -i {
+			tree[i]++
+		}
+	}
+	return res
+}
+// test
+assertEq(countSmaller([]int{5, 2, 6, 1}), []int{2, 1, 1, 0})
+assertEq(countSmaller([]int{-1, -1}), []int{0, 0})
 ```
 
 ## 493. Reverse Pairs | Hard
@@ -391,6 +559,46 @@ check(new Solution().reversePairs(new int[]{2, 4, 3, 5, 1}), 3);
 check(new Solution().reversePairs(new int[]{2147483647, 2147483647, 2147483647}), 0);
 ```
 
+```go
+func reversePairs(nums []int) int {
+	var sortCount func(a []int) ([]int, int) // merge sort that also counts the pairs
+	sortCount = func(a []int) ([]int, int) {
+		if len(a) <= 1 {
+			return a, 0
+		}
+		mid := len(a) / 2
+		left, cl := sortCount(append([]int(nil), a[:mid]...))
+		right, cr := sortCount(append([]int(nil), a[mid:]...))
+		count, j := cl+cr, 0
+		for _, x := range left { // both halves sorted: j only moves forward
+			for j < len(right) && x > 2*right[j] {
+				j++
+			}
+			count += j
+		}
+		merged := make([]int, 0, len(a))
+		i, k := 0, 0
+		for i < len(left) && k < len(right) {
+			if left[i] <= right[k] {
+				merged = append(merged, left[i])
+				i++
+			} else {
+				merged = append(merged, right[k])
+				k++
+			}
+		}
+		merged = append(append(merged, left[i:]...), right[k:]...)
+		return merged, count
+	}
+	_, count := sortCount(nums)
+	return count
+}
+// test
+assertEq(reversePairs([]int{1, 3, 2, 3, 1}), 2)
+assertEq(reversePairs([]int{2, 4, 3, 5, 1}), 3)
+assertEq(reversePairs([]int{2147483647, 2147483647, 2147483647}), 0)
+```
+
 ## 218. The Skyline Problem | Hard
 related: 253, 850
 tags: sweep-line, max-heap
@@ -452,6 +660,51 @@ int[][] B = {{2, 9, 10}, {3, 7, 15}, {5, 12, 12}, {15, 20, 10}, {19, 24, 8}};
 check(new Solution().getSkyline(B), "[[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]]");
 ```
 
+```go
+type heightHeap [][2]int // (height, right edge), tallest first
+
+func (h heightHeap) Len() int           { return len(h) }
+func (h heightHeap) Less(i, j int) bool { return h[i][0] > h[j][0] }
+func (h heightHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *heightHeap) Push(x any)        { *h = append(*h, x.([2]int)) }
+func (h *heightHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func getSkyline(buildings [][]int) [][]int {
+	xs := []int{} // every edge is a candidate key point
+	for _, b := range buildings {
+		xs = append(xs, b[0], b[1])
+	}
+	sort.Ints(xs)
+	res := [][]int{}
+	h := &heightHeap{{0, math.MaxInt}} // the ground never ends
+	i := 0
+	for k, x := range xs {
+		if k > 0 && x == xs[k-1] {
+			continue
+		}
+		for ; i < len(buildings) && buildings[i][0] <= x; i++ { // buildings started by x
+			heap.Push(h, [2]int{buildings[i][2], buildings[i][1]})
+		}
+		for (*h)[0][1] <= x { // lazily drop the tallest while it has ended
+			heap.Pop(h)
+		}
+		if top := (*h)[0][0]; len(res) == 0 || res[len(res)-1][1] != top {
+			res = append(res, []int{x, top})
+		}
+	}
+	return res
+}
+// test
+B := [][]int{{2, 9, 10}, {3, 7, 15}, {5, 12, 12}, {15, 20, 10}, {19, 24, 8}}
+assertEq(getSkyline(B), [][]int{{2, 10}, {3, 15}, {7, 12}, {12, 0}, {15, 10}, {20, 8}, {24, 0}})
+assertEq(getSkyline([][]int{{0, 2, 3}, {2, 5, 3}}), [][]int{{0, 3}, {5, 0}})
+```
+
 ## 1732. Find the Highest Altitude | Easy
 related: 724, 303
 tags: prefix-sum
@@ -481,6 +734,21 @@ class Solution {
 // test
 check(new Solution().largestAltitude(new int[]{-5, 1, 5, 0, -7}), 1);
 check(new Solution().largestAltitude(new int[]{-4, -3, -2, -1, 4, 3, 2}), 0);
+```
+
+```go
+func largestAltitude(gain []int) int {
+	alt, best := 0, 0 // the start (altitude 0) counts too
+	for _, g := range gain {
+		alt += g
+		best = max(best, alt)
+	}
+	return best
+}
+// test
+assertEq(largestAltitude([]int{-5, 1, 5, 0, -7}), 1)
+assertEq(largestAltitude([]int{-4, -3, -2, -1, 4, 3, 2}), 0)
+assertEq(largestAltitude([]int{3}), 3)
 ```
 
 ## 724. Find Pivot Index | Easy
@@ -523,4 +791,26 @@ class Solution {
 // test
 check(new Solution().pivotIndex(new int[]{1, 7, 3, 6, 5, 6}), 3);
 check(new Solution().pivotIndex(new int[]{2, 1, -1}), 0);
+```
+
+```go
+func pivotIndex(nums []int) int {
+	total, left := 0, 0
+	for _, x := range nums {
+		total += x
+	}
+	for i, x := range nums {
+		if left == total-left-x { // left sum equals right sum
+			return i
+		}
+		left += x
+	}
+	return -1
+}
+// test
+assertEq(pivotIndex([]int{1, 7, 3, 6, 5, 6}), 3)
+assertEq(pivotIndex([]int{1, 2, 3}), -1)
+assertEq(pivotIndex([]int{2, 1, -1}), 0)
+assertEq(pivotIndex([]int{0}), 0)
+assertEq(pivotIndex([]int{-1, -1, 0, 1, 1, 0}), 5)
 ```
