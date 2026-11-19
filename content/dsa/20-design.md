@@ -107,6 +107,71 @@ check(c.get(3), 3);
 check(c.get(4), 4);
 ```
 
+```go
+type lruNode struct {
+	key, val   int
+	prev, next *lruNode
+}
+
+type LRUCache struct {
+	cap        int
+	nodes      map[int]*lruNode
+	head, tail *lruNode // sentinels: head.next is the most recent, tail.prev the least
+}
+
+func Constructor(capacity int) LRUCache {
+	head, tail := &lruNode{}, &lruNode{}
+	head.next, tail.prev = tail, head
+	return LRUCache{cap: capacity, nodes: map[int]*lruNode{}, head: head, tail: tail}
+}
+
+func (this *LRUCache) unlink(n *lruNode) {
+	n.prev.next, n.next.prev = n.next, n.prev
+}
+
+func (this *LRUCache) pushFront(n *lruNode) {
+	n.prev, n.next = this.head, this.head.next
+	this.head.next.prev = n
+	this.head.next = n
+}
+
+func (this *LRUCache) Get(key int) int {
+	n, ok := this.nodes[key]
+	if !ok {
+		return -1
+	}
+	this.unlink(n) // used: move to the front
+	this.pushFront(n)
+	return n.val
+}
+
+func (this *LRUCache) Put(key int, value int) {
+	if n, ok := this.nodes[key]; ok {
+		n.val = value
+		this.unlink(n)
+		this.pushFront(n)
+		return
+	}
+	n := &lruNode{key: key, val: value}
+	this.nodes[key] = n
+	this.pushFront(n)
+	if len(this.nodes) > this.cap { // evict the least recently used
+		lru := this.tail.prev
+		this.unlink(lru)
+		delete(this.nodes, lru.key)
+	}
+}
+// test
+c := Constructor(2)
+c.Put(1, 1)
+c.Put(2, 2)
+assertEq(c.Get(1), 1)
+c.Put(3, 3) // evicts 2
+assertEq(c.Get(2), -1)
+c.Put(4, 4) // evicts 1
+assertEq([]int{c.Get(1), c.Get(3), c.Get(4)}, []int{-1, 3, 4})
+```
+
 ## 460. LFU Cache | Hard
 related: 146
 tags: hash-map, bucket-sort
@@ -220,6 +285,84 @@ check(c.get(3), 3);
 check(c.get(4), 4);
 ```
 
+```go
+type lfuEntry struct {
+	key, val, freq int
+}
+
+type LFUCache struct {
+	cap, minFreq int
+	items        map[int]*list.Element // key -> its element in lists[freq]
+	lists        map[int]*list.List    // freq -> entries, most recently used at the front
+}
+
+func Constructor(capacity int) LFUCache {
+	return LFUCache{cap: capacity, items: map[int]*list.Element{}, lists: map[int]*list.List{}}
+}
+
+func (this *LFUCache) touch(el *list.Element) { // one more use: move to the next frequency list
+	e := el.Value.(*lfuEntry)
+	old := this.lists[e.freq]
+	old.Remove(el)
+	if old.Len() == 0 {
+		delete(this.lists, e.freq)
+		if this.minFreq == e.freq {
+			this.minFreq++
+		}
+	}
+	e.freq++
+	if this.lists[e.freq] == nil {
+		this.lists[e.freq] = list.New()
+	}
+	this.items[e.key] = this.lists[e.freq].PushFront(e)
+}
+
+func (this *LFUCache) Get(key int) int {
+	el, ok := this.items[key]
+	if !ok {
+		return -1
+	}
+	e := el.Value.(*lfuEntry)
+	this.touch(el)
+	return e.val
+}
+
+func (this *LFUCache) Put(key int, value int) {
+	if this.cap == 0 {
+		return
+	}
+	if el, ok := this.items[key]; ok {
+		e := el.Value.(*lfuEntry)
+		e.val = value
+		this.touch(el)
+		return
+	}
+	if len(this.items) == this.cap { // evict the LRU entry among the least frequent
+		l := this.lists[this.minFreq]
+		victim := l.Back()
+		l.Remove(victim)
+		if l.Len() == 0 {
+			delete(this.lists, this.minFreq)
+		}
+		delete(this.items, victim.Value.(*lfuEntry).key)
+	}
+	if this.lists[1] == nil {
+		this.lists[1] = list.New()
+	}
+	this.items[key] = this.lists[1].PushFront(&lfuEntry{key: key, val: value, freq: 1})
+	this.minFreq = 1
+}
+// test
+c := Constructor(2)
+c.Put(1, 1)
+c.Put(2, 2)
+assertEq(c.Get(1), 1)
+c.Put(3, 3) // evicts 2 (freq 1)
+assertEq([]int{c.Get(2), c.Get(3)}, []int{-1, 3})
+c.Put(4, 4) // 1 and 3 both have freq 2: evict the least recent of them, 1
+assertEq([]int{c.Get(1), c.Get(3), c.Get(4)}, []int{-1, 3, 4})
+```
+
 ## 380. Insert Delete GetRandom O(1) | Medium
 related: 381
 tags: array-plus-map
@@ -293,6 +436,50 @@ check(rs.remove(1) && !rs.insert(2), true);
 check(rs.getRandom(), 2);
 ```
 
+```go
+type RandomizedSet struct {
+	vals []int
+	idx  map[int]int // value -> position in vals
+}
+
+func Constructor() RandomizedSet {
+	return RandomizedSet{idx: map[int]int{}}
+}
+
+func (this *RandomizedSet) Insert(val int) bool {
+	if _, ok := this.idx[val]; ok {
+		return false
+	}
+	this.idx[val] = len(this.vals)
+	this.vals = append(this.vals, val)
+	return true
+}
+
+func (this *RandomizedSet) Remove(val int) bool {
+	i, ok := this.idx[val]
+	if !ok {
+		return false
+	}
+	last := this.vals[len(this.vals)-1] // move the last value into the hole: O(1)
+	this.vals[i] = last
+	this.idx[last] = i
+	this.vals = this.vals[:len(this.vals)-1]
+	delete(this.idx, val)
+	return true
+}
+
+func (this *RandomizedSet) GetRandom() int {
+	return this.vals[rand.Intn(len(this.vals))]
+}
+// test
+rs := Constructor()
+assertEq([]bool{rs.Insert(1), rs.Remove(2), rs.Insert(2)}, []bool{true, false, true})
+r := rs.GetRandom()
+assertEq(r == 1 || r == 2, true)
+assertEq([]bool{rs.Remove(1), rs.Insert(2)}, []bool{true, false})
+assertEq(rs.GetRandom(), 2)
+```
+
 ## 232. Implement Queue using Stacks | Easy
 related: 225, 155
 tags: two-stacks
@@ -350,6 +537,52 @@ q.push(1); q.push(2);
 check(q.peek(), 1);
 check(q.pop(), 1);
 check(q.empty(), false);
+```
+
+```go
+type MyQueue struct {
+	in, out []int // push onto in; pop from out, refilled (reversed) only when empty
+}
+
+func Constructor() MyQueue {
+	return MyQueue{}
+}
+
+func (this *MyQueue) Push(x int) {
+	this.in = append(this.in, x)
+}
+
+func (this *MyQueue) move() {
+	if len(this.out) == 0 {
+		for len(this.in) > 0 {
+			this.out = append(this.out, this.in[len(this.in)-1])
+			this.in = this.in[:len(this.in)-1]
+		}
+	}
+}
+
+func (this *MyQueue) Pop() int {
+	this.move()
+	x := this.out[len(this.out)-1]
+	this.out = this.out[:len(this.out)-1]
+	return x
+}
+
+func (this *MyQueue) Peek() int {
+	this.move()
+	return this.out[len(this.out)-1]
+}
+
+func (this *MyQueue) Empty() bool {
+	return len(this.in) == 0 && len(this.out) == 0
+}
+// test
+q := Constructor()
+q.Push(1)
+q.Push(2)
+assertEq([]any{q.Peek(), q.Pop(), q.Empty()}, []any{1, 1, false})
+q.Push(3)
+assertEq([]any{q.Pop(), q.Peek(), q.Pop(), q.Empty()}, []any{2, 3, 3, true})
 ```
 
 ## 622. Design Circular Queue | Medium
@@ -430,6 +663,61 @@ check(cq.Rear(), 4);
 check(cq.Front(), 2);
 ```
 
+```go
+type MyCircularQueue struct {
+	a       []int
+	head, n int // index of the front, number of items
+}
+
+func Constructor(k int) MyCircularQueue {
+	return MyCircularQueue{a: make([]int, k)}
+}
+
+func (this *MyCircularQueue) EnQueue(value int) bool {
+	if this.IsFull() {
+		return false
+	}
+	this.a[(this.head+this.n)%len(this.a)] = value
+	this.n++
+	return true
+}
+
+func (this *MyCircularQueue) DeQueue() bool {
+	if this.IsEmpty() {
+		return false
+	}
+	this.head = (this.head + 1) % len(this.a)
+	this.n--
+	return true
+}
+
+func (this *MyCircularQueue) Front() int {
+	if this.IsEmpty() {
+		return -1
+	}
+	return this.a[this.head]
+}
+
+func (this *MyCircularQueue) Rear() int {
+	if this.IsEmpty() {
+		return -1
+	}
+	return this.a[(this.head+this.n-1)%len(this.a)]
+}
+
+func (this *MyCircularQueue) IsEmpty() bool {
+	return this.n == 0
+}
+
+func (this *MyCircularQueue) IsFull() bool {
+	return this.n == len(this.a)
+}
+// test
+cq := Constructor(3)
+assertEq([]bool{cq.EnQueue(1), cq.EnQueue(2), cq.EnQueue(3), cq.EnQueue(4)}, []bool{true, true, true, false})
+assertEq([]any{cq.Rear(), cq.IsFull(), cq.DeQueue(), cq.EnQueue(4), cq.Rear(), cq.Front()}, []any{3, true, true, true, 4, 2})
+```
+
 ## 1146. Snapshot Array | Medium
 related: 981
 tags: versioning, binary-search
@@ -491,6 +779,47 @@ check(sa.snap(), 0);
 sa.set(0, 6);
 check(sa.get(0, 0), 5);
 check(sa.get(1, 0), 0);
+```
+
+```go
+type SnapshotArray struct {
+	hist   [][][2]int // per index: (snap id, value) changes, in snap order
+	snapID int
+}
+
+func Constructor(length int) SnapshotArray {
+	hist := make([][][2]int, length)
+	for i := range hist {
+		hist[i] = [][2]int{{-1, 0}} // everything starts at 0
+	}
+	return SnapshotArray{hist: hist}
+}
+
+func (this *SnapshotArray) Set(index int, val int) {
+	h := this.hist[index]
+	if h[len(h)-1][0] == this.snapID { // overwrite within the same snapshot
+		h[len(h)-1][1] = val
+	} else {
+		this.hist[index] = append(h, [2]int{this.snapID, val})
+	}
+}
+
+func (this *SnapshotArray) Snap() int {
+	this.snapID++
+	return this.snapID - 1
+}
+
+func (this *SnapshotArray) Get(index int, snap_id int) int {
+	h := this.hist[index]
+	i := sort.Search(len(h), func(k int) bool { return h[k][0] > snap_id }) - 1 // last change at or before snap_id
+	return h[i][1]
+}
+// test
+sa := Constructor(3)
+sa.Set(0, 5)
+assertEq(sa.Snap(), 0)
+sa.Set(0, 6)
+assertEq([]int{sa.Get(0, 0), sa.Get(0, 1), sa.Get(1, 0)}, []int{5, 6, 0})
 ```
 
 ## 535. Encode and Decode TinyURL | Medium
@@ -559,6 +888,53 @@ class Codec {
 Codec c = new Codec();
 String u = "https://leetcode.com/problems/design-tinyurl";
 check(c.decode(c.encode(u)), u);
+```
+
+```go
+type Codec struct {
+	longToShort, shortToLong map[string]string
+}
+
+func Constructor() Codec {
+	return Codec{longToShort: map[string]string{}, shortToLong: map[string]string{}}
+}
+
+const alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func base62(n int) string {
+	s := ""
+	for {
+		s = string(alphabet[n%62]) + s
+		n /= 62
+		if n == 0 {
+			return s
+		}
+	}
+}
+
+// Encodes a URL to a shortened URL.
+func (this *Codec) encode(longUrl string) string {
+	code, ok := this.longToShort[longUrl]
+	if !ok { // a counter in base 62: short, unique, no collisions
+		code = base62(len(this.shortToLong) + 1)
+		this.longToShort[longUrl] = code
+		this.shortToLong[code] = longUrl
+	}
+	return "http://tinyurl.com/" + code
+}
+
+// Decodes a shortened URL to its original URL.
+func (this *Codec) decode(shortUrl string) string {
+	return this.shortToLong[shortUrl[strings.LastIndex(shortUrl, "/")+1:]]
+}
+// test
+c := Constructor()
+u := "https://leetcode.com/problems/design-tinyurl"
+assertEq(c.decode(c.encode(u)), u)
+assertEq(c.encode(u) == c.encode(u), true)
+for _, u := range []string{"https://example.com/a?b=c#d", "x"} {
+	assertEq(c.decode(c.encode(u)), u)
+}
 ```
 
 ## 706. Design HashMap | Easy
@@ -636,6 +1012,59 @@ hm.remove(2);
 check(hm.get(2), -1);
 ```
 
+```go
+type MyHashMap struct {
+	b [][][2]int // separate chaining: buckets of (key, value)
+}
+
+const buckets = 1009 // a prime number of buckets
+
+func Constructor() MyHashMap {
+	return MyHashMap{b: make([][][2]int, buckets)}
+}
+
+func (this *MyHashMap) Put(key int, value int) {
+	b := this.b[key%buckets]
+	for i := range b {
+		if b[i][0] == key {
+			b[i][1] = value
+			return
+		}
+	}
+	this.b[key%buckets] = append(b, [2]int{key, value})
+}
+
+func (this *MyHashMap) Get(key int) int {
+	for _, kv := range this.b[key%buckets] {
+		if kv[0] == key {
+			return kv[1]
+		}
+	}
+	return -1
+}
+
+func (this *MyHashMap) Remove(key int) {
+	b := this.b[key%buckets]
+	for i := range b {
+		if b[i][0] == key {
+			this.b[key%buckets] = append(b[:i], b[i+1:]...)
+			return
+		}
+	}
+}
+// test
+hm := Constructor()
+hm.Put(1, 1)
+hm.Put(2, 2)
+assertEq([]int{hm.Get(1), hm.Get(3)}, []int{1, -1})
+hm.Put(2, 1)
+assertEq(hm.Get(2), 1)
+hm.Remove(2)
+assertEq(hm.Get(2), -1)
+hm.Put(1009+1, 7) // same bucket as 1
+assertEq([]int{hm.Get(1), hm.Get(1010)}, []int{1, 7})
+```
+
 
 ## 1472. Design Browser History | Medium
 related: 155
@@ -699,6 +1128,45 @@ check(b.forward(2), "linkedin.com");
 check(b.back(7), "leetcode.com");
 ```
 
+```go
+type BrowserHistory struct {
+	pages     []string
+	cur, last int // current page; last valid page (later ones are stale)
+}
+
+func Constructor(homepage string) BrowserHistory {
+	return BrowserHistory{pages: []string{homepage}}
+}
+
+func (this *BrowserHistory) Visit(url string) {
+	this.cur++
+	if this.cur == len(this.pages) {
+		this.pages = append(this.pages, url)
+	} else {
+		this.pages[this.cur] = url // overwrite instead of truncating
+	}
+	this.last = this.cur // forward history is gone
+}
+
+func (this *BrowserHistory) Back(steps int) string {
+	this.cur = max(0, this.cur-steps)
+	return this.pages[this.cur]
+}
+
+func (this *BrowserHistory) Forward(steps int) string {
+	this.cur = min(this.last, this.cur+steps)
+	return this.pages[this.cur]
+}
+// test
+b := Constructor("leetcode.com")
+for _, u := range []string{"google.com", "facebook.com", "youtube.com"} {
+	b.Visit(u)
+}
+assertEq([]string{b.Back(1), b.Back(1), b.Forward(1)}, []string{"facebook.com", "google.com", "facebook.com"})
+b.Visit("linkedin.com")
+assertEq([]string{b.Forward(2), b.Back(2), b.Back(7)}, []string{"linkedin.com", "google.com", "leetcode.com"})
+```
+
 ## 1396. Design Underground System | Medium
 related: 146
 tags: hash-map
@@ -760,6 +1228,56 @@ u.checkOut(45, "Waterloo", 15); u.checkOut(27, "Waterloo", 20);
 check(u.getAverageTime("Leyton", "Waterloo"), 11.0);
 ```
 
+```go
+type checkIn struct {
+	station string
+	t       int
+}
+
+type UndergroundSystem struct {
+	active map[int]checkIn      // id -> where and when they entered
+	stats  map[[2]string][2]int // (from, to) -> (total time, trips)
+}
+
+func Constructor() UndergroundSystem {
+	return UndergroundSystem{active: map[int]checkIn{}, stats: map[[2]string][2]int{}}
+}
+
+func (this *UndergroundSystem) CheckIn(id int, stationName string, t int) {
+	this.active[id] = checkIn{stationName, t}
+}
+
+func (this *UndergroundSystem) CheckOut(id int, stationName string, t int) {
+	in := this.active[id]
+	delete(this.active, id)
+	key := [2]string{in.station, stationName}
+	s := this.stats[key]
+	s[0] += t - in.t
+	s[1]++
+	this.stats[key] = s
+}
+
+func (this *UndergroundSystem) GetAverageTime(startStation string, endStation string) float64 {
+	s := this.stats[[2]string{startStation, endStation}]
+	return float64(s[0]) / float64(s[1])
+}
+// test
+u := Constructor()
+u.CheckIn(45, "Leyton", 3)
+u.CheckIn(32, "Paradise", 8)
+u.CheckIn(27, "Leyton", 10)
+u.CheckOut(45, "Waterloo", 15)
+u.CheckOut(27, "Waterloo", 20)
+u.CheckOut(32, "Cambridge", 22)
+assertEq([]float64{u.GetAverageTime("Paradise", "Cambridge"), u.GetAverageTime("Leyton", "Waterloo")}, []float64{14, 11})
+u2 := Constructor()
+u2.CheckIn(10, "A", 1)
+u2.CheckOut(10, "B", 5)
+u2.CheckIn(11, "A", 2)
+u2.CheckOut(11, "B", 4)
+assertEq(u2.GetAverageTime("A", "B"), 3.0)
+```
+
 ## 1352. Product of the Last K Numbers | Medium
 related: 238, 303
 tags: prefix-product
@@ -811,6 +1329,40 @@ ProductOfNumbers p = new ProductOfNumbers();
 for (int x : new int[]{3, 0, 2, 5, 4}) p.add(x);
 check(p.getProduct(3), 40);
 check(p.getProduct(4), 0);
+```
+
+```go
+type ProductOfNumbers struct {
+	pre []int // prefix products since the last zero
+}
+
+func Constructor() ProductOfNumbers {
+	return ProductOfNumbers{pre: []int{1}}
+}
+
+func (this *ProductOfNumbers) Add(num int) {
+	if num == 0 {
+		this.pre = []int{1} // any window containing the zero has product 0
+	} else {
+		this.pre = append(this.pre, this.pre[len(this.pre)-1]*num)
+	}
+}
+
+func (this *ProductOfNumbers) GetProduct(k int) int {
+	n := len(this.pre)
+	if k >= n {
+		return 0 // the window reaches back past a zero
+	}
+	return this.pre[n-1] / this.pre[n-1-k]
+}
+// test
+p := Constructor()
+for _, x := range []int{3, 0, 2, 5, 4} {
+	p.Add(x)
+}
+assertEq([]int{p.GetProduct(2), p.GetProduct(3), p.GetProduct(4)}, []int{20, 40, 0})
+p.Add(8)
+assertEq(p.GetProduct(2), 32)
 ```
 
 ## 284. Peeking Iterator | Medium
@@ -877,6 +1429,58 @@ check(pi.peek(), 2);
 check(pi.next(), 2);
 check(pi.next(), 3);
 check(pi.hasNext(), false);
+```
+
+```go
+type Iterator struct { // provided by LeetCode (a minimal stand-in)
+	nums []int
+	i    int
+}
+
+func (this *Iterator) hasNext() bool {
+	return this.i < len(this.nums)
+}
+
+func (this *Iterator) next() int {
+	this.i++
+	return this.nums[this.i-1]
+}
+
+type PeekingIterator struct {
+	iter    *Iterator
+	has     bool
+	nextVal int // cached next element
+}
+
+func Constructor(iter *Iterator) *PeekingIterator {
+	p := &PeekingIterator{iter: iter}
+	p.advance()
+	return p
+}
+
+func (this *PeekingIterator) advance() {
+	this.has = this.iter.hasNext()
+	if this.has {
+		this.nextVal = this.iter.next()
+	}
+}
+
+func (this *PeekingIterator) hasNext() bool {
+	return this.has
+}
+
+func (this *PeekingIterator) next() int {
+	v := this.nextVal
+	this.advance()
+	return v
+}
+
+func (this *PeekingIterator) peek() int {
+	return this.nextVal
+}
+// test
+pi := Constructor(&Iterator{nums: []int{1, 2, 3}})
+assertEq([]any{pi.next(), pi.peek(), pi.next(), pi.next(), pi.hasNext()}, []any{1, 2, 2, 3, false})
 ```
 
 ## 341. Flatten Nested List Iterator | Medium
@@ -957,6 +1561,75 @@ NestedIterator it = new NestedIterator(List.of(new NI(new NI(1), new NI(1)), new
 List<Integer> out = new ArrayList<>();
 while (it.hasNext()) out.add(it.next());
 check(out, "[1, 1, 2, 1, 1]");
+```
+
+```go
+type NestedInteger struct { // provided by LeetCode (a minimal stand-in)
+	isInt bool
+	val   int
+	list  []*NestedInteger
+}
+
+func (this NestedInteger) IsInteger() bool { return this.isInt }
+
+func (this NestedInteger) GetInteger() int { return this.val }
+
+func (this NestedInteger) GetList() []*NestedInteger { return this.list }
+
+type NestedIterator struct {
+	st []*NestedInteger // reversed: the next element is on top
+}
+
+func Constructor(nestedList []*NestedInteger) *NestedIterator {
+	st := make([]*NestedInteger, len(nestedList))
+	for i, x := range nestedList {
+		st[len(nestedList)-1-i] = x
+	}
+	return &NestedIterator{st: st}
+}
+
+func (this *NestedIterator) Next() int {
+	top := this.st[len(this.st)-1] // HasNext() left an integer on top
+	this.st = this.st[:len(this.st)-1]
+	return top.GetInteger()
+}
+
+func (this *NestedIterator) HasNext() bool {
+	for len(this.st) > 0 && !this.st[len(this.st)-1].IsInteger() { // unpack lists lazily
+		top := this.st[len(this.st)-1]
+		this.st = this.st[:len(this.st)-1]
+		l := top.GetList()
+		for i := len(l) - 1; i >= 0; i-- {
+			this.st = append(this.st, l[i])
+		}
+	}
+	return len(this.st) > 0
+}
+// test
+var wrap func(x any) *NestedInteger
+wrap = func(x any) *NestedInteger {
+	if v, ok := x.(int); ok {
+		return &NestedInteger{isInt: true, val: v}
+	}
+	n := &NestedInteger{}
+	for _, y := range x.([]any) {
+		n.list = append(n.list, wrap(y))
+	}
+	return n
+}
+flatten := func(items []any) []int {
+	nested := []*NestedInteger{}
+	for _, x := range items {
+		nested = append(nested, wrap(x))
+	}
+	it, out := Constructor(nested), []int{}
+	for it.HasNext() {
+		out = append(out, it.Next())
+	}
+	return out
+}
+assertEq(flatten([]any{[]any{1, 1}, 2, []any{1, 1}}), []int{1, 1, 2, 1, 1})
+assertEq(flatten([]any{1, []any{4, []any{6}}, []any{[]any{}}}), []int{1, 4, 6})
 ```
 
 ## 432. All O`one Data Structure | Hard
@@ -1091,6 +1764,104 @@ a.dec("hello"); a.dec("hello");
 check(a.getMaxKey(), "leet");
 ```
 
+```go
+type bucket struct {
+	cnt        int
+	keys       map[string]bool
+	prev, next *bucket
+}
+
+type AllOne struct {
+	head, tail *bucket            // sentinels; counts increase from head to tail
+	where      map[string]*bucket // key -> the bucket holding it
+}
+
+func Constructor() AllOne {
+	head, tail := &bucket{}, &bucket{}
+	head.next, tail.prev = tail, head
+	return AllOne{head: head, tail: tail, where: map[string]*bucket{}}
+}
+
+func (this *AllOne) after(node *bucket, cnt int) *bucket {
+	b := &bucket{cnt: cnt, keys: map[string]bool{}, prev: node, next: node.next}
+	node.next.prev = b
+	node.next = b
+	return b
+}
+
+func (this *AllOne) dropIfEmpty(b *bucket) {
+	if len(b.keys) == 0 {
+		b.prev.next, b.next.prev = b.next, b.prev
+	}
+}
+
+func (this *AllOne) Inc(key string) {
+	cur, ok := this.where[key]
+	if !ok {
+		cur = this.head // count 0
+	}
+	nxt := cur.next
+	if nxt == this.tail || nxt.cnt != cur.cnt+1 {
+		nxt = this.after(cur, cur.cnt+1)
+	}
+	nxt.keys[key] = true
+	this.where[key] = nxt
+	if cur != this.head {
+		delete(cur.keys, key)
+		this.dropIfEmpty(cur)
+	}
+}
+
+func (this *AllOne) Dec(key string) {
+	cur := this.where[key]
+	if cur.cnt == 1 {
+		delete(this.where, key)
+	} else {
+		prv := cur.prev
+		if prv == this.head || prv.cnt != cur.cnt-1 {
+			prv = this.after(cur.prev, cur.cnt-1)
+		}
+		prv.keys[key] = true
+		this.where[key] = prv
+	}
+	delete(cur.keys, key)
+	this.dropIfEmpty(cur)
+}
+
+func anyKey(b *bucket) string {
+	for k := range b.keys {
+		return k
+	}
+	return ""
+}
+
+func (this *AllOne) GetMaxKey() string {
+	if this.tail.prev == this.head {
+		return ""
+	}
+	return anyKey(this.tail.prev)
+}
+
+func (this *AllOne) GetMinKey() string {
+	if this.head.next == this.tail {
+		return ""
+	}
+	return anyKey(this.head.next)
+}
+// test
+a := Constructor()
+a.Inc("hello")
+a.Inc("hello")
+assertEq([]string{a.GetMaxKey(), a.GetMinKey()}, []string{"hello", "hello"})
+a.Inc("leet")
+assertEq([]string{a.GetMaxKey(), a.GetMinKey()}, []string{"hello", "leet"})
+a.Dec("hello")
+a.Dec("hello")
+assertEq([]string{a.GetMaxKey(), a.GetMinKey()}, []string{"leet", "leet"})
+a.Dec("leet")
+assertEq([]string{a.GetMaxKey(), a.GetMinKey()}, []string{"", ""})
+```
+
 ## 895. Maximum Frequency Stack | Hard
 related: 460, 155, 716
 tags: design, stack, buckets
@@ -1155,6 +1926,44 @@ class FreqStack {
 FreqStack fs = new FreqStack();
 for (int v : new int[]{5, 7, 5, 7, 4, 5}) fs.push(v);
 check(new int[]{fs.pop(), fs.pop(), fs.pop(), fs.pop()}, new int[]{5, 7, 5, 4});
+```
+
+```go
+type FreqStack struct {
+	freq  map[int]int   // value -> current frequency
+	group map[int][]int // frequency -> stack of values that reached it
+	maxf  int
+}
+
+func Constructor() FreqStack {
+	return FreqStack{freq: map[int]int{}, group: map[int][]int{}}
+}
+
+func (this *FreqStack) Push(val int) {
+	f := this.freq[val] + 1
+	this.freq[val] = f
+	this.group[f] = append(this.group[f], val) // val stays in the lower groups too
+	this.maxf = max(this.maxf, f)
+}
+
+func (this *FreqStack) Pop() int {
+	g := this.group[this.maxf]
+	val := g[len(g)-1]
+	this.group[this.maxf] = g[:len(g)-1]
+	this.freq[val]--
+	if len(g) == 1 {
+		this.maxf--
+	}
+	return val
+}
+// test
+fs := Constructor()
+for _, v := range []int{5, 7, 5, 7, 4, 5} {
+	fs.Push(v)
+}
+assertEq([]int{fs.Pop(), fs.Pop(), fs.Pop(), fs.Pop()}, []int{5, 7, 5, 4})
+fs.Push(9)
+assertEq([]int{fs.Pop(), fs.Pop(), fs.Pop()}, []int{9, 7, 5})
 ```
 
 ## 588. Design In-Memory File System | Hard
@@ -1243,6 +2052,78 @@ check(fs.ls("/a/b/c/d"), List.of("d"));
 check(fs.readContentFromFile("/a/b/c/d"), "hello");
 ```
 
+```go
+type fsNode struct {
+	kids    map[string]*fsNode
+	isFile  bool
+	content string
+}
+
+type FileSystem struct {
+	root *fsNode
+}
+
+func Constructor() FileSystem {
+	return FileSystem{root: &fsNode{kids: map[string]*fsNode{}}}
+}
+
+func (this *FileSystem) walk(path string) *fsNode { // creates missing directories on the way
+	node := this.root
+	for _, part := range strings.Split(path, "/") {
+		if part == "" {
+			continue
+		}
+		next, ok := node.kids[part]
+		if !ok {
+			next = &fsNode{kids: map[string]*fsNode{}}
+			node.kids[part] = next
+		}
+		node = next
+	}
+	return node
+}
+
+func (this *FileSystem) Ls(path string) []string {
+	node := this.walk(path)
+	if node.isFile {
+		return []string{path[strings.LastIndex(path, "/")+1:]}
+	}
+	names := []string{}
+	for name := range node.kids {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+func (this *FileSystem) Mkdir(path string) {
+	this.walk(path)
+}
+
+func (this *FileSystem) AddContentToFile(filePath string, content string) {
+	node := this.walk(filePath)
+	node.isFile = true
+	node.content += content
+}
+
+func (this *FileSystem) ReadContentFromFile(filePath string) string {
+	return this.walk(filePath).content
+}
+// test
+fs := Constructor()
+assertEq(fs.Ls("/"), []string{})
+fs.Mkdir("/a/b/c")
+fs.AddContentToFile("/a/b/c/d", "hello")
+assertEq(fs.Ls("/"), []string{"a"})
+assertEq(fs.ReadContentFromFile("/a/b/c/d"), "hello")
+fs.AddContentToFile("/a/b/c/d", " world")
+assertEq(fs.ReadContentFromFile("/a/b/c/d"), "hello world")
+assertEq(fs.Ls("/a/b/c/d"), []string{"d"})
+fs.Mkdir("/a/b/e")
+fs.AddContentToFile("/a/b/aa", "x")
+assertEq(fs.Ls("/a/b"), []string{"aa", "c", "e"})
+```
+
 ## 362. Design Hit Counter | Medium
 related: 933, 359, 1396
 tags: design, queue, premium
@@ -1307,6 +2188,47 @@ check(hc.getHits(300), 4);
 check(hc.getHits(301), 3);
 ```
 
+```go
+type HitCounter struct {
+	q     [][2]int // (timestamp, hits), oldest first
+	total int
+}
+
+func Constructor() HitCounter {
+	return HitCounter{}
+}
+
+func (this *HitCounter) Hit(timestamp int) {
+	if n := len(this.q); n > 0 && this.q[n-1][0] == timestamp { // same second: one entry
+		this.q[n-1][1]++
+	} else {
+		this.q = append(this.q, [2]int{timestamp, 1})
+	}
+	this.total++
+}
+
+func (this *HitCounter) GetHits(timestamp int) int {
+	for len(this.q) > 0 && this.q[0][0] <= timestamp-300 { // older than 5 minutes
+		this.total -= this.q[0][1]
+		this.q = this.q[1:]
+	}
+	return this.total
+}
+// test
+hc := Constructor()
+hc.Hit(1)
+hc.Hit(2)
+hc.Hit(3)
+assertEq(hc.GetHits(4), 3)
+hc.Hit(300)
+assertEq([]int{hc.GetHits(300), hc.GetHits(301)}, []int{4, 3})
+hc2 := Constructor()
+for i := 0; i < 1000; i++ {
+	hc2.Hit(1)
+}
+assertEq([]int{hc2.GetHits(300), hc2.GetHits(301)}, []int{1000, 0})
+```
+
 ## 933. Number of Recent Calls | Easy
 related: 362, 346
 tags: queue, design
@@ -1345,6 +2267,29 @@ class RecentCounter {
 // test
 RecentCounter rc = new RecentCounter();
 check(new int[]{rc.ping(1), rc.ping(100), rc.ping(3001), rc.ping(3002)}, new int[]{1, 2, 3, 3});
+```
+
+```go
+type RecentCounter struct {
+	q []int // ping times within the last 3000 ms
+}
+
+func Constructor() RecentCounter {
+	return RecentCounter{}
+}
+
+func (this *RecentCounter) Ping(t int) int {
+	this.q = append(this.q, t)
+	for this.q[0] < t-3000 {
+		this.q = this.q[1:]
+	}
+	return len(this.q)
+}
+// test
+rc := Constructor()
+assertEq([]int{rc.Ping(1), rc.Ping(100), rc.Ping(3001), rc.Ping(3002)}, []int{1, 2, 3, 3})
+rc2 := Constructor()
+assertEq([]int{rc2.Ping(1), rc2.Ping(3001), rc2.Ping(3002), rc2.Ping(6003)}, []int{1, 2, 2, 1})
 ```
 
 ## 705. Design HashSet | Easy
@@ -1403,4 +2348,55 @@ class MyHashSet {
 MyHashSet hs = new MyHashSet();
 hs.add(1); hs.add(1009); hs.remove(1);
 check(hs.contains(1) + " " + hs.contains(1009), "false true");
+```
+
+```go
+type MyHashSet struct {
+	buckets [][]int // separate chaining
+}
+
+const size = 1009 // a prime number of buckets
+
+func Constructor() MyHashSet {
+	return MyHashSet{buckets: make([][]int, size)}
+}
+
+func (this *MyHashSet) Add(key int) {
+	if !this.Contains(key) {
+		this.buckets[key%size] = append(this.buckets[key%size], key)
+	}
+}
+
+func (this *MyHashSet) Remove(key int) {
+	b := this.buckets[key%size]
+	for i, k := range b {
+		if k == key {
+			this.buckets[key%size] = append(b[:i], b[i+1:]...)
+			return
+		}
+	}
+}
+
+func (this *MyHashSet) Contains(key int) bool {
+	for _, k := range this.buckets[key%size] {
+		if k == key {
+			return true
+		}
+	}
+	return false
+}
+// test
+hs := Constructor()
+hs.Add(1)
+hs.Add(2)
+assertEq([]bool{hs.Contains(1), hs.Contains(3)}, []bool{true, false})
+hs.Add(2)
+assertEq(hs.Contains(2), true)
+hs.Remove(2)
+assertEq(hs.Contains(2), false)
+hs.Add(0) // 0, 1009 and 2018 share a bucket
+hs.Add(1009)
+hs.Add(2018)
+hs.Remove(1009)
+assertEq([]bool{hs.Contains(0), hs.Contains(1009), hs.Contains(2018)}, []bool{true, false, true})
 ```
