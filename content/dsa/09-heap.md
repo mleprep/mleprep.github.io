@@ -609,3 +609,318 @@ class Solution {
 // test
 check(new Solution().topKFrequent(new String[]{"i", "love", "leetcode", "i", "love", "coding"}, 2), "[i, love]");
 ```
+
+
+## 451. Sort Characters By Frequency | Medium
+related: 347, 692
+tags: bucket-sort, counting
+
+Count characters, then emit them from most to least frequent (bucket sort by count, or sort the ≤ 62 distinct chars).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def frequencySort(self, s: str) -> str:
+        return "".join(ch * c for ch, c in Counter(s).most_common())
+# test
+assert Solution().frequencySort("tree") in ("eert", "eetr")
+assert Solution().frequencySort("Aabb") in ("bbAa", "bbaA")
+```
+
+```java
+class Solution {
+    public String frequencySort(String s) {
+        Map<Character, Integer> cnt = new HashMap<>();
+        for (char c : s.toCharArray()) cnt.merge(c, 1, Integer::sum);
+        List<Character>[] bucket = new List[s.length() + 1];
+        for (Map.Entry<Character, Integer> e : cnt.entrySet()) {
+            if (bucket[e.getValue()] == null) bucket[e.getValue()] = new ArrayList<>();
+            bucket[e.getValue()].add(e.getKey());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int f = s.length(); f > 0; f--)
+            if (bucket[f] != null) for (char c : bucket[f]) sb.append(String.valueOf(c).repeat(f));
+        return sb.toString();
+    }
+}
+// test
+String r = new Solution().frequencySort("tree");
+check(r.equals("eert") || r.equals("eetr"), true);
+```
+
+## 658. Find K Closest Elements | Medium
+related: 973, 35
+tags: binary-search, window
+
+The answer is a window `arr[i .. i+k)`. Binary search its start `i ∈ [0, n−k]`: if `x − arr[mid] > arr[mid+k] − x`, the window should move right.
+
+**Complexity:** O(log(n − k) + k).
+
+```python
+class Solution:
+    def findClosestElements(self, arr: List[int], k: int, x: int) -> List[int]:
+        lo, hi = 0, len(arr) - k
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if x - arr[mid] > arr[mid + k] - x:
+                lo = mid + 1
+            else:
+                hi = mid
+        return arr[lo:lo + k]
+# test
+assert Solution().findClosestElements([1, 2, 3, 4, 5], 4, 3) == [1, 2, 3, 4]
+assert Solution().findClosestElements([1, 1, 2, 3, 4, 5], 4, -1) == [1, 1, 2, 3]
+assert Solution().findClosestElements([1, 3], 1, 2) == [1]
+```
+
+```java
+class Solution {
+    public List<Integer> findClosestElements(int[] arr, int k, int x) {
+        int lo = 0, hi = arr.length - k;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (x - arr[mid] > arr[mid + k] - x) lo = mid + 1; else hi = mid;
+        }
+        List<Integer> res = new ArrayList<>();
+        for (int i = lo; i < lo + k; i++) res.add(arr[i]);
+        return res;
+    }
+}
+// test
+check(new Solution().findClosestElements(new int[]{1, 2, 3, 4, 5}, 4, 3), "[1, 2, 3, 4]");
+```
+
+## 1642. Furthest Building You Can Reach | Medium
+related: 871, 630
+tags: greedy, min-heap
+
+Use ladders for the **largest** climbs. Push every climb into a min-heap; when the heap exceeds `ladders`, the smallest climb gets paid with bricks instead. Stop when bricks go negative.
+
+**Complexity:** O(n log ladders).
+
+```python
+class Solution:
+    def furthestBuilding(self, heights: List[int], bricks: int, ladders: int) -> int:
+        h = []
+        for i in range(len(heights) - 1):
+            d = heights[i + 1] - heights[i]
+            if d <= 0:
+                continue
+            heappush(h, d)
+            if len(h) > ladders:
+                bricks -= heappop(h)
+                if bricks < 0:
+                    return i
+        return len(heights) - 1
+# test
+assert Solution().furthestBuilding([4, 2, 7, 6, 9, 14, 12], 5, 1) == 4
+assert Solution().furthestBuilding([4, 12, 2, 7, 3, 18, 20, 3, 19], 10, 2) == 7
+assert Solution().furthestBuilding([14, 3, 19, 3], 17, 0) == 3
+```
+
+```java
+class Solution {
+    public int furthestBuilding(int[] heights, int bricks, int ladders) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for (int i = 0; i < heights.length - 1; i++) {
+            int d = heights[i + 1] - heights[i];
+            if (d <= 0) continue;
+            pq.add(d);
+            if (pq.size() > ladders && (bricks -= pq.poll()) < 0) return i;
+        }
+        return heights.length - 1;
+    }
+}
+// test
+check(new Solution().furthestBuilding(new int[]{4, 12, 2, 7, 3, 18, 20, 3, 19}, 10, 2), 7);
+```
+
+## 871. Minimum Number of Refueling Stops | Hard
+related: 1642, 134
+tags: greedy, max-heap
+
+Drive as far as the fuel allows, pushing every station passed into a max-heap. When stuck, retroactively refuel at the **biggest** station passed (one stop). Fail if the heap is empty.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+        h, reach, i, stops = [], startFuel, 0, 0
+        while reach < target:
+            while i < len(stations) and stations[i][0] <= reach:
+                heappush(h, -stations[i][1])
+                i += 1
+            if not h:
+                return -1
+            reach -= heappop(h)
+            stops += 1
+        return stops
+# test
+assert Solution().minRefuelStops(1, 1, []) == 0
+assert Solution().minRefuelStops(100, 1, [[10, 100]]) == -1
+assert Solution().minRefuelStops(100, 10, [[10, 60], [20, 30], [30, 30], [60, 40]]) == 2
+```
+
+```java
+class Solution {
+    public int minRefuelStops(int target, int startFuel, int[][] stations) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        long reach = startFuel;
+        int i = 0, stops = 0;
+        while (reach < target) {
+            while (i < stations.length && stations[i][0] <= reach) pq.add(stations[i++][1]);
+            if (pq.isEmpty()) return -1;
+            reach += pq.poll();
+            stops++;
+        }
+        return stops;
+    }
+}
+// test
+check(new Solution().minRefuelStops(100, 10, new int[][]{{10, 60}, {20, 30}, {30, 30}, {60, 40}}), 2);
+```
+
+## 630. Course Schedule III | Hard
+related: 1642, 502
+tags: greedy, max-heap
+
+Sort by deadline and take courses greedily, tracking total time. If the deadline is exceeded, drop the **longest** course taken so far (max-heap): the count stays the same but the time used shrinks.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def scheduleCourse(self, courses: List[List[int]]) -> int:
+        h, t = [], 0
+        for dur, last in sorted(courses, key=lambda c: c[1]):
+            heappush(h, -dur)
+            t += dur
+            if t > last:
+                t += heappop(h)          # remove the longest (stored negative)
+        return len(h)
+# test
+assert Solution().scheduleCourse([[100, 200], [200, 1300], [1000, 1250], [2000, 3200]]) == 3
+assert Solution().scheduleCourse([[1, 2]]) == 1
+assert Solution().scheduleCourse([[3, 2], [4, 3]]) == 0
+```
+
+```java
+class Solution {
+    public int scheduleCourse(int[][] courses) {
+        Arrays.sort(courses, (a, b) -> a[1] - b[1]);
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        int t = 0;
+        for (int[] c : courses) {
+            pq.add(c[0]);
+            t += c[0];
+            if (t > c[1]) t -= pq.poll();
+        }
+        return pq.size();
+    }
+}
+// test
+check(new Solution().scheduleCourse(new int[][]{{100, 200}, {200, 1300}, {1000, 1250}, {2000, 3200}}), 3);
+```
+
+## 1834. Single-Threaded CPU | Medium
+related: 621
+tags: simulation, min-heap
+
+Sort tasks by enqueue time. At each step, push all tasks that have arrived by `time` into a heap keyed by `(processing time, index)`; run the top. If the heap is empty, jump `time` to the next arrival.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def getOrder(self, tasks: List[List[int]]) -> List[int]:
+        order = sorted(range(len(tasks)), key=lambda i: tasks[i][0])
+        h, res, time, i = [], [], 0, 0
+        while len(res) < len(tasks):
+            if not h and time < tasks[order[i]][0]:
+                time = tasks[order[i]][0]
+            while i < len(order) and tasks[order[i]][0] <= time:
+                j = order[i]
+                heappush(h, (tasks[j][1], j))
+                i += 1
+            p, j = heappop(h)
+            time += p
+            res.append(j)
+        return res
+# test
+assert Solution().getOrder([[1, 2], [2, 4], [3, 2], [4, 1]]) == [0, 2, 3, 1]
+assert Solution().getOrder([[7, 10], [7, 12], [7, 5], [7, 4], [7, 2]]) == [4, 3, 2, 0, 1]
+```
+
+```java
+class Solution {
+    public int[] getOrder(int[][] tasks) {
+        int n = tasks.length;
+        Integer[] order = new Integer[n];
+        for (int i = 0; i < n; i++) order[i] = i;
+        Arrays.sort(order, (a, b) -> tasks[a][0] - tasks[b][0]);
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> tasks[a][1] != tasks[b][1] ? tasks[a][1] - tasks[b][1] : a - b);
+        int[] res = new int[n];
+        long time = 0;
+        for (int k = 0, i = 0; k < n; k++) {
+            if (pq.isEmpty() && time < tasks[order[i]][0]) time = tasks[order[i]][0];
+            while (i < n && tasks[order[i]][0] <= time) pq.add(order[i++]);
+            int j = pq.poll();
+            time += tasks[j][1];
+            res[k] = j;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().getOrder(new int[][]{{1, 2}, {2, 4}, {3, 2}, {4, 1}}), new int[]{0, 2, 3, 1});
+```
+
+## 480. Sliding Window Median | Hard
+related: 295, 239
+tags: sorted-window, two-heaps
+
+Maintain the current window **sorted**: insert the new value and delete the outgoing one with binary search; the median is the middle element(s). Optimal alternative: the two-heap median finder (295) with lazy deletion, or two balanced `TreeSet`s (Java, below), for O(n log k).
+
+**Complexity:** O(n log k) with balanced trees; O(n·k) with a plain sorted list (fine in practice for Python).
+
+```python
+class Solution:
+    def medianSlidingWindow(self, nums: List[int], k: int) -> List[float]:
+        win = sorted(nums[:k])
+        res = []
+        for i in range(k, len(nums) + 1):
+            res.append((win[k // 2] + win[(k - 1) // 2]) / 2)
+            if i == len(nums):
+                break
+            win.pop(bisect.bisect_left(win, nums[i - k]))
+            bisect.insort(win, nums[i])
+        return res
+# test
+assert Solution().medianSlidingWindow([1, 3, -1, -3, 5, 3, 6, 7], 3) == [1.0, -1.0, -1.0, 3.0, 5.0, 6.0]
+assert Solution().medianSlidingWindow([1, 2, 3, 4, 2, 3, 1, 4, 2], 3) == [2.0, 3.0, 3.0, 3.0, 2.0, 3.0, 2.0]
+```
+
+```java
+class Solution {
+    public double[] medianSlidingWindow(int[] nums, int k) {
+        // indices ordered by (value, index) so duplicates are distinct; lo holds the smaller half (size ceil(k/2))
+        Comparator<Integer> cmp = (a, b) -> nums[a] != nums[b] ? Integer.compare(nums[a], nums[b]) : a - b;
+        TreeSet<Integer> lo = new TreeSet<>(cmp), hi = new TreeSet<>(cmp);
+        double[] res = new double[nums.length - k + 1];
+        for (int i = 0; i < nums.length; i++) {
+            if (i >= k && !lo.remove(i - k)) hi.remove(i - k);
+            lo.add(i);
+            hi.add(lo.pollLast());                       // keep every lo <= every hi
+            if (hi.size() > lo.size()) lo.add(hi.pollFirst());
+            if (i >= k - 1)
+                res[i - k + 1] = k % 2 == 1 ? nums[lo.last()] : ((double) nums[lo.last()] + nums[hi.first()]) / 2;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().medianSlidingWindow(new int[]{1, 3, -1, -3, 5, 3, 6, 7}, 3), new double[]{1.0, -1.0, -1.0, 3.0, 5.0, 6.0});
+check(new Solution().medianSlidingWindow(new int[]{1, 4, 2, 3}, 4), new double[]{2.5});
+```

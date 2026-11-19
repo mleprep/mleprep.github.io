@@ -836,3 +836,421 @@ char[][] b = Stream.of("53..7....", "6..195...", ".98....6.", "8...6...3", "4..8
 new Solution().solveSudoku(b);
 check(new String(b[0]) + new String(b[8]), "534678912345286179");
 ```
+
+
+## 216. Combination Sum III | Medium
+related: 39, 40, 77
+tags: combinations
+
+Choose k distinct digits from 1–9 summing to n: combinations with `i + 1` and pruning when the remainder goes negative.
+
+**Complexity:** O(C(9, k)).
+
+```python
+class Solution:
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
+        res, path = [], []
+
+        def bt(start, rest):
+            if len(path) == k:
+                if rest == 0:
+                    res.append(path[:])
+                return
+            for d in range(start, 10):
+                if d > rest:
+                    break
+                path.append(d)
+                bt(d + 1, rest - d)
+                path.pop()
+
+        bt(1, n)
+        return res
+# test
+assert Solution().combinationSum3(3, 7) == [[1, 2, 4]]
+assert Solution().combinationSum3(3, 9) == [[1, 2, 6], [1, 3, 5], [2, 3, 4]]
+assert Solution().combinationSum3(4, 1) == []
+```
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> res = new ArrayList<>();
+        bt(k, 1, n, new ArrayList<>(), res);
+        return res;
+    }
+
+    private void bt(int k, int start, int rest, List<Integer> path, List<List<Integer>> res) {
+        if (path.size() == k) { if (rest == 0) res.add(new ArrayList<>(path)); return; }
+        for (int d = start; d <= 9 && d <= rest; d++) {
+            path.add(d);
+            bt(k, d + 1, rest - d, path, res);
+            path.remove(path.size() - 1);
+        }
+    }
+}
+// test
+check(new Solution().combinationSum3(3, 9), "[[1, 2, 6], [1, 3, 5], [2, 3, 4]]");
+```
+
+## 784. Letter Case Permutation | Medium
+related: 78, 17
+tags: branching
+
+Each letter branches into lower/upper; digits don't branch. Building iteratively: for each letter, double the result list.
+
+**Complexity:** O(2^L · n).
+
+```python
+class Solution:
+    def letterCasePermutation(self, s: str) -> List[str]:
+        res = [""]
+        for ch in s:
+            if ch.isalpha():
+                res = [p + c for p in res for c in (ch.lower(), ch.upper())]
+            else:
+                res = [p + ch for p in res]
+        return res
+# test
+assert sorted(Solution().letterCasePermutation("a1b2")) == ["A1B2", "A1b2", "a1B2", "a1b2"]
+assert Solution().letterCasePermutation("3z4") == ["3z4", "3Z4"]
+```
+
+```java
+class Solution {
+    public List<String> letterCasePermutation(String s) {
+        List<String> res = new ArrayList<>();
+        bt(s.toCharArray(), 0, res);
+        return res;
+    }
+
+    private void bt(char[] c, int i, List<String> res) {
+        if (i == c.length) { res.add(new String(c)); return; }
+        if (Character.isLetter(c[i])) {
+            c[i] = Character.toLowerCase(c[i]); bt(c, i + 1, res);
+            c[i] = Character.toUpperCase(c[i]); bt(c, i + 1, res);
+        } else bt(c, i + 1, res);
+    }
+}
+// test
+check(new Solution().letterCasePermutation("3z4"), "[3z4, 3Z4]");
+```
+
+## 52. N-Queens II | Hard
+related: 51
+tags: bitmask, constraint-search
+
+Count placements only. Bitmasks for columns and both diagonals: `free = ~(cols | d1 | d2) & full`; take the lowest bit each time; shift the diagonals by one when moving to the next row.
+
+**Complexity:** O(n!), very fast in practice.
+
+```python
+class Solution:
+    def totalNQueens(self, n: int) -> int:
+        full = (1 << n) - 1
+
+        def bt(cols, d1, d2):
+            if cols == full:
+                return 1
+            count, free = 0, ~(cols | d1 | d2) & full
+            while free:
+                bit = free & -free
+                free -= bit
+                count += bt(cols | bit, ((d1 | bit) << 1) & full, (d2 | bit) >> 1)
+            return count
+
+        return bt(0, 0, 0)
+# test
+assert Solution().totalNQueens(4) == 2
+assert Solution().totalNQueens(1) == 1
+assert Solution().totalNQueens(8) == 92
+```
+
+```java
+class Solution {
+    private int full;
+
+    public int totalNQueens(int n) {
+        full = (1 << n) - 1;
+        return bt(0, 0, 0);
+    }
+
+    private int bt(int cols, int d1, int d2) {
+        if (cols == full) return 1;
+        int count = 0;
+        for (int free = ~(cols | d1 | d2) & full; free != 0; ) {
+            int bit = free & -free;
+            free -= bit;
+            count += bt(cols | bit, ((d1 | bit) << 1) & full, (d2 | bit) >> 1);
+        }
+        return count;
+    }
+}
+// test
+check(new Solution().totalNQueens(8), 92);
+```
+
+## 140. Word Break II | Hard
+related: 139, 472
+tags: memoization, backtracking
+
+`sentences(i)` = all segmentations of `s[i:]`: for every dictionary word starting at `i`, prepend it to each sentence of the rest. Memoize by `i`.
+
+**Complexity:** exponential output in the worst case; memoization avoids recomputation.
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        words = set(wordDict)
+
+        @cache
+        def go(i):
+            if i == len(s):
+                return [""]
+            out = []
+            for j in range(i + 1, len(s) + 1):
+                if s[i:j] in words:
+                    out += [s[i:j] + (" " + rest if rest else "") for rest in go(j)]
+            return out
+
+        return go(0)
+# test
+assert sorted(Solution().wordBreak("catsanddog", ["cat", "cats", "and", "sand", "dog"])) == ["cat sand dog", "cats and dog"]
+assert sorted(Solution().wordBreak("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"])) == [
+    "pine apple pen apple", "pine applepen apple", "pineapple pen apple"]
+assert Solution().wordBreak("catsandog", ["cats", "dog", "sand", "and", "cat"]) == []
+```
+
+```java
+class Solution {
+    private final Map<Integer, List<String>> memo = new HashMap<>();
+
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        return go(s, 0, new HashSet<>(wordDict));
+    }
+
+    private List<String> go(String s, int i, Set<String> words) {
+        if (memo.containsKey(i)) return memo.get(i);
+        List<String> out = new ArrayList<>();
+        if (i == s.length()) out.add("");
+        for (int j = i + 1; j <= s.length(); j++) {
+            String w = s.substring(i, j);
+            if (!words.contains(w)) continue;
+            for (String rest : go(s, j, words)) out.add(rest.isEmpty() ? w : w + " " + rest);
+        }
+        memo.put(i, out);
+        return out;
+    }
+}
+// test
+List<String> r = new Solution().wordBreak("catsanddog", List.of("cat", "cats", "and", "sand", "dog"));
+Collections.sort(r);
+check(r, "[cat sand dog, cats and dog]");
+```
+
+## 282. Expression Add Operators | Hard
+related: 224, 227
+tags: backtracking, expression
+
+Try every split of the digits and every operator. Track the running `value` and the last **operand** `prev`, so `*` can undo it: `value − prev + prev·cur`. Disallow numbers with leading zeros.
+
+```viz
+"123", target 6
+1+2+3 = 6 ✓     1*2*3 = 6 ✓
+1+2*3: value 3, prev 2 -> 3 - 2 + 2*3 = 7
+```
+
+**Complexity:** O(4ⁿ · n).
+
+```python
+class Solution:
+    def addOperators(self, num: str, target: int) -> List[str]:
+        res = []
+
+        def bt(i, expr, value, prev):
+            if i == len(num):
+                if value == target:
+                    res.append(expr)
+                return
+            for j in range(i + 1, len(num) + 1):
+                s = num[i:j]
+                if len(s) > 1 and s[0] == "0":
+                    break
+                cur = int(s)
+                if i == 0:
+                    bt(j, s, cur, cur)
+                else:
+                    bt(j, expr + "+" + s, value + cur, cur)
+                    bt(j, expr + "-" + s, value - cur, -cur)
+                    bt(j, expr + "*" + s, value - prev + prev * cur, prev * cur)
+
+        bt(0, "", 0, 0)
+        return res
+# test
+assert sorted(Solution().addOperators("123", 6)) == ["1*2*3", "1+2+3"]
+assert sorted(Solution().addOperators("232", 8)) == ["2*3+2", "2+3*2"]
+assert Solution().addOperators("3456237490", 9191) == []
+assert sorted(Solution().addOperators("105", 5)) == ["1*0+5", "10-5"]
+```
+
+```java
+class Solution {
+    public List<String> addOperators(String num, int target) {
+        List<String> res = new ArrayList<>();
+        bt(num, target, 0, "", 0, 0, res);
+        return res;
+    }
+
+    private void bt(String num, int target, int i, String expr, long value, long prev, List<String> res) {
+        if (i == num.length()) { if (value == target) res.add(expr); return; }
+        for (int j = i + 1; j <= num.length(); j++) {
+            String s = num.substring(i, j);
+            if (s.length() > 1 && s.charAt(0) == '0') break;
+            long cur = Long.parseLong(s);
+            if (i == 0) bt(num, target, j, s, cur, cur, res);
+            else {
+                bt(num, target, j, expr + "+" + s, value + cur, cur, res);
+                bt(num, target, j, expr + "-" + s, value - cur, -cur, res);
+                bt(num, target, j, expr + "*" + s, value - prev + prev * cur, prev * cur, res);
+            }
+        }
+    }
+}
+// test
+List<String> r = new Solution().addOperators("232", 8);
+Collections.sort(r);
+check(r, "[2*3+2, 2+3*2]");
+```
+
+## 301. Remove Invalid Parentheses | Hard
+related: 1249, 20
+tags: bfs, backtracking
+
+**BFS by number of removals**: level 0 = the string, level d = all strings with d characters removed. The first level that contains valid strings is the answer (minimum removals); collect all of them, deduped with a set.
+
+**Complexity:** exponential worst case; fine for n ≤ 25.
+
+```python
+class Solution:
+    def removeInvalidParentheses(self, s: str) -> List[str]:
+        def valid(t):
+            bal = 0
+            for ch in t:
+                if ch == "(":
+                    bal += 1
+                elif ch == ")":
+                    bal -= 1
+                    if bal < 0:
+                        return False
+            return bal == 0
+
+        level = {s}
+        while True:
+            good = [t for t in level if valid(t)]
+            if good:
+                return good
+            level = {t[:i] + t[i + 1:] for t in level for i in range(len(t)) if t[i] in "()"}
+# test
+assert sorted(Solution().removeInvalidParentheses("()())()")) == ["(())()", "()()()"]
+assert sorted(Solution().removeInvalidParentheses("(a)())()")) == ["(a())()", "(a)()()"]
+assert Solution().removeInvalidParentheses(")(") == [""]
+```
+
+```java
+class Solution {
+    public List<String> removeInvalidParentheses(String s) {
+        Set<String> level = new HashSet<>(List.of(s));
+        while (true) {
+            List<String> good = new ArrayList<>();
+            for (String t : level) if (valid(t)) good.add(t);
+            if (!good.isEmpty()) return good;
+            Set<String> next = new HashSet<>();
+            for (String t : level)
+                for (int i = 0; i < t.length(); i++)
+                    if (t.charAt(i) == '(' || t.charAt(i) == ')') next.add(t.substring(0, i) + t.substring(i + 1));
+            level = next;
+        }
+    }
+
+    private boolean valid(String t) {
+        int bal = 0;
+        for (char c : t.toCharArray()) {
+            if (c == '(') bal++;
+            else if (c == ')' && --bal < 0) return false;
+        }
+        return bal == 0;
+    }
+}
+// test
+List<String> r = new Solution().removeInvalidParentheses("()())()");
+Collections.sort(r);
+check(r, "[(())(), ()()()]");
+```
+
+## 698. Partition to K Equal Sum Subsets | Medium
+related: 416, 473
+tags: backtracking, pruning
+
+Target = total / k. Place numbers (sorted **descending**, so failures happen early) into k buckets. Prune: never put a number into a bucket that would overflow, and if placing into an **empty** bucket failed, other empty buckets will fail too.
+
+**Complexity:** O(kⁿ) worst case, heavily pruned.
+
+```python
+class Solution:
+    def canPartitionKSubsets(self, nums: List[int], k: int) -> bool:
+        total = sum(nums)
+        if total % k:
+            return False
+        target = total // k
+        nums.sort(reverse=True)
+        if nums[0] > target:
+            return False
+        buckets = [0] * k
+
+        def bt(i):
+            if i == len(nums):
+                return True
+            for b in range(k):
+                if buckets[b] + nums[i] <= target:
+                    buckets[b] += nums[i]
+                    if bt(i + 1):
+                        return True
+                    buckets[b] -= nums[i]
+                if buckets[b] == 0:
+                    break                     # symmetric empty buckets
+            return False
+
+        return bt(0)
+# test
+assert Solution().canPartitionKSubsets([4, 3, 2, 3, 5, 2, 1], 4) is True
+assert Solution().canPartitionKSubsets([1, 2, 3, 4], 3) is False
+```
+
+```java
+class Solution {
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+        int total = 0;
+        for (int x : nums) total += x;
+        if (total % k != 0) return false;
+        Arrays.sort(nums);
+        int target = total / k;
+        if (nums[nums.length - 1] > target) return false;
+        return bt(nums, nums.length - 1, new int[k], target);   // largest first
+    }
+
+    private boolean bt(int[] nums, int i, int[] buckets, int target) {
+        if (i < 0) return true;
+        for (int b = 0; b < buckets.length; b++) {
+            if (buckets[b] + nums[i] <= target) {
+                buckets[b] += nums[i];
+                if (bt(nums, i - 1, buckets, target)) return true;
+                buckets[b] -= nums[i];
+            }
+            if (buckets[b] == 0) break;
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().canPartitionKSubsets(new int[]{4, 3, 2, 3, 5, 2, 1}, 4), true);
+check(new Solution().canPartitionKSubsets(new int[]{1, 2, 3, 4}, 3), false);
+```
