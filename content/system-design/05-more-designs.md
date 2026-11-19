@@ -1,6 +1,6 @@
 # More Designs
 
-Thirteen more frequently asked designs, in the same format: requirements → estimates → architecture → deep dives.
+More frequently asked designs, in the same format: requirements → estimates → architecture → deep dives.
 
 ## Collaborative Editor (Google Docs)
 
@@ -219,3 +219,178 @@ storage service rejects writes with a token older than the last one seen
 ```
 
 **Deep dives**: consensus (majority quorum) keeps the lock table consistent through node failures; **leases** with heartbeats free locks of dead clients — but a paused client (GC, network) may still think it holds the lock → **fencing tokens** make the protected resource reject stale holders; Redis single-node locks (`SET key val NX PX 30000`) are fine for efficiency locks, not for correctness (Redlock is debated); watch the predecessor only (avoid herd effect).
+
+## Google Maps (Navigation & Routing)
+
+**Requirements**: render the map at any zoom, find the fastest route between two points with live traffic, accurate ETA, turn-by-turn navigation with re-routing; ~1 B users, very read-heavy for tiles.
+
+**Estimates**: the world at zoom level 21 is ~4.4 trillion 256×256 tiles (4²¹) — petabytes naive, but most tiles are ocean or empty land and compress to almost nothing; tiles are **static** → precompute and serve from a CDN. Active navigators send GPS points every few seconds (batched) → hundreds of thousands of location writes/s.
+
+```viz
+map tiles:   client --(zoom, x, y)--> CDN --miss--> tile store (S3)  <- offline tile/vector-tile pipeline
+routing:     client -> routing svc -> routing tiles (road graph partitioned by region, cached in memory)
+                                    -> live traffic layer (edge speeds) -> ETA model
+location:    navigating clients --batched GPS--> Kafka -> map-matching -> traffic aggregation (per edge speed)
+                                                                      -> ETA training data, re-route triggers
+```
+
+**Deep dives**
+- **Tiles**: precomputed per zoom level, addressed by `zoom/x/y`, cached by CDN; **vector tiles** (geometry, styled on the client) are smaller and allow rotation/3-D.
+- **Routing at continent scale**: plain Dijkstra/A* explores too much; production systems use **Contraction Hierarchies** or **hierarchical routing**: road graph partitioned into tiles with precomputed shortcuts between boundary nodes, so a query touches local roads near the endpoints and highways in between.
+- **Live traffic**: map-match GPS traces to road segments, aggregate speeds per edge per minute (stream processing), update edge weights; precomputed shortcuts must be refreshed (customizable CH).
+- **ETA** = route travel time from current speeds + ML correction (historical patterns by time of week, incidents) — see ETA Prediction in ML system design.
+- **Re-routing**: the client follows the route locally; the server pushes better routes when traffic changes significantly.
+
+## Nearby Friends
+
+**Requirements**: users who opt in see friends within ~5 miles with their distance, updated about every 30 s; history kept for analytics; inactive friends disappear after a few minutes.
+
+**Estimates**: 100 M DAU, 10% online concurrently → 10 M users × 1 update / 30 s ≈ **330k location updates/s**; each update must reach the user's online nearby friends.
+
+```viz
+client ==WebSocket==> WS servers --update--> location cache (Redis: user -> lat,lng,ts, TTL 10 min)
+                          |                 -> location history (Cassandra) for analytics
+                          +--publish--> pub/sub channel "user:<id>"  (Redis pub/sub cluster, sharded by channel)
+friends' WS servers subscribe to each online friend's channel; on a message: compute distance, push if within radius
+```
+
+**Deep dives**
+- **Pub/sub fan-out** instead of querying a geo index: each online user subscribes (via their WS server) to channels of their friends; channels are cheap, and the pub/sub tier is sharded by consistent hashing on the channel id.
+- **Distance check** happens on the subscriber's WS server (it knows its own user's location) — no global geo index needed because the candidate set is just the friend list.
+- **Scale of fan-out**: 330k updates/s × online friends each → millions of messages/s → many pub/sub nodes; it's CPU-bound, so shard and autoscale.
+- **Stateful WS servers**: on deploy or failure, clients reconnect and re-subscribe; drain connections gradually.
+- Extension "nearby random people": add a geohash-based channel per cell and subscribe to your cell + neighbours.
+
+## Digital Wallet (Balance Transfers)
+
+**Requirements**: users hold balances and transfer money to each other; **no money created or lost**, every transfer applied exactly once, full audit trail; high throughput (target ~1 M transfers/s at peak in Alex Xu's version).
+
+```viz
+transfer(A -> B, $5, idempotency key)
+  -> sequencer / partition by account -> command log (replicated with Raft)
+  -> state machine: validate (A has $5?) -> emit events "A -5", "B +5" -> apply to balances (in memory + snapshots)
+  -> read side (CQRS): balances, statements, reconciliation
+```
+
+**Deep dives**
+- **Sharding** accounts across many databases makes a transfer a **distributed transaction** when A and B live on different shards: options are 2PC (blocking), **TCC** (try: freeze A's $5, confirm/cancel on both sides) or a **saga** with compensation.
+- **Event sourcing** (the reproducible design): store *commands* and resulting *events* in an append-only log; current balances are a deterministic replay of the log. Gives a perfect audit trail, easy recovery (snapshot + replay) and the ability to rebuild read models.
+- **Exactly-once**: client idempotency keys, dedupe table keyed by request id inside the same transaction as the balance change.
+- **Reliability**: replicate the event log with Raft across zones; balance state is derived, so any replica can rebuild it.
+- **Reconciliation** with the external ledger/bank daily; double-entry bookkeeping (every transfer = debit + credit summing to zero).
+
+## Dating App (Tinder)
+
+**Requirements**: create a profile with preferences (age, distance, gender); get a stack of nearby candidates; swipe left/right; a **match** when both swiped right (notify both instantly); never show the same profile twice.
+
+**Estimates**: 20 M DAU × 100 swipes/day = 2 B swipes/day ≈ **25k swipes/s** (peaks 3–5×).
+
+```viz
+feed:   client -> feed svc -> candidate generation: geo + filters (Elasticsearch geo_distance / geohash index)
+                           -> drop already-swiped (per-user swiped set / Bloom filter) -> rank -> cached stack (Redis)
+swipe:  client -> swipe svc -> swipes store (Cassandra, partition = swiper_id)
+                           -> right swipe? atomic check of the reverse swipe -> match -> matches DB + push notification
+```
+
+**Deep dives**
+- **Match consistency**: A and B may swipe right on each other at the same moment. Store the pair under one key (`min(A,B):max(A,B)`) and update it atomically (Redis Lua script or a single-partition conditional write) so exactly one of the two swipes creates the match.
+- **Feed generation**: precompute a stack of ~100–200 candidates per user (batch + refresh when the user moves or the stack runs low) so swiping is instant; ranking blends distance, activity, mutual-interest likelihood.
+- **Avoid repeats**: check candidates against the user's swipe history; a per-user Bloom filter keeps it cheap (a rare false positive just hides one profile).
+- **Location updates** are infrequent and only update the user's geo document; privacy: show rounded distances.
+
+## Online Judge (LeetCode)
+
+**Requirements**: browse problems, submit code in many languages, run it against hidden tests with time/memory limits, return the verdict in seconds; contests with **10k+ simultaneous submitters** and a live leaderboard.
+
+```viz
+client -> API -> submissions DB (status: queued) -> queue per language (SQS/Kafka)
+                                                    |
+                                     sandboxed workers (container / gVisor / Firecracker microVM)
+                                     compile -> run each test with CPU/mem/time limits, no network
+                                                    |
+                         verdict -> submissions DB -> client (poll or WebSocket) ; contest -> leaderboard
+test cases: object store, cached on workers        leaderboard: Redis sorted set (score = solved, penalty)
+```
+
+**Deep dives**
+- **Isolation is the core problem**: untrusted code must not escape, hog resources or reach the network → microVMs or gVisor containers, seccomp syscall filters, cgroups for CPU/memory, read-only filesystem, wall-clock and CPU timeouts, output size limits; destroy or recycle the sandbox after each run.
+- **Scale**: queue decouples bursts from execution; pre-warmed worker pools per language (cold starts are slow); autoscale on queue depth before contests start.
+- **Fairness**: per-user rate limits; run tests in parallel within a submission; stop at the first failing test.
+- **Leaderboard**: sorted set keyed by contest with a composite score (problems solved, then lower penalty time); recompute only on accepted submissions.
+- **Client-side execution** (what this site does with Pyodide) is great for practice — no servers, instant feedback — but a contest judge must run on the server because the client can't be trusted.
+
+## Post Search (Facebook / Twitter Search)
+
+**Requirements**: search posts by keywords, sorted by **recency** or **popularity (likes)**; new posts searchable within ~1 minute; billions of posts, high query volume, posts get liked constantly.
+
+```viz
+write:  posts -> Kafka -> indexing workers: tokenize -> append post_id to each term's posting list
+                                             (sharded by term; one list ordered by time, one by like bucket)
+likes:  like events -> counter svc -> re-index a post only when its count crosses a bucket (1, 10, 100, 1k …)
+query:  "taylor swift" -> fetch both terms' lists -> intersect -> top N -> fetch exact like counts -> re-rank
+        popular queries cached (TTL ~ 1 min)
+```
+
+**Deep dives**
+- **Inverted index** (term → post ids) partitioned by term; keep postings sorted by time so "most recent" is a prefix read; very hot terms are cached and replicated.
+- **Like-count churn**: re-indexing on every like would be a write storm — index coarse popularity buckets and fetch exact counts only for the top candidates at query time.
+- **Freshness vs cost**: an in-memory real-time index for recent posts plus a larger on-disk index for older ones; queries merge both.
+- **Scale**: billions of posts × ~10 terms each — compress posting lists (delta + varint encoding); move cold index segments to cheaper storage.
+- **Privacy filtering**: the result set must respect visibility (friends-only posts) → filter at query time against the viewer's graph, or index visibility attributes.
+
+## Online Auction (eBay)
+
+**Requirements**: list items with an end time; users place bids; a bid must beat the current highest; everyone watching sees the price update live; the highest bid at the end wins; bids must never be lost.
+
+```viz
+bid -> API (idempotency key) -> bids partitioned by auction_id (Kafka) -> bid processor (one per partition)
+                                   -> conditional update: UPDATE auctions SET price=?, leader=? WHERE id=? AND price < ?
+                                   -> bids log (all bids, durable) -> publish "new price" -> SSE to watchers
+auction end: delayed job at end_time -> close auction -> notify winner -> payment
+```
+
+**Deep dives**
+- **Consistency of the highest bid**: either an atomic conditional update in the database (optimistic, retry on conflict) or serialize bids per auction through a partitioned queue (one consumer per auction → no races, natural ordering).
+- **Durability**: write every bid to a durable log *before* acknowledging; the auction's state can be rebuilt from it.
+- **Real-time updates**: SSE/WebSockets to watchers via pub/sub per auction; popular auctions have many watchers → two-level fan-out (pub/sub → gateway servers).
+- **Ending correctly**: use the server's timestamp for bid acceptance; close via a scheduled job (delay queue / timer wheel); many sites **extend the end time** after late bids to discourage sniping.
+- **Proxy bidding**: users give a maximum; the system bids the minimum increment on their behalf.
+
+## Food Delivery (DoorDash / Uber Eats)
+
+**Requirements**: browse restaurants near the customer with menus and ETAs; place and pay for orders; restaurants accept and prepare; **dispatch** assigns couriers; live courier tracking; order status updates.
+
+```viz
+browse:  client -> search svc (geo index of restaurants + filters) -> menu cache/CDN -> ETA estimates
+order:   client -> order svc (state machine: placed -> accepted -> preparing -> picked up -> delivered)
+                -> payment (authorize; capture on delivery) -> restaurant tablet notification
+dispatch: every few seconds per region: open orders × available couriers -> optimizer -> offers to couriers
+couriers: location every ~5 s -> location svc (in-memory geo index by region) -> tracking via WebSocket/SSE
+```
+
+**Deep dives**
+- **Dispatch is an assignment problem**: batch orders and couriers per region every few seconds and solve for minimum total delivery time (min-cost matching / heuristics), considering food prep time (don't make couriers wait), order batching (two orders, one courier) and fairness.
+- **ETA** combines prep time prediction, courier travel time and traffic (an ML model per stage).
+- **Order state machine** with idempotent transitions; restaurants and couriers confirm steps; timeouts trigger reassignment.
+- **Peak hours**: surge pricing / delivery fees by region to balance supply and demand; precompute restaurant availability.
+- Location pipeline, geo index and real-time tracking mirror the Ride Sharing design.
+
+## Top-K Trending (YouTube Top Videos / Heavy Hitters)
+
+**Requirements**: the top K most viewed videos for the last hour, day, month and all time; views arrive at very high rate; results can be a minute stale.
+
+**Estimates**: 70 B views/day ≈ **800k views/s** — far too many to update a database row per view.
+
+```viz
+view events -> Kafka (partition by video_id) -> stream counters (Flink): count per video per 1-minute bucket
+                                                  -> per-partition top-K (min-heap) -> merge -> global top-K
+                                                  -> window rollups: last hour = 60 minute-buckets, day = 24 hour-buckets
+precomputed lists (per window) -> cache -> API "top 100 today"
+```
+
+**Deep dives**
+- **Exact counting** works because the stream is partitioned by video id: each partition owns its videos' counts, keeps a local top-K, and a final stage merges the per-partition lists (the global top K must appear in some partition's top K).
+- **Sliding windows**: keep per-minute counts and add the newest bucket / subtract the expiring one; long windows use coarser buckets (hours, days).
+- **Approximate** alternative when memory is tight: **Count-Min Sketch + heap** per window — bounded memory, small overestimates.
+- **Hot keys**: a viral video concentrates load on one partition → pre-aggregate in the producers (count locally for a second, then send) or salt the key and merge.
+- All-time counts are updated in batches to the video database (e.g. every minute), never per view.

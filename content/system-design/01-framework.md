@@ -82,3 +82,36 @@ Ask about these before designing:
 - **Availability / durability**: can we lose data? multi-region?
 - **Security & privacy**: auth, PII, abuse/rate limiting.
 - **Out of scope**: say it explicitly (analytics, admin tools, ML ranking …).
+
+## Scaling from Zero to Millions of Users
+
+**Q: Walk me through how an architecture evolves as traffic grows.** (A classic warm-up; it also gives you vocabulary for every other design.)
+
+```viz
+1  single server: web app + DB on one box                         ~ hundreds of users
+2  split DB onto its own server (scale each independently)
+3  load balancer + several STATELESS web servers (sessions -> Redis / JWT)
+4  DB replication: primary for writes, read replicas for reads
+5  cache (Redis) in front of the DB + CDN for static assets/media
+6  message queue + workers for slow/async work (email, thumbnails)
+7  multiple data centers / regions: GeoDNS, data replicated across regions
+8  shard the database (by user_id …), split into services by domain    ~ tens of millions
+   + logging, metrics, tracing, autoscaling, CI/CD from early on
+```
+
+What to say at each step:
+- **Why stateless web tier**: any server can handle any request → add/remove servers freely, survive failures. State goes to a shared store.
+- **Replication** gives read scale and availability (promote a replica on failure) but introduces **replication lag**.
+- **Cache** cuts DB load for read-heavy data; plan invalidation and expiry. **CDN** serves static content close to users.
+- **Queues** decouple producers from slow consumers and absorb spikes.
+- **Multi-region**: lower latency and disaster tolerance; hardest part is data — choose per data type between a single write region (simple, cross-region write latency) and multi-region writes (conflict resolution).
+- **Sharding** is the last resort for the data tier: pick the shard key carefully (celebrity/hot keys, cross-shard joins, resharding with consistent hashing).
+
+## Common Mistakes in the Interview
+
+- Jumping into boxes before agreeing on requirements and scale.
+- Designing for Google scale when the stated scale fits one Postgres instance — say "this fits on one machine; here's when it wouldn't."
+- Naming technologies without justifying them ("Kafka" — why? ordering? replay? fan-out?).
+- Ignoring failure: what happens when this node, queue, or region dies? Retries → idempotency.
+- Hand-waving the data model; the schema and access patterns usually decide the database and shard key.
+- Spending the deep dive on easy parts; ask "which part would you like to go deeper on?" and pick the genuinely hard one (contention, fan-out, consistency).
