@@ -83,6 +83,52 @@ t.insert("app");
 check(t.search("app"), true);
 ```
 
+```go
+type Trie struct {
+	children [26]*Trie
+	end      bool // a word ends here
+}
+
+func Constructor() Trie {
+	return Trie{}
+}
+
+func (this *Trie) Insert(word string) {
+	node := this
+	for i := 0; i < len(word); i++ {
+		c := word[i] - 'a'
+		if node.children[c] == nil {
+			node.children[c] = &Trie{}
+		}
+		node = node.children[c]
+	}
+	node.end = true
+}
+
+func (this *Trie) walk(s string) *Trie {
+	node := this
+	for i := 0; i < len(s) && node != nil; i++ {
+		node = node.children[s[i]-'a']
+	}
+	return node
+}
+
+func (this *Trie) Search(word string) bool {
+	node := this.walk(word)
+	return node != nil && node.end
+}
+
+func (this *Trie) StartsWith(prefix string) bool {
+	return this.walk(prefix) != nil
+}
+// test
+t := Constructor()
+t.Insert("apple")
+assertEq([]bool{t.Search("apple"), t.Search("app"), t.StartsWith("app")}, []bool{true, false, true})
+t.Insert("app")
+assertEq(t.Search("app"), true)
+```
+
 ## 211. Design Add and Search Words Data Structure | Medium
 related: 208, 212
 tags: blind75, design, dfs
@@ -151,6 +197,56 @@ class WordDictionary {
 WordDictionary wd = new WordDictionary();
 wd.addWord("bad"); wd.addWord("dad"); wd.addWord("mad");
 check(!wd.search("pad") && wd.search("bad") && wd.search(".ad") && wd.search("b.."), true);
+```
+
+```go
+type WordDictionary struct {
+	children [26]*WordDictionary
+	end      bool
+}
+
+func Constructor() WordDictionary {
+	return WordDictionary{}
+}
+
+func (this *WordDictionary) AddWord(word string) {
+	node := this
+	for i := 0; i < len(word); i++ {
+		c := word[i] - 'a'
+		if node.children[c] == nil {
+			node.children[c] = &WordDictionary{}
+		}
+		node = node.children[c]
+	}
+	node.end = true
+}
+
+func (this *WordDictionary) Search(word string) bool {
+	var dfs func(node *WordDictionary, i int) bool
+	dfs = func(node *WordDictionary, i int) bool {
+		if i == len(word) {
+			return node.end
+		}
+		if word[i] == '.' { // try every child
+			for _, child := range node.children {
+				if child != nil && dfs(child, i+1) {
+					return true
+				}
+			}
+			return false
+		}
+		child := node.children[word[i]-'a']
+		return child != nil && dfs(child, i+1)
+	}
+	return dfs(this, 0)
+}
+// test
+wd := Constructor()
+for _, w := range []string{"bad", "dad", "mad"} {
+	wd.AddWord(w)
+}
+assertEq([]bool{wd.Search("pad"), wd.Search("bad"), wd.Search(".ad"), wd.Search("b..")}, []bool{false, true, true, true})
+assertEq([]bool{wd.Search("..."), wd.Search("."), wd.Search("ba"), wd.Search("bad.")}, []bool{true, false, false, false})
 ```
 
 ## 212. Word Search II | Hard
@@ -244,6 +340,65 @@ Collections.sort(r);
 check(r, "[eat, oath]");
 ```
 
+```go
+type trieNode struct {
+	next [26]*trieNode
+	word string // set at the node where a word ends
+	kids int    // live children, for pruning
+}
+
+func findWords(board [][]byte, words []string) []string {
+	root := &trieNode{}
+	for _, w := range words {
+		node := root
+		for i := 0; i < len(w); i++ {
+			c := w[i] - 'a'
+			if node.next[c] == nil {
+				node.next[c] = &trieNode{}
+				node.kids++
+			}
+			node = node.next[c]
+		}
+		node.word = w
+	}
+	R, C, res := len(board), len(board[0]), []string{}
+	var dfs func(r, c int, parent *trieNode)
+	dfs = func(r, c int, parent *trieNode) {
+		ch := board[r][c]
+		node := parent.next[ch-'a']
+		if node.word != "" {
+			res = append(res, node.word)
+			node.word = "" // report each word once
+		}
+		board[r][c] = '#'
+		for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+			nr, nc := r+d[0], c+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C && board[nr][nc] != '#' && node.next[board[nr][nc]-'a'] != nil {
+				dfs(nr, nc, node)
+			}
+		}
+		board[r][c] = ch
+		if node.kids == 0 && node.word == "" { // prune an exhausted branch
+			parent.next[ch-'a'] = nil
+			parent.kids--
+		}
+	}
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if root.next[board[r][c]-'a'] != nil {
+				dfs(r, c, root)
+			}
+		}
+	}
+	return res
+}
+// test
+assertUnordered(findWords(byteGrid("oaan", "etae", "ihkr", "iflv"), []string{"oath", "pea", "eat", "rain"}), []string{"eat", "oath"})
+assertEq(findWords(byteGrid("ab", "cd"), []string{"abcb"}), []string{})
+assertEq(findWords(byteGrid("a"), []string{"a"}), []string{"a"})
+assertUnordered(findWords(byteGrid("ab", "cd"), []string{"ab", "cb", "ad", "bd", "ac", "ca", "da", "bc", "db", "adcb", "dabc", "abb", "acb"}), []string{"ab", "ac", "bd", "ca", "db"})
+```
+
 ## 421. Maximum XOR of Two Numbers in an Array | Medium
 related: 208, 136
 tags: bit-trie, greedy
@@ -310,6 +465,41 @@ class Solution {
 check(new Solution().findMaximumXOR(new int[]{3, 10, 5, 25, 2, 8}), 28);
 ```
 
+```go
+func findMaximumXOR(nums []int) int {
+	type node struct{ next [2]*node }
+	root := &node{}
+	for _, x := range nums { // binary trie of the numbers, high bit first
+		n := root
+		for b := 30; b >= 0; b-- {
+			bit := x >> b & 1
+			if n.next[bit] == nil {
+				n.next[bit] = &node{}
+			}
+			n = n.next[bit]
+		}
+	}
+	best := 0
+	for _, x := range nums {
+		n, cur := root, 0
+		for b := 30; b >= 0; b-- {
+			bit := x >> b & 1
+			if n.next[1-bit] != nil { // take the opposite bit whenever possible
+				cur |= 1 << b
+				n = n.next[1-bit]
+			} else {
+				n = n.next[bit]
+			}
+		}
+		best = max(best, cur)
+	}
+	return best
+}
+// test
+assertEq(findMaximumXOR([]int{3, 10, 5, 25, 2, 8}), 28)
+assertEq(findMaximumXOR([]int{14, 70, 53, 83, 49, 91, 36, 80, 92, 51, 66, 70}), 127)
+```
+
 
 ## 648. Replace Words | Medium
 related: 208
@@ -374,6 +564,47 @@ class Solution {
 check(new Solution().replaceWords(List.of("cat", "bat", "rat"), "the cattle was rattled by the battery"), "the cat was rat by the bat");
 ```
 
+```go
+func replaceWords(dictionary []string, sentence string) string {
+	type node struct {
+		next [26]*node
+		end  bool
+	}
+	root := &node{}
+	for _, w := range dictionary {
+		n := root
+		for i := 0; i < len(w); i++ {
+			c := w[i] - 'a'
+			if n.next[c] == nil {
+				n.next[c] = &node{}
+			}
+			n = n.next[c]
+		}
+		n.end = true
+	}
+	shortest := func(word string) string { // the shortest root that prefixes word
+		n := root
+		for i := 0; i < len(word); i++ {
+			if n = n.next[word[i]-'a']; n == nil {
+				return word
+			}
+			if n.end {
+				return word[:i+1]
+			}
+		}
+		return word
+	}
+	words := strings.Fields(sentence)
+	for i, w := range words {
+		words[i] = shortest(w)
+	}
+	return strings.Join(words, " ")
+}
+// test
+assertEq(replaceWords([]string{"cat", "bat", "rat"}, "the cattle was rattled by the battery"), "the cat was rat by the bat")
+assertEq(replaceWords([]string{"a", "b", "c"}, "aadsfasf absbs bbab cadsfafs"), "a a b c")
+```
+
 ## 1268. Search Suggestions System | Medium
 related: 208, 642
 tags: sort, binary-search, trie
@@ -426,6 +657,30 @@ check(new Solution().suggestedProducts(new String[]{"havana"}, "tatiana"), "[[],
 check(new Solution().suggestedProducts(new String[]{"mobile", "mouse", "moneypot", "monitor", "mousepad"}, "mou").get(2), "[mouse, mousepad]");
 ```
 
+```go
+func suggestedProducts(products []string, searchWord string) [][]string {
+	sort.Strings(products)
+	res := [][]string{}
+	for k := 1; k <= len(searchWord); k++ {
+		prefix := searchWord[:k]
+		i := sort.SearchStrings(products, prefix) // first product >= prefix
+		group := []string{}
+		for j := i; j < len(products) && j < i+3 && strings.HasPrefix(products[j], prefix); j++ {
+			group = append(group, products[j])
+		}
+		res = append(res, group)
+	}
+	return res
+}
+// test
+P := []string{"mobile", "mouse", "moneypot", "monitor", "mousepad"}
+assertEq(suggestedProducts(P, "mouse"), [][]string{
+	{"mobile", "moneypot", "monitor"}, {"mobile", "moneypot", "monitor"},
+	{"mouse", "mousepad"}, {"mouse", "mousepad"}, {"mouse", "mousepad"}})
+assertEq(suggestedProducts([]string{"havana"}, "tatiana"), [][]string{{}, {}, {}, {}, {}, {}, {}})
+assertEq(suggestedProducts([]string{"bags", "baggage", "banner", "box", "cloths"}, "bags"), [][]string{{"baggage", "bags", "banner"}, {"baggage", "bags", "banner"}, {"baggage", "bags"}, {"bags"}})
+```
+
 ## 745. Prefix and Suffix Search | Hard
 related: 208, 211
 tags: trie, hashing
@@ -471,6 +726,38 @@ WordFilter wf = new WordFilter(new String[]{"apple", "ape", "maple"});
 check(wf.f("a", "e"), 1);
 check(wf.f("", "le"), 2);
 check(wf.f("b", ""), -1);
+```
+
+```go
+type WordFilter struct {
+	idx map[string]int // "prefix#suffix" -> largest index
+}
+
+func Constructor(words []string) WordFilter {
+	idx := map[string]int{}
+	for i, w := range words {
+		for p := 0; p <= len(w); p++ {
+			for s := 0; s <= len(w); s++ {
+				idx[w[:p]+"#"+w[s:]] = i // later words overwrite earlier ones
+			}
+		}
+	}
+	return WordFilter{idx}
+}
+
+func (this *WordFilter) F(pref string, suff string) int {
+	if i, ok := this.idx[pref+"#"+suff]; ok {
+		return i
+	}
+	return -1
+}
+// test
+wf := Constructor([]string{"apple", "ape", "maple"})
+assertEq([]int{wf.F("a", "e"), wf.F("ap", "le"), wf.F("", "le"), wf.F("b", "")}, []int{1, 0, 2, -1})
+wf2 := Constructor([]string{"apple"})
+assertEq(wf2.F("a", "e"), 0)
+wf3 := Constructor([]string{"abc", "abc"})
+assertEq(wf3.F("a", "c"), 1)
 ```
 
 ## 336. Palindrome Pairs | Hard
@@ -539,4 +826,49 @@ class Solution {
 List<List<Integer>> pp = new ArrayList<>(new Solution().palindromePairs(new String[]{"abcd", "dcba", "lls", "s", "sssll"}));
 pp.sort(Comparator.comparing((List<Integer> x) -> x.get(0)).thenComparing(x -> x.get(1)));
 check(pp, List.of(List.of(0, 1), List.of(1, 0), List.of(2, 4), List.of(3, 2)));
+```
+
+```go
+func palindromePairs(words []string) [][]int {
+	isPal := func(s string) bool {
+		for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+			if s[i] != s[j] {
+				return false
+			}
+		}
+		return true
+	}
+	reverse := func(s string) string {
+		b := []byte(s)
+		for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
+			b[i], b[j] = b[j], b[i]
+		}
+		return string(b)
+	}
+	rev := map[string]int{}
+	for i, w := range words {
+		rev[reverse(w)] = i
+	}
+	res := [][]int{}
+	for i, w := range words {
+		for j := 0; j <= len(w); j++ {
+			pre, suf := w[:j], w[j:]
+			// w + words[k] is a palindrome if words[k] reversed == pre and suf is a palindrome
+			if k, ok := rev[pre]; ok && k != i && isPal(suf) {
+				res = append(res, []int{i, k})
+			}
+			// words[k] + w is a palindrome if words[k] reversed == suf and pre is a palindrome
+			if k, ok := rev[suf]; ok && j > 0 && k != i && isPal(pre) {
+				res = append(res, []int{k, i})
+			}
+		}
+	}
+	return res
+}
+// test
+assertUnordered(palindromePairs([]string{"abcd", "dcba", "lls", "s", "sssll"}), [][]int{{0, 1}, {1, 0}, {2, 4}, {3, 2}})
+assertUnordered(palindromePairs([]string{"bat", "tab", "cat"}), [][]int{{0, 1}, {1, 0}})
+assertUnordered(palindromePairs([]string{"a", ""}), [][]int{{0, 1}, {1, 0}})
+assertEq(palindromePairs([]string{"a", "b", "c"}), [][]int{})
+assertUnordered(palindromePairs([]string{"ab", "ba", "aba"}), [][]int{{0, 1}, {0, 2}, {1, 0}, {2, 1}}) // "ababa" twice
 ```
