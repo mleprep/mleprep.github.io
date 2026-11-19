@@ -1,4 +1,4 @@
-/* LeetCode Review – tiny hash-routed SPA.
+/* SDE & MLE Prep – tiny hash-routed SPA.
    Routes: #/  #/browse?filters  #/<section>  #/<section>/<topic>?filters  #/<section>/<topic>/<slug>
    Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  list=grind169 (b75=1 = list=blind75)
    co=Google  win=6m (company window: all time by default)  sort=num|diff|title|freq  q=text */
@@ -290,7 +290,7 @@ function viewHome() {
     frequently asked company problems — each with the key idea, a sketch, complexity and tested ${c.go >= total ? 'Python, Java &amp; Go'
       : `Python &amp; Java${c.go ? ` (and Go for ${c.go} so far)` : ''}`}. Open any problem and
     pick <b>Solve in browser</b> to write Python${c.go ? ' or Go' : ''} and run it against the tests right on this page (nothing runs on a server).
-    Plus system design and ML / deep learning. Progress is saved in this browser.</p>
+    Plus system design and ML / deep learning, so one site covers both SDE and MLE interview loops. Progress is saved in this browser.</p>
     <div class="meta big">
       ${DIFFS.map(d => `<a class="badge ${d}" href="${browse({ d })}">${c[d]} ${d}</a>`).join('')}
       <a class="badge star" href="${browse({ list: 'blind75' })}">★ ${b75} Blind 75</a>
@@ -719,7 +719,7 @@ async function route() {
     else await viewItem(s, t, slug, stale);
   } catch (e) { if (!stale()) main.innerHTML = `<h1>Error</h1><pre>${esc(e.message)}</pre>`; }
   if (stale()) return;
-  document.title = (main.querySelector('h1')?.textContent || '') + ' · LeetCode Review';
+  document.title = (main.querySelector('h1')?.textContent || '') + ' · SDE & MLE Prep';
   const p = path.join('/');
   if (p !== lastPath) window.scrollTo(0, 0);   // keep scroll when only filters change
   lastPath = p;

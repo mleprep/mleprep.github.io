@@ -783,7 +783,7 @@ func (interp *Interpreter) cfg(root *node, sc *scope, importPath, pkgName string
 				case n.action != aAssign:
 					// Do not skip assign operation if it is combined with another operator.
 				case n.nleft > 1 && (isCall(src) || src.action == aRecv || src.action == aCompositeLit):
-					// Patched for the LeetCode Review judge: in a multiple assignment the other
+					// Patched for the SDE & MLE Prep judge: in a multiple assignment the other
 					// pairs must still be assigned, so the node cannot become a nop
 					// (upstream, `a, b := 1, []int{}` left a == 0).
 				case src.rval.IsValid():
@@ -1496,7 +1496,7 @@ func (interp *Interpreter) cfg(root *node, sc *scope, importPath, pkgName string
 			init, body := n.child[0], n.child[1]
 			n.start = init.start
 			init.tnext = body.start
-			// Patched for the LeetCode Review judge: loop back to the body, not to the init
+			// Patched for the SDE & MLE Prep judge: loop back to the body, not to the init
 			// statement (upstream re-ran init on every iteration, so the loop never ended).
 			body.tnext = body.start
 			sc = sc.pop()

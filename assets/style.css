@@ -79,6 +79,9 @@ aside a.on { background: var(--accent-soft); color: var(--accent); font-weight: 
 aside a span { min-width: 0; }
 aside a small { color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
 main { padding: 2.25rem var(--gutter) 5rem; min-width: 0; }
+/* Site footer: sits under main in the content column (column 2 on desktop, the only column on mobile). */
+.foot { grid-column: -2 / -1; padding: 1.1rem var(--gutter) 1.75rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; line-height: 1.6; }
+.foot p { margin: 0 0 0.35rem; max-width: var(--measure); }
 
 /* ---------------------------------------------------------------- typography */
 h1 { font-size: clamp(1.6rem, 1.2rem + 0.9vw, 2.1rem); line-height: 1.2; margin: 0 0 0.6rem; letter-spacing: -0.022em; font-weight: 700; }
