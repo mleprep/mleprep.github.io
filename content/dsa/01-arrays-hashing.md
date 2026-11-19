@@ -61,6 +61,22 @@ check(new Solution().twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{0, 1});
 check(new Solution().twoSum(new int[]{3, 2, 4}, 6), new int[]{1, 2});
 ```
 
+```go
+func twoSum(nums []int, target int) []int {
+	seen := map[int]int{} // value -> index
+	for i, x := range nums {
+		if j, ok := seen[target-x]; ok {
+			return []int{j, i}
+		}
+		seen[x] = i
+	}
+	return nil
+}
+// test
+assertUnordered(twoSum([]int{2, 7, 11, 15}, 9), []int{0, 1})
+assertUnordered(twoSum([]int{3, 2, 4}, 6), []int{1, 2})
+```
+
 ## 217. Contains Duplicate | Easy
 related: 242, 128
 tags: blind75, hash-set
@@ -94,6 +110,22 @@ class Solution {
 // test
 check(new Solution().containsDuplicate(new int[]{1, 2, 3, 1}), true);
 check(new Solution().containsDuplicate(new int[]{1, 2, 3, 4}), false);
+```
+
+```go
+func containsDuplicate(nums []int) bool {
+	seen := map[int]bool{}
+	for _, x := range nums {
+		if seen[x] {
+			return true
+		}
+		seen[x] = true
+	}
+	return false
+}
+// test
+assertEq(containsDuplicate([]int{1, 2, 3, 1}), true)
+assertEq(containsDuplicate([]int{1, 2, 3, 4}), false)
 ```
 
 ## 242. Valid Anagram | Easy
@@ -135,6 +167,23 @@ class Solution {
 // test
 check(new Solution().isAnagram("anagram", "nagaram"), true);
 check(new Solution().isAnagram("rat", "car"), false);
+```
+
+```go
+func isAnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+	var cnt [26]int
+	for i := range s {
+		cnt[s[i]-'a']++
+		cnt[t[i]-'a']--
+	}
+	return cnt == [26]int{} // arrays compare by value
+}
+// test
+assertEq(isAnagram("anagram", "nagaram"), true)
+assertEq(isAnagram("rat", "car"), false)
 ```
 
 ## 49. Group Anagrams | Medium
@@ -186,6 +235,28 @@ List<List<String>> r = new Solution().groupAnagrams(new String[]{"eat", "tea", "
 r.forEach(Collections::sort);
 r.sort((a, b) -> a.get(0).compareTo(b.get(0)));
 check(r, "[[ate, eat, tea], [bat], [nat, tan]]");
+```
+
+```go
+func groupAnagrams(strs []string) [][]string {
+	groups := map[[26]int][]string{} // letter counts are a valid map key
+	for _, w := range strs {
+		var key [26]int
+		for _, ch := range w {
+			key[ch-'a']++
+		}
+		groups[key] = append(groups[key], w)
+	}
+	res := make([][]string, 0, len(groups))
+	for _, g := range groups {
+		res = append(res, g)
+	}
+	return res
+}
+// test
+assertUnorderedDeep(groupAnagrams([]string{"eat", "tea", "tan", "ate", "nat", "bat"}), [][]string{{"ate", "eat", "tea"}, {"bat"}, {"nat", "tan"}})
+assertEq(groupAnagrams([]string{""}), [][]string{{""}})
+assertEq(groupAnagrams([]string{"a"}), [][]string{{"a"}})
 ```
 
 ## 347. Top K Frequent Elements | Medium
@@ -241,6 +312,32 @@ Arrays.sort(t);
 check(t, new int[]{1, 2});
 ```
 
+```go
+func topKFrequent(nums []int, k int) []int {
+	cnt := map[int]int{}
+	for _, x := range nums {
+		cnt[x]++
+	}
+	bucket := make([][]int, len(nums)+1) // bucket[f] = values seen f times
+	for x, f := range cnt {
+		bucket[f] = append(bucket[f], x)
+	}
+	res := []int{}
+	for f := len(bucket) - 1; f > 0; f-- {
+		for _, x := range bucket[f] {
+			res = append(res, x)
+			if len(res) == k {
+				return res
+			}
+		}
+	}
+	return res
+}
+// test
+assertUnordered(topKFrequent([]int{1, 1, 1, 2, 2, 3}, 2), []int{1, 2})
+assertEq(topKFrequent([]int{1}, 1), []int{1})
+```
+
 ## 238. Product of Array Except Self | Medium
 related: 42, 152
 tags: blind75, prefix-product
@@ -291,6 +388,26 @@ class Solution {
 // test
 check(new Solution().productExceptSelf(new int[]{1, 2, 3, 4}), new int[]{24, 12, 8, 6});
 check(new Solution().productExceptSelf(new int[]{-1, 1, 0, -3, 3}), new int[]{0, 0, 9, 0, 0});
+```
+
+```go
+func productExceptSelf(nums []int) []int {
+	n := len(nums)
+	ans := make([]int, n)
+	ans[0] = 1
+	for i := 1; i < n; i++ {
+		ans[i] = ans[i-1] * nums[i-1] // product of everything to the left
+	}
+	right := 1
+	for i := n - 1; i >= 0; i-- {
+		ans[i] *= right
+		right *= nums[i]
+	}
+	return ans
+}
+// test
+assertEq(productExceptSelf([]int{1, 2, 3, 4}), []int{24, 12, 8, 6})
+assertEq(productExceptSelf([]int{-1, 1, 0, -3, 3}), []int{0, 0, 9, 0, 0})
 ```
 
 ## 36. Valid Sudoku | Medium
@@ -348,6 +465,31 @@ b[0][0] = '8';
 check(new Solution().isValidSudoku(b), false);
 ```
 
+```go
+func isValidSudoku(board [][]byte) bool {
+	var rows, cols, boxes [9][9]bool
+	for r := 0; r < 9; r++ {
+		for c := 0; c < 9; c++ {
+			if board[r][c] == '.' {
+				continue
+			}
+			v, b := board[r][c]-'1', r/3*3+c/3
+			if rows[r][v] || cols[c][v] || boxes[b][v] {
+				return false
+			}
+			rows[r][v], cols[c][v], boxes[b][v] = true, true, true
+		}
+	}
+	return true
+}
+// test
+board := byteGrid("53..7....", "6..195...", ".98....6.", "8...6...3", "4..8.3..1",
+	"7...2...6", ".6....28.", "...419..5", "....8..79")
+assertEq(isValidSudoku(board), true)
+board[0][0] = '8' // column 0 already has an 8
+assertEq(isValidSudoku(board), false)
+```
+
 ## 271. Encode and Decode Strings | Medium
 related: 49
 tags: blind75, string, premium
@@ -399,6 +541,39 @@ class Codec {
 Codec c = new Codec();
 List<String> data = Arrays.asList("we", "say", ":", "yes", "#4#", "");
 check(c.decode(c.encode(data)), data);
+```
+
+```go
+type Codec struct{}
+
+func Constructor() Codec {
+	return Codec{}
+}
+
+// Encode writes each string as "<length>#<string>".
+func (codec *Codec) Encode(strs []string) string {
+	var sb strings.Builder
+	for _, s := range strs {
+		sb.WriteString(strconv.Itoa(len(s)) + "#" + s)
+	}
+	return sb.String()
+}
+
+func (codec *Codec) Decode(s string) []string {
+	res := []string{}
+	for i := 0; i < len(s); {
+		j := i + strings.IndexByte(s[i:], '#')
+		n, _ := strconv.Atoi(s[i:j])
+		res = append(res, s[j+1:j+1+n])
+		i = j + 1 + n
+	}
+	return res
+}
+// test
+c := Constructor()
+for _, data := range [][]string{{"neet", "code", "love", "you"}, {"we", "say", ":", "yes", "#4#", ""}, {}} {
+	assertEq(c.Decode(c.Encode(data)), data)
+}
 ```
 
 ## 128. Longest Consecutive Sequence | Medium
@@ -453,6 +628,29 @@ check(new Solution().longestConsecutive(new int[]{100, 4, 200, 1, 3, 2}), 4);
 check(new Solution().longestConsecutive(new int[]{0, 3, 7, 2, 5, 8, 4, 6, 0, 1}), 9);
 ```
 
+```go
+func longestConsecutive(nums []int) int {
+	set := map[int]bool{}
+	for _, x := range nums {
+		set[x] = true
+	}
+	best := 0
+	for x := range set {
+		if !set[x-1] { // x starts a run
+			y := x
+			for set[y+1] {
+				y++
+			}
+			best = max(best, y-x+1)
+		}
+	}
+	return best
+}
+// test
+assertEq(longestConsecutive([]int{100, 4, 200, 1, 3, 2}), 4)
+assertEq(longestConsecutive([]int{0, 3, 7, 2, 5, 8, 4, 6, 0, 1}), 9)
+```
+
 ## 169. Majority Element | Easy
 related: 347
 tags: boyer-moore
@@ -489,6 +687,26 @@ class Solution {
 // test
 check(new Solution().majorityElement(new int[]{3, 2, 3}), 3);
 check(new Solution().majorityElement(new int[]{2, 2, 1, 1, 1, 2, 2}), 2);
+```
+
+```go
+func majorityElement(nums []int) int {
+	cand, cnt := 0, 0 // Boyer-Moore voting
+	for _, x := range nums {
+		if cnt == 0 {
+			cand = x
+		}
+		if x == cand {
+			cnt++
+		} else {
+			cnt--
+		}
+	}
+	return cand
+}
+// test
+assertEq(majorityElement([]int{3, 2, 3}), 3)
+assertEq(majorityElement([]int{2, 2, 1, 1, 1, 2, 2}), 2)
 ```
 
 ## 560. Subarray Sum Equals K | Medium
@@ -539,6 +757,23 @@ class Solution {
 check(new Solution().subarraySum(new int[]{1, 1, 1}, 2), 2);
 check(new Solution().subarraySum(new int[]{1, 2, 3}, 3), 2);
 check(new Solution().subarraySum(new int[]{1, -1, 0}, 0), 3);
+```
+
+```go
+func subarraySum(nums []int, k int) int {
+	count, pre := 0, 0
+	seen := map[int]int{0: 1} // prefix sum -> how many times seen
+	for _, x := range nums {
+		pre += x
+		count += seen[pre-k]
+		seen[pre]++
+	}
+	return count
+}
+// test
+assertEq(subarraySum([]int{1, 1, 1}, 2), 2)
+assertEq(subarraySum([]int{1, 2, 3}, 3), 2)
+assertEq(subarraySum([]int{1, -1, 0}, 0), 3)
 ```
 
 ## 41. First Missing Positive | Hard
@@ -596,6 +831,28 @@ check(new Solution().firstMissingPositive(new int[]{3, 4, -1, 1}), 2);
 check(new Solution().firstMissingPositive(new int[]{7, 8, 9, 11, 12}), 1);
 ```
 
+```go
+func firstMissingPositive(nums []int) int {
+	n := len(nums)
+	for i := range nums {
+		for nums[i] >= 1 && nums[i] <= n && nums[nums[i]-1] != nums[i] {
+			j := nums[i] - 1 // put value v at index v-1
+			nums[i], nums[j] = nums[j], nums[i]
+		}
+	}
+	for i, v := range nums {
+		if v != i+1 {
+			return i + 1
+		}
+	}
+	return n + 1
+}
+// test
+assertEq(firstMissingPositive([]int{1, 2, 0}), 3)
+assertEq(firstMissingPositive([]int{3, 4, -1, 1}), 2)
+assertEq(firstMissingPositive([]int{7, 8, 9, 11, 12}), 1)
+```
+
 ## 189. Rotate Array | Medium
 related: 48, 61
 tags: reverse-trick
@@ -648,6 +905,28 @@ new Solution().rotate(a, 3);
 check(a, new int[]{5, 6, 7, 1, 2, 3, 4});
 ```
 
+```go
+func rotate(nums []int, k int) {
+	rev := func(i, j int) {
+		for ; i < j; i, j = i+1, j-1 {
+			nums[i], nums[j] = nums[j], nums[i]
+		}
+	}
+	n := len(nums)
+	k %= n
+	rev(0, n-1)
+	rev(0, k-1)
+	rev(k, n-1)
+}
+// test
+a := []int{1, 2, 3, 4, 5, 6, 7}
+rotate(a, 3)
+assertEq(a, []int{5, 6, 7, 1, 2, 3, 4})
+b := []int{-1, -100, 3, 99}
+rotate(b, 2)
+assertEq(b, []int{3, 99, -1, -100})
+```
+
 ## 88. Merge Sorted Array | Easy
 related: 21, 977
 tags: two-pointers
@@ -687,6 +966,29 @@ class Solution {
 int[] a = {1, 2, 3, 0, 0, 0};
 new Solution().merge(a, 3, new int[]{2, 5, 6}, 3);
 check(a, new int[]{1, 2, 2, 3, 5, 6});
+```
+
+```go
+func merge(nums1 []int, m int, nums2 []int, n int) {
+	i, j, k := m-1, n-1, m+n-1 // fill from the back
+	for j >= 0 {
+		if i >= 0 && nums1[i] > nums2[j] {
+			nums1[k] = nums1[i]
+			i--
+		} else {
+			nums1[k] = nums2[j]
+			j--
+		}
+		k--
+	}
+}
+// test
+a := []int{1, 2, 3, 0, 0, 0}
+merge(a, 3, []int{2, 5, 6}, 3)
+assertEq(a, []int{1, 2, 2, 3, 5, 6})
+b := []int{0}
+merge(b, 0, []int{1}, 1)
+assertEq(b, []int{1})
 ```
 
 ## 26. Remove Duplicates from Sorted Array | Easy
@@ -732,6 +1034,29 @@ int k = new Solution().removeDuplicates(a);
 check(Arrays.copyOf(a, k), new int[]{0, 1, 2, 3, 4});
 ```
 
+```go
+func removeDuplicates(nums []int) int {
+	k := 0
+	for _, x := range nums {
+		if k == 0 || x != nums[k-1] {
+			nums[k] = x
+			k++
+		}
+	}
+	return k
+}
+// test
+a := []int{0, 0, 1, 1, 1, 2, 2, 3, 3, 4}
+k := removeDuplicates(a)
+assertEq(a[:k], []int{0, 1, 2, 3, 4})
+b := []int{1, 1, 2}
+k = removeDuplicates(b)
+assertEq(b[:k], []int{1, 2})
+c := []int{7}
+k = removeDuplicates(c)
+assertEq(c[:k], []int{7})
+```
+
 ## 14. Longest Common Prefix | Easy
 related: 208
 tags: string
@@ -767,6 +1092,24 @@ class Solution {
 // test
 check(new Solution().longestCommonPrefix(new String[]{"flower", "flow", "flight"}), "fl");
 check(new Solution().longestCommonPrefix(new String[]{"dog", "racecar", "car"}), "");
+```
+
+```go
+func longestCommonPrefix(strs []string) string {
+	first := strs[0]
+	for i := 0; i < len(first); i++ {
+		for _, s := range strs[1:] {
+			if i == len(s) || s[i] != first[i] {
+				return first[:i]
+			}
+		}
+	}
+	return first
+}
+// test
+assertEq(longestCommonPrefix([]string{"flower", "flow", "flight"}), "fl")
+assertEq(longestCommonPrefix([]string{"dog", "racecar", "car"}), "")
+assertEq(longestCommonPrefix([]string{"ab", "abc"}), "ab")
 ```
 
 ## 205. Isomorphic Strings | Easy
@@ -807,6 +1150,25 @@ class Solution {
 check(new Solution().isIsomorphic("egg", "add"), true);
 check(new Solution().isIsomorphic("foo", "bar"), false);
 check(new Solution().isIsomorphic("badc", "baba"), false);
+```
+
+```go
+func isIsomorphic(s string, t string) bool {
+	var st, ts [256]byte // 0 = not mapped yet
+	for i := 0; i < len(s); i++ {
+		a, b := s[i], t[i]
+		if st[a] == 0 && ts[b] == 0 {
+			st[a], ts[b] = b, a
+		} else if st[a] != b || ts[b] != a {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(isIsomorphic("egg", "add"), true)
+assertEq(isIsomorphic("foo", "bar"), false)
+assertEq(isIsomorphic("badc", "baba"), false)
 ```
 
 ## 525. Contiguous Array | Medium
@@ -857,6 +1219,29 @@ class Solution {
 // test
 check(new Solution().findMaxLength(new int[]{0, 1}), 2);
 check(new Solution().findMaxLength(new int[]{0, 1, 1, 0, 1, 1}), 4);
+```
+
+```go
+func findMaxLength(nums []int) int {
+	first := map[int]int{0: -1} // balance -> first index it was seen
+	pre, best := 0, 0
+	for i, x := range nums {
+		if x == 1 {
+			pre++
+		} else {
+			pre--
+		}
+		if j, ok := first[pre]; ok {
+			best = max(best, i-j)
+		} else {
+			first[pre] = i
+		}
+	}
+	return best
+}
+// test
+assertEq(findMaxLength([]int{0, 1}), 2)
+assertEq(findMaxLength([]int{0, 1, 1, 0, 1, 1}), 4)
 ```
 
 
@@ -916,6 +1301,30 @@ new Solution().nextPermutation(b);
 check(b, new int[]{1, 2, 3});
 ```
 
+```go
+func nextPermutation(nums []int) {
+	i := len(nums) - 2
+	for i >= 0 && nums[i] >= nums[i+1] {
+		i--
+	}
+	if i >= 0 {
+		j := len(nums) - 1
+		for nums[j] <= nums[i] {
+			j--
+		}
+		nums[i], nums[j] = nums[j], nums[i]
+	}
+	for l, r := i+1, len(nums)-1; l < r; l, r = l+1, r-1 {
+		nums[l], nums[r] = nums[r], nums[l]
+	}
+}
+// test
+for _, tc := range [][2][]int{{{1, 2, 3}, {1, 3, 2}}, {{3, 2, 1}, {1, 2, 3}}, {{1, 1, 5}, {1, 5, 1}}, {{1, 3, 5, 4, 2}, {1, 4, 2, 3, 5}}} {
+	nextPermutation(tc[0])
+	assertEq(tc[0], tc[1])
+}
+```
+
 ## 118. Pascal's Triangle | Easy
 related: 62
 tags: dp
@@ -954,6 +1363,24 @@ class Solution {
 check(new Solution().generate(5), "[[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]");
 ```
 
+```go
+func generate(numRows int) [][]int {
+	rows := [][]int{{1}}
+	for len(rows) < numRows {
+		prev := rows[len(rows)-1]
+		row := []int{1}
+		for i := 0; i+1 < len(prev); i++ {
+			row = append(row, prev[i]+prev[i+1])
+		}
+		rows = append(rows, append(row, 1))
+	}
+	return rows
+}
+// test
+assertEq(generate(5), [][]int{{1}, {1, 1}, {1, 2, 1}, {1, 3, 3, 1}, {1, 4, 6, 4, 1}})
+assertEq(generate(1), [][]int{{1}})
+```
+
 ## 179. Largest Number | Medium
 related: 1
 tags: custom-sort
@@ -986,6 +1413,24 @@ class Solution {
 // test
 check(new Solution().largestNumber(new int[]{3, 30, 34, 5, 9}), "9534330");
 check(new Solution().largestNumber(new int[]{0, 0}), "0");
+```
+
+```go
+func largestNumber(nums []int) string {
+	s := make([]string, len(nums))
+	for i, x := range nums {
+		s[i] = strconv.Itoa(x)
+	}
+	sort.Slice(s, func(i, j int) bool { return s[i]+s[j] > s[j]+s[i] })
+	if s[0] == "0" {
+		return "0"
+	}
+	return strings.Join(s, "")
+}
+// test
+assertEq(largestNumber([]int{10, 2}), "210")
+assertEq(largestNumber([]int{3, 30, 34, 5, 9}), "9534330")
+assertEq(largestNumber([]int{0, 0}), "0")
 ```
 
 ## 228. Summary Ranges | Easy
@@ -1026,6 +1471,28 @@ class Solution {
 }
 // test
 check(new Solution().summaryRanges(new int[]{0, 1, 2, 4, 5, 7}), "[0->2, 4->5, 7]");
+```
+
+```go
+func summaryRanges(nums []int) []string {
+	res := []string{}
+	for i := 0; i < len(nums); {
+		j := i
+		for j+1 < len(nums) && nums[j+1] == nums[j]+1 {
+			j++
+		}
+		if i == j {
+			res = append(res, strconv.Itoa(nums[i]))
+		} else {
+			res = append(res, fmt.Sprintf("%d->%d", nums[i], nums[j]))
+		}
+		i = j + 1
+	}
+	return res
+}
+// test
+assertEq(summaryRanges([]int{0, 1, 2, 4, 5, 7}), []string{"0->2", "4->5", "7"})
+assertEq(summaryRanges([]int{}), []string{})
 ```
 
 ## 274. H-Index | Medium
@@ -1069,6 +1536,27 @@ class Solution {
 }
 // test
 check(new Solution().hIndex(new int[]{3, 0, 6, 1, 5}), 3);
+```
+
+```go
+func hIndex(citations []int) int {
+	n := len(citations)
+	cnt := make([]int, n+1) // cnt[c] = papers with c citations (capped at n)
+	for _, c := range citations {
+		cnt[min(c, n)]++
+	}
+	papers := 0
+	for h := n; h >= 0; h-- {
+		papers += cnt[h]
+		if papers >= h {
+			return h
+		}
+	}
+	return 0
+}
+// test
+assertEq(hIndex([]int{3, 0, 6, 1, 5}), 3)
+assertEq(hIndex([]int{1, 3, 1}), 1)
 ```
 
 ## 289. Game of Life | Medium
@@ -1121,6 +1609,38 @@ new Solution().gameOfLife(b);
 check(b, new int[][]{{0, 0, 0}, {1, 0, 1}, {0, 1, 1}, {0, 1, 0}});
 ```
 
+```go
+func gameOfLife(board [][]int) {
+	R, C := len(board), len(board[0])
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			live := 0
+			for i := max(0, r-1); i < min(R, r+2); i++ {
+				for j := max(0, c-1); j < min(C, c+2); j++ {
+					live += board[i][j] & 1 // bit 0 = current state
+				}
+			}
+			live -= board[r][c] & 1
+			if live == 3 || (live == 2 && board[r][c]&1 == 1) {
+				board[r][c] |= 2 // bit 1 = next state
+			}
+		}
+	}
+	for r := range board {
+		for c := range board[r] {
+			board[r][c] >>= 1
+		}
+	}
+}
+// test
+b := [][]int{{0, 1, 0}, {0, 0, 1}, {1, 1, 1}, {0, 0, 0}}
+gameOfLife(b)
+assertEq(b, [][]int{{0, 0, 0}, {1, 0, 1}, {0, 1, 1}, {0, 1, 0}})
+b2 := [][]int{{1, 1}, {1, 0}}
+gameOfLife(b2)
+assertEq(b2, [][]int{{1, 1}, {1, 1}})
+```
+
 ## 448. Find All Numbers Disappeared in an Array | Easy
 related: 41, 268
 tags: in-place
@@ -1155,6 +1675,32 @@ class Solution {
 }
 // test
 check(new Solution().findDisappearedNumbers(new int[]{4, 3, 2, 7, 8, 2, 3, 1}), "[5, 6]");
+```
+
+```go
+func findDisappearedNumbers(nums []int) []int {
+	for _, v := range nums {
+		i := abs(v) - 1
+		nums[i] = -abs(nums[i]) // mark value i+1 as seen
+	}
+	res := []int{}
+	for i, v := range nums {
+		if v > 0 {
+			res = append(res, i+1)
+		}
+	}
+	return res
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+// test
+assertEq(findDisappearedNumbers([]int{4, 3, 2, 7, 8, 2, 3, 1}), []int{5, 6})
+assertEq(findDisappearedNumbers([]int{1, 1}), []int{2})
 ```
 
 ## 523. Continuous Subarray Sum | Medium
@@ -1203,6 +1749,28 @@ check(new Solution().checkSubarraySum(new int[]{23, 2, 4, 6, 7}, 6), true);
 check(new Solution().checkSubarraySum(new int[]{23, 2, 6, 4, 7}, 13), false);
 ```
 
+```go
+func checkSubarraySum(nums []int, k int) bool {
+	first := map[int]int{0: -1} // prefix sum mod k -> first index
+	pre := 0
+	for i, x := range nums {
+		pre = (pre + x) % k
+		if j, ok := first[pre]; ok {
+			if i-j >= 2 {
+				return true
+			}
+		} else {
+			first[pre] = i
+		}
+	}
+	return false
+}
+// test
+assertEq(checkSubarraySum([]int{23, 2, 4, 6, 7}, 6), true)
+assertEq(checkSubarraySum([]int{23, 2, 6, 4, 7}, 13), false)
+assertEq(checkSubarraySum([]int{5, 0, 0, 0}, 3), true)
+```
+
 ## 953. Verifying an Alien Dictionary | Easy
 related: 269
 tags: hash-map
@@ -1241,6 +1809,33 @@ class Solution {
 // test
 check(new Solution().isAlienSorted(new String[]{"hello", "leetcode"}, "hlabcdefgijkmnopqrstuvwxyz"), true);
 check(new Solution().isAlienSorted(new String[]{"apple", "app"}, "abcdefghijklmnopqrstuvwxyz"), false);
+```
+
+```go
+func isAlienSorted(words []string, order string) bool {
+	var rank [26]int
+	for i := 0; i < len(order); i++ {
+		rank[order[i]-'a'] = i
+	}
+	less := func(a, b string) bool { // a <= b in the alien order
+		for i := 0; i < len(a) && i < len(b); i++ {
+			if a[i] != b[i] {
+				return rank[a[i]-'a'] < rank[b[i]-'a']
+			}
+		}
+		return len(a) <= len(b)
+	}
+	for i := 1; i < len(words); i++ {
+		if !less(words[i-1], words[i]) {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(isAlienSorted([]string{"hello", "leetcode"}, "hlabcdefgijkmnopqrstuvwxyz"), true)
+assertEq(isAlienSorted([]string{"word", "world", "row"}, "worldabcefghijkmnpqstuvxyz"), false)
+assertEq(isAlienSorted([]string{"apple", "app"}, "abcdefghijklmnopqrstuvwxyz"), false)
 ```
 
 ## 974. Subarray Sums Divisible by K | Medium
@@ -1284,6 +1879,23 @@ class Solution {
 check(new Solution().subarraysDivByK(new int[]{4, 5, 0, -2, -3, 1}, 5), 7);
 ```
 
+```go
+func subarraysDivByK(nums []int, k int) int {
+	cnt := make([]int, k)
+	cnt[0] = 1
+	pre, res := 0, 0
+	for _, x := range nums {
+		pre = ((pre+x)%k + k) % k // Go's % can be negative
+		res += cnt[pre]
+		cnt[pre]++
+	}
+	return res
+}
+// test
+assertEq(subarraysDivByK([]int{4, 5, 0, -2, -3, 1}, 5), 7)
+assertEq(subarraysDivByK([]int{5}, 9), 0)
+```
+
 ## 383. Ransom Note | Easy
 related: 242, 409
 tags: counting
@@ -1316,6 +1928,26 @@ class Solution {
 // test
 check(new Solution().canConstruct("aa", "ab"), false);
 check(new Solution().canConstruct("aa", "aab"), true);
+```
+
+```go
+func canConstruct(ransomNote string, magazine string) bool {
+	var have [26]int
+	for _, c := range magazine {
+		have[c-'a']++
+	}
+	for _, c := range ransomNote {
+		if have[c-'a']--; have[c-'a'] < 0 {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(canConstruct("a", "b"), false)
+assertEq(canConstruct("aa", "ab"), false)
+assertEq(canConstruct("aa", "aab"), true)
+assertEq(canConstruct("", "x"), true)
 ```
 
 ## 409. Longest Palindrome | Easy
@@ -1351,6 +1983,28 @@ class Solution {
 // test
 check(new Solution().longestPalindrome("abccccdd"), 7);
 check(new Solution().longestPalindrome("Aa"), 1);
+```
+
+```go
+func longestPalindrome(s string) int {
+	var cnt [128]int
+	for i := 0; i < len(s); i++ {
+		cnt[s[i]]++
+	}
+	pairs := 0
+	for _, v := range cnt {
+		pairs += v / 2 * 2
+	}
+	if pairs < len(s) {
+		return pairs + 1 // one odd letter can sit in the middle
+	}
+	return pairs
+}
+// test
+assertEq(longestPalindrome("abccccdd"), 7)
+assertEq(longestPalindrome("a"), 1)
+assertEq(longestPalindrome("Aa"), 1)
+assertEq(longestPalindrome("bb"), 2)
 ```
 
 ## 58. Length of Last Word | Easy
@@ -1391,6 +2045,25 @@ class Solution {
 // test
 check(new Solution().lengthOfLastWord("   fly me   to   the moon  "), 4);
 check(new Solution().lengthOfLastWord("a"), 1);
+```
+
+```go
+func lengthOfLastWord(s string) int {
+	i := len(s) - 1
+	for i >= 0 && s[i] == ' ' {
+		i--
+	}
+	j := i
+	for j >= 0 && s[j] != ' ' {
+		j--
+	}
+	return i - j
+}
+// test
+assertEq(lengthOfLastWord("Hello World"), 5)
+assertEq(lengthOfLastWord("   fly me   to   the moon  "), 4)
+assertEq(lengthOfLastWord("luffy is still joyboy"), 6)
+assertEq(lengthOfLastWord("a"), 1)
 ```
 
 ## 6. Zigzag Conversion | Medium
@@ -1455,6 +2128,36 @@ class Solution {
 check(new Solution().convert("PAYPALISHIRING", 3), "PAHNAPLSIIGYIR");
 check(new Solution().convert("PAYPALISHIRING", 4), "PINALSIGYAHRPI");
 check(new Solution().convert("AB", 1), "AB");
+```
+
+```go
+func convert(s string, numRows int) string {
+	if numRows == 1 || numRows >= len(s) {
+		return s
+	}
+	rows := make([][]byte, numRows)
+	r, step := 0, 1
+	for i := 0; i < len(s); i++ {
+		rows[r] = append(rows[r], s[i])
+		if r == 0 {
+			step = 1
+		} else if r == numRows-1 {
+			step = -1
+		}
+		r += step
+	}
+	var sb strings.Builder
+	for _, row := range rows {
+		sb.Write(row)
+	}
+	return sb.String()
+}
+// test
+assertEq(convert("PAYPALISHIRING", 3), "PAHNAPLSIIGYIR")
+assertEq(convert("PAYPALISHIRING", 4), "PINALSIGYAHRPI")
+assertEq(convert("A", 1), "A")
+assertEq(convert("AB", 1), "AB")
+assertEq(convert("ABC", 2), "ACB")
 ```
 
 ## 28. Find the Index of the First Occurrence in a String | Easy
@@ -1522,6 +2225,41 @@ check(new Solution().strStr("aaaaab", "aab"), 3);
 check(new Solution().strStr("leetcode", "leeto"), -1);
 ```
 
+```go
+func strStr(haystack string, needle string) int {
+	lps, k := make([]int, len(needle)), 0 // KMP failure function
+	for i := 1; i < len(needle); i++ {
+		for k > 0 && needle[i] != needle[k] {
+			k = lps[k-1]
+		}
+		if needle[i] == needle[k] {
+			k++
+		}
+		lps[i] = k
+	}
+	k = 0
+	for i := 0; i < len(haystack); i++ {
+		for k > 0 && haystack[i] != needle[k] {
+			k = lps[k-1]
+		}
+		if haystack[i] == needle[k] {
+			k++
+			if k == len(needle) {
+				return i - k + 1
+			}
+		}
+	}
+	return -1
+}
+// test
+assertEq(strStr("sadbutsad", "sad"), 0)
+assertEq(strStr("leetcode", "leeto"), -1)
+assertEq(strStr("aaaaab", "aab"), 3)
+assertEq(strStr("mississippi", "issip"), 4)
+assertEq(strStr("a", "a"), 0)
+assertEq(strStr("abc", "c"), 2)
+```
+
 ## 290. Word Pattern | Easy
 related: 205, 242
 tags: hash-map, bijection
@@ -1570,6 +2308,33 @@ check(new Solution().wordPattern("abba", "dog cat cat dog"), true);
 check(new Solution().wordPattern("abba", "dog dog dog dog"), false);
 ```
 
+```go
+func wordPattern(pattern string, s string) bool {
+	words := strings.Fields(s)
+	if len(words) != len(pattern) {
+		return false
+	}
+	p2w, w2p := map[byte]string{}, map[string]byte{}
+	for i, w := range words {
+		p := pattern[i]
+		if x, ok := p2w[p]; ok && x != w {
+			return false
+		}
+		if x, ok := w2p[w]; ok && x != p {
+			return false
+		}
+		p2w[p], w2p[w] = w, p
+	}
+	return true
+}
+// test
+assertEq(wordPattern("abba", "dog cat cat dog"), true)
+assertEq(wordPattern("abba", "dog cat cat fish"), false)
+assertEq(wordPattern("aaaa", "dog cat cat dog"), false)
+assertEq(wordPattern("abba", "dog dog dog dog"), false)
+assertEq(wordPattern("aaa", "aa aa aa aa"), false)
+```
+
 ## 1431. Kids With the Greatest Number of Candies | Easy
 related: 2215
 tags: array
@@ -1600,6 +2365,24 @@ class Solution {
 }
 // test
 check(new Solution().kidsWithCandies(new int[]{2, 3, 5, 1, 3}, 3), List.of(true, true, true, false, true));
+```
+
+```go
+func kidsWithCandies(candies []int, extraCandies int) []bool {
+	best := 0
+	for _, c := range candies {
+		best = max(best, c)
+	}
+	res := make([]bool, len(candies))
+	for i, c := range candies {
+		res[i] = c+extraCandies >= best
+	}
+	return res
+}
+// test
+assertEq(kidsWithCandies([]int{2, 3, 5, 1, 3}, 3), []bool{true, true, true, false, true})
+assertEq(kidsWithCandies([]int{4, 2, 1, 1, 2}, 1), []bool{true, false, false, false, false})
+assertEq(kidsWithCandies([]int{12, 1, 12}, 10), []bool{true, false, true})
 ```
 
 ## 2215. Find the Difference of Two Arrays | Easy
@@ -1639,6 +2422,35 @@ for (List<Integer> l : d) Collections.sort(l);
 check(d, List.of(List.of(1, 3), List.of(4, 6)));
 ```
 
+```go
+func findDifference(nums1 []int, nums2 []int) [][]int {
+	a, b := map[int]bool{}, map[int]bool{}
+	for _, x := range nums1 {
+		a[x] = true
+	}
+	for _, x := range nums2 {
+		b[x] = true
+	}
+	minus := func(x, y map[int]bool) []int {
+		out := []int{}
+		for v := range x {
+			if !y[v] {
+				out = append(out, v)
+			}
+		}
+		return out
+	}
+	return [][]int{minus(a, b), minus(b, a)}
+}
+// test
+r := findDifference([]int{1, 2, 3}, []int{2, 4, 6})
+assertUnordered(r[0], []int{1, 3})
+assertUnordered(r[1], []int{4, 6})
+r = findDifference([]int{1, 2, 3, 3}, []int{1, 1, 2, 2})
+assertEq(r, [][]int{{3}, {}})
+assertEq(findDifference([]int{-1}, []int{-1}), [][]int{{}, {}})
+```
+
 ## 1207. Unique Number of Occurrences | Easy
 related: 1657, 451
 tags: counting
@@ -1669,6 +2481,27 @@ class Solution {
 // test
 check(new Solution().uniqueOccurrences(new int[]{1, 2, 2, 1, 1, 3}), true);
 check(new Solution().uniqueOccurrences(new int[]{1, 2}), false);
+```
+
+```go
+func uniqueOccurrences(arr []int) bool {
+	cnt := map[int]int{}
+	for _, x := range arr {
+		cnt[x]++
+	}
+	seen := map[int]bool{}
+	for _, c := range cnt {
+		if seen[c] {
+			return false
+		}
+		seen[c] = true
+	}
+	return true
+}
+// test
+assertEq(uniqueOccurrences([]int{1, 2, 2, 1, 1, 3}), true)
+assertEq(uniqueOccurrences([]int{1, 2}), false)
+assertEq(uniqueOccurrences([]int{-3, 0, 1, -3, 1, 1, 1, -3, 10, 0}), true)
 ```
 
 ## 1657. Determine if Two Strings Are Close | Medium
@@ -1709,6 +2542,32 @@ check(new Solution().closeStrings("cabbba", "abbccc"), true);
 check(new Solution().closeStrings("uau", "ssx"), false);
 ```
 
+```go
+func closeStrings(word1 string, word2 string) bool {
+	var c1, c2 [26]int
+	for _, c := range word1 {
+		c1[c-'a']++
+	}
+	for _, c := range word2 {
+		c2[c-'a']++
+	}
+	for i := range c1 {
+		if (c1[i] == 0) != (c2[i] == 0) { // same set of letters
+			return false
+		}
+	}
+	a, b := c1[:], c2[:]
+	sort.Ints(a)
+	sort.Ints(b)
+	return c1 == c2 // same multiset of counts (arrays sorted in place)
+}
+// test
+assertEq(closeStrings("abc", "bca"), true)
+assertEq(closeStrings("a", "aa"), false)
+assertEq(closeStrings("cabbba", "abbccc"), true)
+assertEq(closeStrings("uau", "ssx"), false)
+```
+
 ## 2352. Equal Row and Column Pairs | Medium
 related: 36
 tags: hash-map
@@ -1746,6 +2605,29 @@ class Solution {
 check(new Solution().equalPairs(new int[][]{{3, 1, 2, 2}, {1, 4, 4, 5}, {2, 4, 2, 2}, {2, 4, 2, 2}}), 3);
 ```
 
+```go
+func equalPairs(grid [][]int) int {
+	n := len(grid)
+	rows := map[string]int{}
+	for _, r := range grid {
+		rows[fmt.Sprint(r)]++
+	}
+	res := 0
+	for c := 0; c < n; c++ {
+		col := make([]int, n)
+		for r := 0; r < n; r++ {
+			col[r] = grid[r][c]
+		}
+		res += rows[fmt.Sprint(col)]
+	}
+	return res
+}
+// test
+assertEq(equalPairs([][]int{{3, 2, 1}, {1, 7, 6}, {2, 7, 7}}), 1)
+assertEq(equalPairs([][]int{{3, 1, 2, 2}, {1, 4, 4, 5}, {2, 4, 2, 2}, {2, 4, 2, 2}}), 3)
+assertEq(equalPairs([][]int{{1}}), 1)
+```
+
 ## 1929. Concatenation of Array | Easy
 related: 217, 1
 tags: array
@@ -1775,6 +2657,16 @@ class Solution {
 }
 // test
 check(new Solution().getConcatenation(new int[]{1, 2, 1}), new int[]{1, 2, 1, 1, 2, 1});
+```
+
+```go
+func getConcatenation(nums []int) []int {
+	return append(append([]int{}, nums...), nums...)
+}
+// test
+assertEq(getConcatenation([]int{1, 2, 1}), []int{1, 2, 1, 1, 2, 1})
+assertEq(getConcatenation([]int{1, 3, 2, 1}), []int{1, 3, 2, 1, 1, 3, 2, 1})
+assertEq(getConcatenation([]int{5}), []int{5, 5})
 ```
 
 ## 912. Sort an Array | Medium
@@ -1831,6 +2723,41 @@ class Solution {
 }
 // test
 check(new Solution().sortArray(new int[]{5, 1, 1, 2, 0, 0}), new int[]{0, 0, 1, 1, 2, 5});
+```
+
+```go
+func sortArray(nums []int) []int {
+	if len(nums) <= 1 {
+		return nums
+	}
+	mid := len(nums) / 2
+	left, right := sortArray(nums[:mid:mid]), sortArray(nums[mid:])
+	out := make([]int, 0, len(nums))
+	i, j := 0, 0
+	for i < len(left) && j < len(right) {
+		if left[i] <= right[j] {
+			out = append(out, left[i])
+			i++
+		} else {
+			out = append(out, right[j])
+			j++
+		}
+	}
+	out = append(out, left[i:]...)
+	return append(out, right[j:]...)
+}
+// test
+assertEq(sortArray([]int{5, 2, 3, 1}), []int{1, 2, 3, 5})
+assertEq(sortArray([]int{5, 1, 1, 2, 0, 0}), []int{0, 0, 1, 1, 2, 5})
+assertEq(sortArray([]int{1}), []int{1})
+rnd := rand.New(rand.NewSource(7))
+data := make([]int, 300)
+for i := range data {
+	data[i] = rnd.Intn(101) - 50
+}
+want := append([]int{}, data...)
+sort.Ints(want)
+assertEq(sortArray(data), want)
 ```
 
 ## 229. Majority Element II | Medium
@@ -1890,4 +2817,43 @@ List<Integer> me = new Solution().majorityElement(new int[]{2, 2, 1, 1, 1, 2, 2}
 Collections.sort(me);
 check(me, List.of(1, 2));
 check(new Solution().majorityElement(new int[]{3, 2, 3}), List.of(3));
+```
+
+```go
+func majorityElement(nums []int) []int {
+	c1, c2, n1, n2 := 0, 1, 0, 0 // two candidates (distinct initial values)
+	for _, x := range nums {
+		switch {
+		case x == c1:
+			n1++
+		case x == c2:
+			n2++
+		case n1 == 0:
+			c1, n1 = x, 1
+		case n2 == 0:
+			c2, n2 = x, 1
+		default:
+			n1, n2 = n1-1, n2-1
+		}
+	}
+	res := []int{}
+	for _, c := range []int{c1, c2} {
+		cnt := 0
+		for _, x := range nums {
+			if x == c {
+				cnt++
+			}
+		}
+		if cnt > len(nums)/3 {
+			res = append(res, c)
+		}
+	}
+	return res
+}
+// test
+assertEq(majorityElement([]int{3, 2, 3}), []int{3})
+assertEq(majorityElement([]int{1}), []int{1})
+assertUnordered(majorityElement([]int{1, 2}), []int{1, 2})
+assertUnordered(majorityElement([]int{2, 2, 1, 1, 1, 2, 2}), []int{1, 2})
+assertEq(majorityElement([]int{1, 2, 3, 4}), []int{})
 ```

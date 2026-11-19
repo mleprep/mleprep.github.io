@@ -197,7 +197,7 @@ button.go:hover, .code .bar button.go:hover { background: var(--accent); color: 
 .notes-off .chip { margin-top: 0.7rem; }
 .runbar { display: flex; align-items: center; gap: 0.8rem; margin: 1.2em 0 -0.9em; font-size: 0.8rem; }
 .runbar + pre { margin-top: 1.4em; }
-@media (max-width: 600px) { .code .bar .lbl .wide { display: none; } .modes { display: flex; } .modes button { flex: 1; } }
+@media (max-width: 600px) { .code .bar .lbl.wide, .code .bar .lbl .wide { display: none; } .modes { display: flex; } .modes button { flex: 1; } }
 
 /* ---------------------------------------------------------------- lists & cards */
 .list-wrap { max-width: 82rem; }

@@ -287,8 +287,9 @@ function viewHome() {
   main.innerHTML = `
     <h1>Interview prep, condensed.</h1>
     <p class="lead">${total} problems — every one from Blind 75, NeetCode 150 &amp; 250, Grind 169, LeetCode 75 and Top Interview 150, plus
-    frequently asked company problems — each with the key idea, a sketch, complexity and tested Python &amp; Java. Open any problem and
-    pick <b>Solve in browser</b> to write Python and run it against the tests right on this page (nothing runs on a server).
+    frequently asked company problems — each with the key idea, a sketch, complexity and tested ${c.go >= total ? 'Python, Java &amp; Go'
+      : `Python &amp; Java${c.go ? ` (and Go for ${c.go} so far)` : ''}`}. Open any problem and
+    pick <b>Solve in browser</b> to write Python${c.go ? ' or Go' : ''} and run it against the tests right on this page (nothing runs on a server).
     Plus system design and ML / deep learning. Progress is saved in this browser.</p>
     <div class="meta big">
       ${DIFFS.map(d => `<a class="badge ${d}" href="${browse({ d })}">${c[d]} ${d}</a>`).join('')}
@@ -379,11 +380,11 @@ async function viewItem(s, t, slug, stale) {
       <div class="codecol">
         <div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read">Solution</button><button role="tab" data-mode="solve">Solve in browser ▶</button></div>
         <div class="code" id="readbox">
-          <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button><span class="sp"></span>
+          <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button>${it.go ? '<button data-l="go">Go</button>' : ''}<span class="sp"></span>
             <button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>
           <div class="scroll"><pre><code id="src"></code></pre><pre class="test" hidden><code id="tsrc"></code></pre></div></div>
         <div class="code" id="solvebox" hidden>
-          <div class="bar"><span class="lbl" title="Runs on your machine with Pyodide (CPython on WebAssembly). Java can't be compiled in the browser, so the judge is Python-only.">Python 3<span class="wide"> · runs in your browser</span></span><span class="sp"></span>
+          <div class="bar"><button data-sl="python" title="Python 3 via Pyodide (CPython compiled to WebAssembly)">Python</button>${it.go ? '<button data-sl="go" title="Go via Yaegi, a Go interpreter compiled to WebAssembly: Go 1.22 semantics, with min/max and slices.Sort available. LeetCode style: no package clause or imports needed.">Go</button>' : ''}<span class="lbl wide" title="Your code runs on your machine, nothing is sent to a server. Java can't be compiled in the browser, so it isn't judged here.">runs in your browser</span><span class="sp"></span>
             <button id="viewtests">Tests</button><button id="reset" title="Replace your code with the starter stub (Ctrl+Z undoes)">Reset</button><button id="run" class="go" title="Ctrl+Enter">Run tests ▶</button></div>
           <pre class="test" id="jtests" hidden><code></code></pre>
           <div id="editor" class="editor"></div></div>
@@ -404,34 +405,54 @@ async function viewItem(s, t, slug, stale) {
   const pad = String(it.id).padStart(4, '0');
   const base = pad + '_' + it.slug.replace(/-/g, '_');
   const cls = 'P' + pad + it.slug.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+  // solution + tests + runnable file per language (problems without Go fall back to Python)
+  const SRC = { python: [it.py, it.pyTest, `python/${base}.py`], java: [it.java, it.javaTest, `java/${cls}.java`] };
+  if (it.go) SRC.go = [it.go, it.goTest, `go/${base}.go`];
+  const lang = () => SRC[S.lang] ? S.lang : 'python';
   const show = () => {
-    const py = S.lang === 'python';
-    $('#src').innerHTML = hl(py ? it.py : it.java, S.lang);
-    $('#tsrc').innerHTML = hl((py ? it.pyTest : it.javaTest) || '', S.lang);
+    const [src, test] = SRC[lang()];
+    $('#src').innerHTML = hl(src, lang());
+    $('#tsrc').innerHTML = hl(test || '', lang());
     $('.code pre.test').hidden = !S.tests;
     $('#tests').classList.toggle('on', S.tests);
-    main.querySelectorAll('[data-l]').forEach(b => b.classList.toggle('on', b.dataset.l === S.lang));
+    main.querySelectorAll('[data-l]').forEach(b => b.classList.toggle('on', b.dataset.l === lang()));
   };
   main.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { S.lang = b.dataset.l; store.set('lc-lang', S.lang); show(); });
   $('#tests').onclick = () => { S.tests = !S.tests; store.set('lc-tests', S.tests); show(); };
   $('#copy').onclick = async () => {
-    try { await navigator.clipboard.writeText(S.lang === 'python' ? it.py : it.java); $('#copy').textContent = 'Copied ✓'; }
+    try { await navigator.clipboard.writeText(SRC[lang()][0]); $('#copy').textContent = 'Copied ✓'; }
     catch (e) { $('#copy').textContent = 'Copy failed'; }
     setTimeout(() => $('#copy') && ($('#copy').textContent = 'Copy'), 1400);
   };
-  $('#file').onclick = () => window.open(REPO + (S.lang === 'python' ? `python/${base}.py` : `java/${cls}.java`), '_blank', 'noopener');
+  $('#file').onclick = () => window.open(REPO + SRC[lang()][2], '_blank', 'noopener');
   show();
-  solveMode(it, k, t);
+  solveMode(it, k, t, show);
 }
 
 // ---------------------------------------------------------------- solve mode (in-browser judge)
-function solveMode(it, k, t) {
-  const draftKey = 'lc-draft:' + it.slug;
-  let ed = null, notes = false, saveT;
-  const code = () => ed ? ed.get() : store.get(draftKey, null) ?? it.pyStub;
+function solveMode(it, k, t, showRead) {
+  const L = {
+    python: { stub: it.pyStub, test: it.pyTest, draft: 'lc-draft:' + it.slug, judge: PyJudge,
+      boot: 'Starting Python… (the first run downloads the runtime, ~10 MB; later runs are instant)' },
+  };
+  if (it.go) L.go = { stub: it.goStub, test: it.goTest, draft: 'lc-draft-go:' + it.slug, judge: GoJudge,
+    boot: 'Starting Go… (the first run downloads the interpreter, ~3 MB; later runs are instant)' };
+  const cur = () => L[S.lang] ? S.lang : 'python';   // Java isn't judged: solve in Python
+  let ed = null, edLang = null, notes = false, saveT = null, saveFn = null;
+  const code = l => ed && edLang === l ? ed.get() : store.get(L[l].draft, null) ?? L[l].stub;
+  const flush = () => { if (saveT) { clearTimeout(saveT); saveT = null; saveFn(); } };
   const save = () => {
+    const l = edLang;
     clearTimeout(saveT);
-    saveT = setTimeout(() => { const c = code(); c === it.pyStub ? store.set(draftKey, null) : store.set(draftKey, c); }, 300);
+    saveFn = () => { saveT = null; const c = code(l); store.set(L[l].draft, c === L[l].stub ? null : c); };
+    saveT = setTimeout(saveFn, 300);
+  };
+  const setLang = () => {
+    const l = cur();
+    main.querySelectorAll('[data-sl]').forEach(b => b.classList.toggle('on', b.dataset.sl === l));
+    const pre = $('#jtests');
+    if (!pre.hidden) pre.firstChild.innerHTML = hl(L[l].test, l);
+    if (ed && edLang !== l) { flush(); const v = code(l); edLang = l; ed.swap(v, l); }
   };
   const setMode = m => {
     S.mode = m;
@@ -444,22 +465,35 @@ function solveMode(it, k, t) {
     $('#results').hidden = !solve || !$('#results').innerHTML;
     $('#body').hidden = solve && !notes;
     $('#notes-off').hidden = !solve || notes;
+    setLang();
     if (solve) {
-      Judge.start();   // warm up Python while the user reads/types
-      if (!ed) makeEditor($('#editor'), code(), { onChange: save, onRun: run }).then(e => { ed = e; });
+      L[cur()].judge.start();   // warm up the runtime while the user reads/types
+      if (!ed && !edLang) {
+        edLang = cur();
+        makeEditor($('#editor'), code(edLang), edLang, { onChange: save, onRun: run }).then(e => { ed = e; setLang(); });
+      }
     }
   };
+  main.querySelectorAll('[data-sl]').forEach(b => b.onclick = () => {
+    if (b.dataset.sl === cur()) return;
+    S.lang = b.dataset.sl;
+    store.set('lc-lang', S.lang);
+    setLang();
+    showRead();
+    L[cur()].judge.start();
+  });
   const run = async () => {
     const btn = $('#run');
     if (!btn) return;
-    if (btn.dataset.busy) { Judge.kill('Stopped.'); return; }
+    const l = cur(), J = L[l].judge;
+    if (btn.dataset.busy) { PyJudge.kill('Stopped.'); GoJudge.kill('Stopped.'); return; }
     btn.dataset.busy = '1';
     btn.textContent = 'Stop ■';
     const res = $('#results');
     res.hidden = false;
-    res.innerHTML = `<div class="rsum">${Judge.state === 'ready' ? 'Running…' : 'Starting Python… (the first run downloads the runtime, ~10 MB; later runs are instant)'}</div>`;
+    res.innerHTML = `<div class="rsum">${J.state === 'ready' ? 'Running…' : L[l].boot}</div>`;
     try {
-      const r = await Judge.run({ kind: 'judge', code: code(), test: it.pyTest });
+      const r = await J.run({ kind: 'judge', code: code(l), test: L[l].test });
       if (!res.isConnected) return;
       const pass = r.cases.filter(c => c.ok).length, ok = !r.error && r.cases.length && pass === r.cases.length;
       let note = '';
@@ -480,12 +514,17 @@ function solveMode(it, k, t) {
   main.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
   $('#shownotes').onclick = () => { notes = true; setMode('solve'); };
   $('#run').onclick = run;
-  $('#reset').onclick = () => { if (ed) { ed.set(it.pyStub); ed.focus(); } store.set(draftKey, null); };
+  $('#reset').onclick = () => {
+    const l = cur();
+    if (ed && edLang === l) { ed.set(L[l].stub); ed.focus(); }
+    flush();
+    store.set(L[l].draft, null);
+  };
   $('#viewtests').onclick = () => {
     const pre = $('#jtests');
     pre.hidden = !pre.hidden;
     $('#viewtests').classList.toggle('on', !pre.hidden);
-    if (!pre.hidden) pre.firstChild.innerHTML = hl(it.pyTest, 'python');
+    if (!pre.hidden) pre.firstChild.innerHTML = hl(L[cur()].test, cur());
   };
   setMode(S.mode === 'solve' ? 'solve' : 'read');
 }
@@ -519,13 +558,13 @@ function addRunButtons(root) {
     pre.after(out);
     const btn = bar.querySelector('button');
     btn.onclick = async () => {
-      if (btn.dataset.busy) { Judge.kill('Stopped.'); return; }
+      if (btn.dataset.busy) { PyJudge.kill('Stopped.'); return; }
       btn.dataset.busy = '1';
       btn.textContent = 'Stop ■';
       out.hidden = false;
-      out.innerHTML = `<div class="rsum">${Judge.state === 'ready' ? 'Running…' : 'Starting Python + NumPy… (first run downloads ~15 MB, then it is cached)'}</div>`;
+      out.innerHTML = `<div class="rsum">${PyJudge.state === 'ready' ? 'Running…' : 'Starting Python + NumPy… (first run downloads ~15 MB, then it is cached)'}</div>`;
       try {
-        const r = await Judge.run({ kind: 'script', code: src }, 30000);
+        const r = await PyJudge.run({ kind: 'script', code: src }, 30000);
         out.innerHTML = `<div class="rsum ${r.error ? 'bad' : 'good'}">${r.error ? '✗ Error' : '✓ Done'}<span>${r.ms} ms</span></div>
           ${r.error ? `<pre class="rerr">${esc(r.error)}</pre>` : ''}${r.stdout ? `<div class="rout"><span>output</span><pre>${esc(r.stdout)}</pre></div>` : ''}`;
       } catch (e) {
@@ -535,45 +574,50 @@ function addRunButtons(root) {
   });
 }
 
-/* Python runtime in a Web Worker (assets/py-worker.js). A run that exceeds its time limit
-   terminates the worker (the only way to stop an infinite loop); the next run starts a new one. */
-const Judge = {
-  w: null, seq: 0, pending: new Map(), state: 'idle',
-  start() {
-    if (this.w) return;
-    this.state = 'loading';
-    this.w = new Worker('assets/py-worker.js');
-    this.w.onmessage = ({ data }) => {
-      if ('ready' in data) {
-        this.state = data.ready ? 'ready' : 'error';
-        if (!data.ready) this.kill('Could not start Python: ' + data.error);
-        return;
-      }
-      const p = this.pending.get(data.id);
-      if (!p) return;
-      if (data.started) { p.timer = setTimeout(() => this.kill(`Time limit exceeded (${p.limit / 1000} s) — infinite loop or too slow?`), p.limit); return; }
-      clearTimeout(p.timer);
-      this.pending.delete(data.id);
-      data.ok ? p.resolve(data.result) : p.reject(new Error(data.error));
-    };
-    this.w.onerror = e => { e.preventDefault(); this.kill('Could not start Python (offline or blocked CDN?)'); };
-  },
-  run(msg, limit = 10000) {
-    this.start();
-    return new Promise((resolve, reject) => {
-      const id = ++this.seq;
-      this.pending.set(id, { resolve, reject, limit, timer: null });
-      this.w.postMessage({ id, ...msg });
-    });
-  },
-  kill(reason) {
-    if (this.w) this.w.terminate();
-    this.w = null;
-    this.state = 'idle';
-    for (const p of this.pending.values()) { clearTimeout(p.timer); p.reject(new Error(reason)); }
-    this.pending.clear();
-  },
-};
+/* Language runtimes in Web Workers: Python (assets/py-worker.js, Pyodide) and Go (assets/go-worker.js, Yaegi).
+   A run that exceeds its time limit terminates the worker (the only way to stop an infinite loop); the next
+   run starts a new one. */
+function makeJudge(url, name) {
+  return {
+    w: null, seq: 0, pending: new Map(), state: 'idle',
+    start() {
+      if (this.w) return;
+      this.state = 'loading';
+      this.w = new Worker(url);
+      this.w.onmessage = ({ data }) => {
+        if ('ready' in data) {
+          this.state = data.ready ? 'ready' : 'error';
+          if (!data.ready) this.kill(`Could not start ${name}: ` + data.error);
+          return;
+        }
+        const p = this.pending.get(data.id);
+        if (!p) return;
+        if (data.started) { p.timer = setTimeout(() => this.kill(`Time limit exceeded (${p.limit / 1000} s) — infinite loop or too slow?`), p.limit); return; }
+        clearTimeout(p.timer);
+        this.pending.delete(data.id);
+        data.ok ? p.resolve(data.result) : p.reject(new Error(data.error));
+        if (data.dead) this.kill(data.error);   // the runtime crashed (e.g. stack overflow): start afresh next time
+      };
+      this.w.onerror = e => { e.preventDefault(); this.kill(`Could not start ${name} (offline or blocked download?)`); };
+    },
+    run(msg, limit = 10000) {
+      this.start();
+      return new Promise((resolve, reject) => {
+        const id = ++this.seq;
+        this.pending.set(id, { resolve, reject, limit, timer: null });
+        this.w.postMessage({ id, ...msg });
+      });
+    },
+    kill(reason) {
+      if (this.w) this.w.terminate();
+      this.w = null;
+      this.state = 'idle';
+      for (const p of this.pending.values()) { clearTimeout(p.timer); p.reject(new Error(reason)); }
+      this.pending.clear();
+    },
+  };
+}
+const PyJudge = makeJudge('assets/py-worker.js', 'Python'), GoJudge = makeJudge('assets/go-worker.js', 'Go');
 
 /* Code editor: CodeMirror 5 from cdnjs, loaded on first use; falls back to a plain textarea. */
 const CM = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/';
@@ -592,38 +636,53 @@ function loadCM() {
     css.href = CM + 'codemirror.min.css';
     document.head.prepend(css);   // before style.css so the site's editor theme wins
     await loadScript(CM + 'codemirror.min.js');
-    await Promise.all(['mode/python/python.min.js', 'addon/edit/matchbrackets.min.js', 'addon/edit/closebrackets.min.js',
-      'addon/comment/comment.min.js'].map(p => loadScript(CM + p)));
+    await Promise.all(['mode/python/python.min.js', 'mode/go/go.min.js', 'addon/edit/matchbrackets.min.js',
+      'addon/edit/closebrackets.min.js', 'addon/comment/comment.min.js'].map(p => loadScript(CM + p)));
   })().catch(e => { cmLoad = null; throw e; });
 }
-async function makeEditor(host, value, { onChange, onRun }) {
+// Python indents with 4 spaces, Go (gofmt) with tabs
+const EDITOR = { python: { mode: 'python', tabs: false, label: 'Python code editor' }, go: { mode: 'go', tabs: true, label: 'Go code editor' } };
+async function makeEditor(host, value, lang, { onChange, onRun }) {
   try {
     await loadCM();
     const cm = CodeMirror(host, {
-      value, mode: 'python', indentUnit: 4, tabSize: 4, lineNumbers: true, matchBrackets: true, autoCloseBrackets: true,
-      viewportMargin: Infinity, screenReaderLabel: 'Python code editor',
+      value, mode: EDITOR[lang].mode, indentUnit: 4, tabSize: 4, indentWithTabs: EDITOR[lang].tabs, lineNumbers: true,
+      matchBrackets: true, autoCloseBrackets: true, viewportMargin: Infinity, screenReaderLabel: EDITOR[lang].label,
       extraKeys: {
-        Tab: c => c.somethingSelected() ? c.indentSelection('add') : c.replaceSelection('    '),
+        Tab: c => c.somethingSelected() ? c.indentSelection('add') : c.replaceSelection(c.getOption('indentWithTabs') ? '\t' : '    '),
         'Shift-Tab': c => c.indentSelection('subtract'),
         'Ctrl-Enter': () => onRun(), 'Cmd-Enter': () => onRun(),
         'Ctrl-/': 'toggleComment', 'Cmd-/': 'toggleComment',
       },
     });
     cm.on('change', onChange);
-    return { get: () => cm.getValue(), set: v => cm.setValue(v), focus: () => cm.focus() };
+    return {
+      get: () => cm.getValue(), set: v => cm.setValue(v), focus: () => cm.focus(),
+      swap(v, l) {   // switch language: new mode, new text, fresh undo history
+        cm.setOption('mode', EDITOR[l].mode);
+        cm.setOption('indentWithTabs', EDITOR[l].tabs);
+        cm.setOption('screenReaderLabel', EDITOR[l].label);
+        cm.setValue(v);
+        cm.clearHistory();
+      },
+    };
   } catch (e) {
     const ta = document.createElement('textarea');
+    let tab = EDITOR[lang].tabs ? '\t' : '    ';
     ta.className = 'plain';
     ta.spellcheck = false;
     ta.value = value;
-    ta.setAttribute('aria-label', 'Python code editor');
+    ta.setAttribute('aria-label', EDITOR[lang].label);
     ta.addEventListener('input', onChange);
     ta.addEventListener('keydown', ev => {
       if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); onRun(); }
-      else if (ev.key === 'Tab' && !ev.shiftKey) { ev.preventDefault(); ta.setRangeText('    ', ta.selectionStart, ta.selectionEnd, 'end'); onChange(); }
+      else if (ev.key === 'Tab' && !ev.shiftKey) { ev.preventDefault(); ta.setRangeText(tab, ta.selectionStart, ta.selectionEnd, 'end'); onChange(); }
     });
     host.append(ta);
-    return { get: () => ta.value, set: v => { ta.value = v; }, focus: () => ta.focus() };
+    return {
+      get: () => ta.value, set: v => { ta.value = v; }, focus: () => ta.focus(),
+      swap(v, l) { ta.value = v; tab = EDITOR[l].tabs ? '\t' : '    '; ta.setAttribute('aria-label', EDITOR[l].label); },
+    };
   }
 }
 // "Asked at" chips on a problem page: companies by all-time frequency; ● = also asked in the last six months

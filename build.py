@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate the site data and runnable solution files from content/**/*.md.
 
-    python build.py            # write data/, python/, java/
-    python build.py --test     # ...and run every Python + Java test (Java needs `java` 11+ on PATH or JAVA_HOME)
+    python build.py            # write data/, python/, java/, go/
+    python build.py --test     # ...and run every Python, Java and Go test (Java needs `java` 11+ on PATH or
+                               #    JAVA_HOME, Go needs `go` 1.22+ on PATH or GOROOT; missing ones are skipped)
     python build.py --test 146 # ...only run problems whose number is listed
 
 Problem format (content/dsa/*.md):
@@ -23,6 +24,12 @@ Problem format (content/dsa/*.md):
     class Solution { ... }
     // test
     check(new Solution().twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{0, 1});
+    ```
+
+    ```go                         (LeetCode style: no package clause or imports; the tests are main's body)
+    func twoSum(nums []int, target int) []int { ... }
+    // test
+    assertEq(twoSum([]int{2, 7, 11, 15}, 9), []int{0, 1})
     ```
 """
 import ast
@@ -85,6 +92,116 @@ def py_stub(src, test):
     return "\n\n\n".join(out) + "\n"
 
 
+# ---------------------------------------------------------------- Go starter code
+GO_NUM = {"int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr",
+          "byte", "rune", "float32", "float64"}
+PROVIDED = "provided by LeetCode"
+
+
+def go_zero(t):
+    t = t.strip()
+    if t in GO_NUM:
+        return "0"
+    if t == "string":
+        return '""'
+    if t == "bool":
+        return "false"
+    if t.startswith(("[]", "*", "map[", "func", "chan", "<-chan")) or t in ("error", "any", "interface{}"):
+        return "nil"
+    return t + "{}"  # arrays, structs
+
+
+def go_split(s):
+    """Split on commas outside brackets."""
+    parts, depth, cur = [], 0, ""
+    for ch in s:
+        depth += ch in "([{"
+        depth -= ch in ")]}"
+        if ch == "," and depth == 0:
+            parts.append(cur.strip())
+            cur = ""
+        else:
+            cur += ch
+    return [x for x in parts + [cur.strip()] if x]
+
+
+def go_chunks(src):
+    """Top-level declarations of gofmt'd Go source as dicts {kind, name, recv, head, decl, text};
+    comment lines directly above a declaration belong to it."""
+    lines = src.rstrip("\n").split("\n")
+    starts = []
+    for i, ln in enumerate(lines):
+        if re.match(r"(func|type|var|const)\b", ln):
+            j = i
+            while j > 0 and lines[j - 1].startswith("//"):
+                j -= 1
+            starts.append((j, i))
+    out = []
+    for k, (s, d) in enumerate(starts):
+        e = starts[k + 1][0] if k + 1 < len(starts) else len(lines)
+        decl = lines[d]
+        c = {"text": "\n".join(lines[s:e]).rstrip(), "head": "\n".join(lines[s:d + 1]), "decl": decl, "recv": None}
+        m = re.match(r"func\s*(?:\(\s*\w*\s*\*?\s*(\w+)[^)]*\)\s*)?(\w+)", decl)
+        if m:
+            c.update(kind="func", recv=m.group(1), name=m.group(2))
+        else:
+            m = re.match(r"(type|var|const)\s+(\w*)", decl)
+            c.update(kind=m.group(1), name=m.group(2))
+        out.append(c)
+    return out
+
+
+def go_stub_func(decl):
+    """'func (r *T) Name(params) results {' -> the same signature with a body returning zero values."""
+    head = decl.rstrip()
+    if not head.endswith("{"):
+        sys.exit(f"Go stub: put the body of {decl!r} on its own lines")
+    head = head[:-1].rstrip()
+    i = re.match(r"func\s*(\([^)]*\)\s*)?\w+\s*(\[[^\]]*\])?\s*", head).end()
+    depth, j = 0, i
+    for j in range(i, len(head)):
+        depth += head[j] == "("
+        depth -= head[j] == ")"
+        if depth == 0:
+            break
+    res = head[j + 1:].strip()
+    if not res:
+        body = ""
+    elif res.startswith("("):
+        parts = go_split(res[1:-1])
+        named = any(re.match(r"[A-Za-z_]\w*\s+\S", x) and not re.match(r"(func|map|chan|struct|interface)\b", x)
+                    for x in parts)
+        body = "\treturn\n" if named else "\treturn " + ", ".join(go_zero(x) for x in parts) + "\n"
+    else:
+        body = f"\treturn {go_zero(res)}\n"
+    return f"{head} {{\n{body}}}"
+
+
+def go_stub(src, test):
+    """Starter code for the in-browser Go judge, like py_stub: functions the tests call, and the methods
+    they call on a type, keep their signatures (bodies return zero values; such types become empty structs);
+    declarations marked "provided by LeetCode" and types the tests use directly are kept verbatim;
+    everything else (helpers) is dropped."""
+    chunks = go_chunks(src)
+    calls = set(re.findall(r"(?<![.\w])(\w+)\s*\(", test))
+    mcalls = set(re.findall(r"\.(\w+)\s*\(", test))
+    used = lambda name: re.search(rf"\b{re.escape(name)}\b", test)
+    provided = {c["name"] for c in chunks if PROVIDED in c["head"] and c["kind"] == "type"}
+    called_heads = " ".join(c["decl"] for c in chunks if c["kind"] == "func" and not c["recv"] and c["name"] in calls)
+    api = {c["recv"] for c in chunks if c["recv"] and c["name"] in mcalls and c["recv"] not in provided}
+    api = {t for t in api if used(t) or re.search(rf"\b{t}\b", called_heads)}
+    keep = {c["name"] for c in chunks if c["kind"] == "type" and c["name"] not in api and used(c["name"])} | provided
+    out = []
+    for c in chunks:
+        if PROVIDED in c["head"] or c["recv"] in keep or (c["kind"] == "type" and c["name"] in keep):
+            out.append(c["text"])
+        elif c["kind"] == "type" and c["name"] in api:
+            out.append(f"type {c['name']} struct {{\n}}")
+        elif c["kind"] == "func" and (c["name"] in calls if not c["recv"] else c["recv"] in api and c["name"] in mcalls):
+            out.append(go_stub_func(c["decl"]))
+    return "\n\n".join(out) + "\n"
+
+
 def parse_item(section, topic, head, body, src):
     lines = body.strip("\n").split("\n")
     meta = {}
@@ -104,7 +221,7 @@ def parse_item(section, topic, head, body, src):
 
         def grab(mm):
             lang = mm.group(1)
-            if lang in ("python", "java") and lang not in code:
+            if lang in ("python", "java", "go") and lang not in code:
                 code[lang] = mm.group(2)
                 return ""
             return mm.group(0)
@@ -116,6 +233,9 @@ def parse_item(section, topic, head, body, src):
         item["py"], item["pyTest"] = split_test(code["python"], "# test")
         item["java"], item["javaTest"] = split_test(code["java"], "// test")
         item["pyStub"] = py_stub(item["py"], item["pyTest"])
+        if "go" in code:
+            item["go"], item["goTest"] = split_test(code["go"], "// test")
+            item["goStub"] = go_stub(item["go"], item["goTest"])
     else:
         item.update(title=head, slug=slugify(head), related=meta.get("related", []))
     item["md"] = re.sub(r"\n{3,}", "\n\n", body).strip()
@@ -253,12 +373,46 @@ class TreeNode {
 '''
 
 
+GO_MAIN = '''//go:build ignore
+
+// {id}. {title} ({difficulty})
+// https://leetcode.com/problems/{slug}/
+// Run: go run {fname} lc.go
+package main
+
+import (
+{imports})
+
+{code}
+func main() {{
+{tests}
+	if lcFails > 0 {{
+		fmt.Println(lcFails, "test(s) FAILED")
+		os.Exit(1)
+	}}
+	fmt.Println("OK")
+}}
+'''
+
+# packages LeetCode-style Go code uses without importing them (tools/gojudge resolves the same names)
+GO_PKGS = {"bits": "math/bits", "bytes": "bytes", "cmp": "cmp", "errors": "errors", "fmt": "fmt",
+           "heap": "container/heap", "list": "container/list", "maps": "maps", "math": "math", "rand": "math/rand",
+           "regexp": "regexp", "slices": "slices", "sort": "sort", "strconv": "strconv", "strings": "strings",
+           "unicode": "unicode", "utf8": "unicode/utf8"}
+
+
+def go_imports(code):
+    # import lines for the packages `code` refers to, plus fmt and os, which main uses
+    used = {GO_PKGS[n] for n in re.findall(r"(?<![\w.])(\w+)\.[A-Z]", code) if n in GO_PKGS} | {"fmt", "os"}
+    return "".join(f'\t"{x}"\n' for x in sorted(used))
+
+
 def indent(s, n):
     return "".join((" " * n + ln) if ln.strip() else ln for ln in s.splitlines(True))
 
 
 def write_runnables(problems):
-    for d in ("python", "java"):
+    for d in ("python", "java", "go"):
         out = ROOT / d
         out.mkdir(exist_ok=True)
         for f in out.glob("[0-9P]*"):
@@ -281,7 +435,15 @@ def write_runnables(problems):
         if re.search(r"\bTreeNode\b", src) and not re.search(r"\bclass TreeNode\b", src):
             java += JAVA_TREE
         (ROOT / "java" / java_name).write_text(java, encoding="utf-8", newline="\n")
-        files.append((p["id"], py_name, java_name))
+
+        go_name = None
+        if "go" in p:
+            go_name = f"{base}.go"
+            tests = "\n".join(("\t" + ln) if ln.strip() else "" for ln in p["goTest"].rstrip("\n").split("\n"))
+            go = GO_MAIN.format(fname=go_name, imports=go_imports(p["go"] + p["goTest"]), code=p["go"],
+                                tests=tests, **{k: p[k] for k in ("id", "title", "difficulty", "slug")})
+            (ROOT / "go" / go_name).write_text(go, encoding="utf-8", newline="\n")
+        files.append((p["id"], py_name, java_name, go_name))
     return files
 
 
@@ -312,17 +474,29 @@ def ml_snippets(topics):
                 yield f"ml/{t['id']}/{it['slug']}", "\n".join(blocks)
 
 
+def find_go():
+    root = os.environ.get("GOROOT")
+    for exe in ("go.exe", "go"):
+        if root and (Path(root) / "bin" / exe).exists():
+            return str(Path(root) / "bin" / exe)
+    return shutil.which("go")
+
+
 def run_tests(files, only, snippets):
-    java = find_java()
+    java, go = find_java(), find_go()
     if not java:
-        print("! java not found (set JAVA_HOME or PATH) - only running Python tests")
+        print("! java not found (set JAVA_HOME or PATH) - skipping the Java tests")
+    if not go:
+        print("! go not found (set GOROOT or PATH) - skipping the Go tests")
     jobs = []
-    for pid, py, jv in files:
+    for pid, py, jv, gf in files:
         if only and pid not in only:
             continue
         jobs.append((f"{py}", [sys.executable, py], ROOT / "python"))
         if java:
             jobs.append((f"{jv}", [java, jv], ROOT / "java"))
+        if go and gf:
+            jobs.append((f"{gf}", [go, "run", gf, "lc.go"], ROOT / "go"))
     tmp = None
     if snippets and not only:
         if subprocess.run([sys.executable, "-c", "import numpy"], capture_output=True).returncode:
@@ -376,6 +550,7 @@ def main():
     if missing:
         print(f"! related problems not in the set (not linked): {missing}")
     manifest["counts"] = {d: sum(p["difficulty"] == d for p in problems) for d in ("Easy", "Medium", "Hard")}
+    manifest["counts"]["go"] = sum("go" in p for p in problems)
     (ROOT / "data" / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, separators=(",", ":")),
                                                  encoding="utf-8")
     files = write_runnables(problems)

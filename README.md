@@ -4,17 +4,26 @@ A concise, browsable interview-prep site: **https://mleprep.github.io/**
 
 | Section | What's inside |
 |---|---|
-| **Algorithms** | **477 problems** (106 Easy / 299 Medium / 72 Hard) covering **100% of Blind 75, NeetCode 150, NeetCode 250, Grind 169, LeetCode 75 and LeetCode Top Interview 150**, plus frequently asked company problems, grouped into 20 patterns. Each has the key idea, an ASCII sketch, complexity, **Python + Java** solutions with tests, and related-problem links. Premium-only problems are marked and include a short problem statement. |
+| **Algorithms** | **477 problems** (106 Easy / 299 Medium / 72 Hard) covering **100% of Blind 75, NeetCode 150, NeetCode 250, Grind 169, LeetCode 75 and LeetCode Top Interview 150**, plus frequently asked company problems, grouped into 20 patterns. Each has the key idea, an ASCII sketch, complexity, **Python + Java + Go** solutions with tests, and related-problem links. Premium-only problems are marked and include a short problem statement. |
 | **System Design** | 76 articles: interview framework, estimation numbers and the zero-to-millions scaling walkthrough; 27 building blocks (caching, sharding, consistent hashing, CAP, queues, rate limiting, real-time transports, API design, Bloom filter / Count-Min / HyperLogLog, search, stream processing, geo indexes, distributed transactions, Raft, auth, choosing a database…); Hello Interview-style patterns (scaling reads/writes, contention, workflows, long-running tasks, large files); 37 designs (URL shortener, news feed, chat, Uber, YouTube, Dropbox, Kafka, payments, Google Docs, S3, stock exchange, Google Maps, nearby friends, digital wallet, Tinder, LeetCode, post search, auctions, food delivery, top-K trending, LLM serving…). |
 | **ML / Deep Learning** | 102 articles: ML fundamentals Q&A (incl. statistics & hypothesis tests, information theory, loss functions, bandits, collaborative filtering, interpretability, forecasting), deep learning (object detection, model compression, diffusion, ViT/CLIP, MoE, distributed training, GNNs), LLMs & GenAI (RLHF/DPO, LoRA, RAG, KV cache, agents, vector search, reasoning models, safety, multimodal), **25 tested NumPy implementations** you can run in the browser (attention, KV cache, MLP/BatchNorm/LayerNorm backprop, Adam, BPE, top-p sampling, RoPE, NMS, ALS, NDCG, LoRA…), and 18 ML system designs (recsys, search, ads, fraud, feed ranking, similar listings, Street View blurring, Smart Compose, text-to-image, RAG assistant, A/B testing…). |
 
 **Solve in the browser.** Every problem page has a *Solution / Solve in browser* switch. Solve mode hides the notes, gives you an
-editor with a starter stub, and **Run tests** executes your Python against the problem's tests entirely on your machine — Python
-runs in a Web Worker via [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly), so there is no server. You get per-test
-got/expected, runtime errors with line numbers, `print` output and a 10 s time limit; drafts are saved per problem and an accepted
-solution marks the problem done. Tests accept any valid answer where LeetCode does (any order, any valid topological order, any
-height-balanced BST…). The ML coding snippets have a **Run** button too (NumPy loads on demand). Java is not judged in the
-browser: there is no free, reliable way to run `javac` client-side, so Java solutions stay read/copy/run-locally.
+editor with a starter stub, and **Run tests** executes your **Python or Go** against the problem's tests entirely on your machine,
+in a Web Worker, so there is no server:
+
+- **Python** runs on [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly, ~10 MB on first use).
+- **Go** runs on [Yaegi](https://github.com/traefik/yaegi), a Go interpreter written in Go, compiled to WebAssembly (~3 MB on
+  first use; source in `tools/gojudge`). Write it LeetCode style: no `package` clause or imports (`sort`, `strings`, `heap`… are
+  imported automatically). Go 1.22 semantics, plus the `min`/`max` builtins and `slices.Sort`/`Max`/`BinarySearch`… Known
+  interpreter limits: a few thousand nested recursive calls, and generic functions whose type argument must be inferred from a
+  function-literal argument.
+
+You get per-test got/expected, runtime errors (with the line or function), `print`/`fmt.Println` output and a 10 s time limit;
+drafts are saved per problem and language, and an accepted solution marks the problem done. Tests accept any valid answer where
+LeetCode does (any order, any valid topological order, any height-balanced BST…). The ML coding snippets have a **Run** button too
+(NumPy loads on demand). Java is not judged in the browser: there is no free, reliable way to run `javac` client-side, so Java
+solutions stay read/copy/run-locally.
 
 **Browse** (`#/browse`) filters every problem by level, status (todo/done), **study list** (Blind 75, NeetCode 150, NeetCode 250,
 Grind 169, LeetCode 75, Top Interview 150 — optionally in the list's own order), pattern tag, topic and **company** (all time or last 6 months,
@@ -43,34 +52,41 @@ Every problem is also generated as a standalone runnable file with tests:
 ```bash
 cd python && python 0001_two_sum.py          # prints OK when all asserts pass
 cd java   && java P0001TwoSum.java            # Java 11+ single-file launch, prints OK
+cd go     && go run 0001_two_sum.go lc.go     # Go 1.22+, prints OK
 ```
 
 The `Solution` class inside each file is exactly what you paste into LeetCode. Python files import `python/lc.py`
 (ListNode / TreeNode + `make_list`, `list_vals`, `make_tree`, `tree_vals`, `find_node`); Java files inline the same helpers
-(`ListNode.of(1, 2, 3)`, `TreeNode.of(3, 9, 20, null, null, 15, 7)`).
+(`ListNode.of(1, 2, 3)`, `TreeNode.of(3, 9, 20, null, null, 15, 7)`). Go files are LeetCode-style functions plus a `main`
+holding the tests; they share `go/lc.go` (`makeList(1, 2, 3)`, `makeTree(3, 9, 20, nil, nil, 15, 7)`, `byteGrid("1.1")` and the
+`assertEq` / `assertUnordered` / `assertUnorderedDeep` checks), which the browser judge interprets too.
 
 ## Repo layout
 
 ```
 content/                 <- source of truth (markdown, one file per topic)
-  dsa/NN-topic.md            problems: idea + ```viz + ```python / ```java (each with a "# test" / "// test" part)
+  dsa/NN-topic.md            problems: idea + ```viz + ```python / ```java / ```go (each with a "# test" / "// test" part)
   system-design/*.md         articles (one "## " heading per article)
   ml/*.md                    articles
-build.py                 <- content -> data/*.json (site, incl. a starter stub per problem) + python/*.py + java/*.java
+build.py                 <- content -> data/*.json (site, incl. starter stubs) + python/*.py + java/*.java + go/*.go
 tools/import_companies.py <- public company-tag dataset -> data/companies.json
 tools/import_lists.py    <- public study lists -> data/lists.json
 index.html, assets/      <- static single-page site (no build tools; marked, highlight.js, CodeMirror, Pyodide from CDNs)
   assets/judge.py            the in-browser judge (also runs under CPython: `python assets/judge.py` self-checks every problem)
   assets/py-worker.js        Web Worker hosting Pyodide
-data/, python/, java/    <- generated by build.py (committed so GitHub Pages and local runs just work)
+  assets/go-worker.js        Web Worker hosting the Go judge (go-judge.wasm.gz + Go's wasm_exec.js)
+tools/gojudge/           <- the Go judge: Yaegi + test harness; `sh build.sh` -> assets/go-judge.wasm.gz
+data/, python/, java/, go/ <- generated by build.py (committed so GitHub Pages and local runs just work; go/lc.go is hand-written)
 ```
 
 ## Edit or add content
 
 1. Edit `content/dsa/<topic>.md` (the problem format is documented at the top of `build.py`).
-2. `python build.py --test` regenerates everything and runs **all Python + Java test files** (954 for 477 problems) plus the 25 ML
-   NumPy snippets (skipped if numpy isn't installed) in parallel. Java needs `java` on PATH or `JAVA_HOME`. Add problem numbers to
-   test only those: `python build.py --test 1 146`.
-3. `python assets/judge.py` checks the browser judge: every reference solution must pass its tests and every starter stub must fail.
+2. `python build.py --test` regenerates everything and runs **all Python, Java and Go test files** plus the 25 ML NumPy snippets
+   (skipped if numpy isn't installed) in parallel. Java needs `java` on PATH or `JAVA_HOME`, Go needs `go` on PATH or `GOROOT`;
+   a missing toolchain is skipped. Add problem numbers to test only those: `python build.py --test 1 146`.
+3. Check the browser judges: every reference solution must pass its tests and every starter stub must fail.
+   `python assets/judge.py` (Python) and `cd tools/gojudge && go run .` (Go; `go run . -only 1,146` for some problems).
+   After changing `tools/gojudge` or upgrading Yaegi, rebuild the WebAssembly with `sh tools/gojudge/build.sh`.
 4. Preview: `python -m http.server` and open http://localhost:8000.
 5. Commit and push to `main`; GitHub Pages serves the repo root.
