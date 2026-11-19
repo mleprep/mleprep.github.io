@@ -35,7 +35,7 @@ function loadCompanies(d) {
 }
 const coRows = it => (CO && CO.by[it.slug]) || [];
 
-// study lists (data/lists.json, optional): Blind 75, NeetCode 150, Grind 169, LeetCode 75, Top Interview 150
+// study lists (data/lists.json, optional): Blind 75, NeetCode 150/250, Grind 169, LeetCode 75, Top Interview 150
 let LISTS = [];
 function loadLists(d) {
   LISTS = d.lists.map(l => ({ ...l, pos: new Map(l.slugs.map((s, i) => [s, i])) }));
@@ -286,7 +286,7 @@ function viewHome() {
   const b75 = FLAT.filter(f => (f.it.tags || []).includes('blind75')).length;
   main.innerHTML = `
     <h1>Interview prep, condensed.</h1>
-    <p class="lead">${total} problems — every one from Blind 75, NeetCode 150, Grind 169, LeetCode 75 and Top Interview 150, plus
+    <p class="lead">${total} problems — every one from Blind 75, NeetCode 150 &amp; 250, Grind 169, LeetCode 75 and Top Interview 150, plus
     frequently asked company problems — each with the key idea, a sketch, complexity and tested Python &amp; Java. Open any problem and
     pick <b>Solve in browser</b> to write Python and run it against the tests right on this page (nothing runs on a server).
     Plus system design and ML / deep learning. Progress is saved in this browser.</p>

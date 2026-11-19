@@ -1139,3 +1139,72 @@ class Solution {
 check(new Solution().totalCost(new int[]{17, 12, 10, 2, 7, 2, 11, 20, 8}, 3, 4), 11L);
 check(new Solution().totalCost(new int[]{1, 2, 4, 1}, 3, 3), 4L);
 ```
+
+## 1405. Longest Happy String | Medium
+related: 767, 621
+tags: max-heap, greedy
+
+Greedy with a max-heap of remaining counts: append the most plentiful letter unless the last two characters are already that letter — then append the second most plentiful instead (and stop if there is none). Using the largest pile whenever allowed is what keeps the string as long as possible.
+
+**Complexity:** O(a + b + c).
+
+```python
+class Solution:
+    def longestDiverseString(self, a: int, b: int, c: int) -> str:
+        heap = [(-n, ch) for n, ch in ((a, "a"), (b, "b"), (c, "c")) if n]
+        heapify(heap)
+        out = []
+        while heap:
+            n1, c1 = heappop(heap)
+            if len(out) >= 2 and out[-1] == out[-2] == c1:
+                if not heap:
+                    break
+                n2, c2 = heappop(heap)
+                out.append(c2)
+                if n2 + 1:
+                    heappush(heap, (n2 + 1, c2))
+                heappush(heap, (n1, c1))
+            else:
+                out.append(c1)
+                if n1 + 1:
+                    heappush(heap, (n1 + 1, c1))
+        return "".join(out)
+# test
+def happy(s, a, b, c):  # any valid answer of maximum length is accepted
+    x, y, z = sorted((a, b, c), reverse=True)
+    return ("aaa" not in s and "bbb" not in s and "ccc" not in s and s.count("a") <= a and s.count("b") <= b
+            and s.count("c") <= c and len(s) == y + z + min(x, 2 * (y + z + 1)))
+for a, b, c in ((1, 1, 7), (7, 1, 0), (2, 2, 1), (0, 0, 0), (0, 8, 11), (5, 5, 5), (0, 0, 9)):
+    assert happy(Solution().longestDiverseString(a, b, c), a, b, c)
+```
+
+```java
+class Solution {
+    public String longestDiverseString(int a, int b, int c) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((x, y) -> y[0] - x[0]);   // {count, letter}
+        if (a > 0) pq.add(new int[]{a, 'a'});
+        if (b > 0) pq.add(new int[]{b, 'b'});
+        if (c > 0) pq.add(new int[]{c, 'c'});
+        StringBuilder sb = new StringBuilder();
+        while (!pq.isEmpty()) {
+            int[] top = pq.poll();
+            int len = sb.length();
+            if (len >= 2 && sb.charAt(len - 1) == top[1] && sb.charAt(len - 2) == top[1]) {
+                if (pq.isEmpty()) break;
+                int[] second = pq.poll();
+                sb.append((char) second[1]);
+                if (--second[0] > 0) pq.add(second);
+                pq.add(top);
+            } else {
+                sb.append((char) top[1]);
+                if (--top[0] > 0) pq.add(top);
+            }
+        }
+        return sb.toString();
+    }
+}
+// test
+String hs = new Solution().longestDiverseString(1, 1, 7);
+check(hs.length() == 8 && !hs.contains("ccc"), true);
+check(new Solution().longestDiverseString(7, 1, 0).length(), 5);
+```

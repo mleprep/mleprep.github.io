@@ -1268,3 +1268,108 @@ class Solution {
 check(new Solution().canPartitionKSubsets(new int[]{4, 3, 2, 3, 5, 2, 1}, 4), true);
 check(new Solution().canPartitionKSubsets(new int[]{1, 2, 3, 4}, 3), false);
 ```
+
+## 1863. Sum of All Subset XOR Totals | Easy
+related: 78, 136
+tags: subsets, bit-trick
+
+Backtracking over all 2ⁿ subsets works (n ≤ 12). The elegant O(n) answer: a bit that is set in **any** element is set in exactly half of all subset XORs, so the sum is `(OR of all nums) · 2^(n−1)`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def subsetXORSum(self, nums: List[int]) -> int:
+        return functools.reduce(lambda x, y: x | y, nums) << (len(nums) - 1)
+# test
+assert Solution().subsetXORSum([1, 3]) == 6
+assert Solution().subsetXORSum([5, 1, 6]) == 28
+assert Solution().subsetXORSum([3, 4, 5, 6, 7, 8]) == 480
+nums = [9, 2, 7, 12, 1]
+brute = sum(functools.reduce(lambda x, y: x ^ y, c, 0) for r in range(len(nums) + 1) for c in itertools.combinations(nums, r))
+assert Solution().subsetXORSum(nums) == brute
+```
+
+```java
+class Solution {
+    public int subsetXORSum(int[] nums) {
+        int or = 0;
+        for (int x : nums) or |= x;
+        return or << (nums.length - 1);
+    }
+}
+// test
+check(new Solution().subsetXORSum(new int[]{5, 1, 6}), 28);
+check(new Solution().subsetXORSum(new int[]{3, 4, 5, 6, 7, 8}), 480);
+```
+
+## 473. Matchsticks to Square | Medium
+related: 698, 416
+tags: backtracking, pruning
+
+Each side must equal `total / 4`. Place sticks **longest first** into one of four sides, backtracking on failure. Two prunings make it fast: skip a side if the stick overflows it, and if a stick doesn't work on an **empty** side, don't try the other empty sides (they're interchangeable).
+
+**Complexity:** O(4ⁿ) worst case, tiny in practice with pruning (n ≤ 15).
+
+```python
+class Solution:
+    def makesquare(self, matchsticks: List[int]) -> bool:
+        total = sum(matchsticks)
+        if total % 4:
+            return False
+        side = total // 4
+        sticks = sorted(matchsticks, reverse=True)
+        if sticks[0] > side:
+            return False
+        sides = [0] * 4
+
+        def place(i):
+            if i == len(sticks):
+                return True                    # every side <= side and the total is 4·side -> all equal
+            for k in range(4):
+                if sides[k] + sticks[i] <= side:
+                    sides[k] += sticks[i]
+                    if place(i + 1):
+                        return True
+                    sides[k] -= sticks[i]
+                if sides[k] == 0:
+                    break
+            return False
+
+        return place(0)
+# test
+assert Solution().makesquare([1, 1, 2, 2, 2]) is True
+assert Solution().makesquare([3, 3, 3, 3, 4]) is False
+assert Solution().makesquare([5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3]) is True
+assert Solution().makesquare([10, 6, 5, 5, 5, 3, 3, 3, 2, 2, 2, 2]) is True
+assert Solution().makesquare([1, 1, 1]) is False
+```
+
+```java
+class Solution {
+    public boolean makesquare(int[] matchsticks) {
+        int total = 0;
+        for (int m : matchsticks) total += m;
+        if (total % 4 != 0) return false;
+        Integer[] sticks = Arrays.stream(matchsticks).boxed().sorted(Collections.reverseOrder()).toArray(Integer[]::new);
+        if (sticks[0] > total / 4) return false;
+        return place(sticks, 0, new int[4], total / 4);
+    }
+
+    private boolean place(Integer[] sticks, int i, int[] sides, int side) {
+        if (i == sticks.length) return true;
+        for (int k = 0; k < 4; k++) {
+            if (sides[k] + sticks[i] <= side) {
+                sides[k] += sticks[i];
+                if (place(sticks, i + 1, sides, side)) return true;
+                sides[k] -= sticks[i];
+            }
+            if (sides[k] == 0) break;
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().makesquare(new int[]{1, 1, 2, 2, 2}), true);
+check(new Solution().makesquare(new int[]{3, 3, 3, 3, 4}), false);
+```

@@ -1346,3 +1346,61 @@ class RecentCounter {
 RecentCounter rc = new RecentCounter();
 check(new int[]{rc.ping(1), rc.ping(100), rc.ping(3001), rc.ping(3002)}, new int[]{1, 2, 3, 3});
 ```
+
+## 705. Design HashSet | Easy
+related: 706, 380
+tags: design, hashing
+
+Separate chaining: an array of buckets (a prime count spreads keys evenly), each a small list; hash = `key % buckets`. Operations scan one bucket. Follow-ups: resize (rehash into 2× buckets) when the load factor grows; open addressing with tombstones as the alternative.
+
+**Complexity:** O(1) average per operation.
+
+```python
+class MyHashSet:
+    def __init__(self):
+        self.size = 1009
+        self.buckets = [[] for _ in range(self.size)]
+
+    def add(self, key: int) -> None:
+        b = self.buckets[key % self.size]
+        if key not in b:
+            b.append(key)
+
+    def remove(self, key: int) -> None:
+        b = self.buckets[key % self.size]
+        if key in b:
+            b.remove(key)
+
+    def contains(self, key: int) -> bool:
+        return key in self.buckets[key % self.size]
+# test
+hs = MyHashSet()
+hs.add(1); hs.add(2)
+assert hs.contains(1) and not hs.contains(3)
+hs.add(2)
+assert hs.contains(2)
+hs.remove(2)
+assert not hs.contains(2)
+hs.add(0); hs.add(1009); hs.add(2018)                 # same bucket
+hs.remove(1009)
+assert hs.contains(0) and not hs.contains(1009) and hs.contains(2018)
+```
+
+```java
+class MyHashSet {
+    private static final int SIZE = 1009;
+    private final List<List<Integer>> buckets = new ArrayList<>();
+
+    public MyHashSet() { for (int i = 0; i < SIZE; i++) buckets.add(new LinkedList<>()); }
+
+    public void add(int key) { if (!contains(key)) buckets.get(key % SIZE).add(key); }
+
+    public void remove(int key) { buckets.get(key % SIZE).remove(Integer.valueOf(key)); }
+
+    public boolean contains(int key) { return buckets.get(key % SIZE).contains(key); }
+}
+// test
+MyHashSet hs = new MyHashSet();
+hs.add(1); hs.add(1009); hs.remove(1);
+check(hs.contains(1) + " " + hs.contains(1009), "false true");
+```

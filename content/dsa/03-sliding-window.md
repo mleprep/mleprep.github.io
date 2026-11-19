@@ -893,3 +893,48 @@ class Solution {
 check(new Solution().longestSubarray(new int[]{0, 1, 1, 1, 0, 1, 1, 0, 1}), 5);
 check(new Solution().longestSubarray(new int[]{1, 1, 1}), 2);
 ```
+
+## 978. Longest Turbulent Subarray | Medium
+related: 376, 53
+tags: kadane, state-machine
+
+Track the length of the turbulent run ending here whose **last step goes up** and whose **last step goes down**. An up step extends a run that last went down (and vice versa); an equal pair resets both to 1.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def maxTurbulenceSize(self, arr: List[int]) -> int:
+        best = up = down = 1
+        for i in range(1, len(arr)):
+            if arr[i] > arr[i - 1]:
+                up, down = down + 1, 1
+            elif arr[i] < arr[i - 1]:
+                up, down = 1, up + 1
+            else:
+                up = down = 1
+            best = max(best, up, down)
+        return best
+# test
+assert Solution().maxTurbulenceSize([9, 4, 2, 10, 7, 8, 8, 1, 9]) == 5
+assert Solution().maxTurbulenceSize([4, 8, 12, 16]) == 2
+assert Solution().maxTurbulenceSize([100]) == 1
+assert Solution().maxTurbulenceSize([9, 9]) == 1
+```
+
+```java
+class Solution {
+    public int maxTurbulenceSize(int[] arr) {
+        int best = 1, up = 1, down = 1;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > arr[i - 1]) { up = down + 1; down = 1; }
+            else if (arr[i] < arr[i - 1]) { down = up + 1; up = 1; }
+            else up = down = 1;
+            best = Math.max(best, Math.max(up, down));
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().maxTurbulenceSize(new int[]{9, 4, 2, 10, 7, 8, 8, 1, 9}), 5);
+```

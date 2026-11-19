@@ -948,3 +948,76 @@ class Solution {
 check(new Solution().gcdOfStrings("ABABAB", "ABAB"), "AB");
 check(new Solution().gcdOfStrings("LEET", "CODE"), "");
 ```
+
+## 168. Excel Sheet Column Title | Easy
+related: 171
+tags: base-conversion
+
+Bijective base 26: digits are 1..26 (A..Z), there is no zero. Subtract 1 before each `% 26` / `// 26` step so `Z` (26) maps to the last letter without a carry.
+
+**Complexity:** O(log₂₆ n).
+
+```python
+class Solution:
+    def convertToTitle(self, columnNumber: int) -> str:
+        out = []
+        while columnNumber:
+            columnNumber -= 1
+            out.append(chr(ord("A") + columnNumber % 26))
+            columnNumber //= 26
+        return "".join(reversed(out))
+# test
+assert Solution().convertToTitle(1) == "A"
+assert Solution().convertToTitle(28) == "AB"
+assert Solution().convertToTitle(701) == "ZY"
+assert Solution().convertToTitle(26) == "Z"
+assert Solution().convertToTitle(52) == "AZ"
+assert Solution().convertToTitle(2147483647) == "FXSHRXW"
+```
+
+```java
+class Solution {
+    public String convertToTitle(int columnNumber) {
+        StringBuilder sb = new StringBuilder();
+        for (int n = columnNumber; n > 0; n /= 26) {
+            n--;
+            sb.append((char) ('A' + n % 26));
+        }
+        return sb.reverse().toString();
+    }
+}
+// test
+check(new Solution().convertToTitle(701), "ZY");
+check(new Solution().convertToTitle(52), "AZ");
+```
+
+## 867. Transpose Matrix | Easy
+related: 48, 54
+tags: matrix
+
+Element `(i, j)` moves to `(j, i)`, so an `R × C` matrix becomes `C × R` (a new matrix unless it's square).
+
+**Complexity:** O(R·C).
+
+```python
+class Solution:
+    def transpose(self, matrix: List[List[int]]) -> List[List[int]]:
+        return [list(col) for col in zip(*matrix)]
+# test
+assert Solution().transpose([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) == [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+assert Solution().transpose([[1, 2, 3], [4, 5, 6]]) == [[1, 4], [2, 5], [3, 6]]
+assert Solution().transpose([[7]]) == [[7]]
+```
+
+```java
+class Solution {
+    public int[][] transpose(int[][] matrix) {
+        int R = matrix.length, C = matrix[0].length;
+        int[][] t = new int[C][R];
+        for (int i = 0; i < R; i++) for (int j = 0; j < C; j++) t[j][i] = matrix[i][j];
+        return t;
+    }
+}
+// test
+check(new Solution().transpose(new int[][]{{1, 2, 3}, {4, 5, 6}}), new int[][]{{1, 4}, {2, 5}, {3, 6}});
+```

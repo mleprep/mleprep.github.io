@@ -567,3 +567,58 @@ List<Interval> fr = new Solution().employeeFreeTime(List.of(
     List.of(new Interval(1, 3), new Interval(6, 7)), List.of(new Interval(2, 4)), List.of(new Interval(2, 5), new Interval(9, 12))));
 check(fr.stream().map(iv -> List.of(iv.start, iv.end)).collect(Collectors.toList()), List.of(List.of(5, 6), List.of(7, 9)));
 ```
+
+## 2402. Meeting Rooms III | Hard
+related: 253, 1834
+tags: two-heaps, simulation
+
+Process meetings by start time with two min-heaps: **free rooms** by number and **busy rooms** by `(end time, room)`. Before each meeting, release rooms that have ended. If a room is free, use the lowest-numbered one; otherwise wait for the earliest-ending room (lowest number on ties) and **delay** the meeting, keeping its duration. Count uses per room.
+
+**Complexity:** O(m log m + m log n).
+
+```python
+class Solution:
+    def mostBooked(self, n: int, meetings: List[List[int]]) -> int:
+        free, busy, count = list(range(n)), [], [0] * n
+        for s, e in sorted(meetings):
+            while busy and busy[0][0] <= s:
+                heappush(free, heappop(busy)[1])
+            if free:
+                room = heappop(free)
+                heappush(busy, (e, room))
+            else:
+                end, room = heappop(busy)
+                heappush(busy, (end + e - s, room))
+            count[room] += 1
+        return count.index(max(count))
+# test
+assert Solution().mostBooked(2, [[0, 10], [1, 5], [2, 7], [3, 4]]) == 0
+assert Solution().mostBooked(3, [[1, 20], [2, 10], [3, 5], [4, 9], [6, 8]]) == 1
+assert Solution().mostBooked(1, [[0, 1]]) == 0
+assert Solution().mostBooked(4, [[18, 19], [3, 12], [17, 19], [2, 13], [7, 10]]) == 0
+```
+
+```java
+class Solution {
+    public int mostBooked(int n, int[][] meetings) {
+        Arrays.sort(meetings, (a, b) -> Integer.compare(a[0], b[0]));
+        PriorityQueue<Integer> free = new PriorityQueue<>();
+        for (int i = 0; i < n; i++) free.add(i);
+        PriorityQueue<long[]> busy = new PriorityQueue<>((a, b) -> a[0] != b[0] ? Long.compare(a[0], b[0]) : Long.compare(a[1], b[1]));
+        int[] count = new int[n];
+        for (int[] m : meetings) {
+            while (!busy.isEmpty() && busy.peek()[0] <= m[0]) free.add((int) busy.poll()[1]);
+            int room;
+            if (!free.isEmpty()) { room = free.poll(); busy.add(new long[]{m[1], room}); }
+            else { long[] b = busy.poll(); room = (int) b[1]; busy.add(new long[]{b[0] + m[1] - m[0], room}); }
+            count[room]++;
+        }
+        int best = 0;
+        for (int i = 1; i < n; i++) if (count[i] > count[best]) best = i;
+        return best;
+    }
+}
+// test
+check(new Solution().mostBooked(2, new int[][]{{0, 10}, {1, 5}, {2, 7}, {3, 4}}), 0);
+check(new Solution().mostBooked(3, new int[][]{{1, 20}, {2, 10}, {3, 5}, {4, 9}, {6, 8}}), 1);
+```

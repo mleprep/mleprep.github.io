@@ -1745,3 +1745,149 @@ class Solution {
 // test
 check(new Solution().equalPairs(new int[][]{{3, 1, 2, 2}, {1, 4, 4, 5}, {2, 4, 2, 2}, {2, 4, 2, 2}}), 3);
 ```
+
+## 1929. Concatenation of Array | Easy
+related: 217, 1
+tags: array
+
+Build `nums + nums`: allocate `2n` slots and write each element twice, at `i` and `i + n`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def getConcatenation(self, nums: List[int]) -> List[int]:
+        return nums + nums
+# test
+assert Solution().getConcatenation([1, 2, 1]) == [1, 2, 1, 1, 2, 1]
+assert Solution().getConcatenation([1, 3, 2, 1]) == [1, 3, 2, 1, 1, 3, 2, 1]
+assert Solution().getConcatenation([5]) == [5, 5]
+```
+
+```java
+class Solution {
+    public int[] getConcatenation(int[] nums) {
+        int n = nums.length;
+        int[] ans = new int[2 * n];
+        for (int i = 0; i < n; i++) ans[i] = ans[i + n] = nums[i];
+        return ans;
+    }
+}
+// test
+check(new Solution().getConcatenation(new int[]{1, 2, 1}), new int[]{1, 2, 1, 1, 2, 1});
+```
+
+## 912. Sort an Array | Medium
+related: 75, 148, 215
+tags: merge-sort, divide-and-conquer
+
+Built-in sort is off limits, so implement an O(n log n) sort. **Merge sort**: sort each half recursively, then merge the two sorted halves with two pointers (stable, guaranteed O(n log n), O(n) extra space). Quicksort is in-place but needs a random pivot to avoid O(n²) on sorted/duplicate-heavy input; heap sort is in-place and O(n log n) but not stable.
+
+**Complexity:** O(n log n) time, O(n) space.
+
+```python
+class Solution:
+    def sortArray(self, nums: List[int]) -> List[int]:
+        if len(nums) <= 1:
+            return nums
+        mid = len(nums) // 2
+        left, right = self.sortArray(nums[:mid]), self.sortArray(nums[mid:])
+        out, i, j = [], 0, 0
+        while i < len(left) and j < len(right):
+            if left[i] <= right[j]:
+                out.append(left[i])
+                i += 1
+            else:
+                out.append(right[j])
+                j += 1
+        return out + left[i:] + right[j:]
+# test
+assert Solution().sortArray([5, 2, 3, 1]) == [1, 2, 3, 5]
+assert Solution().sortArray([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
+assert Solution().sortArray([1]) == [1]
+rnd = random.Random(7)
+data = [rnd.randint(-50, 50) for _ in range(300)]
+assert Solution().sortArray(data[:]) == sorted(data)
+```
+
+```java
+class Solution {
+    public int[] sortArray(int[] nums) {
+        mergeSort(nums, new int[nums.length], 0, nums.length - 1);
+        return nums;
+    }
+
+    private void mergeSort(int[] a, int[] tmp, int lo, int hi) {
+        if (lo >= hi) return;
+        int mid = (lo + hi) / 2;
+        mergeSort(a, tmp, lo, mid);
+        mergeSort(a, tmp, mid + 1, hi);
+        int i = lo, j = mid + 1, k = lo;
+        while (i <= mid && j <= hi) tmp[k++] = a[i] <= a[j] ? a[i++] : a[j++];
+        while (i <= mid) tmp[k++] = a[i++];
+        while (j <= hi) tmp[k++] = a[j++];
+        System.arraycopy(tmp, lo, a, lo, hi - lo + 1);
+    }
+}
+// test
+check(new Solution().sortArray(new int[]{5, 1, 1, 2, 0, 0}), new int[]{0, 0, 1, 1, 2, 5});
+```
+
+## 229. Majority Element II | Medium
+related: 169
+tags: boyer-moore
+
+At most **two** values can appear more than n/3 times. Extended Boyer–Moore voting keeps two candidates with counters: a match increments its counter, an empty slot adopts the value, otherwise both counters drop (cancelling a triple of distinct values). A second pass verifies the candidates' real counts.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def majorityElement(self, nums: List[int]) -> List[int]:
+        c1, c2, n1, n2 = None, None, 0, 0
+        for x in nums:
+            if x == c1:
+                n1 += 1
+            elif x == c2:
+                n2 += 1
+            elif n1 == 0:
+                c1, n1 = x, 1
+            elif n2 == 0:
+                c2, n2 = x, 1
+            else:
+                n1, n2 = n1 - 1, n2 - 1
+        return [c for c in (c1, c2) if c is not None and nums.count(c) > len(nums) // 3]
+# test
+assert Solution().majorityElement([3, 2, 3]) == [3]
+assert Solution().majorityElement([1]) == [1]
+assert sorted(Solution().majorityElement([1, 2])) == [1, 2]
+assert sorted(Solution().majorityElement([2, 2, 1, 1, 1, 2, 2])) == [1, 2]
+assert Solution().majorityElement([1, 2, 3, 4]) == []
+```
+
+```java
+class Solution {
+    public List<Integer> majorityElement(int[] nums) {
+        int c1 = 0, c2 = 1, n1 = 0, n2 = 0;           // distinct placeholders; verified below
+        for (int x : nums) {
+            if (x == c1) n1++;
+            else if (x == c2) n2++;
+            else if (n1 == 0) { c1 = x; n1 = 1; }
+            else if (n2 == 0) { c2 = x; n2 = 1; }
+            else { n1--; n2--; }
+        }
+        List<Integer> res = new ArrayList<>();
+        for (int c : new int[]{c1, c2}) {
+            int cnt = 0;
+            for (int x : nums) if (x == c) cnt++;
+            if (cnt > nums.length / 3) res.add(c);
+        }
+        return res;
+    }
+}
+// test
+List<Integer> me = new Solution().majorityElement(new int[]{2, 2, 1, 1, 1, 2, 2});
+Collections.sort(me);
+check(me, List.of(1, 2));
+check(new Solution().majorityElement(new int[]{3, 2, 3}), List.of(3));
+```

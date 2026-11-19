@@ -1160,3 +1160,39 @@ class Solution {
 check(new Solution().pairSum(ListNode.of(5, 4, 2, 1)), 6);
 check(new Solution().pairSum(ListNode.of(4, 2, 2, 3)), 7);
 ```
+
+## 2807. Insert Greatest Common Divisors in Linked List | Medium
+related: 1071, 2
+tags: linked-list, gcd
+
+Walk the list; between each node and its successor splice in a new node holding `gcd(a, b)`, then jump past it.
+
+**Complexity:** O(n log V).
+
+```python
+class Solution:
+    def insertGreatestCommonDivisors(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        cur = head
+        while cur and cur.next:
+            cur.next = ListNode(math.gcd(cur.val, cur.next.val), cur.next)
+            cur = cur.next.next
+        return head
+# test
+assert list_vals(Solution().insertGreatestCommonDivisors(make_list([18, 6, 10, 3]))) == [18, 6, 6, 2, 10, 1, 3]
+assert list_vals(Solution().insertGreatestCommonDivisors(make_list([7]))) == [7]
+assert list_vals(Solution().insertGreatestCommonDivisors(make_list([4, 4]))) == [4, 4, 4]
+```
+
+```java
+class Solution {
+    public ListNode insertGreatestCommonDivisors(ListNode head) {
+        for (ListNode cur = head; cur != null && cur.next != null; cur = cur.next.next)
+            cur.next = new ListNode(gcd(cur.val, cur.next.val), cur.next);
+        return head;
+    }
+
+    private int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }
+}
+// test
+check(new Solution().insertGreatestCommonDivisors(ListNode.of(18, 6, 10, 3)), "[18, 6, 6, 2, 10, 1, 3]");
+```

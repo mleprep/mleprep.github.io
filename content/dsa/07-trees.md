@@ -2399,3 +2399,186 @@ while (!q.isEmpty()) {
 }
 check(sb.toString(), "*1011");
 ```
+
+## 144. Binary Tree Preorder Traversal | Easy
+related: 94, 145, 589
+tags: preorder, stack
+
+Iterative preorder: pop a node, record it, push its **right** child then its **left** child (so the left is processed first).
+
+**Complexity:** O(n) time, O(h) stack.
+
+```python
+class Solution:
+    def preorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+        out, st = [], [root] if root else []
+        while st:
+            node = st.pop()
+            out.append(node.val)
+            if node.right:
+                st.append(node.right)
+            if node.left:
+                st.append(node.left)
+        return out
+# test
+assert Solution().preorderTraversal(make_tree([1, None, 2, 3])) == [1, 2, 3]
+assert Solution().preorderTraversal(make_tree([1, 2, 3, 4, 5, None, 8, None, None, 6, 7, 9])) == [1, 2, 4, 5, 6, 7, 3, 8, 9]
+assert Solution().preorderTraversal(make_tree([])) == []
+```
+
+```java
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> out = new ArrayList<>();
+        Deque<TreeNode> st = new ArrayDeque<>();
+        if (root != null) st.push(root);
+        while (!st.isEmpty()) {
+            TreeNode n = st.pop();
+            out.add(n.val);
+            if (n.right != null) st.push(n.right);
+            if (n.left != null) st.push(n.left);
+        }
+        return out;
+    }
+}
+// test
+check(new Solution().preorderTraversal(TreeNode.of(1, 2, 3, 4, 5, null, 8, null, null, 6, 7, 9)), List.of(1, 2, 4, 5, 6, 7, 3, 8, 9));
+```
+
+## 145. Binary Tree Postorder Traversal | Easy
+related: 94, 144
+tags: stack, reverse-trick
+
+Postorder (left, right, root) is the **reverse** of a modified preorder (root, right, left): run preorder pushing left before right, then reverse the output.
+
+**Complexity:** O(n) time, O(n) space.
+
+```python
+class Solution:
+    def postorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+        out, st = [], [root] if root else []
+        while st:
+            node = st.pop()
+            out.append(node.val)
+            if node.left:
+                st.append(node.left)
+            if node.right:
+                st.append(node.right)
+        return out[::-1]
+# test
+assert Solution().postorderTraversal(make_tree([1, None, 2, 3])) == [3, 2, 1]
+assert Solution().postorderTraversal(make_tree([1, 2, 3, 4, 5, None, 8, None, None, 6, 7, 9])) == [4, 6, 7, 5, 2, 9, 8, 3, 1]
+assert Solution().postorderTraversal(make_tree([])) == []
+```
+
+```java
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        LinkedList<Integer> out = new LinkedList<>();
+        Deque<TreeNode> st = new ArrayDeque<>();
+        if (root != null) st.push(root);
+        while (!st.isEmpty()) {
+            TreeNode n = st.pop();
+            out.addFirst(n.val);                 // prepend = reverse of root-right-left
+            if (n.left != null) st.push(n.left);
+            if (n.right != null) st.push(n.right);
+        }
+        return out;
+    }
+}
+// test
+check(new Solution().postorderTraversal(TreeNode.of(1, 2, 3, 4, 5, null, 8, null, null, 6, 7, 9)), List.of(4, 6, 7, 5, 2, 9, 8, 3, 1));
+```
+
+## 701. Insert into a Binary Search Tree | Medium
+related: 700, 450, 98
+tags: bst
+
+Walk down as in a search until you fall off the tree; attach the new node there as a leaf. (Any valid BST is accepted; leaf insertion is the simplest.)
+
+**Complexity:** O(h).
+
+```python
+class Solution:
+    def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+        node = TreeNode(val)
+        if not root:
+            return node
+        cur = root
+        while True:
+            if val < cur.val:
+                if not cur.left:
+                    cur.left = node
+                    return root
+                cur = cur.left
+            else:
+                if not cur.right:
+                    cur.right = node
+                    return root
+                cur = cur.right
+# test
+def inorder(n):
+    return inorder(n.left) + [n.val] + inorder(n.right) if n else []
+for vals, v in (([4, 2, 7, 1, 3], 5), ([40, 20, 60, 10, 30, 50, 70], 25), ([], 5), ([4, 2, 7, 1, 3, None, None, None, None, None, None], 0)):
+    got = inorder(Solution().insertIntoBST(make_tree(vals), v))
+    assert got == sorted([x for x in vals if x is not None] + [v])     # still a BST holding every value
+```
+
+```java
+class Solution {
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null) return new TreeNode(val);
+        TreeNode cur = root;
+        while (true) {
+            if (val < cur.val) {
+                if (cur.left == null) { cur.left = new TreeNode(val); return root; }
+                cur = cur.left;
+            } else {
+                if (cur.right == null) { cur.right = new TreeNode(val); return root; }
+                cur = cur.right;
+            }
+        }
+    }
+}
+// test
+check(new Solution().insertIntoBST(TreeNode.of(4, 2, 7, 1, 3), 5), "[4, 2, 7, 1, 3, 5]");
+```
+
+## 1325. Delete Leaves With a Given Value | Medium
+related: 814, 450
+tags: postorder
+
+Post-order: clean both subtrees first, **then** decide about the node — after its children are deleted it may have become a target leaf itself, which cascades upward naturally.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeLeafNodes(self, root: Optional[TreeNode], target: int) -> Optional[TreeNode]:
+        if not root:
+            return None
+        root.left = self.removeLeafNodes(root.left, target)
+        root.right = self.removeLeafNodes(root.right, target)
+        if not root.left and not root.right and root.val == target:
+            return None
+        return root
+# test
+assert tree_vals(Solution().removeLeafNodes(make_tree([1, 2, 3, 2, None, 2, 4]), 2)) == [1, None, 3, None, 4]
+assert tree_vals(Solution().removeLeafNodes(make_tree([1, 3, 3, 3, 2]), 3)) == [1, 3, None, None, 2]
+assert tree_vals(Solution().removeLeafNodes(make_tree([1, 2, None, 2, None, 2]), 2)) == [1]
+assert Solution().removeLeafNodes(make_tree([1, 1, 1]), 1) is None
+```
+
+```java
+class Solution {
+    public TreeNode removeLeafNodes(TreeNode root, int target) {
+        if (root == null) return null;
+        root.left = removeLeafNodes(root.left, target);
+        root.right = removeLeafNodes(root.right, target);
+        return root.left == null && root.right == null && root.val == target ? null : root;
+    }
+}
+// test
+check(new Solution().removeLeafNodes(TreeNode.of(1, 2, 3, 2, null, 2, 4), 2), "[1, null, 3, null, 4]");
+check(new Solution().removeLeafNodes(TreeNode.of(1, 1, 1), 1), null);
+```

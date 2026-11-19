@@ -507,3 +507,61 @@ class Solution {
 check(new Solution().minFlips(2, 6, 5), 3);
 check(new Solution().minFlips(4, 2, 7), 1);
 ```
+
+## 3133. Minimum Array End | Medium
+related: 1318, 201
+tags: bit-trick
+
+Every element must contain all of x's set bits, so elements are x with some of its **zero bits** filled in. The n-th smallest such number puts the binary digits of `n − 1` into x's zero-bit positions (low to high) — "deposit" `n − 1` into the free bits.
+
+```viz
+x = 4      = 0b100   free bits: positions 0, 1, 3, 4, ...
+n = 3 -> n-1 = 0b10  -> bit 0 <- 0, bit 1 <- 1   -> 0b110 = 6     (array 4, 5, 6)
+```
+
+**Complexity:** O(log n + log x).
+
+```python
+class Solution:
+    def minEnd(self, n: int, x: int) -> int:
+        res, k, bit = x, n - 1, 1
+        while k:
+            if not x & bit:              # free position: place the next bit of n - 1
+                if k & 1:
+                    res |= bit
+                k >>= 1
+            bit <<= 1
+        return res
+# test
+assert Solution().minEnd(3, 4) == 6
+assert Solution().minEnd(2, 7) == 15
+assert Solution().minEnd(1, 5) == 5
+assert Solution().minEnd(5, 1) == 9
+def brute(n, x):                     # n-th smallest number containing all bits of x
+    v, seen = x, 0
+    while True:
+        if v & x == x:
+            seen += 1
+            if seen == n:
+                return v
+        v += 1
+assert all(Solution().minEnd(n, x) == brute(n, x) for n in range(1, 25) for x in range(1, 33))
+```
+
+```java
+class Solution {
+    public long minEnd(int n, int x) {
+        long res = x, k = n - 1;
+        for (long bit = 1; k > 0; bit <<= 1) {
+            if ((x & bit) == 0) {
+                if ((k & 1) == 1) res |= bit;
+                k >>= 1;
+            }
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().minEnd(3, 4), 6L);
+check(new Solution().minEnd(2, 7), 15L);
+```

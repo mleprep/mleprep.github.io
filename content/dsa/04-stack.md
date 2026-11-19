@@ -1146,3 +1146,51 @@ class Solution {
 check(new Solution().removeStars("leet**cod*e"), "lecoe");
 check(new Solution().removeStars("erase*****"), "");
 ```
+
+## 682. Baseball Game | Easy
+related: 150, 155
+tags: stack
+
+The record is a stack of scores: a number pushes, `C` pops, `D` pushes double the top, `+` pushes the sum of the top two. Answer = sum of the stack.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def calPoints(self, operations: List[str]) -> int:
+        st = []
+        for op in operations:
+            if op == "C":
+                st.pop()
+            elif op == "D":
+                st.append(2 * st[-1])
+            elif op == "+":
+                st.append(st[-1] + st[-2])
+            else:
+                st.append(int(op))
+        return sum(st)
+# test
+assert Solution().calPoints(["5", "2", "C", "D", "+"]) == 30
+assert Solution().calPoints(["5", "-2", "4", "C", "D", "9", "+", "+"]) == 27
+assert Solution().calPoints(["1", "C"]) == 0
+```
+
+```java
+class Solution {
+    public int calPoints(String[] operations) {
+        Deque<Integer> st = new ArrayDeque<>();
+        for (String op : operations) {
+            if (op.equals("C")) st.pop();
+            else if (op.equals("D")) st.push(2 * st.peek());
+            else if (op.equals("+")) { int top = st.pop(), sum = top + st.peek(); st.push(top); st.push(sum); }
+            else st.push(Integer.parseInt(op));
+        }
+        int total = 0;
+        for (int v : st) total += v;
+        return total;
+    }
+}
+// test
+check(new Solution().calPoints(new String[]{"5", "2", "C", "D", "+"}), 30);
+check(new Solution().calPoints(new String[]{"5", "-2", "4", "C", "D", "9", "+", "+"}), 27);
+```

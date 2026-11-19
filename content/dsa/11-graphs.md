@@ -2055,3 +2055,131 @@ class Solution {
 check(new Solution().nearestExit(new char[][]{"++.+".toCharArray(), "...+".toCharArray(), "+++.".toCharArray()}, new int[]{1, 2}), 1);
 check(new Solution().nearestExit(new char[][]{".+".toCharArray()}, new int[]{0, 0}), -1);
 ```
+
+## 463. Island Perimeter | Easy
+related: 200, 695
+tags: grid, counting
+
+Every land cell contributes 4 edges; every pair of adjacent land cells hides 2 of them. Count land cells and right/down land neighbours: `4·land − 2·adjacent`.
+
+**Complexity:** O(R·C).
+
+```python
+class Solution:
+    def islandPerimeter(self, grid: List[List[int]]) -> int:
+        land = shared = 0
+        for r, row in enumerate(grid):
+            for c, v in enumerate(row):
+                if v:
+                    land += 1
+                    shared += (r + 1 < len(grid) and grid[r + 1][c]) + (c + 1 < len(row) and row[c + 1])
+        return 4 * land - 2 * shared
+# test
+assert Solution().islandPerimeter([[0, 1, 0, 0], [1, 1, 1, 0], [0, 1, 0, 0], [1, 1, 0, 0]]) == 16
+assert Solution().islandPerimeter([[1]]) == 4
+assert Solution().islandPerimeter([[1, 0]]) == 4
+assert Solution().islandPerimeter([[1, 1], [1, 1]]) == 8
+```
+
+```java
+class Solution {
+    public int islandPerimeter(int[][] grid) {
+        int land = 0, shared = 0;
+        for (int r = 0; r < grid.length; r++)
+            for (int c = 0; c < grid[0].length; c++)
+                if (grid[r][c] == 1) {
+                    land++;
+                    if (r + 1 < grid.length && grid[r + 1][c] == 1) shared++;
+                    if (c + 1 < grid[0].length && grid[r][c + 1] == 1) shared++;
+                }
+        return 4 * land - 2 * shared;
+    }
+}
+// test
+check(new Solution().islandPerimeter(new int[][]{{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}}), 16);
+```
+
+## 997. Find the Town Judge | Easy
+related: 277, 1971
+tags: graph, degree
+
+The judge is trusted by everyone else (in-degree n − 1) and trusts nobody (out-degree 0). One score per person, `in − out`, equals n − 1 only for the judge.
+
+**Complexity:** O(n + |trust|).
+
+```python
+class Solution:
+    def findJudge(self, n: int, trust: List[List[int]]) -> int:
+        score = [0] * (n + 1)
+        for a, b in trust:
+            score[a] -= 1
+            score[b] += 1
+        return next((p for p in range(1, n + 1) if score[p] == n - 1), -1)
+# test
+assert Solution().findJudge(2, [[1, 2]]) == 2
+assert Solution().findJudge(3, [[1, 3], [2, 3]]) == 3
+assert Solution().findJudge(3, [[1, 3], [2, 3], [3, 1]]) == -1
+assert Solution().findJudge(1, []) == 1
+```
+
+```java
+class Solution {
+    public int findJudge(int n, int[][] trust) {
+        int[] score = new int[n + 1];
+        for (int[] t : trust) { score[t[0]]--; score[t[1]]++; }
+        for (int p = 1; p <= n; p++) if (score[p] == n - 1) return p;
+        return -1;
+    }
+}
+// test
+check(new Solution().findJudge(3, new int[][]{{1, 3}, {2, 3}}), 3);
+check(new Solution().findJudge(3, new int[][]{{1, 3}, {2, 3}, {3, 1}}), -1);
+```
+
+## 1462. Course Schedule IV | Medium
+related: 207, 210, 399
+tags: transitive-closure, floyd-warshall
+
+Many reachability queries on a small graph (n ≤ 100) → precompute the **transitive closure** once: Floyd–Warshall on booleans (`reach[i][j] |= reach[i][k] and reach[k][j]`), then answer each query in O(1). (A BFS from every node or a topological pass with bitsets also works.)
+
+**Complexity:** O(n³ + q).
+
+```python
+class Solution:
+    def checkIfPrerequisite(self, numCourses: int, prerequisites: List[List[int]], queries: List[List[int]]) -> List[bool]:
+        n = numCourses
+        reach = [[False] * n for _ in range(n)]
+        for a, b in prerequisites:
+            reach[a][b] = True
+        for k in range(n):
+            for i in range(n):
+                if reach[i][k]:
+                    row_k, row_i = reach[k], reach[i]
+                    for j in range(n):
+                        if row_k[j]:
+                            row_i[j] = True
+        return [reach[u][v] for u, v in queries]
+# test
+assert Solution().checkIfPrerequisite(2, [[1, 0]], [[0, 1], [1, 0]]) == [False, True]
+assert Solution().checkIfPrerequisite(2, [], [[1, 0], [0, 1]]) == [False, False]
+assert Solution().checkIfPrerequisite(3, [[1, 2], [1, 0], [2, 0]], [[1, 0], [1, 2]]) == [True, True]
+assert Solution().checkIfPrerequisite(4, [[0, 1], [1, 2], [2, 3]], [[0, 3], [3, 0], [1, 3]]) == [True, False, True]
+```
+
+```java
+class Solution {
+    public List<Boolean> checkIfPrerequisite(int numCourses, int[][] prerequisites, int[][] queries) {
+        int n = numCourses;
+        boolean[][] reach = new boolean[n][n];
+        for (int[] p : prerequisites) reach[p[0]][p[1]] = true;
+        for (int k = 0; k < n; k++)
+            for (int i = 0; i < n; i++)
+                if (reach[i][k]) for (int j = 0; j < n; j++) if (reach[k][j]) reach[i][j] = true;
+        List<Boolean> res = new ArrayList<>();
+        for (int[] q : queries) res.add(reach[q[0]][q[1]]);
+        return res;
+    }
+}
+// test
+check(new Solution().checkIfPrerequisite(3, new int[][]{{1, 2}, {1, 0}, {2, 0}}, new int[][]{{1, 0}, {1, 2}}), List.of(true, true));
+```

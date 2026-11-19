@@ -954,3 +954,52 @@ check(new Solution().fullJustify(new String[]{"This", "is", "an", "example", "of
 check(new Solution().fullJustify(new String[]{"What", "must", "be", "acknowledgment", "shall", "be"}, 16),
       List.of("What   must   be", "acknowledgment  ", "shall be        "));
 ```
+
+## 1871. Jump Game VII | Medium
+related: 55, 45, 1696
+tags: sliding-window, prefix-sum
+
+`i` is reachable iff `s[i] == '0'` and **some** reachable index lies in `[i − maxJump, i − minJump]`. Keep a running count of reachable indices inside that window (add the index entering at `i − minJump`, drop the one leaving at `i − maxJump − 1`) — O(1) per position instead of scanning the window.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def canReach(self, s: str, minJump: int, maxJump: int) -> bool:
+        n = len(s)
+        ok = [False] * n
+        ok[0] = True
+        window = 0
+        for i in range(1, n):
+            if i >= minJump and ok[i - minJump]:
+                window += 1
+            if i > maxJump and ok[i - maxJump - 1]:
+                window -= 1
+            ok[i] = window > 0 and s[i] == "0"
+        return ok[-1]
+# test
+assert Solution().canReach("011010", 2, 3) is True
+assert Solution().canReach("01101110", 2, 3) is False
+assert Solution().canReach("00", 1, 1) is True
+assert Solution().canReach("01", 1, 1) is False
+assert Solution().canReach("0000000000", 8, 8) is False
+```
+
+```java
+class Solution {
+    public boolean canReach(String s, int minJump, int maxJump) {
+        int n = s.length(), window = 0;
+        boolean[] ok = new boolean[n];
+        ok[0] = true;
+        for (int i = 1; i < n; i++) {
+            if (i >= minJump && ok[i - minJump]) window++;
+            if (i > maxJump && ok[i - maxJump - 1]) window--;
+            ok[i] = window > 0 && s.charAt(i) == '0';
+        }
+        return ok[n - 1];
+    }
+}
+// test
+check(new Solution().canReach("011010", 2, 3), true);
+check(new Solution().canReach("01101110", 2, 3), false);
+```

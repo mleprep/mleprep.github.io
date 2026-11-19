@@ -1105,3 +1105,90 @@ class Solution {
 check(new Solution().successfulPairs(new int[]{5, 1, 3}, new int[]{1, 2, 3, 4, 5}, 7), new int[]{4, 0, 3});
 check(new Solution().successfulPairs(new int[]{100000}, new int[]{100000}, 10000000000L), new int[]{1});
 ```
+
+## 1095. Find in Mountain Array | Hard
+related: 852, 33, 162
+tags: binary-search
+
+Only ~100 `get` calls are allowed, so three binary searches: (1) find the **peak** (first `i` with `a[i] > a[i+1]`), (2) search the **ascending** left part, (3) if not found, search the **descending** right part (comparison flipped). Checking the left side first returns the minimum index.
+
+**Complexity:** O(log n) calls.
+
+```python
+class Solution:
+    def findInMountainArray(self, target: int, mountainArr: 'MountainArray') -> int:
+        n = mountainArr.length()
+        lo, hi = 0, n - 1
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if mountainArr.get(mid) < mountainArr.get(mid + 1):
+                lo = mid + 1
+            else:
+                hi = mid
+        peak = lo
+
+        def search(lo, hi, ascending):
+            while lo <= hi:
+                mid = (lo + hi) // 2
+                v = mountainArr.get(mid)
+                if v == target:
+                    return mid
+                if (v < target) == ascending:
+                    lo = mid + 1
+                else:
+                    hi = mid - 1
+            return -1
+
+        i = search(0, peak, True)
+        return i if i != -1 else search(peak + 1, n - 1, False)
+# test
+class MountainArray:  # LeetCode's interface (counts calls; the limit is 100)
+    def __init__(self, a): self.a, self.calls = a, 0
+    def get(self, i): self.calls += 1; return self.a[i]
+    def length(self): return len(self.a)
+m = MountainArray([1, 2, 3, 4, 5, 3, 1])
+assert Solution().findInMountainArray(3, m) == 2 and m.calls <= 100
+assert Solution().findInMountainArray(3, MountainArray([0, 1, 2, 4, 2, 1])) == -1
+assert Solution().findInMountainArray(1, MountainArray([0, 1, 2, 4, 2, 1])) == 1
+big = MountainArray(list(range(5000)) + list(range(4998, -1, -1)))
+assert Solution().findInMountainArray(4000, big) == 4000 and big.calls <= 100
+big2 = MountainArray(list(range(5000)) + list(range(4998, 2000, -1)))
+assert Solution().findInMountainArray(2001, big2) == 2001
+assert Solution().findInMountainArray(2000, MountainArray(list(range(10, 3000)) + [5])) == 1990
+```
+
+```java
+interface MountainArray { // provided by LeetCode
+    int get(int index);
+    int length();
+}
+
+class Solution {
+    public int findInMountainArray(int target, MountainArray m) {
+        int n = m.length(), lo = 0, hi = n - 1;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (m.get(mid) < m.get(mid + 1)) lo = mid + 1; else hi = mid;
+        }
+        int peak = lo, i = search(m, target, 0, peak, true);
+        return i != -1 ? i : search(m, target, peak + 1, n - 1, false);
+    }
+
+    private int search(MountainArray m, int target, int lo, int hi, boolean asc) {
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2, v = m.get(mid);
+            if (v == target) return mid;
+            if ((v < target) == asc) lo = mid + 1; else hi = mid - 1;
+        }
+        return -1;
+    }
+}
+// test
+int[] arr = {1, 2, 3, 4, 5, 3, 1};
+MountainArray ma = new MountainArray() {
+    public int get(int i) { return arr[i]; }
+    public int length() { return arr.length; }
+};
+check(new Solution().findInMountainArray(3, ma), 2);
+check(new Solution().findInMountainArray(6, ma), -1);
+```

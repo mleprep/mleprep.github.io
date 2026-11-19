@@ -5,6 +5,7 @@
 
 Sources (no login needed):
   Blind 75, NeetCode 150  github.com/neetcode-gh/leetcode  .problemSiteData.json (blind75 / neetcode150 flags)
+  NeetCode 250            neetcode.io/practice (problem data embedded in the page's JS bundle)
   Grind 169               techinterviewhandbook.org/grind75 (problem data embedded in the page's JS bundle)
   LeetCode 75, Top Interview 150   leetcode.com study plans (public GraphQL)
 Prints which list problems are missing from content/dsa so they can be added.
@@ -31,6 +32,22 @@ def neetcode():
     return [slug(x) for x in d if x.get("blind75")], [slug(x) for x in d if x.get("neetcode150")]
 
 
+def neetcode250():
+    page = get("https://neetcode.io/practice")
+    for src in re.findall(r'src="(main\.[0-9a-f]+\.js)"', page):
+        js = get("https://neetcode.io/" + src)
+        slugs = []
+        for obj in re.findall(r'\{problem:"[^{}]*?\}', js):
+            m = re.search(r'link:"([^"]+)"', obj)
+            if "neetcode250:!0" in obj and m:
+                s = m.group(1).strip("/").split("/")[-1]
+                if s not in slugs:
+                    slugs.append(s)
+        if slugs:
+            return slugs
+    sys.exit("NeetCode 250 data not found (site layout changed?)")
+
+
 def grind():
     base = "https://www.techinterviewhandbook.org"
     page = get(base + "/grind75/?weeks=26&hours=40&grouping=none")
@@ -54,6 +71,7 @@ def main():
     lists = [
         {"id": "blind75", "name": "Blind 75", "url": "https://www.teamblind.com/post/New-Year-Gift---Curated-List-of-Top-75-LeetCode-Questions-to-Save-Your-Time-OaM1orEU", "slugs": b75},
         {"id": "neetcode150", "name": "NeetCode 150", "url": "https://neetcode.io/practice", "slugs": nc150},
+        {"id": "neetcode250", "name": "NeetCode 250", "url": "https://neetcode.io/practice", "slugs": neetcode250()},
         {"id": "grind169", "name": "Grind 169", "url": "https://www.techinterviewhandbook.org/grind75", "slugs": grind()},
         {"id": "lc75", "name": "LeetCode 75", "url": "https://leetcode.com/studyplan/leetcode-75/", "slugs": study_plan("leetcode-75")},
         {"id": "ti150", "name": "Top Interview 150", "url": "https://leetcode.com/studyplan/top-interview-150/", "slugs": study_plan("top-interview-150")},

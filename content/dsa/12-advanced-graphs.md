@@ -948,3 +948,265 @@ Set<String> all = new HashSet<>();
 for (int i = 0; i + 3 <= s.length(); i++) all.add(s.substring(i, i + 3));
 check(all.size() == 27 && s.length() == 29, true);
 ```
+
+## 1489. Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree | Hard
+related: 1584, 1192
+tags: mst, union-find
+
+Compute the MST weight once with Kruskal. Then for each edge: if the MST **without** it is heavier (or the graph disconnects), it's **critical**; otherwise, if an MST **forced to include** it still has the optimal weight, it's **pseudo-critical**. Each check is one Kruskal run.
+
+**Complexity:** O(E² · α(V)) (after one sort).
+
+```python
+class Solution:
+    def findCriticalAndPseudoCriticalEdges(self, n: int, edges: List[List[int]]) -> List[List[int]]:
+        order = sorted(range(len(edges)), key=lambda i: edges[i][2])
+
+        def mst(skip=-1, force=-1):
+            parent = list(range(n))
+
+            def find(x):
+                while parent[x] != x:
+                    parent[x] = parent[parent[x]]
+                    x = parent[x]
+                return x
+
+            weight = used = 0
+            if force >= 0:
+                a, b, w = edges[force]
+                parent[find(a)] = find(b)
+                weight, used = w, 1
+            for i in order:
+                a, b, w = edges[i]
+                if i != skip and find(a) != find(b):
+                    parent[find(a)] = find(b)
+                    weight, used = weight + w, used + 1
+            return weight if used == n - 1 else float("inf")
+
+        base = mst()
+        critical, pseudo = [], []
+        for i in range(len(edges)):
+            if mst(skip=i) > base:
+                critical.append(i)
+            elif mst(force=i) == base:
+                pseudo.append(i)
+        return [critical, pseudo]
+# test
+r = Solution().findCriticalAndPseudoCriticalEdges(5, [[0, 1, 1], [1, 2, 1], [2, 3, 2], [0, 3, 2], [0, 4, 3], [3, 4, 3], [1, 4, 6]])
+assert [sorted(r[0]), sorted(r[1])] == [[0, 1], [2, 3, 4, 5]]
+r = Solution().findCriticalAndPseudoCriticalEdges(4, [[0, 1, 1], [1, 2, 1], [2, 3, 1], [0, 3, 1]])
+assert [sorted(r[0]), sorted(r[1])] == [[], [0, 1, 2, 3]]
+r = Solution().findCriticalAndPseudoCriticalEdges(3, [[0, 1, 1], [1, 2, 2], [0, 2, 3]])
+assert [sorted(r[0]), sorted(r[1])] == [[0, 1], []]
+```
+
+```java
+class Solution {
+    private int n;
+    private int[][] edges;
+    private Integer[] order;
+
+    public List<List<Integer>> findCriticalAndPseudoCriticalEdges(int n, int[][] edges) {
+        this.n = n;
+        this.edges = edges;
+        order = new Integer[edges.length];
+        for (int i = 0; i < edges.length; i++) order[i] = i;
+        Arrays.sort(order, (x, y) -> edges[x][2] - edges[y][2]);
+        int base = mst(-1, -1);
+        List<Integer> critical = new ArrayList<>(), pseudo = new ArrayList<>();
+        for (int i = 0; i < edges.length; i++) {
+            if (mst(i, -1) > base) critical.add(i);
+            else if (mst(-1, i) == base) pseudo.add(i);
+        }
+        return List.of(critical, pseudo);
+    }
+
+    private int mst(int skip, int force) {
+        int[] parent = new int[n];
+        for (int i = 0; i < n; i++) parent[i] = i;
+        int weight = 0, used = 0;
+        if (force >= 0) { union(parent, edges[force][0], edges[force][1]); weight = edges[force][2]; used = 1; }
+        for (int i : order) if (i != skip && union(parent, edges[i][0], edges[i][1])) { weight += edges[i][2]; used++; }
+        return used == n - 1 ? weight : Integer.MAX_VALUE;
+    }
+
+    private boolean union(int[] p, int a, int b) {
+        int ra = find(p, a), rb = find(p, b);
+        if (ra == rb) return false;
+        p[ra] = rb;
+        return true;
+    }
+
+    private int find(int[] p, int x) {
+        while (p[x] != x) x = p[x] = p[p[x]];
+        return x;
+    }
+}
+// test
+check(new Solution().findCriticalAndPseudoCriticalEdges(5, new int[][]{{0, 1, 1}, {1, 2, 1}, {2, 3, 2}, {0, 3, 2}, {0, 4, 3}, {3, 4, 3}, {1, 4, 6}}),
+      List.of(List.of(0, 1), List.of(2, 3, 4, 5)));
+```
+
+## 2392. Build a Matrix With Conditions | Hard
+related: 210, 269
+tags: topological-sort
+
+Rows and columns are independent. Topologically sort the numbers 1..k by `rowConditions` (gives each number's row) and separately by `colConditions` (its column); a cycle in either means no answer. Place number v at `(row[v], col[v])` — every row and column gets exactly one number. Any valid matrix is accepted.
+
+**Complexity:** O(k² + conditions) (the k × k output dominates).
+
+```python
+class Solution:
+    def buildMatrix(self, k: int, rowConditions: List[List[int]], colConditions: List[List[int]]) -> List[List[int]]:
+        def topo(conds):
+            adj, indeg = defaultdict(list), [0] * (k + 1)
+            for a, b in conds:
+                adj[a].append(b)
+                indeg[b] += 1
+            q = deque(v for v in range(1, k + 1) if indeg[v] == 0)
+            order = []
+            while q:
+                v = q.popleft()
+                order.append(v)
+                for w in adj[v]:
+                    indeg[w] -= 1
+                    if indeg[w] == 0:
+                        q.append(w)
+            return {v: i for i, v in enumerate(order)} if len(order) == k else None
+
+        row, col = topo(rowConditions), topo(colConditions)
+        if row is None or col is None:
+            return []
+        m = [[0] * k for _ in range(k)]
+        for v in range(1, k + 1):
+            m[row[v]][col[v]] = v
+        return m
+# test
+def valid(k, rc, cc, m):  # any matrix satisfying the conditions is accepted
+    pos = {m[i][j]: (i, j) for i in range(k) for j in range(k) if m[i][j]}
+    return (len(m) == k and all(len(r) == k for r in m) and sorted(pos) == list(range(1, k + 1))
+            and all(pos[a][0] < pos[b][0] for a, b in rc) and all(pos[a][1] < pos[b][1] for a, b in cc))
+assert valid(3, [[1, 2], [3, 2]], [[2, 1], [3, 2]], Solution().buildMatrix(3, [[1, 2], [3, 2]], [[2, 1], [3, 2]]))
+assert Solution().buildMatrix(3, [[1, 2], [2, 3], [3, 1], [2, 3]], [[2, 1]]) == []
+assert valid(4, [[4, 3], [3, 2], [2, 1]], [[1, 2], [2, 3]], Solution().buildMatrix(4, [[4, 3], [3, 2], [2, 1]], [[1, 2], [2, 3]]))
+```
+
+```java
+class Solution {
+    public int[][] buildMatrix(int k, int[][] rowConditions, int[][] colConditions) {
+        int[] row = topo(k, rowConditions), col = topo(k, colConditions);
+        if (row == null || col == null) return new int[0][0];
+        int[][] m = new int[k][k];
+        for (int v = 1; v <= k; v++) m[row[v]][col[v]] = v;
+        return m;
+    }
+
+    private int[] topo(int k, int[][] conds) {                 // position of each value, or null on a cycle
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i <= k; i++) adj.add(new ArrayList<>());
+        int[] indeg = new int[k + 1], pos = new int[k + 1];
+        for (int[] c : conds) { adj.get(c[0]).add(c[1]); indeg[c[1]]++; }
+        Deque<Integer> q = new ArrayDeque<>();
+        for (int v = 1; v <= k; v++) if (indeg[v] == 0) q.add(v);
+        int idx = 0;
+        while (!q.isEmpty()) {
+            int v = q.poll();
+            pos[v] = idx++;
+            for (int w : adj.get(v)) if (--indeg[w] == 0) q.add(w);
+        }
+        return idx == k ? pos : null;
+    }
+}
+// test
+int[][] bm = new Solution().buildMatrix(3, new int[][]{{1, 2}, {3, 2}}, new int[][]{{2, 1}, {3, 2}});
+int[][] at = new int[4][];
+for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) if (bm[i][j] > 0) at[bm[i][j]] = new int[]{i, j};
+check(at[1][0] < at[2][0] && at[3][0] < at[2][0] && at[2][1] < at[1][1] && at[3][1] < at[2][1], true);
+check(new Solution().buildMatrix(3, new int[][]{{1, 2}, {2, 3}, {3, 1}}, new int[][]{{2, 1}}).length, 0);
+```
+
+## 2709. Greatest Common Divisor Traversal | Hard
+related: 952, 547
+tags: union-find, sieve
+
+Indices i and j are directly connected iff they share a prime factor, so connect each index to its primes: with a **smallest-prime-factor sieve**, factor every number and union the index with the first index seen for each of its primes. Traversal between all pairs ⇔ one connected component. A `1` (no prime factors) is isolated unless it's the only element.
+
+**Complexity:** O(M log log M + n log M) for M = max(nums).
+
+```python
+class Solution:
+    def canTraverseAllPairs(self, nums: List[int]) -> bool:
+        n = len(nums)
+        if n == 1:
+            return True
+        if 1 in nums:
+            return False
+        M = max(nums)
+        spf = list(range(M + 1))                      # smallest prime factor
+        for i in range(2, int(M ** 0.5) + 1):
+            if spf[i] == i:
+                for j in range(i * i, M + 1, i):
+                    if spf[j] == j:
+                        spf[j] = i
+        parent = list(range(n))
+
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        first = {}                                    # prime -> first index having it
+        for i, x in enumerate(nums):
+            while x > 1:
+                p = spf[x]
+                if p in first:
+                    parent[find(i)] = find(first[p])
+                else:
+                    first[p] = i
+                while x % p == 0:
+                    x //= p
+        return len({find(i) for i in range(n)}) == 1
+# test
+assert Solution().canTraverseAllPairs([2, 3, 6]) is True
+assert Solution().canTraverseAllPairs([3, 9, 5]) is False
+assert Solution().canTraverseAllPairs([4, 3, 12, 8]) is True
+assert Solution().canTraverseAllPairs([1]) is True
+assert Solution().canTraverseAllPairs([1, 1]) is False
+assert Solution().canTraverseAllPairs([2, 2]) is True
+assert Solution().canTraverseAllPairs([35, 77, 22, 6]) is True
+```
+
+```java
+class Solution {
+    public boolean canTraverseAllPairs(int[] nums) {
+        int n = nums.length, M = 0;
+        if (n == 1) return true;
+        for (int x : nums) { if (x == 1) return false; M = Math.max(M, x); }
+        int[] spf = new int[M + 1];
+        for (int i = 2; i <= M; i++) if (spf[i] == 0) for (int j = i; j <= M; j += i) if (spf[j] == 0) spf[j] = i;
+        int[] parent = new int[n];
+        for (int i = 0; i < n; i++) parent[i] = i;
+        Map<Integer, Integer> first = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            for (int x = nums[i]; x > 1; ) {
+                int p = spf[x];
+                Integer j = first.putIfAbsent(p, i);
+                if (j != null) parent[find(parent, i)] = find(parent, j);
+                while (x % p == 0) x /= p;
+            }
+        }
+        int root = find(parent, 0);
+        for (int i = 1; i < n; i++) if (find(parent, i) != root) return false;
+        return true;
+    }
+
+    private int find(int[] p, int x) {
+        while (p[x] != x) x = p[x] = p[p[x]];
+        return x;
+    }
+}
+// test
+check(new Solution().canTraverseAllPairs(new int[]{2, 3, 6}), true);
+check(new Solution().canTraverseAllPairs(new int[]{3, 9, 5}), false);
+```
