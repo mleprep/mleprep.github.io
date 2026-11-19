@@ -305,3 +305,162 @@ class Solution {
 // test
 check(new Solution().findMaximumXOR(new int[]{3, 10, 5, 25, 2, 8}), 28);
 ```
+
+
+## 648. Replace Words | Medium
+related: 208
+tags: trie
+
+Insert the roots into a trie. For each word, walk the trie and stop at the **first** end-of-root marker; replace the word with that prefix.
+
+**Complexity:** O(total characters).
+
+```python
+class Solution:
+    def replaceWords(self, dictionary: List[str], sentence: str) -> str:
+        root = {}
+        for w in dictionary:
+            node = root
+            for ch in w:
+                node = node.setdefault(ch, {})
+            node["$"] = True
+
+        def shortest(word):
+            node = root
+            for i, ch in enumerate(word):
+                if ch not in node:
+                    return word
+                node = node[ch]
+                if "$" in node:
+                    return word[:i + 1]
+            return word
+
+        return " ".join(shortest(w) for w in sentence.split())
+# test
+assert Solution().replaceWords(["cat", "bat", "rat"], "the cattle was rattled by the battery") == "the cat was rat by the bat"
+assert Solution().replaceWords(["a", "b", "c"], "aadsfasf absbs bbab cadsfafs") == "a a b c"
+```
+
+```java
+class Solution {
+    private static class Node { Node[] next = new Node[26]; boolean end; }
+
+    public String replaceWords(List<String> dictionary, String sentence) {
+        Node root = new Node();
+        for (String w : dictionary) {
+            Node n = root;
+            for (char c : w.toCharArray()) {
+                if (n.next[c - 'a'] == null) n.next[c - 'a'] = new Node();
+                n = n.next[c - 'a'];
+            }
+            n.end = true;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String w : sentence.split(" ")) {
+            if (sb.length() > 0) sb.append(' ');
+            Node n = root;
+            int i = 0;
+            for (; i < w.length() && n != null && !n.end; i++) n = n.next[w.charAt(i) - 'a'];
+            sb.append(n != null && n.end ? w.substring(0, i) : w);
+        }
+        return sb.toString();
+    }
+}
+// test
+check(new Solution().replaceWords(List.of("cat", "bat", "rat"), "the cattle was rattled by the battery"), "the cat was rat by the bat");
+```
+
+## 1268. Search Suggestions System | Medium
+related: 208, 642
+tags: sort, binary-search, trie
+
+Sort the products once. For each typed prefix, binary-search its lower bound; the next 3 products that start with the prefix are the suggestions. (A trie storing the top-3 at each node is the alternative.)
+
+**Complexity:** O(n log n + L log n).
+
+```python
+class Solution:
+    def suggestedProducts(self, products: List[str], searchWord: str) -> List[List[str]]:
+        products.sort()
+        res, prefix = [], ""
+        for ch in searchWord:
+            prefix += ch
+            i = bisect.bisect_left(products, prefix)
+            res.append([p for p in products[i:i + 3] if p.startswith(prefix)])
+        return res
+# test
+P = ["mobile", "mouse", "moneypot", "monitor", "mousepad"]
+assert Solution().suggestedProducts(P, "mouse") == [
+    ["mobile", "moneypot", "monitor"], ["mobile", "moneypot", "monitor"],
+    ["mouse", "mousepad"], ["mouse", "mousepad"], ["mouse", "mousepad"]]
+```
+
+```java
+class Solution {
+    public List<List<String>> suggestedProducts(String[] products, String searchWord) {
+        Arrays.sort(products);
+        List<List<String>> res = new ArrayList<>();
+        String prefix = "";
+        for (char c : searchWord.toCharArray()) {
+            prefix += c;
+            int lo = 0, hi = products.length;
+            while (lo < hi) {
+                int mid = (lo + hi) / 2;
+                if (products[mid].compareTo(prefix) >= 0) hi = mid; else lo = mid + 1;
+            }
+            List<String> cur = new ArrayList<>();
+            for (int i = lo; i < Math.min(lo + 3, products.length) && products[i].startsWith(prefix); i++) cur.add(products[i]);
+            res.add(cur);
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().suggestedProducts(new String[]{"havana"}, "tatiana"), "[[], [], [], [], [], [], []]");
+check(new Solution().suggestedProducts(new String[]{"mobile", "mouse", "moneypot", "monitor", "mousepad"}, "mou").get(2), "[mouse, mousepad]");
+```
+
+## 745. Prefix and Suffix Search | Hard
+related: 208, 211
+tags: trie, hashing
+
+Words are short (≤ 7 chars), so precompute every `(prefix, suffix)` combination per word into a map `prefix + "#" + suffix → index` (later words overwrite → largest index wins). Queries become O(1). Trie alternative: insert `suffix + "#" + word` for every suffix and store the max index at each node.
+
+**Complexity:** O(N · L²) build (L³ including string copies), O(L) query.
+
+```python
+class WordFilter:
+    def __init__(self, words: List[str]):
+        self.idx = {}
+        for i, w in enumerate(words):
+            for p in range(len(w) + 1):
+                for s in range(len(w) + 1):
+                    self.idx[w[:p] + "#" + w[s:]] = i
+
+    def f(self, pref: str, suff: str) -> int:
+        return self.idx.get(pref + "#" + suff, -1)
+# test
+wf = WordFilter(["apple", "ape", "maple"])
+assert wf.f("a", "e") == 1 and wf.f("ap", "le") == 0 and wf.f("", "le") == 2 and wf.f("b", "") == -1
+```
+
+```java
+class WordFilter {
+    private final Map<String, Integer> idx = new HashMap<>();
+
+    public WordFilter(String[] words) {
+        for (int i = 0; i < words.length; i++) {
+            String w = words[i];
+            for (int p = 0; p <= w.length(); p++)
+                for (int s = 0; s <= w.length(); s++) idx.put(w.substring(0, p) + "#" + w.substring(s), i);
+        }
+    }
+
+    public int f(String pref, String suff) { return idx.getOrDefault(pref + "#" + suff, -1); }
+}
+// test
+WordFilter wf = new WordFilter(new String[]{"apple", "ape", "maple"});
+check(wf.f("a", "e"), 1);
+check(wf.f("", "le"), 2);
+check(wf.f("b", ""), -1);
+```
