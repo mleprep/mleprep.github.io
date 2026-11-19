@@ -1,8 +1,10 @@
 /* LeetCode Review – tiny hash-routed SPA.
    Routes: #/  #/browse?filters  #/<section>  #/<section>/<topic>?filters  #/<section>/<topic>/<slug>
-   Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  b75=1  sort=num|diff|title  q=text */
+   Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  b75=1
+   co=Google  win=6m (company window: all time by default)  sort=num|diff|title|freq  q=text */
 const REPO = 'https://github.com/mleprep/mleprep.github.io/blob/main/';
 const DIFFS = ['Easy', 'Medium', 'Hard'];
+const BIG = ['Google', 'Meta', 'Amazon', 'Microsoft', 'Apple', 'Bloomberg'];
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const store = {
@@ -19,6 +21,23 @@ const href = (...p) => '#/' + p.join('/');
 const key = (s, it) => s + '/' + it.slug;
 const isDone = (s, it) => !!S.done[key(s, it)];
 const browse = params => '#/browse' + (params ? '?' + new URLSearchParams(params) : '');
+
+// company tags (data/companies.json, optional): CO.by[slug] = [{c, a, r}] sorted by all-time frequency
+let CO = null;
+function loadCompanies(d) {
+  const by = {};
+  for (const [slug, rows] of Object.entries(d.problems)) by[slug] = rows.map(([i, a, r]) => ({ c: d.companies[i], a, r }));
+  CO = { by, names: d.companies, source: d.source };
+}
+const coRows = it => (CO && CO.by[it.slug]) || [];
+// frequency (0-100) of problem `it` at company `c` in window `win` ('' = all time, '6m' = last six months); 0 = not asked
+function coVal(it, c, win) {
+  const r = coRows(it).find(x => x.c === c);
+  return !r ? 0 : win === '6m' ? r.r : (r.a || r.r);
+}
+// how many companies asked it in the window (used for "Most asked" without a company)
+const coCount = (it, win) => coRows(it).filter(x => (win === '6m' ? x.r : (x.a || x.r)) > 0).length;
+const fmtF = v => v >= 10 ? Math.round(v) : v.toFixed(1);
 
 // flat index: search, browse, pager, related links
 let FLAT = [], BY_ID = {}, TOPIC = {};
@@ -56,6 +75,7 @@ function readF(p) {
     d: new Set((p.get('d') || '').split(',').filter(x => DIFFS.includes(x))),
     st: ['todo', 'done'].includes(p.get('st')) ? p.get('st') : 'all',
     tag: p.get('tag') || '', topic: p.get('topic') || '', b75: p.get('b75') === '1',
+    co: CO ? p.get('co') || '' : '', win: p.get('win') === '6m' ? '6m' : '',
     sort: p.get('sort') || '', q: p.get('q') || '',
   };
 }
@@ -67,6 +87,8 @@ function writeF(F) {
   if (F.b75) p.set('b75', '1');
   if (F.tag) p.set('tag', F.tag);
   if (F.topic) p.set('topic', F.topic);
+  if (F.co) p.set('co', F.co);
+  if (F.win) p.set('win', F.win);
   if (F.sort) p.set('sort', F.sort);
   return p.toString();
 }
@@ -78,6 +100,7 @@ function passes(f, F, skip) {
   if (skip !== 'b75' && F.b75 && !tags.includes('blind75')) return false;
   if (skip !== 'tag' && F.tag && !tags.includes(F.tag)) return false;
   if (skip !== 'topic' && F.topic && f.t !== F.topic) return false;
+  if (skip !== 'co' && F.co && !coVal(it, F.co, F.win)) return false;
   if (F.q) {
     const hay = `${it.id || ''} ${it.title} ${tags.join(' ')} ${f.tTitle} ${it.difficulty || ''}`.toLowerCase();
     if (!F.q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w))) return false;
@@ -85,8 +108,12 @@ function passes(f, F, skip) {
   return true;
 }
 const DRANK = { Easy: 0, Medium: 1, Hard: 2 };
-function sortItems(list, how) {
+function sortItems(list, how, F = {}) {
   const a = list.slice();
+  if (how === 'freq') {
+    const score = F.co ? f => coVal(f.it, F.co, F.win) : f => coCount(f.it, F.win);
+    a.sort((x, y) => score(y) - score(x) || x.order - y.order);
+  }
   if (how === 'num') a.sort((x, y) => (x.it.id || 0) - (y.it.id || 0));
   else if (how === 'diff') a.sort((x, y) => (DRANK[x.it.difficulty] ?? 9) - (DRANK[y.it.difficulty] ?? 9) || x.order - y.order);
   else if (how === 'title') a.sort((x, y) => x.it.title.localeCompare(y.it.title));
@@ -98,7 +125,7 @@ function listView(container, scope, base, opts = {}) {
   let F = readF(parseHash().params);
   const hasDiff = scope.some(f => f.it.difficulty), hasTags = scope.some(f => (f.it.tags || []).length);
   const draw = () => {
-    const shown = sortItems(scope.filter(f => passes(f, F)), F.sort);
+    const shown = sortItems(scope.filter(f => passes(f, F)), F.sort, F);
     const cnt = (skip, pred) => scope.filter(f => passes(f, F, skip) && pred(f)).length;
     const chip = (attr, val, label, on, n) =>
       `<button class="chip${on ? ' on' : ''}" data-${attr}="${esc(val)}">${label}${n == null ? '' : ` <span>${n}</span>`}</button>`;
@@ -107,7 +134,20 @@ function listView(container, scope, base, opts = {}) {
     const tagOpts = Object.keys(tagCounts).sort();
     if (F.tag && !tagOpts.includes(F.tag)) tagOpts.unshift(F.tag);
     const topics = opts.topicFacet ? S.m.sections[0].topics : [];
-    const active = F.d.size || F.st !== 'all' || F.b75 || F.tag || F.topic || F.q;
+    const active = F.d.size || F.st !== 'all' || F.b75 || F.tag || F.topic || F.co || F.win || F.q;
+    // company facet: counts per company among items passing every other filter, in the chosen window
+    const hasCo = CO && hasDiff, coCounts = {};
+    if (hasCo) scope.filter(f => passes(f, F, 'co')).forEach(f => coRows(f.it).forEach(x => {
+      if ((F.win === '6m' ? x.r : (x.a || x.r)) > 0) coCounts[x.c] = (coCounts[x.c] || 0) + 1;
+    }));
+    const coOpts = Object.keys(coCounts).sort((x, y) => x.localeCompare(y, undefined, { sensitivity: 'base' }));
+    if (F.co && !coOpts.includes(F.co)) coOpts.unshift(F.co);
+    const winCnt = w => scope.filter(f => passes(f, { ...F, win: w })).length;
+    // extra column: the selected company's frequency, or how many companies ask it
+    const fcol = hasCo && (F.co || F.sort === 'freq') ? (F.co
+      ? f => { const v = coVal(f.it, F.co, F.win); return { w: v, txt: fmtF(v), title: `${F.co} frequency ${fmtF(v)} / 100${F.win ? ' (last 6 months)' : ''}` }; }
+      : f => { const n = coCount(f.it, F.win); return { w: 100 * n / (fcolMax || 1), txt: n, title: `asked at ${n} companies${F.win ? ' in the last 6 months' : ''}` }; }) : null;
+    const fcolMax = fcol && !F.co ? Math.max(...shown.map(f => coCount(f.it, F.win))) : 0;
     container.innerHTML = `
       <div class="fbar">
         ${hasDiff ? `<div class="fgroup"><span class="flabel">Level</span>${chip('d', '', 'All', !F.d.size)}${DIFFS.map(d =>
@@ -118,11 +158,19 @@ function listView(container, scope, base, opts = {}) {
           `<option value="${esc(t)}" ${t === F.tag ? 'selected' : ''}>${esc(t)} (${tagCounts[t] || 0})</option>`).join('')}</select>` : ''}
         ${topics.length ? `<select class="fsel" data-f="topic" aria-label="Topic"><option value="">All topics</option>${topics.map(t =>
           `<option value="${t.id}" ${t.id === F.topic ? 'selected' : ''}>${esc(t.title)}</option>`).join('')}</select>` : ''}
-        ${hasDiff ? `<select class="fsel" data-f="sort" aria-label="Sort"><option value="">Roadmap order</option>${[['num', 'Problem #'], ['diff', 'Difficulty'], ['title', 'Title A–Z']].map(([v, l]) =>
-          `<option value="${v}" ${v === F.sort ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>` : ''}
+        ${hasDiff ? `<select class="fsel" data-f="sort" aria-label="Sort"><option value="">Roadmap order</option>${[['num', 'Problem #'], ['diff', 'Difficulty'], ['title', 'Title A–Z'], ...(CO ? [['freq', F.co ? `${F.co} frequency` : 'Most asked']] : [])].map(([v, l]) =>
+          `<option value="${v}" ${v === F.sort ? 'selected' : ''}>Sort: ${esc(l)}</option>`).join('')}</select>` : ''}
       </div>
+      ${hasCo ? `<div class="fbar">
+        <div class="fgroup"><span class="flabel">Company</span>${BIG.filter(c => coCounts[c] || F.co === c).map(c =>
+          chip('co', c, esc(c), F.co === c, coCounts[c] || 0)).join('')}
+          <select class="fsel" data-f="co" aria-label="Company"><option value="">All companies (${coOpts.length})</option>${coOpts.map(c =>
+            `<option value="${esc(c)}" ${c === F.co ? 'selected' : ''}>${esc(c)} (${coCounts[c] || 0})</option>`).join('')}</select></div>
+        <div class="fgroup"><span class="flabel">Asked</span>${chip('win', '', 'All time', !F.win, F.co ? winCnt('') : null)}${chip('win', '6m', 'Last 6 months', F.win === '6m', F.co ? winCnt('6m') : null)}</div>
+      </div>` : ''}
       <div class="fsum">Showing <b>${shown.length}</b> of ${scope.length}${F.q ? ` for “${esc(F.q)}”` : ''}${active ? ` · <a href="#" data-clear>Clear filters</a>` : ''}</div>
-      ${shown.length ? rows(shown, opts) : '<p class="muted empty">Nothing matches these filters.</p>'}`;
+      ${shown.length ? rows(shown, { ...opts, fcol }) : '<p class="muted empty">Nothing matches these filters.</p>'}
+      ${hasCo && (F.co || F.sort === 'freq') ? `<p class="muted src">${coSource()}</p>` : ''}`;
     bindChecks(container, draw);
     const update = () => {
       history.replaceState(null, '', '#/' + base + (writeF(F) ? '?' + writeF(F) : ''));
@@ -144,7 +192,18 @@ function listView(container, scope, base, opts = {}) {
       update();
     });
     container.querySelectorAll('[data-topic]').forEach(b => b.onclick = e => { e.preventDefault(); F.topic = b.dataset.topic; update(); });
-    container.querySelectorAll('select[data-f]').forEach(sel => sel.onchange = () => { F[sel.dataset.f] = sel.value; update(); });
+    container.querySelectorAll('[data-co]').forEach(b => b.onclick = e => {
+      e.preventDefault();
+      F.co = F.co === b.dataset.co ? '' : b.dataset.co;
+      if (F.co && !F.sort) F.sort = 'freq';   // picking a company ranks by how often it asks
+      update();
+    });
+    container.querySelectorAll('[data-win]').forEach(b => b.onclick = () => { F.win = b.dataset.win; update(); });
+    container.querySelectorAll('select[data-f]').forEach(sel => sel.onchange = () => {
+      F[sel.dataset.f] = sel.value;
+      if (sel.dataset.f === 'co' && F.co && !F.sort) F.sort = 'freq';
+      update();
+    });
     const clr = container.querySelector('[data-clear]');
     if (clr) clr.onclick = e => { e.preventDefault(); F = readF(new URLSearchParams()); $('#q').value = ''; update(); };
   };
@@ -161,10 +220,13 @@ function rows(list, opts) {
       <td class="t"><a href="${href(f.s, f.t, it.slug)}">${esc(it.title)}</a>
         <span class="tags">${(it.tags || []).map(t => `<a href="#" class="tag${t === 'blind75' ? ' star' : ''}" data-tag="${esc(t)}">${esc(tagLabel(t))}</a>`).join('')}</span></td>
       ${opts.showTopic ? `<td class="tp"><a href="#" data-topic="${f.t}">${esc(f.tTitle)}</a></td>` : ''}
+      ${opts.fcol ? (v => `<td class="fq" title="${esc(v.title)}"><span class="meter"><i style="width:${Math.max(2, Math.min(100, v.w))}%"></i></span><b>${v.txt}</b></td>`)(opts.fcol(f)) : ''}
       ${it.difficulty ? `<td class="d"><a href="#" class="${it.difficulty}" data-d="${it.difficulty}">${it.difficulty}</a></td>` : (dsa ? '<td></td>' : '')}
     </tr>`;
   }).join('')}</tbody></table></div>`;
 }
+const coSource = () => CO ? `Company data: <a href="${CO.source.repo}" target="_blank" rel="noopener">${esc(CO.source.repo.replace('https://github.com/', ''))}</a>${CO.source.date ? ` (${CO.source.date})` : ''}.
+  Frequency is relative within each company (100 = that company's most-asked problem).` : '';
 function bindChecks(root, after) {
   root.querySelectorAll('input[data-k]').forEach(cb => cb.onchange = () => {
     if (cb.checked) S.done[cb.dataset.k] = 1; else delete S.done[cb.dataset.k];
@@ -210,11 +272,15 @@ function viewHome() {
       <a href="#" id="rand">Random unsolved →</a>
     </div>
     <div class="cards">
-      <a class="card" href="#/browse"><b>Browse all problems</b><span>filter by difficulty, pattern, status</span></a>
+      <a class="card" href="#/browse"><b>Browse all problems</b><span>filter by difficulty, pattern, company, status</span></a>
       ${S.m.sections.map(s => {
         const n = s.topics.reduce((a, t) => a + t.items.length, 0);
         return `<a class="card" href="${href(s.id)}"><b>${esc(s.title)}</b><span>${s.topics.length} topics · ${n} ${s.id === 'dsa' ? 'problems' : 'articles'}</span></a>`;
       }).join('')}</div>
+    ${CO ? `<h2>By company</h2><div class="cards">${BIG.map(c => {
+      const all = FLAT.filter(f => f.s === 'dsa' && coVal(f.it, c, '')), recent = all.filter(f => coVal(f.it, c, '6m'));
+      return `<a class="card" href="${browse({ co: c, sort: 'freq' })}"><b>${esc(c)}</b><span>${all.length} problems · ${recent.length} in the last 6 months</span></a>`;
+    }).join('')}<a class="card" href="${browse({ sort: 'freq' })}"><b>Most asked overall</b><span>ranked by how many companies ask each problem</span></a></div>` : ''}
     <h2>Algorithm roadmap</h2>${topicCards(dsa)}`;
   $('#rand').onclick = e => {
     e.preventDefault();
@@ -271,6 +337,7 @@ async function viewItem(s, t, slug) {
       ${(it.tags || []).map(x => `<a class="tag${x === 'blind75' ? ' star' : ''}" href="${browse(x === 'blind75' ? { b75: 1 } : { tag: x })}" title="Browse problems tagged ${esc(x)}">${esc(tagLabel(x))}</a>`).join('')}
       <label class="done"><input type="checkbox" data-k="${k}" ${S.done[k] ? 'checked' : ''}> Done</label>
     </div>
+    ${dsa ? askedAt(it) : ''}
     ${dsa ? `<div class="split">
       <div class="desc"><div id="body"></div>${relHtml}</div>
       <div class="codecol"><div class="code">
@@ -283,6 +350,8 @@ async function viewItem(s, t, slug) {
       <span>${next ? `<a href="${href(next.s, next.t, next.it.slug)}">${esc(next.it.title)} →</a>` : ''}</span></div>`;
   $('#body').append(md(it.md));
   bindChecks(main);
+  const more = $('#comore');
+  if (more) more.onclick = () => { $('.asked').classList.add('all'); more.remove(); };
   if (!dsa) return;
   const pad = String(it.id).padStart(4, '0');
   const base = pad + '_' + it.slug.replace(/-/g, '_');
@@ -304,6 +373,16 @@ async function viewItem(s, t, slug) {
   };
   $('#file').onclick = () => window.open(REPO + (S.lang === 'python' ? `python/${base}.py` : `java/${cls}.java`), '_blank', 'noopener');
   show();
+}
+// "Asked at" chips on a problem page: companies by all-time frequency; ● = also asked in the last six months
+function askedAt(it) {
+  const tier = x => BIG.includes(x.c) ? 0 : x.r ? 1 : 2;   // big tech, then recently asked, then the rest
+  const list = coRows(it).slice().sort((x, y) => tier(x) - tier(y) || (y.a || y.r) - (x.a || x.r));
+  if (!list.length) return '';
+  const TOP = 12;
+  return `<div class="asked"><span class="flabel" title="${esc(coSource().replace(/<[^>]+>/g, ''))}">Asked at ${list.length}</span>${list.map((x, i) =>
+    `<a class="co${i >= TOP ? ' extra' : ''}${x.r ? ' hot' : ''}" href="${browse({ co: x.c, sort: 'freq' })}"
+      title="${esc(x.c)}: frequency ${fmtF(x.a)} all time${x.r ? `, ${fmtF(x.r)} in the last 6 months` : ''}">${esc(x.c)}<span>${fmtF(x.a || x.r)}</span></a>`).join('')}${list.length > TOP ? `<button id="comore" class="co more">+${list.length - TOP} more</button>` : ''}</div>`;
 }
 function notFound() { main.innerHTML = `<h1>Not found</h1><p><a href="#/">Go home</a></p>`; }
 
@@ -363,5 +442,6 @@ $('#theme').onclick = () => {
 };
 window.addEventListener('hashchange', route);
 
-getJSON('data/manifest.json').then(m => { S.m = m; index(); route(); })
+Promise.all([getJSON('data/manifest.json'), getJSON('data/companies.json').catch(() => null)])
+  .then(([m, co]) => { S.m = m; if (co) loadCompanies(co); index(); route(); })
   .catch(e => { main.innerHTML = `<h1>Could not load data</h1><pre>${esc(e.message)}</pre>`; });
