@@ -58,6 +58,29 @@ check(new Solution().isValid("()[]{}"), true);
 check(new Solution().isValid("([)]"), false);
 ```
 
+```go
+func isValid(s string) bool {
+	pair := map[byte]byte{')': '(', ']': '[', '}': '{'}
+	st := []byte{}
+	for i := 0; i < len(s); i++ {
+		if open, ok := pair[s[i]]; ok {
+			if len(st) == 0 || st[len(st)-1] != open {
+				return false
+			}
+			st = st[:len(st)-1]
+		} else {
+			st = append(st, s[i])
+		}
+	}
+	return len(st) == 0
+}
+// test
+assertEq(isValid("()[]{}"), true)
+assertEq(isValid("(]"), false)
+assertEq(isValid("([)]"), false)
+assertEq(isValid("{[]}"), true)
+```
+
 ## 155. Min Stack | Medium
 related: 239, 716
 tags: design
@@ -110,6 +133,45 @@ check(m.top(), 0);
 check(m.getMin(), -2);
 ```
 
+```go
+type MinStack struct {
+	st [][2]int // (val, min so far)
+}
+
+func Constructor() MinStack {
+	return MinStack{}
+}
+
+func (this *MinStack) Push(val int) {
+	m := val
+	if n := len(this.st); n > 0 {
+		m = min(m, this.st[n-1][1])
+	}
+	this.st = append(this.st, [2]int{val, m})
+}
+
+func (this *MinStack) Pop() {
+	this.st = this.st[:len(this.st)-1]
+}
+
+func (this *MinStack) Top() int {
+	return this.st[len(this.st)-1][0]
+}
+
+func (this *MinStack) GetMin() int {
+	return this.st[len(this.st)-1][1]
+}
+// test
+m := Constructor()
+m.Push(-2)
+m.Push(0)
+m.Push(-3)
+assertEq(m.GetMin(), -3)
+m.Pop()
+assertEq(m.Top(), 0)
+assertEq(m.GetMin(), -2)
+```
+
 ## 150. Evaluate Reverse Polish Notation | Medium
 related: 224, 227
 tags: expression
@@ -156,6 +218,35 @@ class Solution {
 // test
 check(new Solution().evalRPN(new String[]{"2", "1", "+", "3", "*"}), 9);
 check(new Solution().evalRPN(new String[]{"10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"}), 22);
+```
+
+```go
+func evalRPN(tokens []string) int {
+	st := []int{}
+	for _, t := range tokens {
+		if len(t) == 1 && strings.Contains("+-*/", t) {
+			b, a := st[len(st)-1], st[len(st)-2]
+			st = st[:len(st)-2]
+			switch t {
+			case "+":
+				st = append(st, a+b)
+			case "-":
+				st = append(st, a-b)
+			case "*":
+				st = append(st, a*b)
+			default:
+				st = append(st, a/b) // Go's / truncates toward 0, as required
+			}
+		} else {
+			n, _ := strconv.Atoi(t)
+			st = append(st, n)
+		}
+	}
+	return st[0]
+}
+// test
+assertEq(evalRPN([]string{"2", "1", "+", "3", "*"}), 9)
+assertEq(evalRPN([]string{"10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"}), 22)
 ```
 
 ## 739. Daily Temperatures | Medium
@@ -207,6 +298,25 @@ class Solution {
 check(new Solution().dailyTemperatures(new int[]{73, 74, 75, 71, 69, 72, 76, 73}), new int[]{1, 1, 4, 2, 1, 1, 0, 0});
 ```
 
+```go
+func dailyTemperatures(temperatures []int) []int {
+	res, st := make([]int, len(temperatures)), []int{} // stack of indices, temps decreasing
+	for i, t := range temperatures {
+		for len(st) > 0 && temperatures[st[len(st)-1]] < t {
+			j := st[len(st)-1]
+			st = st[:len(st)-1]
+			res[j] = i - j
+		}
+		st = append(st, i)
+	}
+	return res
+}
+// test
+assertEq(dailyTemperatures([]int{73, 74, 75, 71, 69, 72, 76, 73}), []int{1, 1, 4, 2, 1, 1, 0, 0})
+assertEq(dailyTemperatures([]int{30, 40, 50, 60}), []int{1, 1, 1, 0})
+assertEq(dailyTemperatures([]int{60, 50, 40}), []int{0, 0, 0})
+```
+
 ## 853. Car Fleet | Medium
 related: 739
 tags: monotonic-stack, sort
@@ -248,6 +358,28 @@ class Solution {
 }
 // test
 check(new Solution().carFleet(12, new int[]{10, 8, 0, 5, 3}, new int[]{2, 4, 1, 1, 3}), 3);
+```
+
+```go
+func carFleet(target int, position []int, speed []int) int {
+	idx := make([]int, len(position))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.Slice(idx, func(a, b int) bool { return position[idx[a]] > position[idx[b]] }) // closest to target first
+	fleets, slowest := 0, 0.0
+	for _, i := range idx {
+		t := float64(target-position[i]) / float64(speed[i])
+		if t > slowest { // can't catch the fleet ahead
+			fleets++
+			slowest = t
+		}
+	}
+	return fleets
+}
+// test
+assertEq(carFleet(12, []int{10, 8, 0, 5, 3}, []int{2, 4, 1, 1, 3}), 3)
+assertEq(carFleet(100, []int{0, 2, 4}, []int{4, 2, 1}), 1)
 ```
 
 ## 84. Largest Rectangle in Histogram | Hard
@@ -300,6 +432,32 @@ class Solution {
 // test
 check(new Solution().largestRectangleArea(new int[]{2, 1, 5, 6, 2, 3}), 10);
 check(new Solution().largestRectangleArea(new int[]{2, 4}), 4);
+```
+
+```go
+func largestRectangleArea(heights []int) int {
+	st, best := []int{}, 0 // increasing stack of indices
+	for i := 0; i <= len(heights); i++ {
+		h := 0 // sentinel bar after the end
+		if i < len(heights) {
+			h = heights[i]
+		}
+		for len(st) > 0 && heights[st[len(st)-1]] >= h {
+			top := heights[st[len(st)-1]]
+			st = st[:len(st)-1]
+			left := -1
+			if len(st) > 0 {
+				left = st[len(st)-1]
+			}
+			best = max(best, top*(i-left-1))
+		}
+		st = append(st, i)
+	}
+	return best
+}
+// test
+assertEq(largestRectangleArea([]int{2, 1, 5, 6, 2, 3}), 10)
+assertEq(largestRectangleArea([]int{2, 4}), 4)
 ```
 
 ## 85. Maximal Rectangle | Hard
@@ -366,6 +524,48 @@ char[][] m = Stream.of("10100", "10111", "11111", "10010").map(String::toCharArr
 check(new Solution().maximalRectangle(m), 6);
 ```
 
+```go
+func maximalRectangle(matrix [][]byte) int {
+	if len(matrix) == 0 {
+		return 0
+	}
+	h := make([]int, len(matrix[0])) // histogram of 1s ending at this row
+	best := 0
+	for _, row := range matrix {
+		for c, v := range row {
+			if v == '1' {
+				h[c]++
+			} else {
+				h[c] = 0
+			}
+		}
+		st := []int{}
+		for i := 0; i <= len(h); i++ {
+			x := 0
+			if i < len(h) {
+				x = h[i]
+			}
+			for len(st) > 0 && h[st[len(st)-1]] >= x {
+				top := h[st[len(st)-1]]
+				st = st[:len(st)-1]
+				left := -1
+				if len(st) > 0 {
+					left = st[len(st)-1]
+				}
+				best = max(best, top*(i-left-1))
+			}
+			st = append(st, i)
+		}
+	}
+	return best
+}
+// test
+assertEq(maximalRectangle(byteGrid("10100", "10111", "11111", "10010")), 6)
+assertEq(maximalRectangle(byteGrid("0")), 0)
+assertEq(maximalRectangle(byteGrid("1")), 1)
+assertEq(maximalRectangle(byteGrid("0110", "1111", "1110")), 6)
+```
+
 ## 496. Next Greater Element I | Easy
 related: 503, 739
 tags: monotonic-stack
@@ -404,6 +604,31 @@ class Solution {
 }
 // test
 check(new Solution().nextGreaterElement(new int[]{4, 1, 2}, new int[]{1, 3, 4, 2}), new int[]{-1, 3, -1});
+```
+
+```go
+func nextGreaterElement(nums1 []int, nums2 []int) []int {
+	nxt, st := map[int]int{}, []int{}
+	for _, x := range nums2 {
+		for len(st) > 0 && st[len(st)-1] < x {
+			nxt[st[len(st)-1]] = x
+			st = st[:len(st)-1]
+		}
+		st = append(st, x)
+	}
+	res := make([]int, len(nums1))
+	for i, x := range nums1 {
+		if v, ok := nxt[x]; ok {
+			res[i] = v
+		} else {
+			res[i] = -1
+		}
+	}
+	return res
+}
+// test
+assertEq(nextGreaterElement([]int{4, 1, 2}, []int{1, 3, 4, 2}), []int{-1, 3, -1})
+assertEq(nextGreaterElement([]int{2, 4}, []int{1, 2, 3, 4}), []int{3, -1})
 ```
 
 ## 503. Next Greater Element II | Medium
@@ -448,6 +673,30 @@ class Solution {
 }
 // test
 check(new Solution().nextGreaterElements(new int[]{1, 2, 3, 4, 3}), new int[]{2, 3, 4, -1, 4});
+```
+
+```go
+func nextGreaterElements(nums []int) []int {
+	n := len(nums)
+	res, st := make([]int, n), []int{}
+	for i := range res {
+		res[i] = -1
+	}
+	for i := 0; i < 2*n; i++ { // two passes handle the wrap-around
+		x := nums[i%n]
+		for len(st) > 0 && nums[st[len(st)-1]] < x {
+			res[st[len(st)-1]] = x
+			st = st[:len(st)-1]
+		}
+		if i < n {
+			st = append(st, i)
+		}
+	}
+	return res
+}
+// test
+assertEq(nextGreaterElements([]int{1, 2, 1}), []int{2, -1, 2})
+assertEq(nextGreaterElements([]int{1, 2, 3, 4, 3}), []int{2, 3, 4, -1, 4})
 ```
 
 ## 394. Decode String | Medium
@@ -512,6 +761,37 @@ check(new Solution().decodeString("3[a2[c]]"), "accaccacc");
 check(new Solution().decodeString("2[abc]3[cd]ef"), "abcabccdcdcdef");
 ```
 
+```go
+func decodeString(s string) string {
+	type frame struct {
+		prev  string
+		times int
+	}
+	st, cur, k := []frame{}, "", 0
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		switch {
+		case ch >= '0' && ch <= '9':
+			k = k*10 + int(ch-'0')
+		case ch == '[':
+			st = append(st, frame{cur, k})
+			cur, k = "", 0
+		case ch == ']':
+			f := st[len(st)-1]
+			st = st[:len(st)-1]
+			cur = f.prev + strings.Repeat(cur, f.times)
+		default:
+			cur += string(ch)
+		}
+	}
+	return cur
+}
+// test
+assertEq(decodeString("3[a]2[bc]"), "aaabcbc")
+assertEq(decodeString("3[a2[c]]"), "accaccacc")
+assertEq(decodeString("2[abc]3[cd]ef"), "abcabccdcdcdef")
+```
+
 ## 71. Simplify Path | Medium
 related: 20
 tags: string
@@ -552,6 +832,29 @@ class Solution {
 // test
 check(new Solution().simplifyPath("/a/./b/../../c/"), "/c");
 check(new Solution().simplifyPath("/../"), "/");
+```
+
+```go
+func simplifyPath(path string) string {
+	st := []string{}
+	for _, part := range strings.Split(path, "/") {
+		switch part {
+		case "..":
+			if len(st) > 0 {
+				st = st[:len(st)-1]
+			}
+		case "", ".":
+		default:
+			st = append(st, part)
+		}
+	}
+	return "/" + strings.Join(st, "/")
+}
+// test
+assertEq(simplifyPath("/home/"), "/home")
+assertEq(simplifyPath("/../"), "/")
+assertEq(simplifyPath("/home//foo/"), "/home/foo")
+assertEq(simplifyPath("/a/./b/../../c/"), "/c")
 ```
 
 ## 224. Basic Calculator | Hard
@@ -610,6 +913,40 @@ check(new Solution().calculate("(1+(4+5+2)-3)+(6+8)"), 23);
 check(new Solution().calculate("-(2+3)"), -5);
 ```
 
+```go
+func calculate(s string) int {
+	res, num, sign := 0, 0, 1
+	st := [][2]int{} // (result before "(", sign before "(")
+	for i := 0; i < len(s); i++ {
+		switch ch := s[i]; {
+		case ch >= '0' && ch <= '9':
+			num = num*10 + int(ch-'0')
+		case ch == '+' || ch == '-':
+			res += sign * num
+			num, sign = 0, 1
+			if ch == '-' {
+				sign = -1
+			}
+		case ch == '(':
+			st = append(st, [2]int{res, sign})
+			res, sign = 0, 1
+		case ch == ')':
+			res += sign * num
+			num = 0
+			top := st[len(st)-1]
+			st = st[:len(st)-1]
+			res = top[0] + top[1]*res
+		}
+	}
+	return res + sign*num
+}
+// test
+assertEq(calculate("1 + 1"), 2)
+assertEq(calculate(" 2-1 + 2 "), 3)
+assertEq(calculate("(1+(4+5+2)-3)+(6+8)"), 23)
+assertEq(calculate("-(2+3)"), -5)
+```
+
 ## 227. Basic Calculator II | Medium
 related: 224, 150
 tags: expression
@@ -666,6 +1003,41 @@ check(new Solution().calculate("3+2*2"), 7);
 check(new Solution().calculate("14-3/2"), 13);
 ```
 
+```go
+func calculate(s string) int {
+	st, num, op := []int{}, 0, byte('+')
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if ch >= '0' && ch <= '9' {
+			num = num*10 + int(ch-'0')
+		}
+		if strings.IndexByte("+-*/", ch) >= 0 || i == len(s)-1 {
+			switch op { // apply the previous operator to num
+			case '+':
+				st = append(st, num)
+			case '-':
+				st = append(st, -num)
+			case '*':
+				st[len(st)-1] *= num
+			case '/':
+				st[len(st)-1] /= num
+			}
+			op, num = ch, 0
+		}
+	}
+	sum := 0
+	for _, x := range st {
+		sum += x
+	}
+	return sum
+}
+// test
+assertEq(calculate("3+2*2"), 7)
+assertEq(calculate(" 3/2 "), 1)
+assertEq(calculate(" 3+5 / 2 "), 5)
+assertEq(calculate("14-3/2"), 13)
+```
+
 ## 901. Online Stock Span | Medium
 related: 739, 496
 tags: monotonic-stack, design
@@ -708,6 +1080,39 @@ StockSpanner sp = new StockSpanner();
 int[] out = new int[7], prices = {100, 80, 60, 70, 60, 75, 85};
 for (int i = 0; i < 7; i++) out[i] = sp.next(prices[i]);
 check(out, new int[]{1, 1, 1, 2, 1, 4, 6});
+```
+
+```go
+type StockSpanner struct {
+	st [][2]int // (price, span)
+}
+
+func Constructor() StockSpanner {
+	return StockSpanner{}
+}
+
+func (this *StockSpanner) Next(price int) int {
+	span := 1
+	for n := len(this.st); n > 0 && this.st[n-1][0] <= price; n = len(this.st) {
+		span += this.st[n-1][1]
+		this.st = this.st[:n-1]
+	}
+	this.st = append(this.st, [2]int{price, span})
+	return span
+}
+// test
+s := Constructor()
+got := []int{}
+for _, p := range []int{100, 80, 60, 70, 60, 75, 85} {
+	got = append(got, s.Next(p))
+}
+assertEq(got, []int{1, 1, 1, 2, 1, 4, 6})
+s2 := Constructor()
+got2 := []int{}
+for _, p := range []int{31, 41, 48, 59, 79} {
+	got2 = append(got2, s2.Next(p))
+}
+assertEq(got2, []int{1, 2, 3, 4, 5})
 ```
 
 
@@ -758,6 +1163,37 @@ class Solution {
 // test
 check(new Solution().minRemoveToMakeValid("lee(t(c)o)de)"), "lee(t(c)o)de");
 check(new Solution().minRemoveToMakeValid("))(("), "");
+```
+
+```go
+func minRemoveToMakeValid(s string) string {
+	st, bad := []int{}, map[int]bool{}
+	for i := 0; i < len(s); i++ {
+		if s[i] == '(' {
+			st = append(st, i)
+		} else if s[i] == ')' {
+			if len(st) > 0 {
+				st = st[:len(st)-1]
+			} else {
+				bad[i] = true
+			}
+		}
+	}
+	for _, i := range st { // unmatched "("
+		bad[i] = true
+	}
+	var sb strings.Builder
+	for i := 0; i < len(s); i++ {
+		if !bad[i] {
+			sb.WriteByte(s[i])
+		}
+	}
+	return sb.String()
+}
+// test
+assertEq(minRemoveToMakeValid("lee(t(c)o)de)"), "lee(t(c)o)de")
+assertEq(minRemoveToMakeValid("a)b(c)d"), "ab(c)d")
+assertEq(minRemoveToMakeValid("))(("), "")
 ```
 
 ## 735. Asteroid Collision | Medium
@@ -813,6 +1249,35 @@ check(new Solution().asteroidCollision(new int[]{10, 2, -5}), new int[]{10});
 check(new Solution().asteroidCollision(new int[]{-2, -1, 1, 2}), new int[]{-2, -1, 1, 2});
 ```
 
+```go
+func asteroidCollision(asteroids []int) []int {
+	st := []int{}
+	for _, x := range asteroids {
+		alive := true
+		for alive && x < 0 && len(st) > 0 && st[len(st)-1] > 0 {
+			top := st[len(st)-1]
+			if top < -x { // the stack top explodes, keep going
+				st = st[:len(st)-1]
+				continue
+			}
+			if top == -x {
+				st = st[:len(st)-1]
+			}
+			alive = false
+		}
+		if alive {
+			st = append(st, x)
+		}
+	}
+	return st
+}
+// test
+assertEq(asteroidCollision([]int{5, 10, -5}), []int{5, 10})
+assertEq(asteroidCollision([]int{8, -8}), []int{})
+assertEq(asteroidCollision([]int{10, 2, -5}), []int{10})
+assertEq(asteroidCollision([]int{-2, -1, 1, 2}), []int{-2, -1, 1, 2})
+```
+
 ## 402. Remove K Digits | Medium
 related: 316, 321
 tags: monotonic-stack, greedy
@@ -862,6 +1327,29 @@ class Solution {
 check(new Solution().removeKdigits("1432219", 3), "1219");
 check(new Solution().removeKdigits("10200", 1), "200");
 check(new Solution().removeKdigits("10", 2), "0");
+```
+
+```go
+func removeKdigits(num string, k int) string {
+	st := []byte{} // increasing digits
+	for i := 0; i < len(num); i++ {
+		for k > 0 && len(st) > 0 && st[len(st)-1] > num[i] {
+			st = st[:len(st)-1]
+			k--
+		}
+		st = append(st, num[i])
+	}
+	st = st[:len(st)-k]
+	res := strings.TrimLeft(string(st), "0")
+	if res == "" {
+		return "0"
+	}
+	return res
+}
+// test
+assertEq(removeKdigits("1432219", 3), "1219")
+assertEq(removeKdigits("10200", 1), "200")
+assertEq(removeKdigits("10", 2), "0")
 ```
 
 ## 316. Remove Duplicate Letters | Medium
@@ -914,6 +1402,34 @@ class Solution {
 check(new Solution().removeDuplicateLetters("cbacdcbc"), "acdb");
 ```
 
+```go
+func removeDuplicateLetters(s string) string {
+	var last [26]int
+	for i := 0; i < len(s); i++ {
+		last[s[i]-'a'] = i
+	}
+	var used [26]bool
+	st := []byte{}
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if used[ch-'a'] {
+			continue
+		}
+		// pop bigger letters that appear again later
+		for len(st) > 0 && st[len(st)-1] > ch && last[st[len(st)-1]-'a'] > i {
+			used[st[len(st)-1]-'a'] = false
+			st = st[:len(st)-1]
+		}
+		st = append(st, ch)
+		used[ch-'a'] = true
+	}
+	return string(st)
+}
+// test
+assertEq(removeDuplicateLetters("bcabc"), "abc")
+assertEq(removeDuplicateLetters("cbacdcbc"), "acdb")
+```
+
 ## 456. 132 Pattern | Medium
 related: 496
 tags: monotonic-stack
@@ -955,6 +1471,28 @@ class Solution {
 // test
 check(new Solution().find132pattern(new int[]{3, 1, 4, 2}), true);
 check(new Solution().find132pattern(new int[]{1, 2, 3, 4}), false);
+```
+
+```go
+func find132pattern(nums []int) bool {
+	st, two := []int{}, math.MinInt
+	for i := len(nums) - 1; i >= 0; i-- {
+		x := nums[i]
+		if x < two {
+			return true
+		}
+		for len(st) > 0 && st[len(st)-1] < x {
+			two = st[len(st)-1] // x acts as "3", the popped value as "2"
+			st = st[:len(st)-1]
+		}
+		st = append(st, x)
+	}
+	return false
+}
+// test
+assertEq(find132pattern([]int{1, 2, 3, 4}), false)
+assertEq(find132pattern([]int{3, 1, 4, 2}), true)
+assertEq(find132pattern([]int{-1, 3, 2, 0}), true)
 ```
 
 ## 907. Sum of Subarray Minimums | Medium
@@ -1014,6 +1552,43 @@ check(new Solution().sumSubarrayMins(new int[]{3, 1, 2, 4}), 17);
 check(new Solution().sumSubarrayMins(new int[]{11, 81, 94, 43, 3}), 444);
 ```
 
+```go
+func sumSubarrayMins(arr []int) int {
+	const MOD = 1_000_000_007
+	n := len(arr)
+	left, right, st := make([]int, n), make([]int, n), []int{}
+	for i := 0; i < n; i++ { // left[i]: choices of start where arr[i] is the min
+		for len(st) > 0 && arr[st[len(st)-1]] > arr[i] {
+			st = st[:len(st)-1]
+		}
+		left[i] = i + 1
+		if len(st) > 0 {
+			left[i] = i - st[len(st)-1]
+		}
+		st = append(st, i)
+	}
+	st = st[:0]
+	for i := n - 1; i >= 0; i-- { // >= on this side so equal values are counted once
+		for len(st) > 0 && arr[st[len(st)-1]] >= arr[i] {
+			st = st[:len(st)-1]
+		}
+		right[i] = n - i
+		if len(st) > 0 {
+			right[i] = st[len(st)-1] - i
+		}
+		st = append(st, i)
+	}
+	sum := 0
+	for i, a := range arr {
+		sum = (sum + a*left[i]*right[i]) % MOD
+	}
+	return sum
+}
+// test
+assertEq(sumSubarrayMins([]int{3, 1, 2, 4}), 17)
+assertEq(sumSubarrayMins([]int{11, 81, 94, 43, 3}), 444)
+```
+
 ## 1047. Remove All Adjacent Duplicates In String | Easy
 related: 1209, 20
 tags: stack
@@ -1050,6 +1625,23 @@ class Solution {
 }
 // test
 check(new Solution().removeDuplicates("azxxzy"), "ay");
+```
+
+```go
+func removeDuplicates(s string) string {
+	st := []byte{}
+	for i := 0; i < len(s); i++ {
+		if len(st) > 0 && st[len(st)-1] == s[i] {
+			st = st[:len(st)-1]
+		} else {
+			st = append(st, s[i])
+		}
+	}
+	return string(st)
+}
+// test
+assertEq(removeDuplicates("abbaca"), "ca")
+assertEq(removeDuplicates("azxxzy"), "ay")
 ```
 
 ## 225. Implement Stack using Queues | Easy
@@ -1107,6 +1699,52 @@ check(s.pop(), 2);
 check(s.empty(), false);
 ```
 
+```go
+type MyStack struct {
+	q []int // front of the queue = top of the stack
+}
+
+func Constructor() MyStack {
+	return MyStack{}
+}
+
+func (this *MyStack) Push(x int) {
+	this.q = append(this.q, x)
+	for i := 0; i < len(this.q)-1; i++ { // rotate the new element to the front
+		this.q = append(this.q[1:], this.q[0])
+	}
+}
+
+func (this *MyStack) Pop() int {
+	x := this.q[0]
+	this.q = this.q[1:]
+	return x
+}
+
+func (this *MyStack) Top() int {
+	return this.q[0]
+}
+
+func (this *MyStack) Empty() bool {
+	return len(this.q) == 0
+}
+// test
+s := Constructor()
+s.Push(1)
+s.Push(2)
+assertEq(s.Top(), 2)
+assertEq(s.Pop(), 2)
+assertEq(s.Empty(), false)
+assertEq(s.Pop(), 1)
+assertEq(s.Empty(), true)
+s2 := Constructor()
+s2.Push(5)
+s2.Push(6)
+s2.Push(7)
+assertEq([]int{s2.Pop(), s2.Top(), s2.Pop(), s2.Top()}, []int{7, 6, 6, 5})
+assertEq(s2.Empty(), false)
+```
+
 ## 2390. Removing Stars From a String | Medium
 related: 844, 1047
 tags: stack
@@ -1145,6 +1783,24 @@ class Solution {
 // test
 check(new Solution().removeStars("leet**cod*e"), "lecoe");
 check(new Solution().removeStars("erase*****"), "");
+```
+
+```go
+func removeStars(s string) string {
+	st := []byte{}
+	for i := 0; i < len(s); i++ {
+		if s[i] == '*' {
+			st = st[:len(st)-1]
+		} else {
+			st = append(st, s[i])
+		}
+	}
+	return string(st)
+}
+// test
+assertEq(removeStars("leet**cod*e"), "lecoe")
+assertEq(removeStars("erase*****"), "")
+assertEq(removeStars("abc"), "abc")
 ```
 
 ## 682. Baseball Game | Easy
@@ -1193,4 +1849,33 @@ class Solution {
 // test
 check(new Solution().calPoints(new String[]{"5", "2", "C", "D", "+"}), 30);
 check(new Solution().calPoints(new String[]{"5", "-2", "4", "C", "D", "9", "+", "+"}), 27);
+```
+
+```go
+func calPoints(operations []string) int {
+	st := []int{}
+	for _, op := range operations {
+		n := len(st)
+		switch op {
+		case "C":
+			st = st[:n-1]
+		case "D":
+			st = append(st, 2*st[n-1])
+		case "+":
+			st = append(st, st[n-1]+st[n-2])
+		default:
+			v, _ := strconv.Atoi(op)
+			st = append(st, v)
+		}
+	}
+	sum := 0
+	for _, x := range st {
+		sum += x
+	}
+	return sum
+}
+// test
+assertEq(calPoints([]string{"5", "2", "C", "D", "+"}), 30)
+assertEq(calPoints([]string{"5", "-2", "4", "C", "D", "9", "+", "+"}), 27)
+assertEq(calPoints([]string{"1", "C"}), 0)
 ```

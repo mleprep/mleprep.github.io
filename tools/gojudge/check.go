@@ -8,11 +8,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -118,25 +116,20 @@ func main() {
 			}
 		}
 	}
-	out := make([]outcome, len(items))
-	var wg sync.WaitGroup
-	sem := make(chan bool, runtime.NumCPU())
+	out := make([]outcome, len(items)) // judge() runs one program at a time, so check them in order
 	for i, it := range items {
-		wg.Add(1)
-		go func(i int, it item) {
-			defer wg.Done()
-			sem <- true
-			defer func() { <-sem }()
-			o := outcome{it: it}
-			o.ref = run(lc, it.Go, it.GoTest, 60*time.Second)
-			o.stb = run(lc, it.GoStub, it.GoTest, 60*time.Second)
-			o.refOK = passed(o.ref)
-			o.stubOK = o.stb.Error == nil && len(o.stb.Cases) > 0 && !passed(o.stb)
-			o.ms = o.ref.Ms
-			out[i] = o
-		}(i, it)
+		o := outcome{it: it}
+		o.ref = run(lc, it.Go, it.GoTest, 30*time.Second)
+		o.stb = run(lc, it.GoStub, it.GoTest, 30*time.Second)
+		o.refOK = passed(o.ref)
+		o.stubOK = o.stb.Error == nil && len(o.stb.Cases) > 0 && !passed(o.stb)
+		o.ms = o.ref.Ms
+		out[i] = o
+		if (o.ref.Error != nil && *o.ref.Error == "TIMEOUT") || (o.stb.Error != nil && *o.stb.Error == "TIMEOUT") {
+			fmt.Printf("%d %s: TIMEOUT (stopping: the stuck run holds the judge)\n", it.ID, it.Title)
+			os.Exit(1)
+		}
 	}
-	wg.Wait()
 	bad := 0
 	for _, o := range out {
 		if !o.refOK || !o.stubOK {

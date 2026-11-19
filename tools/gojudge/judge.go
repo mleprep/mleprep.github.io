@@ -403,6 +403,8 @@ func (h *harness) exports() interp.Exports {
 	}}
 }
 
+var judgeMu sync.Mutex
+
 var lcCache struct {
 	sync.Mutex
 	src string
@@ -512,6 +514,10 @@ func toJSON(r Result) string {
 
 // judge runs code against test and returns the Result as JSON.
 func judge(lcSrc, code, test string) (out string) {
+	// One run at a time: Yaegi builds recursive types (ListNode...) by patching reflect's globally cached
+	// struct types, so two interpreters building the same type at once corrupt each other.
+	judgeMu.Lock()
+	defer judgeMu.Unlock()
 	t0 := time.Now()
 	res := Result{Cases: []Case{}}
 	defer func() { // the interpreter itself can panic on code it does not support
