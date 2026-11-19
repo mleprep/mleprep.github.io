@@ -63,6 +63,27 @@ check(new Solution().search(new int[]{-1, 0, 3, 5, 9, 12}, 9), 4);
 check(new Solution().search(new int[]{-1, 0, 3, 5, 9, 12}, 2), -1);
 ```
 
+```go
+func search(nums []int, target int) int {
+	lo, hi := 0, len(nums)-1
+	for lo <= hi {
+		mid := lo + (hi-lo)/2
+		switch {
+		case nums[mid] == target:
+			return mid
+		case nums[mid] < target:
+			lo = mid + 1
+		default:
+			hi = mid - 1
+		}
+	}
+	return -1
+}
+// test
+assertEq(search([]int{-1, 0, 3, 5, 9, 12}, 9), 4)
+assertEq(search([]int{-1, 0, 3, 5, 9, 12}, 2), -1)
+```
+
 ## 35. Search Insert Position | Easy
 related: 704, 34
 tags: lower-bound
@@ -102,6 +123,25 @@ class Solution {
 // test
 check(new Solution().searchInsert(new int[]{1, 3, 5, 6}, 2), 1);
 check(new Solution().searchInsert(new int[]{1, 3, 5, 6}, 7), 4);
+```
+
+```go
+func searchInsert(nums []int, target int) int {
+	lo, hi := 0, len(nums) // first index with nums[i] >= target
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] >= target {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(searchInsert([]int{1, 3, 5, 6}, 5), 2)
+assertEq(searchInsert([]int{1, 3, 5, 6}, 2), 1)
+assertEq(searchInsert([]int{1, 3, 5, 6}, 7), 4)
 ```
 
 ## 34. Find First and Last Position of Element in Sorted Array | Medium
@@ -157,6 +197,32 @@ check(new Solution().searchRange(new int[]{5, 7, 7, 8, 8, 10}, 8), new int[]{3, 
 check(new Solution().searchRange(new int[]{5, 7, 7, 8, 8, 10}, 6), new int[]{-1, -1});
 ```
 
+```go
+func searchRange(nums []int, target int) []int {
+	lower := func(t int) int { // first index with nums[i] >= t
+		lo, hi := 0, len(nums)
+		for lo < hi {
+			mid := lo + (hi-lo)/2
+			if nums[mid] >= t {
+				hi = mid
+			} else {
+				lo = mid + 1
+			}
+		}
+		return lo
+	}
+	a := lower(target)
+	if a == len(nums) || nums[a] != target {
+		return []int{-1, -1}
+	}
+	return []int{a, lower(target+1) - 1}
+}
+// test
+assertEq(searchRange([]int{5, 7, 7, 8, 8, 10}, 8), []int{3, 4})
+assertEq(searchRange([]int{5, 7, 7, 8, 8, 10}, 6), []int{-1, -1})
+assertEq(searchRange([]int{}, 0), []int{-1, -1})
+```
+
 ## 74. Search a 2D Matrix | Medium
 related: 704, 240
 tags: matrix
@@ -202,6 +268,30 @@ class Solution {
 int[][] M = {{1, 3, 5, 7}, {10, 11, 16, 20}, {23, 30, 34, 60}};
 check(new Solution().searchMatrix(M, 3), true);
 check(new Solution().searchMatrix(M, 13), false);
+```
+
+```go
+func searchMatrix(matrix [][]int, target int) bool {
+	m, n := len(matrix), len(matrix[0])
+	lo, hi := 0, m*n-1 // binary search the flattened matrix
+	for lo <= hi {
+		mid := lo + (hi-lo)/2
+		v := matrix[mid/n][mid%n]
+		switch {
+		case v == target:
+			return true
+		case v < target:
+			lo = mid + 1
+		default:
+			hi = mid - 1
+		}
+	}
+	return false
+}
+// test
+M := [][]int{{1, 3, 5, 7}, {10, 11, 16, 20}, {23, 30, 34, 60}}
+assertEq(searchMatrix(M, 3), true)
+assertEq(searchMatrix(M, 13), false)
 ```
 
 ## 875. Koko Eating Bananas | Medium
@@ -254,6 +344,32 @@ check(new Solution().minEatingSpeed(new int[]{3, 6, 7, 11}, 8), 4);
 check(new Solution().minEatingSpeed(new int[]{30, 11, 23, 4, 20}, 6), 23);
 ```
 
+```go
+func minEatingSpeed(piles []int, h int) int {
+	lo, hi := 1, 0
+	for _, p := range piles {
+		hi = max(hi, p)
+	}
+	for lo < hi { // smallest speed that finishes in h hours
+		k := lo + (hi-lo)/2
+		hours := 0
+		for _, p := range piles {
+			hours += (p + k - 1) / k
+		}
+		if hours <= h {
+			hi = k
+		} else {
+			lo = k + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(minEatingSpeed([]int{3, 6, 7, 11}, 8), 4)
+assertEq(minEatingSpeed([]int{30, 11, 23, 4, 20}, 5), 30)
+assertEq(minEatingSpeed([]int{30, 11, 23, 4, 20}, 6), 23)
+```
+
 ## 153. Find Minimum in Rotated Sorted Array | Medium
 related: 33, 154
 tags: blind75, rotated
@@ -299,6 +415,25 @@ class Solution {
 // test
 check(new Solution().findMin(new int[]{4, 5, 6, 7, 0, 1, 2}), 0);
 check(new Solution().findMin(new int[]{11, 13, 15, 17}), 11);
+```
+
+```go
+func findMin(nums []int) int {
+	lo, hi := 0, len(nums)-1
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] > nums[hi] { // the drop is to the right of mid
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	return nums[lo]
+}
+// test
+assertEq(findMin([]int{3, 4, 5, 1, 2}), 1)
+assertEq(findMin([]int{4, 5, 6, 7, 0, 1, 2}), 0)
+assertEq(findMin([]int{11, 13, 15, 17}), 11)
 ```
 
 ## 33. Search in Rotated Sorted Array | Medium
@@ -355,6 +490,36 @@ check(new Solution().search(new int[]{4, 5, 6, 7, 0, 1, 2}, 0), 4);
 check(new Solution().search(new int[]{4, 5, 6, 7, 0, 1, 2}, 3), -1);
 ```
 
+```go
+func search(nums []int, target int) int {
+	lo, hi := 0, len(nums)-1
+	for lo <= hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] == target {
+			return mid
+		}
+		if nums[lo] <= nums[mid] { // left half sorted
+			if nums[lo] <= target && target < nums[mid] {
+				hi = mid - 1
+			} else {
+				lo = mid + 1
+			}
+		} else { // right half sorted
+			if nums[mid] < target && target <= nums[hi] {
+				lo = mid + 1
+			} else {
+				hi = mid - 1
+			}
+		}
+	}
+	return -1
+}
+// test
+assertEq(search([]int{4, 5, 6, 7, 0, 1, 2}, 0), 4)
+assertEq(search([]int{4, 5, 6, 7, 0, 1, 2}, 3), -1)
+assertEq(search([]int{1}, 0), -1)
+```
+
 ## 162. Find Peak Element | Medium
 related: 852
 tags: slope
@@ -392,6 +557,25 @@ class Solution {
 }
 // test
 check(new Solution().findPeakElement(new int[]{1, 2, 3, 1}), 2);
+```
+
+```go
+func findPeakElement(nums []int) int {
+	lo, hi := 0, len(nums)-1
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] < nums[mid+1] { // uphill: a peak lies to the right
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	return lo
+}
+// test
+assertEq(findPeakElement([]int{1, 2, 3, 1}), 2)
+p := findPeakElement([]int{1, 2, 1, 3, 5, 6, 4})
+assertEq(p == 1 || p == 5, true)
 ```
 
 ## 981. Time Based Key-Value Store | Medium
@@ -444,6 +628,41 @@ check(tm.get("foo", 3), "bar");
 tm.set("foo", "bar2", 4);
 check(tm.get("foo", 5), "bar2");
 check(tm.get("foo", 0), "");
+```
+
+```go
+type entry struct {
+	ts    int
+	value string
+}
+
+type TimeMap struct {
+	data map[string][]entry // timestamps arrive increasing
+}
+
+func Constructor() TimeMap {
+	return TimeMap{data: map[string][]entry{}}
+}
+
+func (this *TimeMap) Set(key string, value string, timestamp int) {
+	this.data[key] = append(this.data[key], entry{timestamp, value})
+}
+
+func (this *TimeMap) Get(key string, timestamp int) string {
+	arr := this.data[key]
+	i := sort.Search(len(arr), func(i int) bool { return arr[i].ts > timestamp }) // first ts > timestamp
+	if i == 0 {
+		return ""
+	}
+	return arr[i-1].value
+}
+// test
+tm := Constructor()
+tm.Set("foo", "bar", 1)
+assertEq(tm.Get("foo", 1), "bar")
+assertEq(tm.Get("foo", 3), "bar")
+tm.Set("foo", "bar2", 4)
+assertEq([]string{tm.Get("foo", 4), tm.Get("foo", 5), tm.Get("foo", 0)}, []string{"bar2", "bar2", ""})
 ```
 
 ## 4. Median of Two Sorted Arrays | Hard
@@ -509,6 +728,50 @@ check(new Solution().findMedianSortedArrays(new int[]{1, 3}, new int[]{2}), 2.0)
 check(new Solution().findMedianSortedArrays(new int[]{1, 2}, new int[]{3, 4}), 2.5);
 ```
 
+```go
+func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
+	A, B := nums1, nums2
+	if len(A) > len(B) {
+		A, B = B, A // binary search the shorter array
+	}
+	m, n := len(A), len(B)
+	half := (m + n + 1) / 2
+	lo, hi := 0, m
+	for {
+		i := (lo + hi) / 2 // i elements from A, j from B on the left side
+		j := half - i
+		al, ar, bl, br := math.MinInt, math.MaxInt, math.MinInt, math.MaxInt
+		if i > 0 {
+			al = A[i-1]
+		}
+		if i < m {
+			ar = A[i]
+		}
+		if j > 0 {
+			bl = B[j-1]
+		}
+		if j < n {
+			br = B[j]
+		}
+		if al <= br && bl <= ar {
+			if (m+n)%2 == 1 {
+				return float64(max(al, bl))
+			}
+			return float64(max(al, bl)+min(ar, br)) / 2
+		}
+		if al > br {
+			hi = i - 1
+		} else {
+			lo = i + 1
+		}
+	}
+}
+// test
+assertEq(findMedianSortedArrays([]int{1, 3}, []int{2}), 2.0)
+assertEq(findMedianSortedArrays([]int{1, 2}, []int{3, 4}), 2.5)
+assertEq(findMedianSortedArrays([]int{}, []int{1}), 1.0)
+```
+
 ## 1011. Capacity To Ship Packages Within D Days | Medium
 related: 875, 410
 tags: search-on-answer
@@ -566,6 +829,38 @@ class Solution {
 check(new Solution().shipWithinDays(new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 5), 15);
 ```
 
+```go
+func shipWithinDays(weights []int, days int) int {
+	need := func(capacity int) int {
+		d, load := 1, 0
+		for _, w := range weights {
+			if load+w > capacity {
+				d, load = d+1, 0
+			}
+			load += w
+		}
+		return d
+	}
+	lo, hi := 0, 0
+	for _, w := range weights {
+		lo = max(lo, w)
+		hi += w
+	}
+	for lo < hi { // smallest capacity that needs <= days
+		mid := lo + (hi-lo)/2
+		if need(mid) <= days {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(shipWithinDays([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 5), 15)
+assertEq(shipWithinDays([]int{3, 2, 2, 4, 1, 4}, 3), 6)
+```
+
 ## 410. Split Array Largest Sum | Hard
 related: 1011, 875
 tags: search-on-answer
@@ -620,6 +915,38 @@ class Solution {
 check(new Solution().splitArray(new int[]{7, 2, 5, 10, 8}, 2), 18);
 ```
 
+```go
+func splitArray(nums []int, k int) int {
+	parts := func(limit int) int { // pieces needed if no piece may exceed limit
+		cnt, s := 1, 0
+		for _, x := range nums {
+			if s+x > limit {
+				cnt, s = cnt+1, 0
+			}
+			s += x
+		}
+		return cnt
+	}
+	lo, hi := 0, 0
+	for _, x := range nums {
+		lo = max(lo, x)
+		hi += x
+	}
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if parts(mid) <= k {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(splitArray([]int{7, 2, 5, 10, 8}, 2), 18)
+assertEq(splitArray([]int{1, 2, 3, 4, 5}, 2), 9)
+```
+
 ## 69. Sqrt(x) | Easy | sqrtx
 related: 367, 50
 tags: search-on-answer
@@ -659,6 +986,26 @@ class Solution {
 // test
 check(new Solution().mySqrt(8), 2);
 check(new Solution().mySqrt(2147395599), 46339);
+```
+
+```go
+func mySqrt(x int) int {
+	lo, hi := 0, x+1 // first m with m*m > x
+	for lo < hi {
+		m := lo + (hi-lo)/2
+		if m*m > x {
+			hi = m
+		} else {
+			lo = m + 1
+		}
+	}
+	return lo - 1
+}
+// test
+assertEq(mySqrt(4), 2)
+assertEq(mySqrt(8), 2)
+assertEq(mySqrt(0), 0)
+assertEq(mySqrt(2147395599), 46339)
 ```
 
 
@@ -710,6 +1057,34 @@ VersionControl.bad = 1702766719;
 check(new Solution().firstBadVersion(2126753390), 1702766719);
 ```
 
+```go
+var bad int // provided by LeetCode (the tests set it)
+
+func isBadVersion(version int) bool { // provided by LeetCode
+	return version >= bad
+}
+
+func firstBadVersion(n int) int {
+	lo, hi := 1, n
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if isBadVersion(mid) {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+bad = 4
+assertEq(firstBadVersion(5), 4)
+bad = 1
+assertEq(firstBadVersion(1), 1)
+bad = 1702766719
+assertEq(firstBadVersion(2126753390), 1702766719)
+```
+
 ## 852. Peak Index in a Mountain Array | Medium
 related: 162, 1095
 tags: slope
@@ -748,6 +1123,25 @@ class Solution {
 }
 // test
 check(new Solution().peakIndexInMountainArray(new int[]{0, 10, 5, 2}), 1);
+```
+
+```go
+func peakIndexInMountainArray(arr []int) int {
+	lo, hi := 0, len(arr)-1
+	for lo < hi { // first index where the array starts descending
+		mid := lo + (hi-lo)/2
+		if arr[mid] > arr[mid+1] {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(peakIndexInMountainArray([]int{0, 1, 0}), 1)
+assertEq(peakIndexInMountainArray([]int{0, 10, 5, 2}), 1)
+assertEq(peakIndexInMountainArray([]int{3, 5, 3, 2, 0}), 1)
 ```
 
 ## 81. Search in Rotated Sorted Array II | Medium
@@ -807,6 +1201,39 @@ check(new Solution().search(new int[]{1, 0, 1, 1, 1}, 0), true);
 check(new Solution().search(new int[]{2, 5, 6, 0, 0, 1, 2}, 3), false);
 ```
 
+```go
+func search(nums []int, target int) bool {
+	lo, hi := 0, len(nums)-1
+	for lo <= hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] == target {
+			return true
+		}
+		switch {
+		case nums[lo] == nums[mid] && nums[mid] == nums[hi]: // can't tell which half is sorted
+			lo, hi = lo+1, hi-1
+		case nums[lo] <= nums[mid]:
+			if nums[lo] <= target && target < nums[mid] {
+				hi = mid - 1
+			} else {
+				lo = mid + 1
+			}
+		default:
+			if nums[mid] < target && target <= nums[hi] {
+				lo = mid + 1
+			} else {
+				hi = mid - 1
+			}
+		}
+	}
+	return false
+}
+// test
+assertEq(search([]int{2, 5, 6, 0, 0, 1, 2}, 0), true)
+assertEq(search([]int{2, 5, 6, 0, 0, 1, 2}, 3), false)
+assertEq(search([]int{1, 0, 1, 1, 1}, 0), true)
+```
+
 ## 240. Search a 2D Matrix II | Medium
 related: 74, 378
 tags: staircase
@@ -855,6 +1282,28 @@ class Solution {
 int[][] M = {{1, 4, 7, 11, 15}, {2, 5, 8, 12, 19}, {3, 6, 9, 16, 22}, {10, 13, 14, 17, 24}, {18, 21, 23, 26, 30}};
 check(new Solution().searchMatrix(M, 5), true);
 check(new Solution().searchMatrix(M, 20), false);
+```
+
+```go
+func searchMatrix(matrix [][]int, target int) bool {
+	r, c := 0, len(matrix[0])-1 // start top-right: left is smaller, down is bigger
+	for r < len(matrix) && c >= 0 {
+		v := matrix[r][c]
+		switch {
+		case v == target:
+			return true
+		case v > target:
+			c--
+		default:
+			r++
+		}
+	}
+	return false
+}
+// test
+M := [][]int{{1, 4, 7, 11, 15}, {2, 5, 8, 12, 19}, {3, 6, 9, 16, 22}, {10, 13, 14, 17, 24}, {18, 21, 23, 26, 30}}
+assertEq(searchMatrix(M, 5), true)
+assertEq(searchMatrix(M, 20), false)
 ```
 
 ## 528. Random Pick with Weight | Medium
@@ -913,6 +1362,37 @@ for (int i = 0; i < 4000; i++) ones += s.pickIndex();
 check(ones > 2800 && ones < 3200, true);
 ```
 
+```go
+type Solution struct {
+	pre []int // prefix sums of the weights
+}
+
+func Constructor(w []int) Solution {
+	pre := make([]int, len(w))
+	s := 0
+	for i, x := range w {
+		s += x
+		pre[i] = s
+	}
+	return Solution{pre}
+}
+
+func (this *Solution) PickIndex() int {
+	r := rand.Intn(this.pre[len(this.pre)-1]) // 0 <= r < total
+	return sort.SearchInts(this.pre, r+1)     // first prefix sum > r
+}
+// test
+s := Constructor([]int{1, 3})
+picks := map[int]int{}
+for i := 0; i < 4000; i++ {
+	picks[s.PickIndex()]++
+}
+assertEq(picks[0]+picks[1], 4000)
+assertEq(picks[1] > 2800 && picks[1] < 3200, true)
+s2 := Constructor([]int{5})
+assertEq(s2.PickIndex(), 0)
+```
+
 ## 1539. Kth Missing Positive Number | Easy
 related: 41, 268
 tags: binary-search
@@ -950,6 +1430,24 @@ class Solution {
 }
 // test
 check(new Solution().findKthPositive(new int[]{2, 3, 4, 7, 11}, 5), 9);
+```
+
+```go
+func findKthPositive(arr []int, k int) int {
+	lo, hi := 0, len(arr) // first index with arr[i]-(i+1) >= k missing numbers before it
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if arr[mid]-(mid+1) >= k {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo + k
+}
+// test
+assertEq(findKthPositive([]int{2, 3, 4, 7, 11}, 5), 9)
+assertEq(findKthPositive([]int{1, 2, 3, 4}, 2), 6)
 ```
 
 ## 1482. Minimum Number of Days to Make m Bouquets | Medium
@@ -1011,6 +1509,45 @@ check(new Solution().minDays(new int[]{7, 7, 7, 7, 12, 7, 7}, 2, 3), 12);
 check(new Solution().minDays(new int[]{1, 10, 3, 10, 2}, 3, 2), -1);
 ```
 
+```go
+func minDays(bloomDay []int, m int, k int) int {
+	if m*k > len(bloomDay) {
+		return -1
+	}
+	ok := func(day int) bool {
+		made, run := 0, 0
+		for _, b := range bloomDay {
+			if b <= day {
+				run++
+			} else {
+				run = 0
+			}
+			if run == k {
+				made, run = made+1, 0
+			}
+		}
+		return made >= m
+	}
+	lo, hi := math.MaxInt, 0
+	for _, b := range bloomDay {
+		lo, hi = min(lo, b), max(hi, b)
+	}
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if ok(mid) {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+// test
+assertEq(minDays([]int{1, 10, 3, 10, 2}, 3, 1), 3)
+assertEq(minDays([]int{1, 10, 3, 10, 2}, 3, 2), -1)
+assertEq(minDays([]int{7, 7, 7, 7, 12, 7, 7}, 2, 3), 12)
+```
+
 ## 374. Guess Number Higher or Lower | Easy
 related: 278, 704
 tags: binary-search
@@ -1063,6 +1600,40 @@ GuessGame.pick = 6;
 check(new Solution().guessNumber(10), 6);
 ```
 
+```go
+var pick int // provided by LeetCode (the tests set it)
+
+func guess(num int) int { // provided by LeetCode
+	if num == pick {
+		return 0
+	}
+	if pick < num {
+		return -1
+	}
+	return 1
+}
+
+func guessNumber(n int) int {
+	lo, hi := 1, n
+	for {
+		mid := lo + (hi-lo)/2
+		switch guess(mid) {
+		case 0:
+			return mid
+		case -1:
+			hi = mid - 1
+		default:
+			lo = mid + 1
+		}
+	}
+}
+// test
+for _, tc := range [][2]int{{10, 6}, {1, 1}, {2, 1}, {2, 2}, {2126753390, 1702766719}} {
+	pick = tc[1]
+	assertEq(guessNumber(tc[0]), tc[1])
+}
+```
+
 ## 2300. Successful Pairs of Spells and Potions | Medium
 related: 35, 1855
 tags: lower-bound, sort
@@ -1104,6 +1675,23 @@ class Solution {
 // test
 check(new Solution().successfulPairs(new int[]{5, 1, 3}, new int[]{1, 2, 3, 4, 5}, 7), new int[]{4, 0, 3});
 check(new Solution().successfulPairs(new int[]{100000}, new int[]{100000}, 10000000000L), new int[]{1});
+```
+
+```go
+func successfulPairs(spells []int, potions []int, success int64) []int {
+	sort.Ints(potions)
+	m := len(potions)
+	res := make([]int, len(spells))
+	for i, s := range spells {
+		need := (int(success) + s - 1) / s // weakest potion that works
+		res[i] = m - sort.SearchInts(potions, need)
+	}
+	return res
+}
+// test
+assertEq(successfulPairs([]int{5, 1, 3}, []int{1, 2, 3, 4, 5}, 7), []int{4, 0, 3})
+assertEq(successfulPairs([]int{3, 1, 2}, []int{8, 5, 8}, 16), []int{2, 0, 2})
+assertEq(successfulPairs([]int{100000}, []int{100000}, 10000000000), []int{1})
 ```
 
 ## 1095. Find in Mountain Array | Hard
@@ -1191,4 +1779,71 @@ MountainArray ma = new MountainArray() {
 };
 check(new Solution().findInMountainArray(3, ma), 2);
 check(new Solution().findInMountainArray(6, ma), -1);
+```
+
+```go
+type MountainArray struct { // provided by LeetCode (this stand-in counts calls; the limit is 100)
+	a     []int
+	calls int
+}
+
+func (this *MountainArray) get(index int) int {
+	this.calls++
+	return this.a[index]
+}
+
+func (this *MountainArray) length() int {
+	return len(this.a)
+}
+
+func findInMountainArray(target int, mountainArr *MountainArray) int {
+	n := mountainArr.length()
+	lo, hi := 0, n-1
+	for lo < hi { // find the peak
+		mid := lo + (hi-lo)/2
+		if mountainArr.get(mid) < mountainArr.get(mid+1) {
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	peak := lo
+	search := func(lo, hi int, ascending bool) int {
+		for lo <= hi {
+			mid := lo + (hi-lo)/2
+			v := mountainArr.get(mid)
+			if v == target {
+				return mid
+			}
+			if (v < target) == ascending {
+				lo = mid + 1
+			} else {
+				hi = mid - 1
+			}
+		}
+		return -1
+	}
+	if i := search(0, peak, true); i != -1 {
+		return i
+	}
+	return search(peak+1, n-1, false)
+}
+// test
+rng := func(from, to, step int) []int { // like Python's range
+	out := []int{}
+	for i := from; i != to; i += step {
+		out = append(out, i)
+	}
+	return out
+}
+m := &MountainArray{a: []int{1, 2, 3, 4, 5, 3, 1}}
+assertEq(findInMountainArray(3, m), 2)
+assertEq(m.calls <= 100, true)
+assertEq(findInMountainArray(3, &MountainArray{a: []int{0, 1, 2, 4, 2, 1}}), -1)
+assertEq(findInMountainArray(1, &MountainArray{a: []int{0, 1, 2, 4, 2, 1}}), 1)
+big := &MountainArray{a: append(rng(0, 5000, 1), rng(4998, -1, -1)...)}
+assertEq(findInMountainArray(4000, big), 4000)
+assertEq(big.calls <= 100, true)
+assertEq(findInMountainArray(2001, &MountainArray{a: append(rng(0, 5000, 1), rng(4998, 2000, -1)...)}), 2001)
+assertEq(findInMountainArray(2000, &MountainArray{a: append(rng(10, 3000, 1), 5)}), 1990)
 ```
