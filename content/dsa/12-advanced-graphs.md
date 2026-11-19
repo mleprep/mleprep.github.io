@@ -80,6 +80,54 @@ check(new Solution().networkDelayTime(new int[][]{{2, 1, 1}, {2, 3, 1}, {3, 4, 1
 check(new Solution().networkDelayTime(new int[][]{{1, 2, 1}}, 2, 2), -1);
 ```
 
+```go
+type distHeap [][2]int // (distance, node), smallest distance first
+
+func (h distHeap) Len() int           { return len(h) }
+func (h distHeap) Less(i, j int) bool { return h[i][0] < h[j][0] }
+func (h distHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *distHeap) Push(x any)        { *h = append(*h, x.([2]int)) }
+func (h *distHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func networkDelayTime(times [][]int, n int, k int) int {
+	g := make([][][2]int, n+1) // u -> (v, w)
+	for _, t := range times {
+		g[t[0]] = append(g[t[0]], [2]int{t[1], t[2]})
+	}
+	dist := map[int]int{} // finalized nodes
+	pq := &distHeap{{0, k}}
+	for pq.Len() > 0 {
+		top := heap.Pop(pq).([2]int)
+		d, u := top[0], top[1]
+		if _, done := dist[u]; done {
+			continue
+		}
+		dist[u] = d
+		for _, e := range g[u] {
+			if _, done := dist[e[0]]; !done {
+				heap.Push(pq, [2]int{d + e[1], e[0]})
+			}
+		}
+	}
+	if len(dist) < n {
+		return -1
+	}
+	best := 0
+	for _, d := range dist {
+		best = max(best, d)
+	}
+	return best
+}
+// test
+assertEq(networkDelayTime([][]int{{2, 1, 1}, {2, 3, 1}, {3, 4, 1}}, 4, 2), 2)
+assertEq(networkDelayTime([][]int{{1, 2, 1}}, 2, 2), -1)
+```
+
 ## 787. Cheapest Flights Within K Stops | Medium
 related: 743
 tags: bellman-ford
@@ -132,6 +180,34 @@ class Solution {
 // test
 int[][] F = {{0, 1, 100}, {1, 2, 100}, {2, 0, 100}, {1, 3, 600}, {2, 3, 200}};
 check(new Solution().findCheapestPrice(4, F, 0, 3, 1), 700);
+```
+
+```go
+func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
+	const inf = math.MaxInt32
+	dist := make([]int, n)
+	for i := range dist {
+		dist[i] = inf
+	}
+	dist[src] = 0
+	for round := 0; round <= k; round++ { // Bellman-Ford limited to k+1 edges
+		next := append([]int(nil), dist...) // relax from last round's values only
+		for _, f := range flights {
+			if dist[f[0]] != inf && dist[f[0]]+f[2] < next[f[1]] {
+				next[f[1]] = dist[f[0]] + f[2]
+			}
+		}
+		dist = next
+	}
+	if dist[dst] == inf {
+		return -1
+	}
+	return dist[dst]
+}
+// test
+F := [][]int{{0, 1, 100}, {1, 2, 100}, {2, 0, 100}, {1, 3, 600}, {2, 3, 200}}
+assertEq(findCheapestPrice(4, F, 0, 3, 1), 700)
+assertEq(findCheapestPrice(3, [][]int{{0, 1, 100}, {1, 2, 100}, {0, 2, 500}}, 0, 2, 0), 500)
 ```
 
 ## 1584. Min Cost to Connect All Points | Medium
@@ -189,6 +265,45 @@ class Solution {
 check(new Solution().minCostConnectPoints(new int[][]{{0, 0}, {2, 2}, {3, 10}, {5, 2}, {7, 0}}), 20);
 ```
 
+```go
+func minCostConnectPoints(points [][]int) int {
+	n := len(points)
+	dist := make([]int, n) // cheapest edge from the tree to each point
+	for i := range dist {
+		dist[i] = math.MaxInt
+	}
+	dist[0] = 0
+	used := make([]bool, n)
+	total := 0
+	for step := 0; step < n; step++ { // dense Prim: O(n^2)
+		u := -1
+		for i := 0; i < n; i++ {
+			if !used[i] && (u == -1 || dist[i] < dist[u]) {
+				u = i
+			}
+		}
+		used[u] = true
+		total += dist[u]
+		for v := 0; v < n; v++ {
+			if !used[v] {
+				dist[v] = min(dist[v], abs(points[v][0]-points[u][0])+abs(points[v][1]-points[u][1]))
+			}
+		}
+	}
+	return total
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+// test
+assertEq(minCostConnectPoints([][]int{{0, 0}, {2, 2}, {3, 10}, {5, 2}, {7, 0}}), 20)
+assertEq(minCostConnectPoints([][]int{{3, 12}, {-2, 5}, {-4, 1}}), 18)
+```
+
 ## 332. Reconstruct Itinerary | Hard
 related: 753
 tags: eulerian-path, hierholzer
@@ -239,6 +354,37 @@ class Solution {
 }
 // test
 check(new Solution().findItinerary(List.of(List.of("JFK", "KUL"), List.of("JFK", "NRT"), List.of("NRT", "JFK"))), "[JFK, NRT, JFK, KUL]");
+```
+
+```go
+func findItinerary(tickets [][]string) []string {
+	g := map[string][]string{}
+	for _, t := range tickets {
+		g[t[0]] = append(g[t[0]], t[1])
+	}
+	for _, dests := range g {
+		sort.Sort(sort.Reverse(sort.StringSlice(dests))) // popping from the end gives the smallest
+	}
+	route, st := []string{}, []string{"JFK"}
+	for len(st) > 0 { // Hierholzer: an airport joins the route once it has no tickets left
+		top := st[len(st)-1]
+		if d := g[top]; len(d) > 0 {
+			g[top] = d[:len(d)-1]
+			st = append(st, d[len(d)-1])
+		} else {
+			route = append(route, top)
+			st = st[:len(st)-1]
+		}
+	}
+	for i, j := 0, len(route)-1; i < j; i, j = i+1, j-1 {
+		route[i], route[j] = route[j], route[i]
+	}
+	return route
+}
+// test
+T := [][]string{{"MUC", "LHR"}, {"JFK", "MUC"}, {"SFO", "SJC"}, {"LHR", "SFO"}}
+assertEq(findItinerary(T), []string{"JFK", "MUC", "LHR", "SFO", "SJC"})
+assertEq(findItinerary([][]string{{"JFK", "KUL"}, {"JFK", "NRT"}, {"NRT", "JFK"}}), []string{"JFK", "NRT", "JFK", "KUL"})
 ```
 
 ## 778. Swim in Rising Water | Hard
@@ -292,6 +438,51 @@ class Solution {
 }
 // test
 check(new Solution().swimInWater(new int[][]{{0, 2}, {1, 3}}), 3);
+```
+
+```go
+type cellHeap [][3]int // (time, row, col), smallest time first
+
+func (h cellHeap) Len() int           { return len(h) }
+func (h cellHeap) Less(i, j int) bool { return h[i][0] < h[j][0] }
+func (h cellHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *cellHeap) Push(x any)        { *h = append(*h, x.([3]int)) }
+func (h *cellHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func swimInWater(grid [][]int) int {
+	n := len(grid)
+	seen := make([][]bool, n)
+	for i := range seen {
+		seen[i] = make([]bool, n)
+	}
+	seen[0][0] = true
+	pq := &cellHeap{{grid[0][0], 0, 0}}
+	dirs := [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	for pq.Len() > 0 {
+		cur := heap.Pop(pq).([3]int)
+		t, r, c := cur[0], cur[1], cur[2]
+		if r == n-1 && c == n-1 {
+			return t
+		}
+		for _, d := range dirs {
+			nr, nc := r+d[0], c+d[1]
+			if nr >= 0 && nr < n && nc >= 0 && nc < n && !seen[nr][nc] {
+				seen[nr][nc] = true
+				heap.Push(pq, [3]int{max(t, grid[nr][nc]), nr, nc})
+			}
+		}
+	}
+	return -1
+}
+// test
+assertEq(swimInWater([][]int{{0, 2}, {1, 3}}), 3)
+G := [][]int{{0, 1, 2, 3, 4}, {24, 23, 22, 21, 5}, {12, 13, 14, 15, 16}, {11, 17, 18, 19, 20}, {10, 9, 8, 7, 6}}
+assertEq(swimInWater(G), 16)
 ```
 
 ## 269. Alien Dictionary | Hard
@@ -372,6 +563,64 @@ check(new Solution().alienOrder(new String[]{"wrt", "wrf", "er", "ett", "rftt"})
 check(new Solution().alienOrder(new String[]{"z", "x", "z"}), "");
 ```
 
+```go
+func alienOrder(words []string) string {
+	adj := map[byte]map[byte]bool{}
+	indeg := map[byte]int{}
+	for _, w := range words {
+		for i := 0; i < len(w); i++ {
+			if adj[w[i]] == nil {
+				adj[w[i]] = map[byte]bool{}
+				indeg[w[i]] = 0
+			}
+		}
+	}
+	for i := 0; i+1 < len(words); i++ {
+		a, b := words[i], words[i+1]
+		j := 0
+		for j < len(a) && j < len(b) && a[j] == b[j] {
+			j++
+		}
+		if j < len(a) && j < len(b) { // first difference: a[j] comes before b[j]
+			if !adj[a[j]][b[j]] {
+				adj[a[j]][b[j]] = true
+				indeg[b[j]]++
+			}
+		} else if len(a) > len(b) {
+			return "" // "abc" before "ab" is impossible
+		}
+	}
+	q := []byte{} // Kahn's algorithm, letters taken alphabetically for a deterministic answer
+	for c := byte('a'); c <= 'z'; c++ {
+		if d, ok := indeg[c]; ok && d == 0 {
+			q = append(q, c)
+		}
+	}
+	out := []byte{}
+	for len(q) > 0 {
+		u := q[0]
+		q = q[1:]
+		out = append(out, u)
+		for v := byte('a'); v <= 'z'; v++ {
+			if adj[u][v] {
+				indeg[v]--
+				if indeg[v] == 0 {
+					q = append(q, v)
+				}
+			}
+		}
+	}
+	if len(out) < len(indeg) {
+		return "" // a cycle
+	}
+	return string(out)
+}
+// test
+assertEq(alienOrder([]string{"wrt", "wrf", "er", "ett", "rftt"}), "wertf")
+assertEq(alienOrder([]string{"z", "x", "z"}), "")
+assertEq(alienOrder([]string{"abc", "ab"}), "")
+```
+
 ## 1631. Path With Minimum Effort | Medium
 related: 778, 743
 tags: dijkstra, minimax
@@ -431,6 +680,62 @@ class Solution {
 }
 // test
 check(new Solution().minimumEffortPath(new int[][]{{1, 2, 2}, {3, 8, 2}, {5, 3, 5}}), 2);
+```
+
+```go
+type effortHeap [][3]int // (effort, row, col), smallest effort first
+
+func (h effortHeap) Len() int           { return len(h) }
+func (h effortHeap) Less(i, j int) bool { return h[i][0] < h[j][0] }
+func (h effortHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *effortHeap) Push(x any)        { *h = append(*h, x.([3]int)) }
+func (h *effortHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func minimumEffortPath(heights [][]int) int {
+	R, C := len(heights), len(heights[0])
+	best := make([][]int, R)
+	for i := range best {
+		best[i] = make([]int, C)
+		for j := range best[i] {
+			best[i][j] = math.MaxInt
+		}
+	}
+	best[0][0] = 0
+	pq := &effortHeap{{0, 0, 0}}
+	dirs := [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	for pq.Len() > 0 {
+		cur := heap.Pop(pq).([3]int)
+		e, r, c := cur[0], cur[1], cur[2]
+		if r == R-1 && c == C-1 {
+			return e
+		}
+		if e > best[r][c] {
+			continue // stale entry
+		}
+		for _, d := range dirs {
+			nr, nc := r+d[0], c+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C {
+				diff := heights[nr][nc] - heights[r][c]
+				if diff < 0 {
+					diff = -diff
+				}
+				if ne := max(e, diff); ne < best[nr][nc] {
+					best[nr][nc] = ne
+					heap.Push(pq, [3]int{ne, nr, nc})
+				}
+			}
+		}
+	}
+	return 0
+}
+// test
+assertEq(minimumEffortPath([][]int{{1, 2, 2}, {3, 8, 2}, {5, 3, 5}}), 2)
+assertEq(minimumEffortPath([][]int{{1, 2, 1, 1, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 1, 1, 2, 1}}), 0)
 ```
 
 ## 310. Minimum Height Trees | Medium
@@ -497,6 +802,50 @@ class Solution {
 }
 // test
 check(new Solution().findMinHeightTrees(6, new int[][]{{3, 0}, {3, 1}, {3, 2}, {3, 4}, {5, 4}}), "[3, 4]");
+```
+
+```go
+func findMinHeightTrees(n int, edges [][]int) []int {
+	if n <= 2 {
+		out := []int{}
+		for i := 0; i < n; i++ {
+			out = append(out, i)
+		}
+		return out
+	}
+	adj := make([][]int, n)
+	deg := make([]int, n)
+	for _, e := range edges {
+		adj[e[0]] = append(adj[e[0]], e[1])
+		adj[e[1]] = append(adj[e[1]], e[0])
+		deg[e[0]]++
+		deg[e[1]]++
+	}
+	leaves := []int{}
+	for i := 0; i < n; i++ {
+		if deg[i] == 1 {
+			leaves = append(leaves, i)
+		}
+	}
+	remaining := n
+	for remaining > 2 { // peel leaves layer by layer; the last 1-2 nodes are the centres
+		remaining -= len(leaves)
+		next := []int{}
+		for _, leaf := range leaves {
+			for _, nb := range adj[leaf] {
+				deg[nb]--
+				if deg[nb] == 1 {
+					next = append(next, nb)
+				}
+			}
+		}
+		leaves = next
+	}
+	return leaves
+}
+// test
+assertUnordered(findMinHeightTrees(4, [][]int{{1, 0}, {1, 2}, {1, 3}}), []int{1})
+assertUnordered(findMinHeightTrees(6, [][]int{{3, 0}, {3, 1}, {3, 2}, {3, 4}, {5, 4}}), []int{3, 4})
 ```
 
 ## 1192. Critical Connections in a Network | Hard
@@ -579,6 +928,48 @@ class Solution {
 check(new Solution().criticalConnections(4, List.of(List.of(0, 1), List.of(1, 2), List.of(2, 0), List.of(1, 3))), "[[1, 3]]");
 ```
 
+```go
+func criticalConnections(n int, connections [][]int) [][]int {
+	g := make([][]int, n)
+	for _, c := range connections {
+		g[c[0]] = append(g[c[0]], c[1])
+		g[c[1]] = append(g[c[1]], c[0])
+	}
+	tin, low := make([]int, n), make([]int, n)
+	for i := range tin {
+		tin[i] = -1
+	}
+	res := [][]int{}
+	timer := 0
+	var dfs func(u, parent int)
+	dfs = func(u, parent int) {
+		tin[u], low[u] = timer, timer
+		timer++
+		for _, v := range g[u] {
+			if v == parent {
+				continue
+			}
+			if tin[v] == -1 {
+				dfs(v, u)
+				low[u] = min(low[u], low[v])
+				if low[v] > tin[u] { // v's subtree cannot reach u or above without this edge
+					res = append(res, []int{u, v})
+				}
+			} else {
+				low[u] = min(low[u], tin[v])
+			}
+		}
+	}
+	dfs(0, -1)
+	return res
+}
+// test
+assertUnorderedDeep(criticalConnections(4, [][]int{{0, 1}, {1, 2}, {2, 0}, {1, 3}}), [][]int{{1, 3}})
+assertUnorderedDeep(criticalConnections(2, [][]int{{0, 1}}), [][]int{{0, 1}})
+assertUnorderedDeep(criticalConnections(6, [][]int{{0, 1}, {1, 2}, {2, 0}, {1, 3}, {3, 4}, {4, 5}, {5, 3}}), [][]int{{1, 3}})
+assertUnorderedDeep(criticalConnections(4, [][]int{{0, 1}, {1, 2}, {2, 3}}), [][]int{{0, 1}, {1, 2}, {2, 3}})
+```
+
 ## 802. Find Eventual Safe States | Medium
 related: 207
 tags: cycle-detection, three-color-dfs
@@ -626,6 +1017,36 @@ class Solution {
 }
 // test
 check(new Solution().eventualSafeNodes(new int[][]{{1, 2}, {2, 3}, {5}, {0}, {5}, {}, {}}), "[2, 4, 5, 6]");
+```
+
+```go
+func eventualSafeNodes(graph [][]int) []int {
+	color := make([]int, len(graph)) // 0 unvisited, 1 on the path or unsafe, 2 safe
+	var safe func(u int) bool
+	safe = func(u int) bool {
+		if color[u] != 0 {
+			return color[u] == 2
+		}
+		color[u] = 1
+		for _, v := range graph[u] {
+			if !safe(v) {
+				return false // stays 1: unsafe
+			}
+		}
+		color[u] = 2
+		return true
+	}
+	res := []int{}
+	for u := range graph {
+		if safe(u) {
+			res = append(res, u)
+		}
+	}
+	return res
+}
+// test
+assertEq(eventualSafeNodes([][]int{{1, 2}, {2, 3}, {5}, {0}, {5}, {}, {}}), []int{2, 4, 5, 6})
+assertEq(eventualSafeNodes([][]int{{1, 2, 3, 4}, {1, 2}, {3, 4}, {0, 4}, {}}), []int{4})
 ```
 
 
@@ -692,6 +1113,60 @@ class Solution {
 }
 // test
 check(new Solution().maxProbability(3, new int[][]{{0, 1}, {1, 2}, {0, 2}}, new double[]{0.5, 0.5, 0.2}, 0, 2), 0.25);
+```
+
+```go
+type probItem struct {
+	p float64
+	u int
+}
+
+type probHeap []probItem // largest probability first
+
+func (h probHeap) Len() int           { return len(h) }
+func (h probHeap) Less(i, j int) bool { return h[i].p > h[j].p }
+func (h probHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *probHeap) Push(x any)        { *h = append(*h, x.(probItem)) }
+func (h *probHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func maxProbability(n int, edges [][]int, succProb []float64, start_node int, end_node int) float64 {
+	type edge struct {
+		to int
+		p  float64
+	}
+	g := make([][]edge, n)
+	for i, e := range edges {
+		g[e[0]] = append(g[e[0]], edge{e[1], succProb[i]})
+		g[e[1]] = append(g[e[1]], edge{e[0], succProb[i]})
+	}
+	best := make([]float64, n)
+	best[start_node] = 1
+	pq := &probHeap{{1, start_node}}
+	for pq.Len() > 0 { // Dijkstra on max-product: multiplying by p <= 1 never helps later
+		cur := heap.Pop(pq).(probItem)
+		if cur.u == end_node {
+			return cur.p
+		}
+		if cur.p < best[cur.u] {
+			continue
+		}
+		for _, e := range g[cur.u] {
+			if np := cur.p * e.p; np > best[e.to] {
+				best[e.to] = np
+				heap.Push(pq, probItem{np, e.to})
+			}
+		}
+	}
+	return 0
+}
+// test
+assertEq(maxProbability(3, [][]int{{0, 1}, {1, 2}, {0, 2}}, []float64{0.5, 0.5, 0.2}, 0, 2), 0.25)
+assertEq(maxProbability(3, [][]int{{0, 1}}, []float64{0.5}, 0, 2), 0.0)
 ```
 
 ## 1976. Number of Ways to Arrive at Destination | Medium
@@ -761,6 +1236,57 @@ int[][] R = {{0, 6, 7}, {0, 1, 2}, {1, 2, 3}, {1, 3, 3}, {6, 3, 3}, {3, 5, 1}, {
 check(new Solution().countPaths(7, R), 4);
 ```
 
+```go
+type pathHeap [][2]int // (distance, node), smallest distance first
+
+func (h pathHeap) Len() int           { return len(h) }
+func (h pathHeap) Less(i, j int) bool { return h[i][0] < h[j][0] }
+func (h pathHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *pathHeap) Push(x any)        { *h = append(*h, x.([2]int)) }
+func (h *pathHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func countPaths(n int, roads [][]int) int {
+	const mod = 1_000_000_007
+	g := make([][][2]int, n)
+	for _, r := range roads {
+		g[r[0]] = append(g[r[0]], [2]int{r[1], r[2]})
+		g[r[1]] = append(g[r[1]], [2]int{r[0], r[2]})
+	}
+	dist, ways := make([]int, n), make([]int, n)
+	for i := range dist {
+		dist[i] = math.MaxInt
+	}
+	dist[0], ways[0] = 0, 1
+	pq := &pathHeap{{0, 0}}
+	for pq.Len() > 0 {
+		cur := heap.Pop(pq).([2]int)
+		d, u := cur[0], cur[1]
+		if d > dist[u] {
+			continue
+		}
+		for _, e := range g[u] {
+			v, t := e[0], e[1]
+			if d+t < dist[v] { // strictly shorter: the shortest ways to v all go through u
+				dist[v], ways[v] = d+t, ways[u]
+				heap.Push(pq, [2]int{dist[v], v})
+			} else if d+t == dist[v] {
+				ways[v] = (ways[v] + ways[u]) % mod
+			}
+		}
+	}
+	return ways[n-1]
+}
+// test
+R := [][]int{{0, 6, 7}, {0, 1, 2}, {1, 2, 3}, {1, 3, 3}, {6, 3, 3}, {3, 5, 1}, {6, 5, 1}, {2, 5, 1}, {0, 4, 5}, {4, 6, 2}}
+assertEq(countPaths(7, R), 4)
+assertEq(countPaths(2, [][]int{{1, 0, 10}}), 1)
+```
+
 ## 1334. Find the City With the Smallest Number of Neighbors at a Threshold Distance | Medium
 related: 743
 tags: floyd-warshall
@@ -814,6 +1340,49 @@ class Solution {
 }
 // test
 check(new Solution().findTheCity(4, new int[][]{{0, 1, 3}, {1, 2, 1}, {1, 3, 4}, {2, 3, 1}}, 4), 3);
+```
+
+```go
+func findTheCity(n int, edges [][]int, distanceThreshold int) int {
+	const inf = math.MaxInt32 / 2 // inf + inf must not overflow
+	d := make([][]int, n)
+	for i := range d {
+		d[i] = make([]int, n)
+		for j := range d[i] {
+			if i != j {
+				d[i][j] = inf
+			}
+		}
+	}
+	for _, e := range edges {
+		d[e[0]][e[1]], d[e[1]][e[0]] = e[2], e[2]
+	}
+	for k := 0; k < n; k++ { // Floyd-Warshall
+		for i := 0; i < n; i++ {
+			for j := 0; j < n; j++ {
+				if d[i][k]+d[k][j] < d[i][j] {
+					d[i][j] = d[i][k] + d[k][j]
+				}
+			}
+		}
+	}
+	best, city := math.MaxInt, -1
+	for i := 0; i < n; i++ {
+		cnt := 0
+		for j := 0; j < n; j++ {
+			if j != i && d[i][j] <= distanceThreshold {
+				cnt++
+			}
+		}
+		if cnt <= best { // ties go to the larger index
+			best, city = cnt, i
+		}
+	}
+	return city
+}
+// test
+assertEq(findTheCity(4, [][]int{{0, 1, 3}, {1, 2, 1}, {1, 3, 4}, {2, 3, 1}}, 4), 3)
+assertEq(findTheCity(5, [][]int{{0, 1, 2}, {0, 4, 8}, {1, 2, 3}, {1, 4, 2}, {2, 3, 1}, {3, 4, 1}}, 2), 0)
 ```
 
 ## 685. Redundant Connection II | Hard
@@ -889,6 +1458,52 @@ check(new Solution().findRedundantDirectedConnection(new int[][]{{1, 2}, {2, 3},
 check(new Solution().findRedundantDirectedConnection(new int[][]{{2, 1}, {3, 1}, {4, 2}, {1, 4}}), new int[]{2, 1});
 ```
 
+```go
+func findRedundantDirectedConnection(edges [][]int) []int {
+	n := len(edges)
+	parentOf := make([]int, n+1) // 0 = no parent yet (nodes are 1..n)
+	var cand1, cand2 []int       // the two edges into a node with two parents
+	for _, e := range edges {
+		u, v := e[0], e[1]
+		if parentOf[v] != 0 {
+			cand1, cand2 = []int{parentOf[v], v}, []int{u, v}
+		} else {
+			parentOf[v] = u
+		}
+	}
+	root := make([]int, n+1)
+	for i := range root {
+		root[i] = i
+	}
+	find := func(x int) int {
+		for root[x] != x {
+			root[x] = root[root[x]]
+			x = root[x]
+		}
+		return x
+	}
+	for _, e := range edges {
+		u, v := e[0], e[1]
+		if cand2 != nil && u == cand2[0] && v == cand2[1] {
+			continue // try the tree without the later candidate
+		}
+		ru, rv := find(u), find(v)
+		if ru == rv { // a cycle even so
+			if cand1 != nil {
+				return cand1
+			}
+			return []int{u, v}
+		}
+		root[rv] = ru
+	}
+	return cand2
+}
+// test
+assertEq(findRedundantDirectedConnection([][]int{{1, 2}, {1, 3}, {2, 3}}), []int{2, 3})
+assertEq(findRedundantDirectedConnection([][]int{{1, 2}, {2, 3}, {3, 4}, {4, 1}, {1, 5}}), []int{4, 1})
+assertEq(findRedundantDirectedConnection([][]int{{2, 1}, {3, 1}, {4, 2}, {1, 4}}), []int{2, 1})
+```
+
 ## 753. Cracking the Safe | Hard
 related: 332
 tags: de-bruijn, eulerian-path
@@ -947,6 +1562,42 @@ String s = new Solution().crackSafe(3, 3);
 Set<String> all = new HashSet<>();
 for (int i = 0; i + 3 <= s.length(); i++) all.add(s.substring(i, i + 3));
 check(all.size() == 27 && s.length() == 29, true);
+```
+
+```go
+func crackSafe(n int, k int) string {
+	seen := map[string]bool{} // edges (n-digit codes) already used
+	out := []byte{}
+	var dfs func(node string)
+	dfs = func(node string) { // Hierholzer on the de Bruijn graph of (n-1)-digit nodes
+		for d := 0; d < k; d++ {
+			edge := node + string(rune('0'+d))
+			if !seen[edge] {
+				seen[edge] = true
+				dfs(edge[1:])
+				out = append(out, byte('0'+d))
+			}
+		}
+	}
+	start := strings.Repeat("0", n-1)
+	dfs(start)
+	return string(out) + start
+}
+// test
+covers := func(s string, n, k int) bool { // every n-digit code appears, in the shortest length
+	codes := map[string]bool{}
+	for i := 0; i+n <= len(s); i++ {
+		codes[s[i:i+n]] = true
+	}
+	want := 1
+	for i := 0; i < n; i++ {
+		want *= k
+	}
+	return len(codes) == want && len(s) == want+n-1
+}
+assertEq(covers(crackSafe(1, 2), 1, 2), true)
+assertEq(covers(crackSafe(2, 2), 2, 2), true)
+assertEq(covers(crackSafe(3, 3), 3, 3), true)
 ```
 
 ## 1489. Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree | Hard
@@ -1047,6 +1698,61 @@ check(new Solution().findCriticalAndPseudoCriticalEdges(5, new int[][]{{0, 1, 1}
       List.of(List.of(0, 1), List.of(2, 3, 4, 5)));
 ```
 
+```go
+func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
+	order := make([]int, len(edges))
+	for i := range order {
+		order[i] = i
+	}
+	sort.Slice(order, func(a, b int) bool { return edges[order[a]][2] < edges[order[b]][2] })
+	mst := func(skip, force int) int { // Kruskal without edge `skip` / starting with edge `force`
+		parent := make([]int, n)
+		for i := range parent {
+			parent[i] = i
+		}
+		find := func(x int) int {
+			for parent[x] != x {
+				parent[x] = parent[parent[x]]
+				x = parent[x]
+			}
+			return x
+		}
+		weight, used := 0, 0
+		if force >= 0 {
+			e := edges[force]
+			parent[find(e[0])] = find(e[1])
+			weight, used = e[2], 1
+		}
+		for _, i := range order {
+			e := edges[i]
+			if i != skip && find(e[0]) != find(e[1]) {
+				parent[find(e[0])] = find(e[1])
+				weight += e[2]
+				used++
+			}
+		}
+		if used < n-1 {
+			return math.MaxInt // disconnected
+		}
+		return weight
+	}
+	base := mst(-1, -1)
+	critical, pseudo := []int{}, []int{}
+	for i := range edges {
+		if mst(i, -1) > base {
+			critical = append(critical, i)
+		} else if mst(-1, i) == base {
+			pseudo = append(pseudo, i)
+		}
+	}
+	return [][]int{critical, pseudo}
+}
+// test
+assertEq(findCriticalAndPseudoCriticalEdges(5, [][]int{{0, 1, 1}, {1, 2, 1}, {2, 3, 2}, {0, 3, 2}, {0, 4, 3}, {3, 4, 3}, {1, 4, 6}}), [][]int{{0, 1}, {2, 3, 4, 5}})
+assertEq(findCriticalAndPseudoCriticalEdges(4, [][]int{{0, 1, 1}, {1, 2, 1}, {2, 3, 1}, {0, 3, 1}}), [][]int{{}, {0, 1, 2, 3}})
+assertEq(findCriticalAndPseudoCriticalEdges(3, [][]int{{0, 1, 1}, {1, 2, 2}, {0, 2, 3}}), [][]int{{0, 1}, {}})
+```
+
 ## 2392. Build a Matrix With Conditions | Hard
 related: 210, 269
 tags: topological-sort
@@ -1123,6 +1829,94 @@ int[][] at = new int[4][];
 for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) if (bm[i][j] > 0) at[bm[i][j]] = new int[]{i, j};
 check(at[1][0] < at[2][0] && at[3][0] < at[2][0] && at[2][1] < at[1][1] && at[3][1] < at[2][1], true);
 check(new Solution().buildMatrix(3, new int[][]{{1, 2}, {2, 3}, {3, 1}}, new int[][]{{2, 1}}).length, 0);
+```
+
+```go
+func buildMatrix(k int, rowConditions [][]int, colConditions [][]int) [][]int {
+	topo := func(conds [][]int) []int { // pos[v] = v's place in a topological order; nil on a cycle
+		adj := make([][]int, k+1)
+		indeg := make([]int, k+1)
+		for _, c := range conds {
+			adj[c[0]] = append(adj[c[0]], c[1])
+			indeg[c[1]]++
+		}
+		q := []int{}
+		for v := 1; v <= k; v++ {
+			if indeg[v] == 0 {
+				q = append(q, v)
+			}
+		}
+		pos := make([]int, k+1)
+		placed := 0
+		for len(q) > 0 {
+			v := q[0]
+			q = q[1:]
+			pos[v] = placed
+			placed++
+			for _, w := range adj[v] {
+				indeg[w]--
+				if indeg[w] == 0 {
+					q = append(q, w)
+				}
+			}
+		}
+		if placed < k {
+			return nil
+		}
+		return pos
+	}
+	row, col := topo(rowConditions), topo(colConditions)
+	if row == nil || col == nil {
+		return [][]int{}
+	}
+	m := make([][]int, k)
+	for i := range m {
+		m[i] = make([]int, k)
+	}
+	for v := 1; v <= k; v++ {
+		m[row[v]][col[v]] = v
+	}
+	return m
+}
+// test
+valid := func(k int, rc, cc, m [][]int) bool { // any matrix satisfying the conditions is accepted
+	if len(m) != k {
+		return false
+	}
+	row, col, cells := map[int]int{}, map[int]int{}, 0
+	for i, r := range m {
+		if len(r) != k {
+			return false
+		}
+		for j, v := range r {
+			if v != 0 {
+				row[v], col[v] = i, j
+				cells++
+			}
+		}
+	}
+	for v := 1; v <= k; v++ {
+		if _, ok := row[v]; !ok {
+			return false
+		}
+	}
+	for _, c := range rc {
+		if row[c[0]] >= row[c[1]] {
+			return false
+		}
+	}
+	for _, c := range cc {
+		if col[c[0]] >= col[c[1]] {
+			return false
+		}
+	}
+	return cells == k
+}
+rc, cc := [][]int{{1, 2}, {3, 2}}, [][]int{{2, 1}, {3, 2}}
+assertEq(valid(3, rc, cc, buildMatrix(3, rc, cc)), true)
+assertEq(buildMatrix(3, [][]int{{1, 2}, {2, 3}, {3, 1}, {2, 3}}, [][]int{{2, 1}}), [][]int{})
+rc, cc = [][]int{{4, 3}, {3, 2}, {2, 1}}, [][]int{{1, 2}, {2, 3}}
+assertEq(valid(4, rc, cc, buildMatrix(4, rc, cc)), true)
 ```
 
 ## 2709. Greatest Common Divisor Traversal | Hard
@@ -1209,4 +2003,72 @@ class Solution {
 // test
 check(new Solution().canTraverseAllPairs(new int[]{2, 3, 6}), true);
 check(new Solution().canTraverseAllPairs(new int[]{3, 9, 5}), false);
+```
+
+```go
+func canTraverseAllPairs(nums []int) bool {
+	n := len(nums)
+	if n == 1 {
+		return true
+	}
+	M := 0
+	for _, x := range nums {
+		if x == 1 {
+			return false // 1 shares no factor with anything
+		}
+		M = max(M, x)
+	}
+	spf := make([]int, M+1) // smallest prime factor
+	for i := range spf {
+		spf[i] = i
+	}
+	for i := 2; i*i <= M; i++ {
+		if spf[i] == i {
+			for j := i * i; j <= M; j += i {
+				if spf[j] == j {
+					spf[j] = i
+				}
+			}
+		}
+	}
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	first := map[int]int{} // prime -> first index divisible by it
+	for i, x := range nums {
+		for x > 1 {
+			p := spf[x]
+			if j, ok := first[p]; ok {
+				parent[find(i)] = find(j)
+			} else {
+				first[p] = i
+			}
+			for x%p == 0 {
+				x /= p
+			}
+		}
+	}
+	for i := 1; i < n; i++ {
+		if find(i) != find(0) {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(canTraverseAllPairs([]int{2, 3, 6}), true)
+assertEq(canTraverseAllPairs([]int{3, 9, 5}), false)
+assertEq(canTraverseAllPairs([]int{4, 3, 12, 8}), true)
+assertEq(canTraverseAllPairs([]int{1}), true)
+assertEq(canTraverseAllPairs([]int{1, 1}), false)
+assertEq(canTraverseAllPairs([]int{2, 2}), true)
+assertEq(canTraverseAllPairs([]int{35, 77, 22, 6}), true)
 ```
