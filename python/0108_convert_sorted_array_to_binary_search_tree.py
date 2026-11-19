@@ -20,5 +20,17 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert tree_vals(Solution().sortedArrayToBST([-10, -3, 0, 5, 9])) == [0, -10, 5, None, -3, None, 9]
+    # any height-balanced BST with the same in-order sequence is accepted
+    def balanced_bst(root, vals):
+        def walk(n):  # (inorder values, height) or None if unbalanced
+            if not n:
+                return [], 0
+            l, r = walk(n.left), walk(n.right)
+            if l is None or r is None or abs(l[1] - r[1]) > 1:
+                return None
+            return l[0] + [n.val] + r[0], 1 + max(l[1], r[1])
+        w = walk(root)
+        return w is not None and w[0] == vals
+    for vals in ([-10, -3, 0, 5, 9], [1, 3], [0], [1, 2, 3, 4, 5, 6, 7, 8]):
+        assert balanced_bst(Solution().sortedArrayToBST(vals), vals)
     print("OK")

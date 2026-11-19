@@ -22,6 +22,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().kSmallestPairs([1, 7, 11], [2, 4, 6], 3) == [[1, 2], [1, 4], [1, 6]]
-    assert Solution().kSmallestPairs([1, 1, 2], [1, 2, 3], 2) == [[1, 1], [1, 1]]
+    assert sorted(Solution().kSmallestPairs([1, 7, 11], [2, 4, 6], 3)) == sorted([[1, 2], [1, 4], [1, 6]])
+    assert sorted(Solution().kSmallestPairs([1, 1, 2], [1, 2, 3], 2)) == sorted([[1, 1], [1, 1]])
     print("OK")

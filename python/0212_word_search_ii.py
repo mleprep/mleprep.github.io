@@ -41,4 +41,7 @@ class Solution:
 if __name__ == "__main__":
     b = [list("oaan"), list("etae"), list("ihkr"), list("iflv")]
     assert sorted(Solution().findWords(b, ["oath", "pea", "eat", "rain"])) == ["eat", "oath"]
+    assert Solution().findWords([["a", "b"], ["c", "d"]], ["abcb"]) == []
+    assert Solution().findWords([["a"]], ["a"]) == ["a"]
+    assert sorted(Solution().findWords([["a", "b"], ["c", "d"]], ["ab", "cb", "ad", "bd", "ac", "ca", "da", "bc", "db", "adcb", "dabc", "abb", "acb"])) == ['ab', 'ac', 'bd', 'ca', 'db']
     print("OK")

@@ -377,8 +377,8 @@ class Solution:
                 res.append(r - k + 1)
         return res
 # test
-assert Solution().findAnagrams("cbaebabacd", "abc") == [0, 6]
-assert Solution().findAnagrams("abab", "ab") == [0, 1, 2]
+assert sorted(Solution().findAnagrams("cbaebabacd", "abc")) == sorted([0, 6])
+assert sorted(Solution().findAnagrams("abab", "ab")) == sorted([0, 1, 2])
 ```
 
 ```java
@@ -503,6 +503,9 @@ class Solution:
         return best / k
 # test
 assert Solution().findMaxAverage([1, 12, -5, -6, 50, 3], 4) == 12.75
+assert Solution().findMaxAverage([5], 1) == 5.0
+assert Solution().findMaxAverage([0, 4, 0, 3, 2], 1) == 4.0
+assert Solution().findMaxAverage([-1, -2, -3], 3) == -2.0
 ```
 
 ```java
@@ -649,9 +652,9 @@ class Solution:
                     res.append(l)
         return sorted(res)
 # test
-assert Solution().findSubstring("barfoothefoobarman", ["foo", "bar"]) == [0, 9]
-assert Solution().findSubstring("wordgoodgoodgoodbestword", ["word", "good", "best", "word"]) == []
-assert Solution().findSubstring("barfoofoobarthefoobarman", ["bar", "foo", "the"]) == [6, 9, 12]
+assert sorted(Solution().findSubstring("barfoothefoobarman", ["foo", "bar"])) == sorted([0, 9])
+assert sorted(Solution().findSubstring("wordgoodgoodgoodbestword", ["word", "good", "best", "word"])) == sorted([])
+assert sorted(Solution().findSubstring("barfoofoobarthefoobarman", ["bar", "foo", "the"])) == sorted([6, 9, 12])
 ```
 
 ```java

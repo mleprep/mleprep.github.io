@@ -26,4 +26,6 @@ if __name__ == "__main__":
     b = [[0, 1, 0], [0, 0, 1], [1, 1, 1], [0, 0, 0]]
     Solution().gameOfLife(b)
     assert b == [[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]
+    b = [[1, 1], [1, 0]]; Solution().gameOfLife(b)
+    assert b == [[1, 1], [1, 1]]
     print("OK")

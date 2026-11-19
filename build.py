@@ -25,12 +25,14 @@ Problem format (content/dsa/*.md):
     check(new Solution().twoSum(new int[]{2, 7, 11, 15}, 9), new int[]{0, 1});
     ```
 """
+import ast
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -53,6 +55,34 @@ def camel(slug):
 def split_test(code, marker):
     parts = re.split(rf"^{re.escape(marker)}\s*$", code, maxsplit=1, flags=re.M)
     return parts[0].rstrip() + "\n", (parts[1].strip("\n") + "\n") if len(parts) > 1 else ""
+
+
+def py_stub(src, test):
+    """Starter code for the in-browser judge, derived from the reference solution:
+    classes the tests call methods on keep only those methods' signatures (body `pass`);
+    classes/functions the tests use without calling methods (LeetCode-provided Node, isBadVersion…)
+    are kept verbatim; everything else (private helpers) is dropped."""
+    tree = ast.parse(src)
+    called = set(re.findall(r"\.(\w+)\s*\(", test))
+    used = lambda name: re.search(rf"\b{re.escape(name)}\b", test)
+    out = []
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and used(node.name):
+            methods = [f for f in node.body if isinstance(f, ast.FunctionDef)]
+            api = [f for f in methods if f.name in called]
+            if not api:
+                out.append(ast.get_source_segment(src, node))
+                continue
+            keep = [f for f in methods if f.name == "__init__" or f in api]
+            lines = [f"class {node.name}:"]
+            for f in keep:
+                f = ast.FunctionDef(name=f.name, args=f.args, body=[ast.Pass()], decorator_list=[],
+                                    returns=f.returns, type_comment=None, type_params=[])
+                lines += ["    " + ln for ln in ast.unparse(ast.fix_missing_locations(f)).split("\n")] + [""]
+            out.append("\n".join(lines).rstrip())
+        elif isinstance(node, ast.FunctionDef) and used(node.name):
+            out.append(ast.get_source_segment(src, node))
+    return "\n\n\n".join(out) + "\n"
 
 
 def parse_item(section, topic, head, body, src):
@@ -85,6 +115,7 @@ def parse_item(section, topic, head, body, src):
                 sys.exit(f"{src}: problem {pid} missing ```{lang} block")
         item["py"], item["pyTest"] = split_test(code["python"], "# test")
         item["java"], item["javaTest"] = split_test(code["java"], "// test")
+        item["pyStub"] = py_stub(item["py"], item["pyTest"])
     else:
         item.update(title=head, slug=slugify(head), related=meta.get("related", []))
     item["md"] = re.sub(r"\n{3,}", "\n\n", body).strip()
@@ -272,7 +303,16 @@ def run(cmd, cwd):
         return False, "TIMEOUT"
 
 
-def run_tests(files, only):
+def ml_snippets(topics):
+    """ML coding articles: every ```python block of an article runs as one script (needs numpy)."""
+    for t in topics:
+        for it in t["items"]:
+            blocks = [mm.group(2) for mm in FENCE.finditer(it["md"]) if mm.group(1) == "python"]
+            if blocks:
+                yield f"ml/{t['id']}/{it['slug']}", "\n".join(blocks)
+
+
+def run_tests(files, only, snippets):
     java = find_java()
     if not java:
         print("! java not found (set JAVA_HOME or PATH) - only running Python tests")
@@ -283,22 +323,36 @@ def run_tests(files, only):
         jobs.append((f"{py}", [sys.executable, py], ROOT / "python"))
         if java:
             jobs.append((f"{jv}", [java, jv], ROOT / "java"))
+    tmp = None
+    if snippets and not only:
+        if subprocess.run([sys.executable, "-c", "import numpy"], capture_output=True).returncode:
+            print("! numpy not installed - skipping the ML coding snippets")
+        else:
+            tmp = Path(tempfile.mkdtemp(prefix="lc-ml-"))
+            for name, code in snippets:
+                f = tmp / (name.replace("/", "_") + ".py")
+                f.write_text(code + '\nprint("OK")\n', encoding="utf-8")
+                jobs.append((name, [sys.executable, "-I", str(f)], tmp))
     failed = []
     with ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as ex:
         for (name, _, _), (ok, out) in zip(jobs, ex.map(lambda j: run(j[1], j[2]), jobs)):
             if not ok:
                 failed.append(name)
                 print(f"FAIL {name}\n{indent(out[-1500:], 4)}")
+    if tmp:
+        shutil.rmtree(tmp, ignore_errors=True)
     print(f"\n{len(jobs) - len(failed)}/{len(jobs)} runnable files passed")
     return not failed
 
 
 # ---------------------------------------------------------------- main
 def main():
-    manifest, problems = {"sections": []}, []
+    manifest, problems, snippets = {"sections": []}, [], []
     for sec, sec_title in SECTIONS:
         sec_dir = CONTENT / sec
         topics = [parse_file(sec, f) for f in sorted(sec_dir.glob("*.md"))] if sec_dir.exists() else []
+        if sec == "ml":
+            snippets = list(ml_snippets([t for t in topics if t["id"] == "ml-coding"]))
         manifest["sections"].append({"id": sec, "title": sec_title, "topics": [
             {"id": t["id"], "title": t["title"], "items": [
                 {k: it[k] for k in ("id", "title", "slug", "difficulty", "tags") if k in it} for it in t["items"]]}
@@ -330,7 +384,7 @@ def main():
 
     if "--test" in sys.argv:
         only = {int(a) for a in sys.argv[sys.argv.index("--test") + 1:] if a.isdigit()}
-        sys.exit(0 if run_tests(files, only) else 1)
+        sys.exit(0 if run_tests(files, only, snippets) else 1)
 
 
 if __name__ == "__main__":

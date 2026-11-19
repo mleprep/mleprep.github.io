@@ -26,4 +26,6 @@ class MyCalendar:
 if __name__ == "__main__":
     c = MyCalendar()
     assert [c.book(10, 20), c.book(15, 25), c.book(20, 30)] == [True, False, True]
+    c2 = MyCalendar()
+    assert [c2.book(5, 10), c2.book(10, 15), c2.book(9, 11), c2.book(0, 5), c2.book(4, 6)] == [True, True, False, True, False]
     print("OK")

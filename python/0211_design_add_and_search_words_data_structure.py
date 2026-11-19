@@ -35,4 +35,5 @@ if __name__ == "__main__":
     for w in ("bad", "dad", "mad"):
         wd.addWord(w)
     assert not wd.search("pad") and wd.search("bad") and wd.search(".ad") and wd.search("b..")
+    assert wd.search("...") and not wd.search(".") and not wd.search("ba") and not wd.search("bad.")
     print("OK")

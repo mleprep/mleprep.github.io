@@ -19,4 +19,7 @@ class Solution:
 
 if __name__ == "__main__":
     assert Solution().findMaxAverage([1, 12, -5, -6, 50, 3], 4) == 12.75
+    assert Solution().findMaxAverage([5], 1) == 5.0
+    assert Solution().findMaxAverage([0, 4, 0, 3, 2], 1) == 4.0
+    assert Solution().findMaxAverage([-1, -2, -3], 3) == -2.0
     print("OK")

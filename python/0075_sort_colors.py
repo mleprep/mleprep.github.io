@@ -25,4 +25,8 @@ class Solution:
 if __name__ == "__main__":
     a = [2, 0, 2, 1, 1, 0]; Solution().sortColors(a)
     assert a == [0, 0, 1, 1, 2, 2]
+    a = [2, 0, 1]; Solution().sortColors(a)
+    assert a == [0, 1, 2]
+    a = [1, 1, 0, 0, 2, 2, 1]; Solution().sortColors(a)
+    assert a == [0, 0, 1, 1, 1, 2, 2]
     print("OK")

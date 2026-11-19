@@ -29,7 +29,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().combinationSum3(3, 7) == [[1, 2, 4]]
-    assert Solution().combinationSum3(3, 9) == [[1, 2, 6], [1, 3, 5], [2, 3, 4]]
-    assert Solution().combinationSum3(4, 1) == []
+    assert sorted(map(sorted, Solution().combinationSum3(3, 7))) == sorted(map(sorted, [[1, 2, 4]]))
+    assert sorted(map(sorted, Solution().combinationSum3(3, 9))) == sorted(map(sorted, [[1, 2, 6], [1, 3, 5], [2, 3, 4]]))
+    assert sorted(map(sorted, Solution().combinationSum3(4, 1))) == sorted(map(sorted, []))
     print("OK")

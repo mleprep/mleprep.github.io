@@ -26,5 +26,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().generateParenthesis(3) == ["((()))", "(()())", "(())()", "()(())", "()()()"]
+    assert sorted(Solution().generateParenthesis(3)) == sorted(["((()))", "(()())", "(())()", "()(())", "()()()"])
+    assert Solution().generateParenthesis(1) == ["()"]
+    assert sorted(Solution().generateParenthesis(4)) == ['(((())))', '((()()))', '((())())', '((()))()', '(()(()))', '(()()())', '(()())()', '(())(())', '(())()()', '()((()))', '()(()())', '()(())()', '()()(())', '()()()()']
     print("OK")

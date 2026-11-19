@@ -31,6 +31,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().solveNQueens(4) == [[".Q..", "...Q", "Q...", "..Q."], ["..Q.", "Q...", "...Q", ".Q.."]]
+    assert sorted(Solution().solveNQueens(4)) == sorted([[".Q..", "...Q", "Q...", "..Q."], ["..Q.", "Q...", "...Q", ".Q.."]])
     assert len(Solution().solveNQueens(8)) == 92
     print("OK")

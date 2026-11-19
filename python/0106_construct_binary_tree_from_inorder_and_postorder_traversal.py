@@ -26,4 +26,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert tree_vals(Solution().buildTree([9, 3, 15, 20, 7], [9, 15, 7, 20, 3])) == [3, 9, 20, None, None, 15, 7]
+    assert tree_vals(Solution().buildTree([-1], [-1])) == [-1]
+    assert tree_vals(Solution().buildTree([2, 1], [2, 1])) == [1, 2]
     print("OK")

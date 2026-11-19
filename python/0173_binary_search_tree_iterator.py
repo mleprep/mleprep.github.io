@@ -33,4 +33,6 @@ if __name__ == "__main__":
     while it.hasNext():
         out.append(it.next())
     assert out == [3, 7, 9, 15, 20]
+    it = BSTIterator(make_tree([1]))
+    assert it.hasNext() and it.next() == 1 and not it.hasNext()
     print("OK")

@@ -14,7 +14,9 @@ class Solution:
 
 
 if __name__ == "__main__":
-    g = Solution().grayCode(3)
-    assert g == [0, 1, 3, 2, 6, 7, 5, 4]
-    assert all(bin(g[i] ^ g[(i + 1) % len(g)]).count("1") == 1 for i in range(len(g)))
+    # any valid Gray code: starts at 0, visits all 2^n values once, neighbours (incl. wrap-around) differ by one bit
+    for n in (1, 2, 3, 4):
+        g = Solution().grayCode(n)
+        assert g[0] == 0 and sorted(g) == list(range(1 << n))
+        assert all(bin(g[i] ^ g[(i + 1) % len(g)]).count("1") == 1 for i in range(len(g)))
     print("OK")

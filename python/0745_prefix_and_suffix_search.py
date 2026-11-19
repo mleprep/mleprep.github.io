@@ -23,4 +23,6 @@ class WordFilter:
 if __name__ == "__main__":
     wf = WordFilter(["apple", "ape", "maple"])
     assert wf.f("a", "e") == 1 and wf.f("ap", "le") == 0 and wf.f("", "le") == 2 and wf.f("b", "") == -1
+    assert WordFilter(["apple"]).f("a", "e") == 0
+    assert WordFilter(["abc", "abc"]).f("a", "c") == 1
     print("OK")

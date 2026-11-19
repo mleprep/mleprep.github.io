@@ -31,4 +31,6 @@ if __name__ == "__main__":
     s = MyStack()
     s.push(1); s.push(2)
     assert s.top() == 2 and s.pop() == 2 and not s.empty() and s.pop() == 1 and s.empty()
+    s2 = MyStack(); s2.push(5); s2.push(6); s2.push(7)
+    assert s2.pop() == 7 and s2.top() == 6 and s2.pop() == 6 and s2.top() == 5 and not s2.empty()
     print("OK")

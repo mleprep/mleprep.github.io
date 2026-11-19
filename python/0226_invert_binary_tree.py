@@ -17,4 +17,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert tree_vals(Solution().invertTree(make_tree([4, 2, 7, 1, 3, 6, 9]))) == [4, 7, 2, 9, 6, 3, 1]
+    assert tree_vals(Solution().invertTree(make_tree([]))) == []
+    assert tree_vals(Solution().invertTree(make_tree([2, 1, 3]))) == [2, 3, 1]
     print("OK")

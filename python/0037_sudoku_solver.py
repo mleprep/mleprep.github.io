@@ -46,4 +46,5 @@ if __name__ == "__main__":
     board = [list(r) for r in B]
     Solution().solveSudoku(board)
     assert ["".join(r) for r in board][0] == "534678912" and ["".join(r) for r in board][8] == "345286179"
+    assert ["".join(r) for r in board] == ['534678912', '672195348', '198342567', '859761423', '426853791', '713924856', '961537284', '287419635', '345286179']
     print("OK")

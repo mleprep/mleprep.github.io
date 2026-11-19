@@ -21,4 +21,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 2, 3, 3]))) == [1, 2, 3]
+    assert list_vals(Solution().deleteDuplicates(make_list([]))) == []
+    assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 1]))) == [1]
     print("OK")

@@ -32,7 +32,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().findSubstring("barfoothefoobarman", ["foo", "bar"]) == [0, 9]
-    assert Solution().findSubstring("wordgoodgoodgoodbestword", ["word", "good", "best", "word"]) == []
-    assert Solution().findSubstring("barfoofoobarthefoobarman", ["bar", "foo", "the"]) == [6, 9, 12]
+    assert sorted(Solution().findSubstring("barfoothefoobarman", ["foo", "bar"])) == sorted([0, 9])
+    assert sorted(Solution().findSubstring("wordgoodgoodgoodbestword", ["word", "good", "best", "word"])) == sorted([])
+    assert sorted(Solution().findSubstring("barfoofoobarthefoobarman", ["bar", "foo", "the"])) == sorted([6, 9, 12])
     print("OK")

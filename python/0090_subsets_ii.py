@@ -27,5 +27,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().subsetsWithDup([1, 2, 2]) == [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]
+    assert sorted(map(sorted, Solution().subsetsWithDup([1, 2, 2]))) == sorted(map(sorted, [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]))
+    assert sorted(map(sorted, Solution().subsetsWithDup([0]))) == [[], [0]]
+    assert sorted(map(sorted, Solution().subsetsWithDup([4, 4, 1, 4]))) == [[], [1], [1, 4], [1, 4, 4], [1, 4, 4, 4], [4], [4, 4], [4, 4, 4]]
     print("OK")

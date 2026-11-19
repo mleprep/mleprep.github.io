@@ -32,4 +32,6 @@ class Solution:
 if __name__ == "__main__":
     m = [[0, 1, 2, 0], [3, 4, 5, 2], [1, 3, 1, 5]]; Solution().setZeroes(m)
     assert m == [[0, 0, 0, 0], [0, 4, 5, 0], [0, 3, 1, 0]]
+    m = [[1, 1, 1], [1, 0, 1], [1, 1, 1]]; Solution().setZeroes(m)
+    assert m == [[1, 0, 1], [0, 0, 0], [1, 0, 1]]
     print("OK")

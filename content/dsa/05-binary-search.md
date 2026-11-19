@@ -22,7 +22,7 @@ Pitfalls: in Java use `lo + (hi - lo) / 2`; make sure each branch shrinks the ra
 
 ## 704. Binary Search | Easy
 related: 35, 34
-tags: classic
+tags: 
 
 Classic closed interval `[lo, hi]`.
 

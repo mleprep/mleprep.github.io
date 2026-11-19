@@ -29,4 +29,7 @@ class Solution:
 if __name__ == "__main__":
     M = ["10100", "10111", "11111", "10010"]
     assert Solution().maximalRectangle([list(r) for r in M]) == 6
+    assert Solution().maximalRectangle([["0"]]) == 0
+    assert Solution().maximalRectangle([["1"]]) == 1
+    assert Solution().maximalRectangle([list(r) for r in ["0110", "1111", "1110"]]) == 6
     print("OK")

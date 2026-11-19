@@ -29,4 +29,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert Solution().updateMatrix([[0, 0, 0], [0, 1, 0], [1, 1, 1]]) == [[0, 0, 0], [0, 1, 0], [1, 2, 1]]
+    assert Solution().updateMatrix([[0], [1], [1]]) == [[0], [1], [2]]
+    assert Solution().updateMatrix([[1, 1, 1], [1, 1, 1], [1, 1, 0]]) == [[4, 3, 2], [3, 2, 1], [2, 1, 0]]
     print("OK")

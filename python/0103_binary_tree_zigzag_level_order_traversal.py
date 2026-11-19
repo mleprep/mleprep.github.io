@@ -24,4 +24,7 @@ class Solution:
 
 if __name__ == "__main__":
     assert Solution().zigzagLevelOrder(make_tree([3, 9, 20, None, None, 15, 7])) == [[3], [20, 9], [15, 7]]
+    assert Solution().zigzagLevelOrder(make_tree([1])) == [[1]]
+    assert Solution().zigzagLevelOrder(make_tree([])) == []
+    assert Solution().zigzagLevelOrder(make_tree([1, 2, 3, 4, None, None, 5])) == [[1], [3, 2], [4, 5]]
     print("OK")

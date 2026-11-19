@@ -30,4 +30,10 @@ if __name__ == "__main__":
     b = [list(r) for r in ["XXXX", "XOOX", "XXOX", "XOXX"]]
     Solution().solve(b)
     assert ["".join(r) for r in b] == ["XXXX", "XXXX", "XXXX", "XOXX"]
+    b = [["X"]]; Solution().solve(b)
+    assert b == [["X"]]
+    b = [list(r) for r in ["XXX", "XOX", "XXX"]]; Solution().solve(b)
+    assert ["".join(r) for r in b] == ["XXX", "XXX", "XXX"]
+    b = [list(r) for r in ["OO", "OO"]]; Solution().solve(b)
+    assert ["".join(r) for r in b] == ["OO", "OO"]
     print("OK")

@@ -37,6 +37,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().fourSum([1, 0, -1, 0, -2, 2], 0) == [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]
-    assert Solution().fourSum([2, 2, 2, 2, 2], 8) == [[2, 2, 2, 2]]
+    assert sorted(map(sorted, Solution().fourSum([1, 0, -1, 0, -2, 2], 0))) == sorted(map(sorted, [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]))
+    assert sorted(map(sorted, Solution().fourSum([2, 2, 2, 2, 2], 8))) == sorted(map(sorted, [[2, 2, 2, 2]]))
     print("OK")

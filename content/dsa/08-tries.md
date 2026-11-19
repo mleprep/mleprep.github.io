@@ -117,6 +117,7 @@ wd = WordDictionary()
 for w in ("bad", "dad", "mad"):
     wd.addWord(w)
 assert not wd.search("pad") and wd.search("bad") and wd.search(".ad") and wd.search("b..")
+assert wd.search("...") and not wd.search(".") and not wd.search("ba") and not wd.search("bad.")
 ```
 
 ```java
@@ -199,6 +200,9 @@ class Solution:
 # test
 b = [list("oaan"), list("etae"), list("ihkr"), list("iflv")]
 assert sorted(Solution().findWords(b, ["oath", "pea", "eat", "rain"])) == ["eat", "oath"]
+assert Solution().findWords([["a", "b"], ["c", "d"]], ["abcb"]) == []
+assert Solution().findWords([["a"]], ["a"]) == ["a"]
+assert sorted(Solution().findWords([["a", "b"], ["c", "d"]], ["ab", "cb", "ad", "bd", "ac", "ca", "da", "bc", "db", "adcb", "dabc", "abb", "acb"])) == ['ab', 'ac', 'bd', 'ca', 'db']
 ```
 
 ```java
@@ -393,6 +397,8 @@ P = ["mobile", "mouse", "moneypot", "monitor", "mousepad"]
 assert Solution().suggestedProducts(P, "mouse") == [
     ["mobile", "moneypot", "monitor"], ["mobile", "moneypot", "monitor"],
     ["mouse", "mousepad"], ["mouse", "mousepad"], ["mouse", "mousepad"]]
+assert Solution().suggestedProducts(["havana"], "tatiana") == [[], [], [], [], [], [], []]
+assert Solution().suggestedProducts(["bags", "baggage", "banner", "box", "cloths"], "bags") == [["baggage", "bags", "banner"], ["baggage", "bags", "banner"], ["baggage", "bags"], ["bags"]]
 ```
 
 ```java
@@ -442,6 +448,8 @@ class WordFilter:
 # test
 wf = WordFilter(["apple", "ape", "maple"])
 assert wf.f("a", "e") == 1 and wf.f("ap", "le") == 0 and wf.f("", "le") == 2 and wf.f("b", "") == -1
+assert WordFilter(["apple"]).f("a", "e") == 0
+assert WordFilter(["abc", "abc"]).f("a", "c") == 1
 ```
 
 ```java

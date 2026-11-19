@@ -31,4 +31,7 @@ if __name__ == "__main__":
     u.checkIn(45, "Leyton", 3); u.checkIn(32, "Paradise", 8); u.checkIn(27, "Leyton", 10)
     u.checkOut(45, "Waterloo", 15); u.checkOut(27, "Waterloo", 20); u.checkOut(32, "Cambridge", 22)
     assert u.getAverageTime("Paradise", "Cambridge") == 14.0 and u.getAverageTime("Leyton", "Waterloo") == 11.0
+    u2 = UndergroundSystem()
+    u2.checkIn(10, "A", 1); u2.checkOut(10, "B", 5); u2.checkIn(11, "A", 2); u2.checkOut(11, "B", 4)
+    assert u2.getAverageTime("A", "B") == 3.0
     print("OK")

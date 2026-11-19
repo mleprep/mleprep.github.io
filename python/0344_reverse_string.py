@@ -19,4 +19,8 @@ class Solution:
 if __name__ == "__main__":
     a = list("hello"); Solution().reverseString(a)
     assert a == list("olleh")
+    a = list("Hannah"); Solution().reverseString(a)
+    assert a == list("hannaH")
+    a = ["x"]; Solution().reverseString(a)
+    assert a == ["x"]
     print("OK")

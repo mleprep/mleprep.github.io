@@ -36,4 +36,6 @@ if __name__ == "__main__":
     q = MyQueue()
     q.push(1); q.push(2)
     assert q.peek() == 1 and q.pop() == 1 and not q.empty()
+    q.push(3)
+    assert q.pop() == 2 and q.peek() == 3 and q.pop() == 3 and q.empty()
     print("OK")

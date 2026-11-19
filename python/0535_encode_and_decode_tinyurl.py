@@ -37,4 +37,6 @@ if __name__ == "__main__":
     c = Codec()
     u = "https://leetcode.com/problems/design-tinyurl"
     assert c.decode(c.encode(u)) == u and c.encode(u) == c.encode(u)
+    for u in ("https://example.com/a?b=c#d", "x"):
+        assert c.decode(c.encode(u)) == u
     print("OK")

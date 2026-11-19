@@ -38,6 +38,8 @@ class KthLargest:
 # test
 kl = KthLargest(3, [4, 5, 8, 2])
 assert [kl.add(v) for v in (3, 5, 10, 9, 4)] == [4, 5, 5, 8, 8]
+kl = KthLargest(1, [])
+assert [kl.add(v) for v in (-3, -2, -4, 0, 4)] == [-3, -2, -2, 0, 4]
 ```
 
 ```java
@@ -548,8 +550,8 @@ class Solution:
                 heappush(h, (nums1[i] + nums2[j + 1], i, j + 1))
         return res
 # test
-assert Solution().kSmallestPairs([1, 7, 11], [2, 4, 6], 3) == [[1, 2], [1, 4], [1, 6]]
-assert Solution().kSmallestPairs([1, 1, 2], [1, 2, 3], 2) == [[1, 1], [1, 1]]
+assert sorted(Solution().kSmallestPairs([1, 7, 11], [2, 4, 6], 3)) == sorted([[1, 2], [1, 4], [1, 6]])
+assert sorted(Solution().kSmallestPairs([1, 1, 2], [1, 2, 3], 2)) == sorted([[1, 1], [1, 1]])
 ```
 
 ```java
@@ -651,7 +653,7 @@ check(r.equals("eert") || r.equals("eetr"), true);
 
 ## 658. Find K Closest Elements | Medium
 related: 973, 35
-tags: binary-search, window
+tags: binary-search, fixed-window
 
 The answer is a window `arr[i .. i+k)`. Binary search its start `i ∈ [0, n−k]`: if `x − arr[mid] > arr[mid+k] − x`, the window should move right.
 

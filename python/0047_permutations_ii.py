@@ -31,5 +31,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().permuteUnique([1, 1, 2]) == [[1, 1, 2], [1, 2, 1], [2, 1, 1]]
+    assert sorted(Solution().permuteUnique([1, 1, 2])) == sorted([[1, 1, 2], [1, 2, 1], [2, 1, 1]])
+    assert sorted(Solution().permuteUnique([1, 2, 3])) == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+    assert Solution().permuteUnique([2, 2]) == [[2, 2]]
     print("OK")

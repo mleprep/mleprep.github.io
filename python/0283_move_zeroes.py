@@ -20,4 +20,8 @@ class Solution:
 if __name__ == "__main__":
     a = [0, 1, 0, 3, 12]; Solution().moveZeroes(a)
     assert a == [1, 3, 12, 0, 0]
+    a = [0]; Solution().moveZeroes(a)
+    assert a == [0]
+    a = [1, 0, 0, 2]; Solution().moveZeroes(a)
+    assert a == [1, 2, 0, 0]
     print("OK")

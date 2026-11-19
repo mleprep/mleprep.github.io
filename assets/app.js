@@ -11,11 +11,15 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } },
 };
-const S = { m: null, cache: {}, done: store.get('lc-done', {}), lang: store.get('lc-lang', 'python'), tests: store.get('lc-tests', false) };
+const S = {
+  m: null, cache: {}, done: store.get('lc-done', {}), lang: store.get('lc-lang', 'python'), tests: store.get('lc-tests', false),
+  mode: store.get('lc-mode', 'read'),   // problem pages: 'read' (solution) or 'solve' (editor + in-browser judge)
+};
 const main = $('#main'), side = $('#side');
 
 const getJSON = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
-const topicData = (sec, t) => (S.cache[sec + '/' + t] ||= getJSON(`data/${sec}/${t}.json`));
+// cache topic files, but forget failed requests so a network blip doesn't break the topic until reload
+const topicData = (sec, t) => (S.cache[sec + '/' + t] ||= getJSON(`data/${sec}/${t}.json`).catch(e => { delete S.cache[sec + '/' + t]; throw e; }));
 const sec = id => S.m.sections.find(s => s.id === id);
 const href = (...p) => '#/' + p.join('/');
 const key = (s, it) => s + '/' + it.slug;
@@ -61,7 +65,8 @@ function md(text) {
   return el;
 }
 const hl = (code, lang) => window.hljs ? hljs.highlight(code, { language: lang }).value : esc(code);
-const tagLabel = t => t === 'blind75' ? '★ Blind 75' : t;
+const tagLabel = t => t === 'blind75' ? '★ Blind 75' : t === 'premium' ? '🔒 Premium' : t;
+const tagClass = t => t === 'blind75' ? ' star' : t === 'premium' ? ' prem' : '';
 
 // ---------------------------------------------------------------- filters
 function parseHash() {
@@ -131,7 +136,7 @@ function listView(container, scope, base, opts = {}) {
       `<button class="chip${on ? ' on' : ''}" data-${attr}="${esc(val)}">${label}${n == null ? '' : ` <span>${n}</span>`}</button>`;
     const tagCounts = {};
     scope.filter(f => passes(f, F, 'tag')).forEach(f => (f.it.tags || []).forEach(t => { if (t !== 'blind75') tagCounts[t] = (tagCounts[t] || 0) + 1; }));
-    const tagOpts = Object.keys(tagCounts).sort();
+    const tagOpts = Object.keys(tagCounts).sort((x, y) => tagCounts[y] - tagCounts[x] || x.localeCompare(y));   // most used first
     if (F.tag && !tagOpts.includes(F.tag)) tagOpts.unshift(F.tag);
     const topics = opts.topicFacet ? S.m.sections[0].topics : [];
     const active = F.d.size || F.st !== 'all' || F.b75 || F.tag || F.topic || F.co || F.win || F.q;
@@ -218,10 +223,10 @@ function rows(list, opts) {
       <td class="c"><input type="checkbox" data-k="${key(f.s, it)}" ${isDone(f.s, it) ? 'checked' : ''} aria-label="done"></td>
       ${dsa ? `<td class="n">${it.id || ''}</td>` : ''}
       <td class="t"><a href="${href(f.s, f.t, it.slug)}">${esc(it.title)}</a>
-        <span class="tags">${(it.tags || []).map(t => `<a href="#" class="tag${t === 'blind75' ? ' star' : ''}" data-tag="${esc(t)}">${esc(tagLabel(t))}</a>`).join('')}</span></td>
-      ${opts.showTopic ? `<td class="tp"><a href="#" data-topic="${f.t}">${esc(f.tTitle)}</a></td>` : ''}
+        <span class="tags">${(it.tags || []).map(t => `<a href="${browse(t === 'blind75' ? { b75: 1 } : { tag: t })}" class="tag${tagClass(t)}" data-tag="${esc(t)}">${esc(tagLabel(t))}</a>`).join('')}</span></td>
+      ${opts.showTopic ? `<td class="tp"><a href="${href(f.s, f.t)}"${f.s === 'dsa' ? ` data-topic="${f.t}"` : ''}>${esc(f.tTitle)}</a></td>` : ''}
       ${opts.fcol ? (v => `<td class="fq" title="${esc(v.title)}"><span class="meter"><i style="width:${Math.max(2, Math.min(100, v.w))}%"></i></span><b>${v.txt}</b></td>`)(opts.fcol(f)) : ''}
-      ${it.difficulty ? `<td class="d"><a href="#" class="${it.difficulty}" data-d="${it.difficulty}">${it.difficulty}</a></td>` : (dsa ? '<td></td>' : '')}
+      ${it.difficulty ? `<td class="d"><a href="${browse({ d: it.difficulty })}" class="${it.difficulty}" data-d="${it.difficulty}">${it.difficulty}</a></td>` : (dsa ? '<td></td>' : '')}
     </tr>`;
   }).join('')}</tbody></table></div>`;
 }
@@ -262,8 +267,10 @@ function viewHome() {
   const b75 = FLAT.filter(f => (f.it.tags || []).includes('blind75')).length;
   main.innerHTML = `
     <h1>Interview prep, condensed.</h1>
-    <p class="lead">${total} hand-picked problems (Blind 75, NeetCode, Grind 169, Top Interview 150) with the key idea, a sketch,
-    complexity and runnable Python &amp; Java — plus system design and ML / deep learning. Progress is saved in this browser.</p>
+    <p class="lead">${total} problems — every one from Blind 75, NeetCode 150, Grind 169, LeetCode 75 and Top Interview 150, plus
+    frequently asked company problems — each with the key idea, a sketch, complexity and tested Python &amp; Java. Open any problem and
+    pick <b>Solve in browser</b> to write Python and run it against the tests right on this page (nothing runs on a server).
+    Plus system design and ML / deep learning. Progress is saved in this browser.</p>
     <div class="meta big">
       ${DIFFS.map(d => `<a class="badge ${d}" href="${browse({ d })}">${c[d]} ${d}</a>`).join('')}
       <a class="badge star" href="${browse({ b75: 1 })}">★ ${b75} Blind 75</a>
@@ -311,18 +318,20 @@ function viewBrowse() {
     bindChecks($('#arts'));
   }
 }
-async function viewTopic(s, t) {
+async function viewTopic(s, t, stale) {
   const data = await topicData(s.id, t.id);
+  if (stale()) return;
   main.innerHTML = `<div class="crumbs"><a href="${href(s.id)}">${esc(s.title)}</a></div><h1>${esc(t.title)}</h1>
     <div id="intro" class="article"></div><h2>${s.id === 'dsa' ? 'Problems' : 'Articles'}</h2><div id="lv"></div>`;
   if (data.intro) $('#intro').append(md(data.intro));
   listView($('#lv'), FLAT.filter(f => f.s === s.id && f.t === t.id), `${s.id}/${t.id}`, {});
 }
-async function viewItem(s, t, slug) {
+async function viewItem(s, t, slug, stale) {
   const data = await topicData(s.id, t.id);
+  if (stale()) return;
   const it = data.items.find(x => x.slug === slug);
   if (!it) return notFound();
-  const pos = FLAT.findIndex(f => f.s === s.id && f.it.slug === slug);
+  const pos = FLAT.findIndex(f => f.s === s.id && f.t === t.id && f.it.slug === slug);
   const prev = FLAT[pos - 1]?.s === s.id ? FLAT[pos - 1] : null, next = FLAT[pos + 1]?.s === s.id ? FLAT[pos + 1] : null;
   const k = key(s.id, it), dsa = s.id === 'dsa';
   const related = dsa ? it.related.map(id => BY_ID[id]).filter(Boolean) : [];
@@ -334,16 +343,28 @@ async function viewItem(s, t, slug) {
     <div class="meta">
       ${dsa ? `<a class="badge ${it.difficulty}" href="${browse({ d: it.difficulty })}" title="All ${it.difficulty} problems">${it.difficulty}</a>
         <a href="https://leetcode.com/problems/${it.slug}/" target="_blank" rel="noopener">LeetCode ↗</a>` : ''}
-      ${(it.tags || []).map(x => `<a class="tag${x === 'blind75' ? ' star' : ''}" href="${browse(x === 'blind75' ? { b75: 1 } : { tag: x })}" title="Browse problems tagged ${esc(x)}">${esc(tagLabel(x))}</a>`).join('')}
+      ${(it.tags || []).map(x => `<a class="tag${tagClass(x)}" href="${browse(x === 'blind75' ? { b75: 1 } : { tag: x })}" title="Browse problems tagged ${esc(x)}">${esc(tagLabel(x))}</a>`).join('')}
       <label class="done"><input type="checkbox" data-k="${k}" ${S.done[k] ? 'checked' : ''}> Done</label>
     </div>
     ${dsa ? askedAt(it) : ''}
     ${dsa ? `<div class="split">
-      <div class="desc"><div id="body"></div>${relHtml}</div>
-      <div class="codecol"><div class="code">
-        <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button><span class="sp"></span>
-          <button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>
-        <div class="scroll"><pre><code id="src"></code></pre><pre class="test" hidden><code id="tsrc"></code></pre></div></div></div>
+      <div class="desc"><div id="notes-off" class="notes-off" hidden><b>Solution notes are hidden while you solve.</b>
+          Read the problem on <a href="https://leetcode.com/problems/${it.slug}/" target="_blank" rel="noopener">LeetCode ↗</a>${(it.tags || []).includes('premium') ? ' (Premium)' : ''},
+          write your solution, and run it against this site's tests. <button id="shownotes" class="chip">Show notes</button></div>
+        <div id="body"></div>${relHtml}</div>
+      <div class="codecol">
+        <div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read">Solution</button><button role="tab" data-mode="solve">Solve in browser ▶</button></div>
+        <div class="code" id="readbox">
+          <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button><span class="sp"></span>
+            <button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>
+          <div class="scroll"><pre><code id="src"></code></pre><pre class="test" hidden><code id="tsrc"></code></pre></div></div>
+        <div class="code" id="solvebox" hidden>
+          <div class="bar"><span class="lbl" title="Runs on your machine with Pyodide (CPython on WebAssembly). Java can't be compiled in the browser, so the judge is Python-only.">Python 3<span class="wide"> · runs in your browser</span></span><span class="sp"></span>
+            <button id="viewtests">Tests</button><button id="reset" title="Replace your code with the starter stub (Ctrl+Z undoes)">Reset</button><button id="run" class="go" title="Ctrl+Enter">Run tests ▶</button></div>
+          <pre class="test" id="jtests" hidden><code></code></pre>
+          <div id="editor" class="editor"></div></div>
+        <div id="results" class="results" aria-live="polite" hidden></div>
+      </div>
     </div>` : `<div class="artgrid"><div id="body" class="article"></div>
       <nav class="rail"><h4>In ${esc(t.title)}</h4>${t.items.map(x => `<a href="${href(s.id, t.id, x.slug)}" class="${x.slug === slug ? 'on' : ''}">${esc(x.title)}</a>`).join('')}</nav></div>`}
     <div class="pager"><span>${prev ? `<a href="${href(prev.s, prev.t, prev.it.slug)}">← ${esc(prev.it.title)}</a>` : ''}</span>
@@ -352,7 +373,10 @@ async function viewItem(s, t, slug) {
   bindChecks(main);
   const more = $('#comore');
   if (more) more.onclick = () => { $('.asked').classList.add('all'); more.remove(); };
-  if (!dsa) return;
+  if (!dsa) {
+    if (s.id === 'ml' && t.id === 'ml-coding') addRunButtons($('#body'));
+    return;
+  }
   const pad = String(it.id).padStart(4, '0');
   const base = pad + '_' + it.slug.replace(/-/g, '_');
   const cls = 'P' + pad + it.slug.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
@@ -373,6 +397,210 @@ async function viewItem(s, t, slug) {
   };
   $('#file').onclick = () => window.open(REPO + (S.lang === 'python' ? `python/${base}.py` : `java/${cls}.java`), '_blank', 'noopener');
   show();
+  solveMode(it, k, t);
+}
+
+// ---------------------------------------------------------------- solve mode (in-browser judge)
+function solveMode(it, k, t) {
+  const draftKey = 'lc-draft:' + it.slug;
+  let ed = null, notes = false, saveT;
+  const code = () => ed ? ed.get() : store.get(draftKey, null) ?? it.pyStub;
+  const save = () => {
+    clearTimeout(saveT);
+    saveT = setTimeout(() => { const c = code(); c === it.pyStub ? store.set(draftKey, null) : store.set(draftKey, c); }, 300);
+  };
+  const setMode = m => {
+    S.mode = m;
+    store.set('lc-mode', m);
+    const solve = m === 'solve';
+    main.querySelectorAll('[data-mode]').forEach(b => { b.classList.toggle('on', b.dataset.mode === m); b.setAttribute('aria-selected', b.dataset.mode === m); });
+    $('#readbox').hidden = solve;
+    $('#solvebox').hidden = !solve;
+    $('.codecol').classList.toggle('solving', solve);
+    $('#results').hidden = !solve || !$('#results').innerHTML;
+    $('#body').hidden = solve && !notes;
+    $('#notes-off').hidden = !solve || notes;
+    if (solve) {
+      Judge.start();   // warm up Python while the user reads/types
+      if (!ed) makeEditor($('#editor'), code(), { onChange: save, onRun: run }).then(e => { ed = e; });
+    }
+  };
+  const run = async () => {
+    const btn = $('#run');
+    if (!btn) return;
+    if (btn.dataset.busy) { Judge.kill('Stopped.'); return; }
+    btn.dataset.busy = '1';
+    btn.textContent = 'Stop ■';
+    const res = $('#results');
+    res.hidden = false;
+    res.innerHTML = `<div class="rsum">${Judge.state === 'ready' ? 'Running…' : 'Starting Python… (the first run downloads the runtime, ~10 MB; later runs are instant)'}</div>`;
+    try {
+      const r = await Judge.run({ kind: 'judge', code: code(), test: it.pyTest });
+      if (!res.isConnected) return;
+      const pass = r.cases.filter(c => c.ok).length, ok = !r.error && r.cases.length && pass === r.cases.length;
+      let note = '';
+      if (ok && !S.done[k]) {
+        S.done[k] = 1;
+        store.set('lc-done', S.done);
+        main.querySelectorAll(`input[data-k="${k}"]`).forEach(cb => { cb.checked = true; });
+        renderSide('dsa', t.id);
+        note = ' · marked as done';
+      }
+      res.innerHTML = judgeHtml(r, note);
+    } catch (e) {
+      if (res.isConnected) res.innerHTML = `<div class="rsum bad">✗ ${esc(e.message)}</div>`;
+    } finally {
+      if (btn.isConnected) { delete btn.dataset.busy; btn.textContent = 'Run tests ▶'; }
+    }
+  };
+  main.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+  $('#shownotes').onclick = () => { notes = true; setMode('solve'); };
+  $('#run').onclick = run;
+  $('#reset').onclick = () => { if (ed) { ed.set(it.pyStub); ed.focus(); } store.set(draftKey, null); };
+  $('#viewtests').onclick = () => {
+    const pre = $('#jtests');
+    pre.hidden = !pre.hidden;
+    $('#viewtests').classList.toggle('on', !pre.hidden);
+    if (!pre.hidden) pre.firstChild.innerHTML = hl(it.pyTest, 'python');
+  };
+  setMode(S.mode === 'solve' ? 'solve' : 'read');
+}
+
+function judgeHtml(r, note = '') {
+  const n = r.cases.length, pass = r.cases.filter(c => c.ok).length, ok = !r.error && n && pass === n;
+  const head = ok ? '✓ Accepted' : r.error ? '✗ Error' : r.cases.some(c => c.exc) ? '✗ Runtime error' : '✗ Wrong answer';
+  const one = s => s.split('\n')[0].slice(0, 120) + (s.includes('\n') || s.length > 120 ? ' …' : '');
+  const full = s => s.includes('\n') || s.length > 120 ? `<pre>${esc(s)}</pre>` : '';
+  return `<div class="rsum ${ok ? 'good' : 'bad'}">${head}<span>${pass}/${n} tests passed · ${r.ms} ms${note}</span></div>
+    ${r.error ? `<pre class="rerr">${esc(r.error)}</pre>` : ''}
+    ${r.cases.map((c, i) => `<details class="case ${c.ok ? 'ok' : 'no'}"${c.ok ? '' : ' open'}>
+      <summary><b>${c.ok ? '✓' : '✗'}</b><span class="tn">Test ${i + 1}</span><code>${esc(one(c.src))}</code></summary>
+      ${full(c.src)}
+      ${c.got != null ? `<div class="kv"><span>got</span><code>${esc(c.got)}</code><span>expected</span><code>${esc(c.expected)}</code></div>` : ''}
+      ${c.error ? `<div class="kv"><span>error</span><code>${esc(c.error)}</code></div>` : ''}</details>`).join('')}
+    ${r.stdout ? `<div class="rout"><span>stdout</span><pre>${esc(r.stdout)}</pre></div>` : ''}`;
+}
+
+// ML coding articles: a Run button above each Python snippet (NumPy is loaded on demand)
+function addRunButtons(root) {
+  root.querySelectorAll('pre > code.language-python').forEach(c => {
+    const pre = c.parentElement, src = c.textContent;
+    const bar = document.createElement('div');
+    bar.className = 'runbar';
+    bar.innerHTML = '<button class="go">Run ▶</button><span class="muted">runs in your browser (Python + NumPy via Pyodide)</span>';
+    const out = document.createElement('div');
+    out.className = 'results';
+    out.hidden = true;
+    pre.before(bar);
+    pre.after(out);
+    const btn = bar.querySelector('button');
+    btn.onclick = async () => {
+      if (btn.dataset.busy) { Judge.kill('Stopped.'); return; }
+      btn.dataset.busy = '1';
+      btn.textContent = 'Stop ■';
+      out.hidden = false;
+      out.innerHTML = `<div class="rsum">${Judge.state === 'ready' ? 'Running…' : 'Starting Python + NumPy… (first run downloads ~15 MB, then it is cached)'}</div>`;
+      try {
+        const r = await Judge.run({ kind: 'script', code: src }, 30000);
+        out.innerHTML = `<div class="rsum ${r.error ? 'bad' : 'good'}">${r.error ? '✗ Error' : '✓ Done'}<span>${r.ms} ms</span></div>
+          ${r.error ? `<pre class="rerr">${esc(r.error)}</pre>` : ''}${r.stdout ? `<div class="rout"><span>output</span><pre>${esc(r.stdout)}</pre></div>` : ''}`;
+      } catch (e) {
+        out.innerHTML = `<div class="rsum bad">✗ ${esc(e.message)}</div>`;
+      } finally { delete btn.dataset.busy; btn.textContent = 'Run ▶'; }
+    };
+  });
+}
+
+/* Python runtime in a Web Worker (assets/py-worker.js). A run that exceeds its time limit
+   terminates the worker (the only way to stop an infinite loop); the next run starts a new one. */
+const Judge = {
+  w: null, seq: 0, pending: new Map(), state: 'idle',
+  start() {
+    if (this.w) return;
+    this.state = 'loading';
+    this.w = new Worker('assets/py-worker.js');
+    this.w.onmessage = ({ data }) => {
+      if ('ready' in data) {
+        this.state = data.ready ? 'ready' : 'error';
+        if (!data.ready) this.kill('Could not start Python: ' + data.error);
+        return;
+      }
+      const p = this.pending.get(data.id);
+      if (!p) return;
+      if (data.started) { p.timer = setTimeout(() => this.kill(`Time limit exceeded (${p.limit / 1000} s) — infinite loop or too slow?`), p.limit); return; }
+      clearTimeout(p.timer);
+      this.pending.delete(data.id);
+      data.ok ? p.resolve(data.result) : p.reject(new Error(data.error));
+    };
+    this.w.onerror = e => { e.preventDefault(); this.kill('Could not start Python (offline or blocked CDN?)'); };
+  },
+  run(msg, limit = 10000) {
+    this.start();
+    return new Promise((resolve, reject) => {
+      const id = ++this.seq;
+      this.pending.set(id, { resolve, reject, limit, timer: null });
+      this.w.postMessage({ id, ...msg });
+    });
+  },
+  kill(reason) {
+    if (this.w) this.w.terminate();
+    this.w = null;
+    this.state = 'idle';
+    for (const p of this.pending.values()) { clearTimeout(p.timer); p.reject(new Error(reason)); }
+    this.pending.clear();
+  },
+};
+
+/* Code editor: CodeMirror 5 from cdnjs, loaded on first use; falls back to a plain textarea. */
+const CM = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/';
+let cmLoad = null;
+const loadScript = src => new Promise((res, rej) => {
+  const el = document.createElement('script');
+  el.src = src;
+  el.onload = res;
+  el.onerror = () => rej(new Error('could not load ' + src));
+  document.head.append(el);
+});
+function loadCM() {
+  return cmLoad ||= (async () => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = CM + 'codemirror.min.css';
+    document.head.prepend(css);   // before style.css so the site's editor theme wins
+    await loadScript(CM + 'codemirror.min.js');
+    await Promise.all(['mode/python/python.min.js', 'addon/edit/matchbrackets.min.js', 'addon/edit/closebrackets.min.js',
+      'addon/comment/comment.min.js'].map(p => loadScript(CM + p)));
+  })().catch(e => { cmLoad = null; throw e; });
+}
+async function makeEditor(host, value, { onChange, onRun }) {
+  try {
+    await loadCM();
+    const cm = CodeMirror(host, {
+      value, mode: 'python', indentUnit: 4, tabSize: 4, lineNumbers: true, matchBrackets: true, autoCloseBrackets: true,
+      viewportMargin: Infinity, screenReaderLabel: 'Python code editor',
+      extraKeys: {
+        Tab: c => c.somethingSelected() ? c.indentSelection('add') : c.replaceSelection('    '),
+        'Shift-Tab': c => c.indentSelection('subtract'),
+        'Ctrl-Enter': () => onRun(), 'Cmd-Enter': () => onRun(),
+        'Ctrl-/': 'toggleComment', 'Cmd-/': 'toggleComment',
+      },
+    });
+    cm.on('change', onChange);
+    return { get: () => cm.getValue(), set: v => cm.setValue(v), focus: () => cm.focus() };
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.className = 'plain';
+    ta.spellcheck = false;
+    ta.value = value;
+    ta.setAttribute('aria-label', 'Python code editor');
+    ta.addEventListener('input', onChange);
+    ta.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); onRun(); }
+      else if (ev.key === 'Tab' && !ev.shiftKey) { ev.preventDefault(); ta.setRangeText('    ', ta.selectionStart, ta.selectionEnd, 'end'); onChange(); }
+    });
+    host.append(ta);
+    return { get: () => ta.value, set: v => { ta.value = v; }, focus: () => ta.focus() };
+  }
 }
 // "Asked at" chips on a problem page: companies by all-time frequency; ● = also asked in the last six months
 function askedAt(it) {
@@ -387,8 +615,9 @@ function askedAt(it) {
 function notFound() { main.innerHTML = `<h1>Not found</h1><p><a href="#/">Go home</a></p>`; }
 
 // ---------------------------------------------------------------- router
-let lastPath = null;
+let lastPath = null, routeSeq = 0;
 async function route() {
+  const my = ++routeSeq, stale = () => my !== routeSeq;   // a newer navigation started while we awaited data
   document.body.classList.remove('open');
   const { path, params } = parseHash();
   const [sid, tid, slug] = path;
@@ -403,9 +632,10 @@ async function route() {
     else if (!s) notFound();
     else if (!tid) viewSection(s);
     else if (!t) notFound();
-    else if (!slug) await viewTopic(s, t);
-    else await viewItem(s, t, slug);
-  } catch (e) { main.innerHTML = `<h1>Error</h1><pre>${esc(e.message)}</pre>`; }
+    else if (!slug) await viewTopic(s, t, stale);
+    else await viewItem(s, t, slug, stale);
+  } catch (e) { if (!stale()) main.innerHTML = `<h1>Error</h1><pre>${esc(e.message)}</pre>`; }
+  if (stale()) return;
   document.title = (main.querySelector('h1')?.textContent || '') + ' · LeetCode Review';
   const p = path.join('/');
   if (p !== lastPath) window.scrollTo(0, 0);   // keep scroll when only filters change
@@ -429,7 +659,8 @@ $('#q').addEventListener('input', e => {
   }, 150);
 });
 document.addEventListener('keydown', e => {
-  if (e.key === '/' && document.activeElement !== $('#q') && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); }
+  const a = document.activeElement;
+  if (e.key === '/' && a !== $('#q') && !/INPUT|SELECT|TEXTAREA/.test(a.tagName) && !a.isContentEditable) { e.preventDefault(); $('#q').focus(); }
   if (e.key === 'Escape' && document.activeElement === $('#q')) { $('#q').value = ''; $('#q').dispatchEvent(new Event('input')); $('#q').blur(); }
 });
 $('#menu').onclick = () => document.body.classList.toggle('open');

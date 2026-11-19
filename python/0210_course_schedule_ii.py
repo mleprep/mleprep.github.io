@@ -27,6 +27,11 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]) == [0, 1, 2, 3]
+    # any valid topological order is accepted
+    def valid(n, pre, order):
+        pos = {c: i for i, c in enumerate(order)}
+        return len(order) == n == len(pos) and all(pos[b] < pos[a] for a, b in pre)
+    assert valid(4, [[1, 0], [2, 0], [3, 1], [3, 2]], Solution().findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]))
+    assert valid(2, [[1, 0]], Solution().findOrder(2, [[1, 0]]))
     assert Solution().findOrder(2, [[0, 1], [1, 0]]) == []
     print("OK")

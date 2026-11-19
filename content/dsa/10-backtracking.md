@@ -54,7 +54,8 @@ class Solution:
         bt(0)
         return res
 # test
-assert Solution().subsets([1, 2, 3]) == [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]
+assert sorted(map(sorted, Solution().subsets([1, 2, 3]))) == sorted(map(sorted, [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]))
+assert sorted(map(sorted, Solution().subsets([0]))) == [[], [0]]
 ```
 
 ```java
@@ -104,7 +105,9 @@ class Solution:
         bt(0)
         return res
 # test
-assert Solution().subsetsWithDup([1, 2, 2]) == [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]
+assert sorted(map(sorted, Solution().subsetsWithDup([1, 2, 2]))) == sorted(map(sorted, [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]))
+assert sorted(map(sorted, Solution().subsetsWithDup([0]))) == [[], [0]]
+assert sorted(map(sorted, Solution().subsetsWithDup([4, 4, 1, 4]))) == [[], [1], [1, 4], [1, 4, 4], [1, 4, 4, 4], [4], [4, 4], [4, 4, 4]]
 ```
 
 ```java
@@ -159,8 +162,8 @@ class Solution:
         bt(0, target)
         return res
 # test
-assert Solution().combinationSum([2, 3, 6, 7], 7) == [[2, 2, 3], [7]]
-assert Solution().combinationSum([2, 3, 5], 8) == [[2, 2, 2, 2], [2, 3, 3], [3, 5]]
+assert sorted(map(sorted, Solution().combinationSum([2, 3, 6, 7], 7))) == sorted(map(sorted, [[2, 2, 3], [7]]))
+assert sorted(map(sorted, Solution().combinationSum([2, 3, 5], 8))) == sorted(map(sorted, [[2, 2, 2, 2], [2, 3, 3], [3, 5]]))
 ```
 
 ```java
@@ -215,7 +218,9 @@ class Solution:
         bt(0, target)
         return res
 # test
-assert Solution().combinationSum2([10, 1, 2, 7, 6, 1, 5], 8) == [[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]
+assert sorted(map(sorted, Solution().combinationSum2([10, 1, 2, 7, 6, 1, 5], 8))) == sorted(map(sorted, [[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]))
+assert sorted(map(sorted, Solution().combinationSum2([2, 5, 2, 1, 2], 5))) == [[1, 2, 2], [5]]
+assert Solution().combinationSum2([1], 2) == []
 ```
 
 ```java
@@ -269,7 +274,9 @@ class Solution:
         bt()
         return res
 # test
-assert Solution().permute([1, 2, 3]) == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+assert sorted(Solution().permute([1, 2, 3])) == sorted([[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]])
+assert sorted(Solution().permute([0, 1])) == [[0, 1], [1, 0]]
+assert Solution().permute([1]) == [[1]]
 ```
 
 ```java
@@ -325,7 +332,9 @@ class Solution:
         bt()
         return res
 # test
-assert Solution().permuteUnique([1, 1, 2]) == [[1, 1, 2], [1, 2, 1], [2, 1, 1]]
+assert sorted(Solution().permuteUnique([1, 1, 2])) == sorted([[1, 1, 2], [1, 2, 1], [2, 1, 1]])
+assert sorted(Solution().permuteUnique([1, 2, 3])) == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+assert Solution().permuteUnique([2, 2]) == [[2, 2]]
 ```
 
 ```java
@@ -376,8 +385,8 @@ class Solution:
         bt(1)
         return res
 # test
-assert Solution().combine(4, 2) == [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-assert Solution().combine(1, 1) == [[1]]
+assert sorted(map(sorted, Solution().combine(4, 2))) == sorted(map(sorted, [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]))
+assert sorted(map(sorted, Solution().combine(1, 1))) == sorted(map(sorted, [[1]]))
 ```
 
 ```java
@@ -427,8 +436,8 @@ class Solution:
         bt(0, "")
         return res
 # test
-assert Solution().letterCombinations("23") == ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]
-assert Solution().letterCombinations("") == []
+assert sorted(Solution().letterCombinations("23")) == sorted(["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"])
+assert sorted(Solution().letterCombinations("")) == sorted([])
 ```
 
 ```java
@@ -487,7 +496,9 @@ class Solution:
         bt("", 0, 0)
         return res
 # test
-assert Solution().generateParenthesis(3) == ["((()))", "(()())", "(())()", "()(())", "()()()"]
+assert sorted(Solution().generateParenthesis(3)) == sorted(["((()))", "(()())", "(())()", "()(())", "()()()"])
+assert Solution().generateParenthesis(1) == ["()"]
+assert sorted(Solution().generateParenthesis(4)) == ['(((())))', '((()()))', '((())())', '((()))()', '(()(()))', '(()()())', '(()())()', '(())(())', '(())()()', '()((()))', '()(()())', '()(())()', '()()(())', '()()()()']
 ```
 
 ```java
@@ -591,7 +602,9 @@ class Solution:
         bt(0)
         return res
 # test
-assert Solution().partition("aab") == [["a", "a", "b"], ["aa", "b"]]
+assert sorted(Solution().partition("aab")) == sorted([["a", "a", "b"], ["aa", "b"]])
+assert Solution().partition("a") == [["a"]]
+assert sorted(Solution().partition("aba")) == [["a", "b", "a"], ["aba"]]
 ```
 
 ```java
@@ -651,9 +664,9 @@ class Solution:
         bt(0, [])
         return res
 # test
-assert Solution().restoreIpAddresses("25525511135") == ["255.255.11.135", "255.255.111.35"]
-assert Solution().restoreIpAddresses("0000") == ["0.0.0.0"]
-assert Solution().restoreIpAddresses("101023") == ["1.0.10.23", "1.0.102.3", "10.1.0.23", "10.10.2.3", "101.0.2.3"]
+assert sorted(Solution().restoreIpAddresses("25525511135")) == sorted(["255.255.11.135", "255.255.111.35"])
+assert sorted(Solution().restoreIpAddresses("0000")) == sorted(["0.0.0.0"])
+assert sorted(Solution().restoreIpAddresses("101023")) == sorted(["1.0.10.23", "1.0.102.3", "10.1.0.23", "10.10.2.3", "101.0.2.3"])
 ```
 
 ```java
@@ -719,7 +732,7 @@ class Solution:
         bt(0)
         return res
 # test
-assert Solution().solveNQueens(4) == [[".Q..", "...Q", "Q...", "..Q."], ["..Q.", "Q...", "...Q", ".Q.."]]
+assert sorted(Solution().solveNQueens(4)) == sorted([[".Q..", "...Q", "Q...", "..Q."], ["..Q.", "Q...", "...Q", ".Q.."]])
 assert len(Solution().solveNQueens(8)) == 92
 ```
 
@@ -800,6 +813,7 @@ B = ["53..7....", "6..195...", ".98....6.", "8...6...3", "4..8.3..1", "7...2...6
 board = [list(r) for r in B]
 Solution().solveSudoku(board)
 assert ["".join(r) for r in board][0] == "534678912" and ["".join(r) for r in board][8] == "345286179"
+assert ["".join(r) for r in board] == ['534678912', '672195348', '198342567', '859761423', '426853791', '713924856', '961537284', '287419635', '345286179']
 ```
 
 ```java
@@ -866,9 +880,9 @@ class Solution:
         bt(1, n)
         return res
 # test
-assert Solution().combinationSum3(3, 7) == [[1, 2, 4]]
-assert Solution().combinationSum3(3, 9) == [[1, 2, 6], [1, 3, 5], [2, 3, 4]]
-assert Solution().combinationSum3(4, 1) == []
+assert sorted(map(sorted, Solution().combinationSum3(3, 7))) == sorted(map(sorted, [[1, 2, 4]]))
+assert sorted(map(sorted, Solution().combinationSum3(3, 9))) == sorted(map(sorted, [[1, 2, 6], [1, 3, 5], [2, 3, 4]]))
+assert sorted(map(sorted, Solution().combinationSum3(4, 1))) == sorted(map(sorted, []))
 ```
 
 ```java

@@ -29,5 +29,8 @@ class Solution:
 
 if __name__ == "__main__":
     t = make_tree([5, 4, 8, 11, None, 13, 4, 7, 2, None, None, 5, 1])
-    assert Solution().pathSum(t, 22) == [[5, 4, 11, 2], [5, 8, 4, 5]]
+    assert sorted(Solution().pathSum(t, 22)) == sorted([[5, 4, 11, 2], [5, 8, 4, 5]])
+    assert Solution().pathSum(make_tree([1, 2, 3]), 5) == []
+    assert Solution().pathSum(make_tree([1, 2]), 0) == []
+    assert Solution().pathSum(make_tree([-2, None, -3]), -5) == [[-2, -3]]
     print("OK")

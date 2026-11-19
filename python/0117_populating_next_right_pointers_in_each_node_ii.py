@@ -33,4 +33,5 @@ if __name__ == "__main__":
     n[2].left, n[2].right, n[3].right = n[4], n[5], n[7]
     Solution().connect(n[1])
     assert n[2].next is n[3] and n[4].next is n[5] and n[5].next is n[7] and n[7].next is None
+    assert Solution().connect(None) is None
     print("OK")

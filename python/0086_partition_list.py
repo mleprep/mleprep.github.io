@@ -25,4 +25,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert list_vals(Solution().partition(make_list([1, 4, 3, 2, 5, 2]), 3)) == [1, 2, 2, 4, 3, 5]
+    assert list_vals(Solution().partition(make_list([2, 1]), 2)) == [1, 2]
+    assert list_vals(Solution().partition(make_list([]), 0)) == []
     print("OK")

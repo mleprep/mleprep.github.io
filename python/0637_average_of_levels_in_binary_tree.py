@@ -23,4 +23,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert Solution().averageOfLevels(make_tree([3, 9, 20, None, None, 15, 7])) == [3.0, 14.5, 11.0]
+    assert Solution().averageOfLevels(make_tree([1])) == [1.0]
+    assert Solution().averageOfLevels(make_tree([2147483647, 2147483647, 2147483647])) == [2147483647.0, 2147483647.0]
     print("OK")

@@ -24,4 +24,7 @@ class Solution:
 if __name__ == "__main__":
     t = make_tree([1, 2, 5, 3, 4, None, 6]); Solution().flatten(t)
     assert tree_vals(t) == [1, None, 2, None, 3, None, 4, None, 5, None, 6]
+    t = make_tree([0]); Solution().flatten(t)
+    assert tree_vals(t) == [0]
+    assert Solution().flatten(None) is None
     print("OK")

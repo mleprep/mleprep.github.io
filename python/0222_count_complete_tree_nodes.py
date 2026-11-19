@@ -1,4 +1,4 @@
-# 222. Count Complete Tree Nodes (Easy)
+# 222. Count Complete Tree Nodes (Medium)
 # https://leetcode.com/problems/count-complete-tree-nodes/
 # Run: python 0222_count_complete_tree_nodes.py
 from typing import *

@@ -29,5 +29,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().permute([1, 2, 3]) == [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+    assert sorted(Solution().permute([1, 2, 3])) == sorted([[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]])
+    assert sorted(Solution().permute([0, 1])) == [[0, 1], [1, 0]]
+    assert Solution().permute([1]) == [[1]]
     print("OK")

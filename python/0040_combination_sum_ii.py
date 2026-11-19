@@ -31,5 +31,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().combinationSum2([10, 1, 2, 7, 6, 1, 5], 8) == [[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]
+    assert sorted(map(sorted, Solution().combinationSum2([10, 1, 2, 7, 6, 1, 5], 8))) == sorted(map(sorted, [[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]))
+    assert sorted(map(sorted, Solution().combinationSum2([2, 5, 2, 1, 2], 5))) == [[1, 2, 2], [5]]
+    assert Solution().combinationSum2([1], 2) == []
     print("OK")

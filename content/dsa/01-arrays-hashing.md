@@ -40,8 +40,8 @@ class Solution:
             seen[x] = i
         return []
 # test
-assert Solution().twoSum([2, 7, 11, 15], 9) == [0, 1]
-assert Solution().twoSum([3, 2, 4], 6) == [1, 2]
+assert sorted(Solution().twoSum([2, 7, 11, 15], 9)) == sorted([0, 1])
+assert sorted(Solution().twoSum([3, 2, 4], 6)) == sorted([1, 2])
 ```
 
 ```java
@@ -165,6 +165,8 @@ class Solution:
 # test
 res = Solution().groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"])
 assert sorted(sorted(g) for g in res) == [["ate", "eat", "tea"], ["bat"], ["nat", "tan"]]
+assert Solution().groupAnagrams([""]) == [[""]]
+assert Solution().groupAnagrams(["a"]) == [["a"]]
 ```
 
 ```java
@@ -541,7 +543,7 @@ check(new Solution().subarraySum(new int[]{1, -1, 0}, 0), 3);
 
 ## 41. First Missing Positive | Hard
 related: 268, 287
-tags: in-place-hashing
+tags: in-place
 
 The answer is in `[1, n+1]`. Use the array as a hash table: **cyclic-swap** each value `v ∈ [1, n]` to index `v-1`. Then the first index `i` with `nums[i] != i+1` gives `i+1`.
 
@@ -708,6 +710,12 @@ class Solution:
 a = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]
 k = Solution().removeDuplicates(a)
 assert k == 5 and a[:k] == [0, 1, 2, 3, 4]
+a = [1, 1, 2]
+k = Solution().removeDuplicates(a)
+assert k == 2 and a[:k] == [1, 2]
+a = [7]
+k = Solution().removeDuplicates(a)
+assert k == 1 and a[:k] == [7]
 ```
 
 ```java
@@ -926,6 +934,7 @@ class Solution:
         return rows
 # test
 assert Solution().generate(5) == [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
+assert Solution().generate(1) == [[1]]
 ```
 
 ```java
@@ -1064,7 +1073,7 @@ check(new Solution().hIndex(new int[]{3, 0, 6, 1, 5}), 3);
 
 ## 289. Game of Life | Medium
 related: 73
-tags: matrix, in-place-encoding
+tags: matrix, in-place
 
 Update in place by storing the **next** state in bit 1 while bit 0 keeps the current state. Count live neighbours with `cell & 1`, then shift every cell right by one.
 
@@ -1087,6 +1096,8 @@ class Solution:
 b = [[0, 1, 0], [0, 0, 1], [1, 1, 1], [0, 0, 0]]
 Solution().gameOfLife(b)
 assert b == [[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]
+b = [[1, 1], [1, 0]]; Solution().gameOfLife(b)
+assert b == [[1, 1], [1, 1]]
 ```
 
 ```java
@@ -1112,7 +1123,7 @@ check(b, new int[][]{{0, 0, 0}, {1, 0, 1}, {0, 1, 1}, {0, 1, 0}});
 
 ## 448. Find All Numbers Disappeared in an Array | Easy
 related: 41, 268
-tags: in-place-hashing
+tags: in-place
 
 Values are in `[1, n]`: for each value `v`, mark index `v−1` by making it negative. Indices that stay positive are the missing numbers.
 

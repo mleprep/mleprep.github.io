@@ -22,4 +22,7 @@ if __name__ == "__main__":
     a = [0, 0, 1, 1, 1, 1, 2, 3, 3]
     k = Solution().removeDuplicates(a)
     assert a[:k] == [0, 0, 1, 1, 2, 3, 3]
+    a = [1, 1, 1, 2, 2, 3]
+    k = Solution().removeDuplicates(a)
+    assert k == 5 and a[:k] == [1, 1, 2, 2, 3]
     print("OK")

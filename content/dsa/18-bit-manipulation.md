@@ -30,6 +30,8 @@ class Solution:
         return reduce(lambda a, b: a ^ b, nums)
 # test
 assert Solution().singleNumber([4, 1, 2, 1, 2]) == 4
+assert Solution().singleNumber([2, 2, 1]) == 1
+assert Solution().singleNumber([1]) == 1
 ```
 
 ```java
@@ -134,6 +136,8 @@ class Solution:
         return bits
 # test
 assert Solution().countBits(5) == [0, 1, 1, 2, 1, 2]
+assert Solution().countBits(0) == [0]
+assert Solution().countBits(2) == [0, 1, 1]
 ```
 
 ```java
@@ -266,7 +270,7 @@ check(new Solution().getSum(-1, 1), 0);
 
 ## 7. Reverse Integer | Medium
 related: 190, 8
-tags: blind75, overflow
+tags: overflow
 
 Pop digits with `% 10` and push with `* 10`. Before pushing, check that the result stays within `[−2³¹, 2³¹−1]`.
 
@@ -379,8 +383,8 @@ class Solution:
                 a ^= v
         return sorted([a, x ^ a])
 # test
-assert Solution().singleNumber([1, 2, 1, 3, 2, 5]) == [3, 5]
-assert Solution().singleNumber([-1, 0]) == [-1, 0]
+assert sorted(Solution().singleNumber([1, 2, 1, 3, 2, 5])) == sorted([3, 5])
+assert sorted(Solution().singleNumber([-1, 0])) == sorted([-1, 0])
 ```
 
 ```java
@@ -448,9 +452,11 @@ class Solution:
     def grayCode(self, n: int) -> List[int]:
         return [i ^ (i >> 1) for i in range(1 << n)]
 # test
-g = Solution().grayCode(3)
-assert g == [0, 1, 3, 2, 6, 7, 5, 4]
-assert all(bin(g[i] ^ g[(i + 1) % len(g)]).count("1") == 1 for i in range(len(g)))
+# any valid Gray code: starts at 0, visits all 2^n values once, neighbours (incl. wrap-around) differ by one bit
+for n in (1, 2, 3, 4):
+    g = Solution().grayCode(n)
+    assert g[0] == 0 and sorted(g) == list(range(1 << n))
+    assert all(bin(g[i] ^ g[(i + 1) % len(g)]).count("1") == 1 for i in range(len(g)))
 ```
 
 ```java

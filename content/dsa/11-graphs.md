@@ -71,6 +71,9 @@ class Solution:
 # test
 g = [list(r) for r in ["11000", "11000", "00100", "00011"]]
 assert Solution().numIslands(g) == 3
+assert Solution().numIslands([["0"]]) == 0
+assert Solution().numIslands([list(r) for r in ["11110", "11010", "11000", "00000"]]) == 1
+assert Solution().numIslands([list(r) for r in ["101", "010", "101"]]) == 5
 ```
 
 ```java
@@ -117,6 +120,8 @@ class Solution:
 # test
 g = [[0, 0, 1, 0, 0], [1, 1, 1, 0, 0], [0, 0, 0, 1, 1], [0, 0, 0, 1, 0]]
 assert Solution().maxAreaOfIsland(g) == 4
+assert Solution().maxAreaOfIsland([[0, 0, 0, 0, 0]]) == 0
+assert Solution().maxAreaOfIsland([[1]]) == 1
 ```
 
 ```java
@@ -297,7 +302,9 @@ class Solution:
         return sorted([r, c] for r, c in pac & atl)
 # test
 H = [[1, 2, 2, 3, 5], [3, 2, 3, 4, 4], [2, 4, 5, 3, 1], [6, 7, 1, 4, 5], [5, 1, 1, 2, 4]]
-assert Solution().pacificAtlantic(H) == [[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]]
+assert sorted(Solution().pacificAtlantic(H)) == sorted([[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]])
+assert Solution().pacificAtlantic([[1]]) == [[0, 0]]
+assert sorted(Solution().pacificAtlantic([[2, 1], [1, 2]])) == [[0, 0], [0, 1], [1, 0], [1, 1]]
 ```
 
 ```java
@@ -358,6 +365,12 @@ class Solution:
 b = [list(r) for r in ["XXXX", "XOOX", "XXOX", "XOXX"]]
 Solution().solve(b)
 assert ["".join(r) for r in b] == ["XXXX", "XXXX", "XXXX", "XOXX"]
+b = [["X"]]; Solution().solve(b)
+assert b == [["X"]]
+b = [list(r) for r in ["XXX", "XOX", "XXX"]]; Solution().solve(b)
+assert ["".join(r) for r in b] == ["XXX", "XXX", "XXX"]
+b = [list(r) for r in ["OO", "OO"]]; Solution().solve(b)
+assert ["".join(r) for r in b] == ["OO", "OO"]
 ```
 
 ```java
@@ -407,6 +420,10 @@ I = 2147483647
 g = [[I, -1, 0, I], [I, I, I, -1], [I, -1, I, -1], [0, -1, I, I]]
 Solution().wallsAndGates(g)
 assert g == [[3, -1, 0, 1], [2, 2, 1, -1], [1, -1, 2, -1], [0, -1, 3, 4]]
+g = [[-1]]; Solution().wallsAndGates(g)
+assert g == [[-1]]
+g = [[I, 0]]; Solution().wallsAndGates(g)
+assert g == [[1, 0]]
 ```
 
 ```java
@@ -521,7 +538,12 @@ class Solution:
                     q.append(v)
         return order if len(order) == numCourses else []
 # test
-assert Solution().findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]) == [0, 1, 2, 3]
+# any valid topological order is accepted
+def valid(n, pre, order):
+    pos = {c: i for i, c in enumerate(order)}
+    return len(order) == n == len(pos) and all(pos[b] < pos[a] for a, b in pre)
+assert valid(4, [[1, 0], [2, 0], [3, 1], [3, 2]], Solution().findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]))
+assert valid(2, [[1, 0]], Solution().findOrder(2, [[1, 0]]))
 assert Solution().findOrder(2, [[0, 1], [1, 0]]) == []
 ```
 
@@ -861,6 +883,9 @@ class Solution:
 eq, val = [["a", "b"], ["b", "c"]], [2.0, 3.0]
 qs = [["a", "c"], ["b", "a"], ["a", "e"], ["a", "a"], ["x", "x"]]
 assert Solution().calcEquation(eq, val, qs) == [6.0, 0.5, -1.0, 1.0, -1.0]
+got = Solution().calcEquation([["a", "b"], ["b", "c"], ["bc", "cd"]], [1.5, 2.5, 5.0], [["a", "c"], ["c", "b"], ["bc", "cd"], ["cd", "bc"]])
+assert all(abs(x - y) < 1e-5 for x, y in zip(got, [3.75, 0.4, 5.0, 0.2])) and len(got) == 4
+assert Solution().calcEquation([["a", "b"]], [0.5], [["a", "b"], ["b", "a"], ["a", "c"], ["x", "y"]]) == [0.5, 2.0, -1.0, -1.0]
 ```
 
 ```java
@@ -981,6 +1006,8 @@ class Solution:
         return dist
 # test
 assert Solution().updateMatrix([[0, 0, 0], [0, 1, 0], [1, 1, 1]]) == [[0, 0, 0], [0, 1, 0], [1, 2, 1]]
+assert Solution().updateMatrix([[0], [1], [1]]) == [[0], [1], [2]]
+assert Solution().updateMatrix([[1, 1, 1], [1, 1, 1], [1, 1, 0]]) == [[4, 3, 2], [3, 2, 1], [2, 1, 0]]
 ```
 
 ```java
@@ -1106,6 +1133,8 @@ acc = [["John", "johnsmith@mail.com", "john_newyork@mail.com"], ["John", "johnsm
 assert sorted(Solution().accountsMerge(acc)) == [
     ["John", "john00@mail.com", "john_newyork@mail.com", "johnsmith@mail.com"],
     ["John", "johnnybravo@mail.com"], ["Mary", "mary@mail.com"]]
+assert sorted(Solution().accountsMerge([["Alex", "a@x.com"], ["Alex", "b@x.com"]])) == [["Alex", "a@x.com"], ["Alex", "b@x.com"]]
+assert Solution().accountsMerge([["Bo", "b@x.com", "a@x.com", "b@x.com"]]) == [["Bo", "a@x.com", "b@x.com"]]
 ```
 
 ```java
@@ -1401,7 +1430,7 @@ check(new Solution().equationsPossible(new String[]{"a==b", "b!=a"}), false);
 
 ## 1466. Reorder Routes to Make All Paths Lead to the City Zero | Medium
 related: 207
-tags: dfs, directed-edges
+tags: dfs, directed-graph
 
 Treat roads as undirected but remember direction: an original edge `a → b` costs 1 when traversed away from 0 (it must be reversed), its reverse costs 0. DFS from 0 summing costs.
 

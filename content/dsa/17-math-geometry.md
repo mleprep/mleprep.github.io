@@ -37,6 +37,10 @@ class Solution:
 # test
 m = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]; Solution().rotate(m)
 assert m == [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
+m = [[5, 1, 9, 11], [2, 4, 8, 10], [13, 3, 6, 7], [15, 14, 12, 16]]; Solution().rotate(m)
+assert m == [[15, 13, 2, 5], [14, 3, 4, 1], [12, 6, 8, 9], [16, 7, 10, 11]]
+m = [[1]]; Solution().rotate(m)
+assert m == [[1]]
 ```
 
 ```java
@@ -112,7 +116,7 @@ check(new Solution().spiralOrder(new int[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10,
 
 ## 73. Set Matrix Zeroes | Medium
 related: 289
-tags: blind75, matrix, in-place-flags
+tags: blind75, matrix, in-place
 
 Use row 0 and column 0 as zero-flags for their rows/columns; remember separately whether row 0 / col 0 themselves need zeroing.
 
@@ -141,6 +145,8 @@ class Solution:
 # test
 m = [[0, 1, 2, 0], [3, 4, 5, 2], [1, 3, 1, 5]]; Solution().setZeroes(m)
 assert m == [[0, 0, 0, 0], [0, 4, 5, 0], [0, 3, 1, 0]]
+m = [[1, 1, 1], [1, 0, 1], [1, 1, 1]]; Solution().setZeroes(m)
+assert m == [[1, 0, 1], [0, 0, 0], [1, 0, 1]]
 ```
 
 ```java

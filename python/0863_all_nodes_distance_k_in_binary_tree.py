@@ -32,4 +32,8 @@ class Solution:
 if __name__ == "__main__":
     t = make_tree([3, 5, 1, 6, 2, 0, 8, None, None, 7, 4])
     assert sorted(Solution().distanceK(t, find_node(t, 5), 2)) == [1, 4, 7]
+    assert Solution().distanceK(t, find_node(t, 5), 0) == [5]
+    assert sorted(Solution().distanceK(t, find_node(t, 7), 3)) == [3, 6]
+    t1 = make_tree([1])
+    assert Solution().distanceK(t1, t1, 3) == []
     print("OK")

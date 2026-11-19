@@ -28,5 +28,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().partition("aab") == [["a", "a", "b"], ["aa", "b"]]
+    assert sorted(Solution().partition("aab")) == sorted([["a", "a", "b"], ["aa", "b"]])
+    assert Solution().partition("a") == [["a"]]
+    assert sorted(Solution().partition("aba")) == [["a", "b", "a"], ["aba"]]
     print("OK")

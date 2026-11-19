@@ -33,4 +33,7 @@ if __name__ == "__main__":
     eq, val = [["a", "b"], ["b", "c"]], [2.0, 3.0]
     qs = [["a", "c"], ["b", "a"], ["a", "e"], ["a", "a"], ["x", "x"]]
     assert Solution().calcEquation(eq, val, qs) == [6.0, 0.5, -1.0, 1.0, -1.0]
+    got = Solution().calcEquation([["a", "b"], ["b", "c"], ["bc", "cd"]], [1.5, 2.5, 5.0], [["a", "c"], ["c", "b"], ["bc", "cd"], ["cd", "bc"]])
+    assert all(abs(x - y) < 1e-5 for x, y in zip(got, [3.75, 0.4, 5.0, 0.2])) and len(got) == 4
+    assert Solution().calcEquation([["a", "b"]], [0.5], [["a", "b"], ["b", "a"], ["a", "c"], ["x", "y"]]) == [0.5, 2.0, -1.0, -1.0]
     print("OK")

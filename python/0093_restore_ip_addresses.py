@@ -31,7 +31,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().restoreIpAddresses("25525511135") == ["255.255.11.135", "255.255.111.35"]
-    assert Solution().restoreIpAddresses("0000") == ["0.0.0.0"]
-    assert Solution().restoreIpAddresses("101023") == ["1.0.10.23", "1.0.102.3", "10.1.0.23", "10.10.2.3", "101.0.2.3"]
+    assert sorted(Solution().restoreIpAddresses("25525511135")) == sorted(["255.255.11.135", "255.255.111.35"])
+    assert sorted(Solution().restoreIpAddresses("0000")) == sorted(["0.0.0.0"])
+    assert sorted(Solution().restoreIpAddresses("101023")) == sorted(["1.0.10.23", "1.0.102.3", "10.1.0.23", "10.10.2.3", "101.0.2.3"])
     print("OK")

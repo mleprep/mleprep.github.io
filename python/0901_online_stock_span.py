@@ -23,4 +23,6 @@ class StockSpanner:
 if __name__ == "__main__":
     s = StockSpanner()
     assert [s.next(p) for p in [100, 80, 60, 70, 60, 75, 85]] == [1, 1, 1, 2, 1, 4, 6]
+    s2 = StockSpanner()
+    assert [s2.next(p) for p in [31, 41, 48, 59, 79]] == [1, 2, 3, 4, 5]
     print("OK")

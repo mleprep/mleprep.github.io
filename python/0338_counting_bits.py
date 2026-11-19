@@ -18,4 +18,6 @@ class Solution:
 
 if __name__ == "__main__":
     assert Solution().countBits(5) == [0, 1, 1, 2, 1, 2]
+    assert Solution().countBits(0) == [0]
+    assert Solution().countBits(2) == [0, 1, 1]
     print("OK")

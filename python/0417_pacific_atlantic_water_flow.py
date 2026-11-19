@@ -30,5 +30,7 @@ class Solution:
 
 if __name__ == "__main__":
     H = [[1, 2, 2, 3, 5], [3, 2, 3, 4, 4], [2, 4, 5, 3, 1], [6, 7, 1, 4, 5], [5, 1, 1, 2, 4]]
-    assert Solution().pacificAtlantic(H) == [[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]]
+    assert sorted(Solution().pacificAtlantic(H)) == sorted([[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]])
+    assert Solution().pacificAtlantic([[1]]) == [[0, 0]]
+    assert sorted(Solution().pacificAtlantic([[2, 1], [1, 2]])) == [[0, 0], [0, 1], [1, 0], [1, 1]]
     print("OK")

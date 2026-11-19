@@ -44,6 +44,8 @@ class Solution:
         return root
 # test
 assert tree_vals(Solution().invertTree(make_tree([4, 2, 7, 1, 3, 6, 9]))) == [4, 7, 2, 9, 6, 3, 1]
+assert tree_vals(Solution().invertTree(make_tree([]))) == []
+assert tree_vals(Solution().invertTree(make_tree([2, 1, 3]))) == [2, 3, 1]
 ```
 
 ```java
@@ -434,6 +436,9 @@ class Solution:
         return res
 # test
 assert Solution().zigzagLevelOrder(make_tree([3, 9, 20, None, None, 15, 7])) == [[3], [20, 9], [15, 7]]
+assert Solution().zigzagLevelOrder(make_tree([1])) == [[1]]
+assert Solution().zigzagLevelOrder(make_tree([])) == []
+assert Solution().zigzagLevelOrder(make_tree([1, 2, 3, 4, None, None, 5])) == [[1], [3, 2], [4, 5]]
 ```
 
 ```java
@@ -545,7 +550,7 @@ check(new Solution().goodNodes(TreeNode.of(3, 1, 4, 3, null, 1, 5)), 4);
 
 ## 98. Validate Binary Search Tree | Medium
 related: 230, 1448
-tags: blind75, bst, bounds
+tags: blind75, bst, boundaries
 
 Each node must lie strictly within `(lo, hi)` inherited from ancestors — checking only direct children is the classic bug.
 
@@ -662,6 +667,8 @@ class Solution:
         return build(0, len(inorder))
 # test
 assert tree_vals(Solution().buildTree([3, 9, 20, 15, 7], [9, 3, 15, 20, 7])) == [3, 9, 20, None, None, 15, 7]
+assert tree_vals(Solution().buildTree([-1], [-1])) == [-1]
+assert tree_vals(Solution().buildTree([1, 2, 3], [3, 2, 1])) == [1, 2, None, 3]
 ```
 
 ```java
@@ -897,7 +904,10 @@ class Solution:
         return res
 # test
 t = make_tree([5, 4, 8, 11, None, 13, 4, 7, 2, None, None, 5, 1])
-assert Solution().pathSum(t, 22) == [[5, 4, 11, 2], [5, 8, 4, 5]]
+assert sorted(Solution().pathSum(t, 22)) == sorted([[5, 4, 11, 2], [5, 8, 4, 5]])
+assert Solution().pathSum(make_tree([1, 2, 3]), 5) == []
+assert Solution().pathSum(make_tree([1, 2]), 0) == []
+assert Solution().pathSum(make_tree([-2, None, -3]), -5) == [[-2, -3]]
 ```
 
 ```java
@@ -1005,6 +1015,9 @@ class Solution:
 # test
 t = make_tree([1, 2, 5, 3, 4, None, 6]); Solution().flatten(t)
 assert tree_vals(t) == [1, None, 2, None, 3, None, 4, None, 5, None, 6]
+t = make_tree([0]); Solution().flatten(t)
+assert tree_vals(t) == [0]
+assert Solution().flatten(None) is None
 ```
 
 ```java
@@ -1058,6 +1071,7 @@ for i in range(1, 4):
     n[i].left, n[i].right = n[2 * i], n[2 * i + 1]
 Solution().connect(n[1])
 assert n[4].next is n[5] and n[5].next is n[6] and n[6].next is n[7] and n[7].next is None and n[2].next is n[3]
+assert Solution().connect(None) is None
 ```
 
 ```java
@@ -1103,7 +1117,19 @@ class Solution:
 
         return build(0, len(nums) - 1)
 # test
-assert tree_vals(Solution().sortedArrayToBST([-10, -3, 0, 5, 9])) == [0, -10, 5, None, -3, None, 9]
+# any height-balanced BST with the same in-order sequence is accepted
+def balanced_bst(root, vals):
+    def walk(n):  # (inorder values, height) or None if unbalanced
+        if not n:
+            return [], 0
+        l, r = walk(n.left), walk(n.right)
+        if l is None or r is None or abs(l[1] - r[1]) > 1:
+            return None
+        return l[0] + [n.val] + r[0], 1 + max(l[1], r[1])
+    w = walk(root)
+    return w is not None and w[0] == vals
+for vals in ([-10, -3, 0, 5, 9], [1, 3], [0], [1, 2, 3, 4, 5, 6, 7, 8]):
+    assert balanced_bst(Solution().sortedArrayToBST(vals), vals)
 ```
 
 ```java
@@ -1152,6 +1178,8 @@ out = []
 while it.hasNext():
     out.append(it.next())
 assert out == [3, 7, 9, 15, 20]
+it = BSTIterator(make_tree([1]))
+assert it.hasNext() and it.next() == 1 and not it.hasNext()
 ```
 
 ```java
@@ -1208,6 +1236,10 @@ class Solution:
 # test
 t = make_tree([3, 5, 1, 6, 2, 0, 8, None, None, 7, 4])
 assert sorted(Solution().distanceK(t, find_node(t, 5), 2)) == [1, 4, 7]
+assert Solution().distanceK(t, find_node(t, 5), 0) == [5]
+assert sorted(Solution().distanceK(t, find_node(t, 7), 3)) == [3, 6]
+t1 = make_tree([1])
+assert Solution().distanceK(t1, t1, 3) == []
 ```
 
 ```java
@@ -1349,6 +1381,8 @@ class Solution:
         return build(0, len(inorder))
 # test
 assert tree_vals(Solution().buildTree([9, 3, 15, 20, 7], [9, 15, 7, 20, 3])) == [3, 9, 20, None, None, 15, 7]
+assert tree_vals(Solution().buildTree([-1], [-1])) == [-1]
+assert tree_vals(Solution().buildTree([2, 1], [2, 1])) == [1, 2]
 ```
 
 ```java
@@ -1404,7 +1438,20 @@ class Solution:
 
         return build(0, n - 1)
 # test
-assert tree_vals(Solution().sortedListToBST(make_list([-10, -3, 0, 5, 9]))) == [0, -10, 5, None, -3, None, 9]
+# any height-balanced BST with the same in-order sequence is accepted
+def balanced_bst(root, vals):
+    def walk(n):  # (inorder values, height) or None if unbalanced
+        if not n:
+            return [], 0
+        l, r = walk(n.left), walk(n.right)
+        if l is None or r is None or abs(l[1] - r[1]) > 1:
+            return None
+        return l[0] + [n.val] + r[0], 1 + max(l[1], r[1])
+    w = walk(root)
+    return w is not None and w[0] == vals
+for vals in ([-10, -3, 0, 5, 9], [1, 3], [0], [1, 2, 3, 4, 5, 6, 7, 8]):
+    assert balanced_bst(Solution().sortedListToBST(make_list(vals)), vals)
+assert Solution().sortedListToBST(None) is None
 ```
 
 ```java
@@ -1465,6 +1512,7 @@ n[1].left, n[1].right = n[2], n[3]
 n[2].left, n[2].right, n[3].right = n[4], n[5], n[7]
 Solution().connect(n[1])
 assert n[2].next is n[3] and n[4].next is n[5] and n[5].next is n[7] and n[7].next is None
+assert Solution().connect(None) is None
 ```
 
 ```java
@@ -1559,7 +1607,8 @@ class Solution:
         dfs(root, [])
         return res
 # test
-assert Solution().binaryTreePaths(make_tree([1, 2, 3, None, 5])) == ["1->2->5", "1->3"]
+assert sorted(Solution().binaryTreePaths(make_tree([1, 2, 3, None, 5]))) == sorted(["1->2->5", "1->3"])
+assert Solution().binaryTreePaths(make_tree([1])) == ["1"]
 ```
 
 ```java
@@ -1582,7 +1631,7 @@ class Solution {
 check(new Solution().binaryTreePaths(TreeNode.of(1, 2, 3, null, 5)), "[1->2->5, 1->3]");
 ```
 
-## 222. Count Complete Tree Nodes | Easy
+## 222. Count Complete Tree Nodes | Medium
 related: 958
 tags: binary-search, complete-tree
 
@@ -1792,6 +1841,8 @@ class Solution:
         return res
 # test
 assert Solution().averageOfLevels(make_tree([3, 9, 20, None, None, 15, 7])) == [3.0, 14.5, 11.0]
+assert Solution().averageOfLevels(make_tree([1])) == [1.0]
+assert Solution().averageOfLevels(make_tree([2147483647, 2147483647, 2147483647])) == [2147483647.0, 2147483647.0]
 ```
 
 ```java

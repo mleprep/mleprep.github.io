@@ -26,6 +26,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().combine(4, 2) == [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-    assert Solution().combine(1, 1) == [[1]]
+    assert sorted(map(sorted, Solution().combine(4, 2))) == sorted(map(sorted, [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]))
+    assert sorted(map(sorted, Solution().combine(1, 1))) == sorted(map(sorted, [[1]]))
     print("OK")

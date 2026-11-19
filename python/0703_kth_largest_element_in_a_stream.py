@@ -24,4 +24,6 @@ class KthLargest:
 if __name__ == "__main__":
     kl = KthLargest(3, [4, 5, 8, 2])
     assert [kl.add(v) for v in (3, 5, 10, 9, 4)] == [4, 5, 5, 8, 8]
+    kl = KthLargest(1, [])
+    assert [kl.add(v) for v in (-3, -2, -4, 0, 4)] == [-3, -2, -2, 0, 4]
     print("OK")

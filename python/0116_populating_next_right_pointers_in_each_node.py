@@ -32,4 +32,5 @@ if __name__ == "__main__":
         n[i].left, n[i].right = n[2 * i], n[2 * i + 1]
     Solution().connect(n[1])
     assert n[4].next is n[5] and n[5].next is n[6] and n[6].next is n[7] and n[7].next is None and n[2].next is n[3]
+    assert Solution().connect(None) is None
     print("OK")

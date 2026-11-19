@@ -24,6 +24,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().findAnagrams("cbaebabacd", "abc") == [0, 6]
-    assert Solution().findAnagrams("abab", "ab") == [0, 1, 2]
+    assert sorted(Solution().findAnagrams("cbaebabacd", "abc")) == sorted([0, 6])
+    assert sorted(Solution().findAnagrams("abab", "ab")) == sorted([0, 1, 2])
     print("OK")

@@ -31,6 +31,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().findMinHeightTrees(4, [[1, 0], [1, 2], [1, 3]]) == [1]
-    assert Solution().findMinHeightTrees(6, [[3, 0], [3, 1], [3, 2], [3, 4], [5, 4]]) == [3, 4]
+    assert sorted(Solution().findMinHeightTrees(4, [[1, 0], [1, 2], [1, 3]])) == sorted([1])
+    assert sorted(Solution().findMinHeightTrees(6, [[3, 0], [3, 1], [3, 2], [3, 4], [5, 4]])) == sorted([3, 4])
     print("OK")

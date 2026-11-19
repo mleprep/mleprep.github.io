@@ -22,4 +22,6 @@ class Solution:
 if __name__ == "__main__":
     res = Solution().groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"])
     assert sorted(sorted(g) for g in res) == [["ate", "eat", "tea"], ["bat"], ["nat", "tan"]]
+    assert Solution().groupAnagrams([""]) == [[""]]
+    assert Solution().groupAnagrams(["a"]) == [["a"]]
     print("OK")

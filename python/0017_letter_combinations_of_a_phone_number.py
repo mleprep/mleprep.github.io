@@ -27,6 +27,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().letterCombinations("23") == ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]
-    assert Solution().letterCombinations("") == []
+    assert sorted(Solution().letterCombinations("23")) == sorted(["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"])
+    assert sorted(Solution().letterCombinations("")) == sorted([])
     print("OK")

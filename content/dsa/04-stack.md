@@ -184,6 +184,8 @@ class Solution:
         return res
 # test
 assert Solution().dailyTemperatures([73, 74, 75, 71, 69, 72, 76, 73]) == [1, 1, 4, 2, 1, 1, 0, 0]
+assert Solution().dailyTemperatures([30, 40, 50, 60]) == [1, 1, 1, 0]
+assert Solution().dailyTemperatures([60, 50, 40]) == [0, 0, 0]
 ```
 
 ```java
@@ -334,6 +336,9 @@ class Solution:
 # test
 M = ["10100", "10111", "11111", "10010"]
 assert Solution().maximalRectangle([list(r) for r in M]) == 6
+assert Solution().maximalRectangle([["0"]]) == 0
+assert Solution().maximalRectangle([["1"]]) == 1
+assert Solution().maximalRectangle([list(r) for r in ["0110", "1111", "1110"]]) == 6
 ```
 
 ```java
@@ -683,6 +688,8 @@ class StockSpanner:
 # test
 s = StockSpanner()
 assert [s.next(p) for p in [100, 80, 60, 70, 60, 75, 85]] == [1, 1, 1, 2, 1, 4, 6]
+s2 = StockSpanner()
+assert [s2.next(p) for p in [31, 41, 48, 59, 79]] == [1, 2, 3, 4, 5]
 ```
 
 ```java
@@ -1075,6 +1082,8 @@ class MyStack:
 s = MyStack()
 s.push(1); s.push(2)
 assert s.top() == 2 and s.pop() == 2 and not s.empty() and s.pop() == 1 and s.empty()
+s2 = MyStack(); s2.push(5); s2.push(6); s2.push(7)
+assert s2.pop() == 7 and s2.top() == 6 and s2.pop() == 6 and s2.top() == 5 and not s2.empty()
 ```
 
 ```java

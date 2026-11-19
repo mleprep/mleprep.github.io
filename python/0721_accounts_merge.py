@@ -35,4 +35,6 @@ if __name__ == "__main__":
     assert sorted(Solution().accountsMerge(acc)) == [
         ["John", "john00@mail.com", "john_newyork@mail.com", "johnsmith@mail.com"],
         ["John", "johnnybravo@mail.com"], ["Mary", "mary@mail.com"]]
+    assert sorted(Solution().accountsMerge([["Alex", "a@x.com"], ["Alex", "b@x.com"]])) == [["Alex", "a@x.com"], ["Alex", "b@x.com"]]
+    assert Solution().accountsMerge([["Bo", "b@x.com", "a@x.com", "b@x.com"]]) == [["Bo", "a@x.com", "b@x.com"]]
     print("OK")

@@ -150,8 +150,8 @@ class Solution:
                     r -= 1
         return res
 # test
-assert Solution().threeSum([-1, 0, 1, 2, -1, -4]) == [[-1, -1, 2], [-1, 0, 1]]
-assert Solution().threeSum([0, 0, 0]) == [[0, 0, 0]]
+assert sorted(map(sorted, Solution().threeSum([-1, 0, 1, 2, -1, -4]))) == sorted(map(sorted, [[-1, -1, 2], [-1, 0, 1]]))
+assert sorted(map(sorted, Solution().threeSum([0, 0, 0]))) == sorted(map(sorted, [[0, 0, 0]]))
 ```
 
 ```java
@@ -285,7 +285,7 @@ check(new Solution().trap(new int[]{4, 2, 0, 3, 2, 5}), 9);
 
 ## 283. Move Zeroes | Easy
 related: 26, 75
-tags: slow-fast
+tags: fast-slow
 
 Slow pointer `k` = next slot for a non-zero. Swap each non-zero into `k`; zeros drift to the end while relative order is kept.
 
@@ -302,6 +302,10 @@ class Solution:
 # test
 a = [0, 1, 0, 3, 12]; Solution().moveZeroes(a)
 assert a == [1, 3, 12, 0, 0]
+a = [0]; Solution().moveZeroes(a)
+assert a == [0]
+a = [1, 0, 0, 2]; Solution().moveZeroes(a)
+assert a == [1, 2, 0, 0]
 ```
 
 ```java
@@ -407,8 +411,8 @@ class Solution:
 
         return ksum(0, 4, target)
 # test
-assert Solution().fourSum([1, 0, -1, 0, -2, 2], 0) == [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]
-assert Solution().fourSum([2, 2, 2, 2, 2], 8) == [[2, 2, 2, 2]]
+assert sorted(map(sorted, Solution().fourSum([1, 0, -1, 0, -2, 2], 0))) == sorted(map(sorted, [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]))
+assert sorted(map(sorted, Solution().fourSum([2, 2, 2, 2, 2], 8))) == sorted(map(sorted, [[2, 2, 2, 2]]))
 ```
 
 ```java
@@ -473,6 +477,10 @@ class Solution:
 # test
 a = [2, 0, 2, 1, 1, 0]; Solution().sortColors(a)
 assert a == [0, 0, 1, 1, 2, 2]
+a = [2, 0, 1]; Solution().sortColors(a)
+assert a == [0, 1, 2]
+a = [1, 1, 0, 0, 2, 2, 1]; Solution().sortColors(a)
+assert a == [0, 0, 1, 1, 1, 2, 2]
 ```
 
 ```java
@@ -601,6 +609,8 @@ class Solution:
         return res
 # test
 assert Solution().sortedSquares([-4, -1, 0, 3, 10]) == [0, 1, 9, 16, 100]
+assert Solution().sortedSquares([-7, -3, 2, 3, 11]) == [4, 9, 9, 49, 121]
+assert Solution().sortedSquares([-5, -3, -2, -1]) == [1, 4, 9, 25]
 ```
 
 ```java
@@ -621,7 +631,7 @@ check(new Solution().sortedSquares(new int[]{-7, -3, 2, 3, 11}), new int[]{4, 9,
 
 ## 27. Remove Element | Easy
 related: 26, 283
-tags: slow-fast
+tags: fast-slow
 
 Copy every element not equal to `val` to the write pointer `k`.
 
@@ -640,6 +650,12 @@ class Solution:
 a = [0, 1, 2, 2, 3, 0, 4, 2]
 k = Solution().removeElement(a, 2)
 assert k == 5 and sorted(a[:k]) == [0, 0, 1, 3, 4]
+a = [3, 2, 2, 3]
+k = Solution().removeElement(a, 3)
+assert k == 2 and sorted(a[:k]) == [2, 2]
+a = [1]
+k = Solution().removeElement(a, 1)
+assert k == 0
 ```
 
 ```java
@@ -657,7 +673,7 @@ check(new Solution().removeElement(a, 3), 2);
 
 ## 80. Remove Duplicates from Sorted Array II | Medium
 related: 26
-tags: slow-fast
+tags: fast-slow
 
 Allow at most two copies: keep `x` if `k < 2` or `x != nums[k-2]` (compare with the element two slots back in the *kept* prefix).
 
@@ -676,6 +692,9 @@ class Solution:
 a = [0, 0, 1, 1, 1, 1, 2, 3, 3]
 k = Solution().removeDuplicates(a)
 assert a[:k] == [0, 0, 1, 1, 2, 3, 3]
+a = [1, 1, 1, 2, 2, 3]
+k = Solution().removeDuplicates(a)
+assert k == 5 and a[:k] == [1, 1, 2, 2, 3]
 ```
 
 ```java
@@ -740,6 +759,10 @@ class Solution:
 # test
 a = list("hello"); Solution().reverseString(a)
 assert a == list("olleh")
+a = list("Hannah"); Solution().reverseString(a)
+assert a == list("hannaH")
+a = ["x"]; Solution().reverseString(a)
+assert a == ["x"]
 ```
 
 ```java

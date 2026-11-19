@@ -21,4 +21,5 @@ class NumArray:
 if __name__ == "__main__":
     na = NumArray([-2, 0, 3, -5, 2, -1])
     assert [na.sumRange(0, 2), na.sumRange(2, 5), na.sumRange(0, 5)] == [1, -1, -3]
+    assert NumArray([5]).sumRange(0, 0) == 5
     print("OK")

@@ -24,4 +24,6 @@ if __name__ == "__main__":
     assert Solution().suggestedProducts(P, "mouse") == [
         ["mobile", "moneypot", "monitor"], ["mobile", "moneypot", "monitor"],
         ["mouse", "mousepad"], ["mouse", "mousepad"], ["mouse", "mousepad"]]
+    assert Solution().suggestedProducts(["havana"], "tatiana") == [[], [], [], [], [], [], []]
+    assert Solution().suggestedProducts(["bags", "baggage", "banner", "box", "cloths"], "bags") == [["baggage", "bags", "banner"], ["baggage", "bags", "banner"], ["baggage", "bags"], ["bags"]]
     print("OK")

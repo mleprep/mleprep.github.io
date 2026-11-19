@@ -56,7 +56,7 @@ check(new Solution().merge(new int[][]{{1, 3}, {2, 6}, {8, 10}, {15, 18}}), new 
 
 ## 57. Insert Interval | Medium
 related: 56
-tags: blind75, sweep
+tags: blind75, sweep-line
 
 Three phases on the already-sorted list: copy intervals ending before the new one; merge every overlapping interval into it; copy the rest.
 
@@ -279,6 +279,8 @@ class Solution:
 A = [[0, 2], [5, 10], [13, 23], [24, 25]]
 B = [[1, 5], [8, 12], [15, 24], [25, 26]]
 assert Solution().intervalIntersection(A, B) == [[1, 2], [5, 5], [8, 10], [15, 23], [24, 24], [25, 25]]
+assert Solution().intervalIntersection([[1, 3], [5, 9]], []) == []
+assert Solution().intervalIntersection([[1, 7]], [[3, 10]]) == [[3, 7]]
 ```
 
 ```java
@@ -413,6 +415,8 @@ class MyCalendar:
 # test
 c = MyCalendar()
 assert [c.book(10, 20), c.book(15, 25), c.book(20, 30)] == [True, False, True]
+c2 = MyCalendar()
+assert [c2.book(5, 10), c2.book(10, 15), c2.book(9, 11), c2.book(0, 5), c2.book(4, 6)] == [True, True, False, True, False]
 ```
 
 ```java

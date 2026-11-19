@@ -24,4 +24,6 @@ class NumMatrix:
 if __name__ == "__main__":
     nm = NumMatrix([[3, 0, 1, 4, 2], [5, 6, 3, 2, 1], [1, 2, 0, 1, 5], [4, 1, 0, 1, 7], [1, 0, 3, 0, 5]])
     assert [nm.sumRegion(2, 1, 4, 3), nm.sumRegion(1, 1, 2, 2), nm.sumRegion(1, 2, 2, 4)] == [8, 11, 12]
+    assert NumMatrix([[1, 2], [3, 4]]).sumRegion(0, 0, 1, 1) == 10
+    assert NumMatrix([[1, 2], [3, 4]]).sumRegion(1, 1, 1, 1) == 4
     print("OK")

@@ -26,4 +26,8 @@ if __name__ == "__main__":
     g = [[I, -1, 0, I], [I, I, I, -1], [I, -1, I, -1], [0, -1, I, I]]
     Solution().wallsAndGates(g)
     assert g == [[3, -1, 0, 1], [2, 2, 1, -1], [1, -1, 2, -1], [0, -1, 3, 4]]
+    g = [[-1]]; Solution().wallsAndGates(g)
+    assert g == [[-1]]
+    g = [[I, 0]]; Solution().wallsAndGates(g)
+    assert g == [[1, 0]]
     print("OK")

@@ -36,4 +36,7 @@ class Solution:
 
 if __name__ == "__main__":
     assert [sorted(e) for e in Solution().criticalConnections(4, [[0, 1], [1, 2], [2, 0], [1, 3]])] == [[1, 3]]
+    assert sorted(sorted(e) for e in Solution().criticalConnections(2, [[0, 1]])) == [[0, 1]]
+    assert sorted(sorted(e) for e in Solution().criticalConnections(6, [[0, 1], [1, 2], [2, 0], [1, 3], [3, 4], [4, 5], [5, 3]])) == [[1, 3]]
+    assert sorted(sorted(e) for e in Solution().criticalConnections(4, [[0, 1], [1, 2], [2, 3]])) == [[0, 1], [1, 2], [2, 3]]
     print("OK")

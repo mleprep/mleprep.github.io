@@ -20,7 +20,7 @@ Other design problems elsewhere: Min Stack (155), Time Map (981), Twitter (355),
 
 ## 146. LRU Cache | Medium
 related: 460, 588
-tags: blind75, hash-map, linked-list
+tags: hash-map, linked-list
 
 Hash map from key to node of a doubly linked list ordered by recency. `get` moves the node to the front; `put` inserts at the front and evicts the node before the tail when over capacity. Sentinels (`head`, `tail`) remove edge cases. Python's `OrderedDict` packages exactly this.
 
@@ -109,7 +109,7 @@ check(c.get(4), 4);
 
 ## 460. LFU Cache | Hard
 related: 146
-tags: hash-map, frequency-buckets
+tags: hash-map, bucket-sort
 
 `key → (value, freq)`, `freq → OrderedDict of keys` (LRU order within a frequency), plus `minFreq`. On access, move the key from bucket `f` to `f+1` (bump `minFreq` if bucket `f` emptied and was the min). On insert, evict the oldest key in `minFreq`'s bucket, then set `minFreq = 1`.
 
@@ -328,6 +328,8 @@ class MyQueue:
 q = MyQueue()
 q.push(1); q.push(2)
 assert q.peek() == 1 and q.pop() == 1 and not q.empty()
+q.push(3)
+assert q.pop() == 2 and q.peek() == 3 and q.pop() == 3 and q.empty()
 ```
 
 ```java
@@ -527,6 +529,8 @@ class Codec:
 c = Codec()
 u = "https://leetcode.com/problems/design-tinyurl"
 assert c.decode(c.encode(u)) == u and c.encode(u) == c.encode(u)
+for u in ("https://example.com/a?b=c#d", "x"):
+    assert c.decode(c.encode(u)) == u
 ```
 
 ```java
@@ -725,6 +729,9 @@ u = UndergroundSystem()
 u.checkIn(45, "Leyton", 3); u.checkIn(32, "Paradise", 8); u.checkIn(27, "Leyton", 10)
 u.checkOut(45, "Waterloo", 15); u.checkOut(27, "Waterloo", 20); u.checkOut(32, "Cambridge", 22)
 assert u.getAverageTime("Paradise", "Cambridge") == 14.0 and u.getAverageTime("Leyton", "Waterloo") == 11.0
+u2 = UndergroundSystem()
+u2.checkIn(10, "A", 1); u2.checkOut(10, "B", 5); u2.checkIn(11, "A", 2); u2.checkOut(11, "B", 4)
+assert u2.getAverageTime("A", "B") == 3.0
 ```
 
 ```java
@@ -954,7 +961,7 @@ check(out, "[1, 1, 2, 1, 1]");
 
 ## 432. All O`one Data Structure | Hard
 related: 460, 146
-tags: linked-list, buckets
+tags: linked-list, bucket-sort
 
 Like LFU: a doubly linked list of **count buckets** in increasing order, each holding a set of keys, plus `key → bucket`. `inc`/`dec` move a key to the neighbouring bucket (creating it if the count isn't there), deleting emptied buckets. Min/max = first/last bucket.
 

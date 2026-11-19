@@ -26,5 +26,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().binaryTreePaths(make_tree([1, 2, 3, None, 5])) == ["1->2->5", "1->3"]
+    assert sorted(Solution().binaryTreePaths(make_tree([1, 2, 3, None, 5]))) == sorted(["1->2->5", "1->3"])
+    assert Solution().binaryTreePaths(make_tree([1])) == ["1"]
     print("OK")

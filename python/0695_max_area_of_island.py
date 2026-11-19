@@ -24,4 +24,6 @@ class Solution:
 if __name__ == "__main__":
     g = [[0, 0, 1, 0, 0], [1, 1, 1, 0, 0], [0, 0, 0, 1, 1], [0, 0, 0, 1, 0]]
     assert Solution().maxAreaOfIsland(g) == 4
+    assert Solution().maxAreaOfIsland([[0, 0, 0, 0, 0]]) == 0
+    assert Solution().maxAreaOfIsland([[1]]) == 1
     print("OK")

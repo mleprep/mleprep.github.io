@@ -1,4 +1,4 @@
-// 222. Count Complete Tree Nodes (Easy)
+// 222. Count Complete Tree Nodes (Medium)
 // https://leetcode.com/problems/count-complete-tree-nodes/
 // Run (Java 11+): java P0222CountCompleteTreeNodes.java
 import java.util.*;

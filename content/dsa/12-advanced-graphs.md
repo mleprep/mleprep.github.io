@@ -296,7 +296,7 @@ check(new Solution().swimInWater(new int[][]{{0, 2}, {1, 3}}), 3);
 
 ## 269. Alien Dictionary | Hard
 related: 207, 210, 953
-tags: topological-sort, premium
+tags: blind75, topological-sort, premium
 
 Compare adjacent words: the first differing letters give an edge `a → b`. If a word is followed by its own proper prefix, the input is invalid. Topologically sort the letters (Kahn); a cycle → `""`.
 
@@ -467,8 +467,8 @@ class Solution:
             leaves = nxt
         return sorted(leaves)
 # test
-assert Solution().findMinHeightTrees(4, [[1, 0], [1, 2], [1, 3]]) == [1]
-assert Solution().findMinHeightTrees(6, [[3, 0], [3, 1], [3, 2], [3, 4], [5, 4]]) == [3, 4]
+assert sorted(Solution().findMinHeightTrees(4, [[1, 0], [1, 2], [1, 3]])) == sorted([1])
+assert sorted(Solution().findMinHeightTrees(6, [[3, 0], [3, 1], [3, 2], [3, 4], [5, 4]])) == sorted([3, 4])
 ```
 
 ```java
@@ -540,6 +540,9 @@ class Solution:
         return res
 # test
 assert [sorted(e) for e in Solution().criticalConnections(4, [[0, 1], [1, 2], [2, 0], [1, 3]])] == [[1, 3]]
+assert sorted(sorted(e) for e in Solution().criticalConnections(2, [[0, 1]])) == [[0, 1]]
+assert sorted(sorted(e) for e in Solution().criticalConnections(6, [[0, 1], [1, 2], [2, 0], [1, 3], [3, 4], [4, 5], [5, 3]])) == [[1, 3]]
+assert sorted(sorted(e) for e in Solution().criticalConnections(4, [[0, 1], [1, 2], [2, 3]])) == [[0, 1], [1, 2], [2, 3]]
 ```
 
 ```java
@@ -815,7 +818,7 @@ check(new Solution().findTheCity(4, new int[][]{{0, 1, 3}, {1, 2, 1}, {1, 3, 4},
 
 ## 685. Redundant Connection II | Hard
 related: 684
-tags: union-find, directed
+tags: union-find, directed-graph
 
 A rooted tree plus one extra **directed** edge creates either (a) a node with two parents, (b) a cycle, or both. If some node has two parents, the answer is one of those two edges: skip the later one and check with Union-Find whether a cycle remains — if yes, the earlier edge is the culprit. Otherwise return the edge that closes the cycle.
 

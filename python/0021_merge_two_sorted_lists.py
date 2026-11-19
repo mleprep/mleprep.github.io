@@ -23,4 +23,7 @@ class Solution:
 
 if __name__ == "__main__":
     assert list_vals(Solution().mergeTwoLists(make_list([1, 2, 4]), make_list([1, 3, 4]))) == [1, 1, 2, 3, 4, 4]
+    assert list_vals(Solution().mergeTwoLists(make_list([]), make_list([]))) == []
+    assert list_vals(Solution().mergeTwoLists(make_list([]), make_list([0]))) == [0]
+    assert list_vals(Solution().mergeTwoLists(make_list([5]), make_list([1, 2, 4]))) == [1, 2, 4, 5]
     print("OK")

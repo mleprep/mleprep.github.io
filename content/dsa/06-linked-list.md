@@ -73,6 +73,9 @@ class Solution:
         return dummy.next
 # test
 assert list_vals(Solution().mergeTwoLists(make_list([1, 2, 4]), make_list([1, 3, 4]))) == [1, 1, 2, 3, 4, 4]
+assert list_vals(Solution().mergeTwoLists(make_list([]), make_list([]))) == []
+assert list_vals(Solution().mergeTwoLists(make_list([]), make_list([0]))) == [0]
+assert list_vals(Solution().mergeTwoLists(make_list([5]), make_list([1, 2, 4]))) == [1, 2, 4, 5]
 ```
 
 ```java
@@ -408,7 +411,7 @@ check(new Solution().addTwoNumbers(ListNode.of(9, 9, 9), ListNode.of(1)), ListNo
 
 ## 287. Find the Duplicate Number | Medium
 related: 142, 41, 268
-tags: fast-slow, cycle
+tags: fast-slow, cycle-detection
 
 Values in `[1, n]` → view `i → nums[i]` as a linked list. The duplicate value is where two arrows enter the same node = **cycle entrance** (Floyd, like 142). No modification, O(1) space.
 
@@ -838,6 +841,8 @@ class Solution:
         return head
 # test
 assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 2, 3, 3]))) == [1, 2, 3]
+assert list_vals(Solution().deleteDuplicates(make_list([]))) == []
+assert list_vals(Solution().deleteDuplicates(make_list([1, 1, 1]))) == [1]
 ```
 
 ```java
@@ -1005,6 +1010,8 @@ class Solution:
         return small.next
 # test
 assert list_vals(Solution().partition(make_list([1, 4, 3, 2, 5, 2]), 3)) == [1, 2, 2, 4, 3, 5]
+assert list_vals(Solution().partition(make_list([2, 1]), 2)) == [1, 2]
+assert list_vals(Solution().partition(make_list([]), 0)) == []
 ```
 
 ```java

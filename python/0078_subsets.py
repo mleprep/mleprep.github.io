@@ -24,5 +24,6 @@ class Solution:
 
 
 if __name__ == "__main__":
-    assert Solution().subsets([1, 2, 3]) == [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]
+    assert sorted(map(sorted, Solution().subsets([1, 2, 3]))) == sorted(map(sorted, [[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]))
+    assert sorted(map(sorted, Solution().subsets([0]))) == [[], [0]]
     print("OK")
