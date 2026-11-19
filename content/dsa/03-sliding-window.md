@@ -483,3 +483,284 @@ class Solution {
 // test
 check(new Solution().numSubarrayProductLessThanK(new int[]{10, 5, 2, 6}, 100), 8);
 ```
+
+
+## 643. Maximum Average Subarray I | Easy
+related: 209
+tags: fixed-window
+
+Fixed window of size k: add the new element, subtract the one leaving, track the max sum.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def findMaxAverage(self, nums: List[int], k: int) -> float:
+        s = best = sum(nums[:k])
+        for i in range(k, len(nums)):
+            s += nums[i] - nums[i - k]
+            best = max(best, s)
+        return best / k
+# test
+assert Solution().findMaxAverage([1, 12, -5, -6, 50, 3], 4) == 12.75
+```
+
+```java
+class Solution {
+    public double findMaxAverage(int[] nums, int k) {
+        int s = 0;
+        for (int i = 0; i < k; i++) s += nums[i];
+        int best = s;
+        for (int i = k; i < nums.length; i++) { s += nums[i] - nums[i - k]; best = Math.max(best, s); }
+        return (double) best / k;
+    }
+}
+// test
+check(new Solution().findMaxAverage(new int[]{1, 12, -5, -6, 50, 3}, 4), 12.75);
+```
+
+## 904. Fruit Into Baskets | Medium
+related: 3, 992
+tags: variable-window
+
+= longest window with **at most 2 distinct** values. Count fruits in the window; shrink while more than 2 types.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def totalFruit(self, fruits: List[int]) -> int:
+        cnt = defaultdict(int)
+        l = best = 0
+        for r, f in enumerate(fruits):
+            cnt[f] += 1
+            while len(cnt) > 2:
+                cnt[fruits[l]] -= 1
+                if cnt[fruits[l]] == 0:
+                    del cnt[fruits[l]]
+                l += 1
+            best = max(best, r - l + 1)
+        return best
+# test
+assert Solution().totalFruit([1, 2, 1]) == 3
+assert Solution().totalFruit([0, 1, 2, 2]) == 3
+assert Solution().totalFruit([1, 2, 3, 2, 2]) == 4
+```
+
+```java
+class Solution {
+    public int totalFruit(int[] fruits) {
+        Map<Integer, Integer> cnt = new HashMap<>();
+        int l = 0, best = 0;
+        for (int r = 0; r < fruits.length; r++) {
+            cnt.merge(fruits[r], 1, Integer::sum);
+            while (cnt.size() > 2) {
+                if (cnt.merge(fruits[l], -1, Integer::sum) == 0) cnt.remove(fruits[l]);
+                l++;
+            }
+            best = Math.max(best, r - l + 1);
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().totalFruit(new int[]{1, 2, 3, 2, 2}), 4);
+```
+
+## 992. Subarrays with K Different Integers | Hard
+related: 904, 713
+tags: variable-window, at-most-trick
+
+"Exactly k" is not monotonic, but "**at most** k" is: `exactly(k) = atMost(k) − atMost(k−1)`. `atMost` counts, for each right end, the `r − l + 1` valid windows.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def subarraysWithKDistinct(self, nums: List[int], k: int) -> int:
+        def at_most(k):
+            cnt = defaultdict(int)
+            l = res = 0
+            for r, x in enumerate(nums):
+                cnt[x] += 1
+                while len(cnt) > k:
+                    cnt[nums[l]] -= 1
+                    if cnt[nums[l]] == 0:
+                        del cnt[nums[l]]
+                    l += 1
+                res += r - l + 1
+            return res
+
+        return at_most(k) - at_most(k - 1)
+# test
+assert Solution().subarraysWithKDistinct([1, 2, 1, 2, 3], 2) == 7
+assert Solution().subarraysWithKDistinct([1, 2, 1, 3, 4], 3) == 3
+```
+
+```java
+class Solution {
+    public int subarraysWithKDistinct(int[] nums, int k) {
+        return atMost(nums, k) - atMost(nums, k - 1);
+    }
+
+    private int atMost(int[] nums, int k) {
+        int[] cnt = new int[nums.length + 1];
+        int l = 0, distinct = 0, res = 0;
+        for (int r = 0; r < nums.length; r++) {
+            if (cnt[nums[r]]++ == 0) distinct++;
+            while (distinct > k) if (--cnt[nums[l++]] == 0) distinct--;
+            res += r - l + 1;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().subarraysWithKDistinct(new int[]{1, 2, 1, 2, 3}, 2), 7);
+```
+
+## 30. Substring with Concatenation of All Words | Hard
+related: 76, 438
+tags: fixed-window, hash-map
+
+All words have length `L`. For each of the `L` offsets, slide a window **word by word**, counting words; when a word is over-used, drop words from the left. A window with exactly `len(words)` words is a match.
+
+**Complexity:** O(L · n).
+
+```python
+class Solution:
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        L, k = len(words[0]), len(words)
+        need = Counter(words)
+        res = []
+        for off in range(L):
+            l, cnt, used = off, defaultdict(int), 0
+            for r in range(off, len(s) - L + 1, L):
+                w = s[r:r + L]
+                if w not in need:
+                    l, cnt, used = r + L, defaultdict(int), 0
+                    continue
+                cnt[w] += 1
+                used += 1
+                while cnt[w] > need[w]:
+                    cnt[s[l:l + L]] -= 1
+                    used -= 1
+                    l += L
+                if used == k:
+                    res.append(l)
+        return sorted(res)
+# test
+assert Solution().findSubstring("barfoothefoobarman", ["foo", "bar"]) == [0, 9]
+assert Solution().findSubstring("wordgoodgoodgoodbestword", ["word", "good", "best", "word"]) == []
+assert Solution().findSubstring("barfoofoobarthefoobarman", ["bar", "foo", "the"]) == [6, 9, 12]
+```
+
+```java
+class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+        int L = words[0].length(), k = words.length;
+        Map<String, Integer> need = new HashMap<>();
+        for (String w : words) need.merge(w, 1, Integer::sum);
+        List<Integer> res = new ArrayList<>();
+        for (int off = 0; off < L; off++) {
+            Map<String, Integer> cnt = new HashMap<>();
+            int l = off, used = 0;
+            for (int r = off; r + L <= s.length(); r += L) {
+                String w = s.substring(r, r + L);
+                if (!need.containsKey(w)) { cnt.clear(); used = 0; l = r + L; continue; }
+                cnt.merge(w, 1, Integer::sum);
+                used++;
+                while (cnt.get(w) > need.get(w)) {
+                    cnt.merge(s.substring(l, l + L), -1, Integer::sum);
+                    used--;
+                    l += L;
+                }
+                if (used == k) res.add(l);
+            }
+        }
+        Collections.sort(res);
+        return res;
+    }
+}
+// test
+check(new Solution().findSubstring("barfoofoobarthefoobarman", new String[]{"bar", "foo", "the"}), "[6, 9, 12]");
+```
+
+## 1423. Maximum Points You Can Obtain from Cards | Medium
+related: 209
+tags: fixed-window, complement
+
+Taking k cards from the ends leaves a **contiguous** window of `n − k` cards in the middle. Minimize that window's sum; answer = total − min window.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def maxScore(self, cardPoints: List[int], k: int) -> int:
+        n, w = len(cardPoints), len(cardPoints) - k
+        s = best = sum(cardPoints[:w])
+        for i in range(w, n):
+            s += cardPoints[i] - cardPoints[i - w]
+            best = min(best, s)
+        return sum(cardPoints) - best
+# test
+assert Solution().maxScore([1, 2, 3, 4, 5, 6, 1], 3) == 12
+assert Solution().maxScore([9, 7, 7, 9, 7, 7, 9], 7) == 55
+```
+
+```java
+class Solution {
+    public int maxScore(int[] cardPoints, int k) {
+        int n = cardPoints.length, w = n - k, s = 0, total = 0;
+        for (int x : cardPoints) total += x;
+        for (int i = 0; i < w; i++) s += cardPoints[i];
+        int best = s;
+        for (int i = w; i < n; i++) { s += cardPoints[i] - cardPoints[i - w]; best = Math.min(best, s); }
+        return total - best;
+    }
+}
+// test
+check(new Solution().maxScore(new int[]{1, 2, 3, 4, 5, 6, 1}, 3), 12);
+```
+
+## 1838. Frequency of the Most Frequent Element | Medium
+related: 424
+tags: sort, variable-window
+
+Sort. A window `[l, r]` can all be raised to `nums[r]` iff `nums[r]·len − sum ≤ k`. Shrink when it isn't.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def maxFrequency(self, nums: List[int], k: int) -> int:
+        nums.sort()
+        l = s = best = 0
+        for r, x in enumerate(nums):
+            s += x
+            while x * (r - l + 1) - s > k:
+                s -= nums[l]
+                l += 1
+            best = max(best, r - l + 1)
+        return best
+# test
+assert Solution().maxFrequency([1, 2, 4], 5) == 3
+assert Solution().maxFrequency([1, 4, 8, 13], 5) == 2
+```
+
+```java
+class Solution {
+    public int maxFrequency(int[] nums, int k) {
+        Arrays.sort(nums);
+        long s = 0;
+        int l = 0, best = 0;
+        for (int r = 0; r < nums.length; r++) {
+            s += nums[r];
+            while ((long) nums[r] * (r - l + 1) - s > k) s -= nums[l++];
+            best = Math.max(best, r - l + 1);
+        }
+        return best;
+    }
+}
+// test
+check(new Solution().maxFrequency(new int[]{1, 4, 8, 13}, 5), 2);
+```

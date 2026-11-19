@@ -577,3 +577,220 @@ class Solution {
 check(new Solution().isSubsequence("abc", "ahbgdc"), true);
 check(new Solution().isSubsequence("axc", "ahbgdc"), false);
 ```
+
+
+## 977. Squares of a Sorted Array | Easy
+related: 88
+tags: opposite-ends
+
+The largest square is at one of the ends. Fill the result from the back, taking the larger `|value|` each time.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        res = [0] * n
+        l, r = 0, n - 1
+        for k in range(n - 1, -1, -1):
+            if abs(nums[l]) > abs(nums[r]):
+                res[k] = nums[l] ** 2; l += 1
+            else:
+                res[k] = nums[r] ** 2; r -= 1
+        return res
+# test
+assert Solution().sortedSquares([-4, -1, 0, 3, 10]) == [0, 1, 9, 16, 100]
+```
+
+```java
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int n = nums.length, l = 0, r = n - 1;
+        int[] res = new int[n];
+        for (int k = n - 1; k >= 0; k--) {
+            if (Math.abs(nums[l]) > Math.abs(nums[r])) { res[k] = nums[l] * nums[l]; l++; }
+            else { res[k] = nums[r] * nums[r]; r--; }
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().sortedSquares(new int[]{-7, -3, 2, 3, 11}), new int[]{4, 9, 9, 49, 121});
+```
+
+## 27. Remove Element | Easy
+related: 26, 283
+tags: slow-fast
+
+Copy every element not equal to `val` to the write pointer `k`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        k = 0
+        for x in nums:
+            if x != val:
+                nums[k] = x
+                k += 1
+        return k
+# test
+a = [0, 1, 2, 2, 3, 0, 4, 2]
+k = Solution().removeElement(a, 2)
+assert k == 5 and sorted(a[:k]) == [0, 0, 1, 3, 4]
+```
+
+```java
+class Solution {
+    public int removeElement(int[] nums, int val) {
+        int k = 0;
+        for (int x : nums) if (x != val) nums[k++] = x;
+        return k;
+    }
+}
+// test
+int[] a = {3, 2, 2, 3};
+check(new Solution().removeElement(a, 3), 2);
+```
+
+## 80. Remove Duplicates from Sorted Array II | Medium
+related: 26
+tags: slow-fast
+
+Allow at most two copies: keep `x` if `k < 2` or `x != nums[k-2]` (compare with the element two slots back in the *kept* prefix).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        k = 0
+        for x in nums:
+            if k < 2 or x != nums[k - 2]:
+                nums[k] = x
+                k += 1
+        return k
+# test
+a = [0, 0, 1, 1, 1, 1, 2, 3, 3]
+k = Solution().removeDuplicates(a)
+assert a[:k] == [0, 0, 1, 1, 2, 3, 3]
+```
+
+```java
+class Solution {
+    public int removeDuplicates(int[] nums) {
+        int k = 0;
+        for (int x : nums) if (k < 2 || x != nums[k - 2]) nums[k++] = x;
+        return k;
+    }
+}
+// test
+int[] a = {1, 1, 1, 2, 2, 3};
+int k = new Solution().removeDuplicates(a);
+check(Arrays.copyOf(a, k), new int[]{1, 1, 2, 2, 3});
+```
+
+## 151. Reverse Words in a String | Medium
+related: 344
+tags: string
+
+Split on whitespace (drops extra spaces), reverse, join. In-place follow-up (char array): reverse the whole string, then reverse each word, then compact spaces.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def reverseWords(self, s: str) -> str:
+        return " ".join(reversed(s.split()))
+# test
+assert Solution().reverseWords("the sky is blue") == "blue is sky the"
+assert Solution().reverseWords("  hello world  ") == "world hello"
+assert Solution().reverseWords("a good   example") == "example good a"
+```
+
+```java
+class Solution {
+    public String reverseWords(String s) {
+        List<String> words = Arrays.asList(s.trim().split("\\s+"));
+        Collections.reverse(words);
+        return String.join(" ", words);
+    }
+}
+// test
+check(new Solution().reverseWords("  hello world  "), "world hello");
+```
+
+## 344. Reverse String | Easy
+related: 151, 125
+tags: opposite-ends
+
+Swap from both ends towards the middle.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def reverseString(self, s: List[str]) -> None:
+        l, r = 0, len(s) - 1
+        while l < r:
+            s[l], s[r] = s[r], s[l]
+            l, r = l + 1, r - 1
+# test
+a = list("hello"); Solution().reverseString(a)
+assert a == list("olleh")
+```
+
+```java
+class Solution {
+    public void reverseString(char[] s) {
+        for (int l = 0, r = s.length - 1; l < r; l++, r--) { char t = s[l]; s[l] = s[r]; s[r] = t; }
+    }
+}
+// test
+char[] a = "hello".toCharArray();
+new Solution().reverseString(a);
+check(new String(a), "olleh");
+```
+
+## 881. Boats to Save People | Medium
+related: 167
+tags: greedy, opposite-ends
+
+Sort. The heaviest person always takes a boat; pair them with the lightest if they fit together.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def numRescueBoats(self, people: List[int], limit: int) -> int:
+        people.sort()
+        l, r, boats = 0, len(people) - 1, 0
+        while l <= r:
+            if people[l] + people[r] <= limit:
+                l += 1
+            r -= 1
+            boats += 1
+        return boats
+# test
+assert Solution().numRescueBoats([3, 2, 2, 1], 3) == 3
+assert Solution().numRescueBoats([3, 5, 3, 4], 5) == 4
+```
+
+```java
+class Solution {
+    public int numRescueBoats(int[] people, int limit) {
+        Arrays.sort(people);
+        int l = 0, r = people.length - 1, boats = 0;
+        while (l <= r) {
+            if (people[l] + people[r] <= limit) l++;
+            r--;
+            boats++;
+        }
+        return boats;
+    }
+}
+// test
+check(new Solution().numRescueBoats(new int[]{3, 2, 2, 1}, 3), 3);
+```

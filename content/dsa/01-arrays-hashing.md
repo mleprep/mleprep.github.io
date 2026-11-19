@@ -850,3 +850,425 @@ class Solution {
 check(new Solution().findMaxLength(new int[]{0, 1}), 2);
 check(new Solution().findMaxLength(new int[]{0, 1, 1, 0, 1, 1}), 4);
 ```
+
+
+## 31. Next Permutation | Medium
+related: 46, 47
+tags: array
+
+From the right, find the first index `i` with `a[i] < a[i+1]` (the "pivot"). Swap it with the rightmost element larger than it, then reverse the suffix (it was descending → make it ascending). No pivot → reverse the whole array.
+
+```viz
+1 3 5 4 2      pivot 3 (3 < 5), rightmost > 3 is 4
+1 4 5 3 2      swap
+1 4 2 3 5      reverse suffix after pivot
+```
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def nextPermutation(self, nums: List[int]) -> None:
+        i = len(nums) - 2
+        while i >= 0 and nums[i] >= nums[i + 1]:
+            i -= 1
+        if i >= 0:
+            j = len(nums) - 1
+            while nums[j] <= nums[i]:
+                j -= 1
+            nums[i], nums[j] = nums[j], nums[i]
+        nums[i + 1:] = reversed(nums[i + 1:])
+# test
+for a, b in (([1, 2, 3], [1, 3, 2]), ([3, 2, 1], [1, 2, 3]), ([1, 1, 5], [1, 5, 1]), ([1, 3, 5, 4, 2], [1, 4, 2, 3, 5])):
+    Solution().nextPermutation(a)
+    assert a == b
+```
+
+```java
+class Solution {
+    public void nextPermutation(int[] nums) {
+        int i = nums.length - 2;
+        while (i >= 0 && nums[i] >= nums[i + 1]) i--;
+        if (i >= 0) {
+            int j = nums.length - 1;
+            while (nums[j] <= nums[i]) j--;
+            swap(nums, i, j);
+        }
+        for (int l = i + 1, r = nums.length - 1; l < r; l++, r--) swap(nums, l, r);
+    }
+
+    private void swap(int[] a, int i, int j) { int t = a[i]; a[i] = a[j]; a[j] = t; }
+}
+// test
+int[] a = {1, 3, 5, 4, 2};
+new Solution().nextPermutation(a);
+check(a, new int[]{1, 4, 2, 3, 5});
+int[] b = {3, 2, 1};
+new Solution().nextPermutation(b);
+check(b, new int[]{1, 2, 3});
+```
+
+## 118. Pascal's Triangle | Easy
+related: 62
+tags: dp
+
+Each row starts and ends with 1; inner values are the sum of the two values above.
+
+**Complexity:** O(n²).
+
+```python
+class Solution:
+    def generate(self, numRows: int) -> List[List[int]]:
+        rows = [[1]]
+        for _ in range(numRows - 1):
+            prev = rows[-1]
+            rows.append([1] + [prev[i] + prev[i + 1] for i in range(len(prev) - 1)] + [1])
+        return rows
+# test
+assert Solution().generate(5) == [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
+```
+
+```java
+class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> rows = new ArrayList<>();
+        for (int r = 0; r < numRows; r++) {
+            List<Integer> row = new ArrayList<>();
+            for (int c = 0; c <= r; c++)
+                row.add(c == 0 || c == r ? 1 : rows.get(r - 1).get(c - 1) + rows.get(r - 1).get(c));
+            rows.add(row);
+        }
+        return rows;
+    }
+}
+// test
+check(new Solution().generate(5), "[[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]");
+```
+
+## 179. Largest Number | Medium
+related: 1
+tags: custom-sort
+
+Sort strings with the comparator "`a` before `b` if `a + b > b + a`". This ordering is transitive, so the concatenation is maximal. Edge case: all zeros → `"0"`.
+
+**Complexity:** O(n log n · L).
+
+```python
+class Solution:
+    def largestNumber(self, nums: List[int]) -> str:
+        s = sorted(map(str, nums), key=functools.cmp_to_key(lambda a, b: -1 if a + b > b + a else 1))
+        res = "".join(s)
+        return "0" if res[0] == "0" else res
+# test
+assert Solution().largestNumber([10, 2]) == "210"
+assert Solution().largestNumber([3, 30, 34, 5, 9]) == "9534330"
+assert Solution().largestNumber([0, 0]) == "0"
+```
+
+```java
+class Solution {
+    public String largestNumber(int[] nums) {
+        String[] s = Arrays.stream(nums).mapToObj(String::valueOf).toArray(String[]::new);
+        Arrays.sort(s, (a, b) -> (b + a).compareTo(a + b));
+        if (s[0].equals("0")) return "0";
+        return String.join("", s);
+    }
+}
+// test
+check(new Solution().largestNumber(new int[]{3, 30, 34, 5, 9}), "9534330");
+check(new Solution().largestNumber(new int[]{0, 0}), "0");
+```
+
+## 228. Summary Ranges | Easy
+related: 128
+tags: array
+
+Extend a run while the next number is consecutive; emit `"a->b"` or `"a"`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        res, i = [], 0
+        while i < len(nums):
+            j = i
+            while j + 1 < len(nums) and nums[j + 1] == nums[j] + 1:
+                j += 1
+            res.append(str(nums[i]) if i == j else f"{nums[i]}->{nums[j]}")
+            i = j + 1
+        return res
+# test
+assert Solution().summaryRanges([0, 1, 2, 4, 5, 7]) == ["0->2", "4->5", "7"]
+assert Solution().summaryRanges([]) == []
+```
+
+```java
+class Solution {
+    public List<String> summaryRanges(int[] nums) {
+        List<String> res = new ArrayList<>();
+        for (int i = 0, j; i < nums.length; i = j + 1) {
+            j = i;
+            while (j + 1 < nums.length && nums[j + 1] == nums[j] + 1) j++;
+            res.add(i == j ? String.valueOf(nums[i]) : nums[i] + "->" + nums[j]);
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().summaryRanges(new int[]{0, 1, 2, 4, 5, 7}), "[0->2, 4->5, 7]");
+```
+
+## 274. H-Index | Medium
+related: 347
+tags: counting-sort
+
+h ≤ n, so bucket citations into `cnt[min(c, n)]`. Walk h from n down, accumulating papers with ≥ h citations; the first h where that count ≥ h is the answer.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def hIndex(self, citations: List[int]) -> int:
+        n = len(citations)
+        cnt = [0] * (n + 1)
+        for c in citations:
+            cnt[min(c, n)] += 1
+        papers = 0
+        for h in range(n, -1, -1):
+            papers += cnt[h]
+            if papers >= h:
+                return h
+        return 0
+# test
+assert Solution().hIndex([3, 0, 6, 1, 5]) == 3
+assert Solution().hIndex([1, 3, 1]) == 1
+```
+
+```java
+class Solution {
+    public int hIndex(int[] citations) {
+        int n = citations.length;
+        int[] cnt = new int[n + 1];
+        for (int c : citations) cnt[Math.min(c, n)]++;
+        for (int h = n, papers = 0; h >= 0; h--) {
+            papers += cnt[h];
+            if (papers >= h) return h;
+        }
+        return 0;
+    }
+}
+// test
+check(new Solution().hIndex(new int[]{3, 0, 6, 1, 5}), 3);
+```
+
+## 289. Game of Life | Medium
+related: 73
+tags: matrix, in-place-encoding
+
+Update in place by storing the **next** state in bit 1 while bit 0 keeps the current state. Count live neighbours with `cell & 1`, then shift every cell right by one.
+
+**Complexity:** O(m·n) time, O(1) space.
+
+```python
+class Solution:
+    def gameOfLife(self, board: List[List[int]]) -> None:
+        R, C = len(board), len(board[0])
+        for r in range(R):
+            for c in range(C):
+                live = sum(board[i][j] & 1 for i in range(max(0, r - 1), min(R, r + 2))
+                           for j in range(max(0, c - 1), min(C, c + 2))) - (board[r][c] & 1)
+                if live == 3 or (live == 2 and board[r][c] & 1):
+                    board[r][c] |= 2
+        for r in range(R):
+            for c in range(C):
+                board[r][c] >>= 1
+# test
+b = [[0, 1, 0], [0, 0, 1], [1, 1, 1], [0, 0, 0]]
+Solution().gameOfLife(b)
+assert b == [[0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 1, 0]]
+```
+
+```java
+class Solution {
+    public void gameOfLife(int[][] board) {
+        int R = board.length, C = board[0].length;
+        for (int r = 0; r < R; r++)
+            for (int c = 0; c < C; c++) {
+                int live = -(board[r][c] & 1);
+                for (int i = Math.max(0, r - 1); i <= Math.min(R - 1, r + 1); i++)
+                    for (int j = Math.max(0, c - 1); j <= Math.min(C - 1, c + 1); j++) live += board[i][j] & 1;
+                if (live == 3 || (live == 2 && (board[r][c] & 1) == 1)) board[r][c] |= 2;
+            }
+        for (int[] row : board)
+            for (int c = 0; c < C; c++) row[c] >>= 1;
+    }
+}
+// test
+int[][] b = {{0, 1, 0}, {0, 0, 1}, {1, 1, 1}, {0, 0, 0}};
+new Solution().gameOfLife(b);
+check(b, new int[][]{{0, 0, 0}, {1, 0, 1}, {0, 1, 1}, {0, 1, 0}});
+```
+
+## 448. Find All Numbers Disappeared in an Array | Easy
+related: 41, 268
+tags: in-place-hashing
+
+Values are in `[1, n]`: for each value `v`, mark index `v−1` by making it negative. Indices that stay positive are the missing numbers.
+
+**Complexity:** O(n) time, O(1) extra space.
+
+```python
+class Solution:
+    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:
+        for v in nums:
+            i = abs(v) - 1
+            nums[i] = -abs(nums[i])
+        return [i + 1 for i, v in enumerate(nums) if v > 0]
+# test
+assert Solution().findDisappearedNumbers([4, 3, 2, 7, 8, 2, 3, 1]) == [5, 6]
+assert Solution().findDisappearedNumbers([1, 1]) == [2]
+```
+
+```java
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        for (int v : nums) {
+            int i = Math.abs(v) - 1;
+            nums[i] = -Math.abs(nums[i]);
+        }
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) if (nums[i] > 0) res.add(i + 1);
+        return res;
+    }
+}
+// test
+check(new Solution().findDisappearedNumbers(new int[]{4, 3, 2, 7, 8, 2, 3, 1}), "[5, 6]");
+```
+
+## 523. Continuous Subarray Sum | Medium
+related: 560, 974
+tags: prefix-sum, hash-map
+
+A subarray sum is a multiple of k ⇔ two prefix sums have the same remainder mod k. Store the **first** index of each remainder (seed `0 → −1`); a repeat at least 2 positions later wins.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def checkSubarraySum(self, nums: List[int], k: int) -> bool:
+        first = {0: -1}
+        pre = 0
+        for i, x in enumerate(nums):
+            pre = (pre + x) % k
+            if pre in first:
+                if i - first[pre] >= 2:
+                    return True
+            else:
+                first[pre] = i
+        return False
+# test
+assert Solution().checkSubarraySum([23, 2, 4, 6, 7], 6) is True
+assert Solution().checkSubarraySum([23, 2, 6, 4, 7], 13) is False
+assert Solution().checkSubarraySum([5, 0, 0, 0], 3) is True
+```
+
+```java
+class Solution {
+    public boolean checkSubarraySum(int[] nums, int k) {
+        Map<Integer, Integer> first = new HashMap<>();
+        first.put(0, -1);
+        int pre = 0;
+        for (int i = 0; i < nums.length; i++) {
+            pre = (pre + nums[i]) % k;
+            Integer j = first.putIfAbsent(pre, i);
+            if (j != null && i - j >= 2) return true;
+        }
+        return false;
+    }
+}
+// test
+check(new Solution().checkSubarraySum(new int[]{23, 2, 4, 6, 7}, 6), true);
+check(new Solution().checkSubarraySum(new int[]{23, 2, 6, 4, 7}, 13), false);
+```
+
+## 953. Verifying an Alien Dictionary | Easy
+related: 269
+tags: hash-map
+
+Map each letter to its rank; compare adjacent words at their first differing character. If none differ, the shorter word must come first.
+
+**Complexity:** O(total characters).
+
+```python
+class Solution:
+    def isAlienSorted(self, words: List[str], order: str) -> bool:
+        rank = {ch: i for i, ch in enumerate(order)}
+        keys = [[rank[ch] for ch in w] for w in words]
+        return all(a <= b for a, b in zip(keys, keys[1:]))   # list comparison = lexicographic
+# test
+assert Solution().isAlienSorted(["hello", "leetcode"], "hlabcdefgijkmnopqrstuvwxyz") is True
+assert Solution().isAlienSorted(["word", "world", "row"], "worldabcefghijkmnpqstuvxyz") is False
+assert Solution().isAlienSorted(["apple", "app"], "abcdefghijklmnopqrstuvwxyz") is False
+```
+
+```java
+class Solution {
+    public boolean isAlienSorted(String[] words, String order) {
+        int[] rank = new int[26];
+        for (int i = 0; i < 26; i++) rank[order.charAt(i) - 'a'] = i;
+        for (int w = 0; w + 1 < words.length; w++) {
+            String a = words[w], b = words[w + 1];
+            int i = 0;
+            while (i < a.length() && i < b.length() && a.charAt(i) == b.charAt(i)) i++;
+            if (i == a.length() || i == b.length()) { if (a.length() > b.length()) return false; }
+            else if (rank[a.charAt(i) - 'a'] > rank[b.charAt(i) - 'a']) return false;
+        }
+        return true;
+    }
+}
+// test
+check(new Solution().isAlienSorted(new String[]{"hello", "leetcode"}, "hlabcdefgijkmnopqrstuvwxyz"), true);
+check(new Solution().isAlienSorted(new String[]{"apple", "app"}, "abcdefghijklmnopqrstuvwxyz"), false);
+```
+
+## 974. Subarray Sums Divisible by K | Medium
+related: 560, 523
+tags: prefix-sum, counting
+
+Count pairs of prefix sums with equal remainder mod k. Normalize negative remainders (`((x % k) + k) % k` in Java).
+
+**Complexity:** O(n) time, O(k) space.
+
+```python
+class Solution:
+    def subarraysDivByK(self, nums: List[int], k: int) -> int:
+        cnt = [0] * k
+        cnt[0] = 1
+        pre = res = 0
+        for x in nums:
+            pre = (pre + x) % k           # Python % is already non-negative
+            res += cnt[pre]
+            cnt[pre] += 1
+        return res
+# test
+assert Solution().subarraysDivByK([4, 5, 0, -2, -3, 1], 5) == 7
+assert Solution().subarraysDivByK([5], 9) == 0
+```
+
+```java
+class Solution {
+    public int subarraysDivByK(int[] nums, int k) {
+        int[] cnt = new int[k];
+        cnt[0] = 1;
+        int pre = 0, res = 0;
+        for (int x : nums) {
+            pre = ((pre + x) % k + k) % k;
+            res += cnt[pre]++;
+        }
+        return res;
+    }
+}
+// test
+check(new Solution().subarraysDivByK(new int[]{4, 5, 0, -2, -3, 1}, 5), 7);
+```
