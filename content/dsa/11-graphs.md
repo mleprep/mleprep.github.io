@@ -97,6 +97,42 @@ char[][] g = Stream.of("11000", "11000", "00100", "00011").map(String::toCharArr
 check(new Solution().numIslands(g), 3);
 ```
 
+```go
+func numIslands(grid [][]byte) int {
+	R, C := len(grid), len(grid[0])
+	sink := func(r, c int) { // flood-fill one island with an explicit stack
+		st := [][2]int{{r, c}}
+		grid[r][c] = '0'
+		for len(st) > 0 {
+			p := st[len(st)-1]
+			st = st[:len(st)-1]
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr >= 0 && nr < R && nc >= 0 && nc < C && grid[nr][nc] == '1' {
+					grid[nr][nc] = '0'
+					st = append(st, [2]int{nr, nc})
+				}
+			}
+		}
+	}
+	count := 0
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if grid[r][c] == '1' {
+				count++
+				sink(r, c)
+			}
+		}
+	}
+	return count
+}
+// test
+assertEq(numIslands(byteGrid("11000", "11000", "00100", "00011")), 3)
+assertEq(numIslands(byteGrid("0")), 0)
+assertEq(numIslands(byteGrid("11110", "11010", "11000", "00000")), 1)
+assertEq(numIslands(byteGrid("101", "010", "101")), 5)
+```
+
 ## 695. Max Area of Island | Medium
 related: 200
 tags: grid-dfs
@@ -141,6 +177,31 @@ class Solution {
 }
 // test
 check(new Solution().maxAreaOfIsland(new int[][]{{0, 0, 1, 0, 0}, {1, 1, 1, 0, 0}, {0, 0, 0, 1, 1}, {0, 0, 0, 1, 0}}), 4);
+```
+
+```go
+func maxAreaOfIsland(grid [][]int) int {
+	R, C := len(grid), len(grid[0])
+	var area func(r, c int) int
+	area = func(r, c int) int {
+		if r < 0 || r >= R || c < 0 || c >= C || grid[r][c] != 1 {
+			return 0
+		}
+		grid[r][c] = 0 // visited
+		return 1 + area(r+1, c) + area(r-1, c) + area(r, c+1) + area(r, c-1)
+	}
+	best := 0
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			best = max(best, area(r, c))
+		}
+	}
+	return best
+}
+// test
+assertEq(maxAreaOfIsland([][]int{{0, 0, 1, 0, 0}, {1, 1, 1, 0, 0}, {0, 0, 0, 1, 1}, {0, 0, 0, 1, 0}}), 4)
+assertEq(maxAreaOfIsland([][]int{{0, 0, 0, 0, 0}}), 0)
+assertEq(maxAreaOfIsland([][]int{{1}}), 1)
 ```
 
 ## 133. Clone Graph | Medium
@@ -202,6 +263,47 @@ Node a = new Node(1), b = new Node(2);
 a.neighbors.add(b); b.neighbors.add(a);
 Node c = new Solution().cloneGraph(a);
 check(c != a && c.neighbors.get(0).val == 2 && c.neighbors.get(0).neighbors.get(0) == c, true);
+```
+
+```go
+type Node struct { // provided by LeetCode
+	Val       int
+	Neighbors []*Node
+}
+
+func cloneGraph(node *Node) *Node {
+	clones := map[*Node]*Node{}
+	var dfs func(*Node) *Node
+	dfs = func(n *Node) *Node {
+		if c, ok := clones[n]; ok {
+			return c
+		}
+		c := &Node{Val: n.Val}
+		clones[n] = c // register before recursing: the graph has cycles
+		for _, nb := range n.Neighbors {
+			c.Neighbors = append(c.Neighbors, dfs(nb))
+		}
+		return c
+	}
+	if node == nil {
+		return nil
+	}
+	return dfs(node)
+}
+// test
+ns := make([]*Node, 4)
+for i := range ns {
+	ns[i] = &Node{Val: i + 1}
+}
+for i, nbs := range [][]int{{2, 4}, {1, 3}, {2, 4}, {1, 3}} {
+	for _, j := range nbs {
+		ns[i].Neighbors = append(ns[i].Neighbors, ns[j-1])
+	}
+}
+c := cloneGraph(ns[0])
+assertEq(c != ns[0], true)
+assertEq([]int{c.Neighbors[0].Val, c.Neighbors[1].Val}, []int{2, 4})
+assertEq(c.Neighbors[0].Neighbors[0] == c, true) // cycle preserved
 ```
 
 ## 994. Rotting Oranges | Medium
@@ -273,6 +375,46 @@ check(new Solution().orangesRotting(new int[][]{{2, 1, 1}, {1, 1, 0}, {0, 1, 1}}
 check(new Solution().orangesRotting(new int[][]{{2, 1, 1}, {0, 1, 1}, {1, 0, 1}}), -1);
 ```
 
+```go
+func orangesRotting(grid [][]int) int {
+	R, C := len(grid), len(grid[0])
+	q, fresh := [][2]int{}, 0
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if grid[r][c] == 2 {
+				q = append(q, [2]int{r, c})
+			} else if grid[r][c] == 1 {
+				fresh++
+			}
+		}
+	}
+	minutes := 0
+	for len(q) > 0 && fresh > 0 { // multi-source BFS, one level per minute
+		minutes++
+		next := [][2]int{}
+		for _, p := range q {
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr >= 0 && nr < R && nc >= 0 && nc < C && grid[nr][nc] == 1 {
+					grid[nr][nc] = 2
+					fresh--
+					next = append(next, [2]int{nr, nc})
+				}
+			}
+		}
+		q = next
+	}
+	if fresh > 0 {
+		return -1
+	}
+	return minutes
+}
+// test
+assertEq(orangesRotting([][]int{{2, 1, 1}, {1, 1, 0}, {0, 1, 1}}), 4)
+assertEq(orangesRotting([][]int{{2, 1, 1}, {0, 1, 1}, {1, 0, 1}}), -1)
+assertEq(orangesRotting([][]int{{0, 2}}), 0)
+```
+
 ## 417. Pacific Atlantic Water Flow | Medium
 related: 130, 200
 tags: blind75, reverse-search
@@ -336,6 +478,58 @@ int[][] H = {{1, 2, 2, 3, 5}, {3, 2, 3, 4, 4}, {2, 4, 5, 3, 1}, {6, 7, 1, 4, 5},
 check(new Solution().pacificAtlantic(H), "[[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]]");
 ```
 
+```go
+func pacificAtlantic(heights [][]int) [][]int {
+	R, C := len(heights), len(heights[0])
+	reach := func(starts [][2]int) [][]bool { // cells that can flow into this ocean (walk uphill from it)
+		seen := make([][]bool, R)
+		for i := range seen {
+			seen[i] = make([]bool, C)
+		}
+		st := starts
+		for _, p := range starts {
+			seen[p[0]][p[1]] = true
+		}
+		for len(st) > 0 {
+			p := st[len(st)-1]
+			st = st[:len(st)-1]
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr >= 0 && nr < R && nc >= 0 && nc < C && !seen[nr][nc] && heights[nr][nc] >= heights[p[0]][p[1]] {
+					seen[nr][nc] = true
+					st = append(st, [2]int{nr, nc})
+				}
+			}
+		}
+		return seen
+	}
+	var pacStart, atlStart [][2]int
+	for c := 0; c < C; c++ {
+		pacStart = append(pacStart, [2]int{0, c})
+		atlStart = append(atlStart, [2]int{R - 1, c})
+	}
+	for r := 0; r < R; r++ {
+		pacStart = append(pacStart, [2]int{r, 0})
+		atlStart = append(atlStart, [2]int{r, C - 1})
+	}
+	pac, atl := reach(pacStart), reach(atlStart)
+	res := [][]int{}
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if pac[r][c] && atl[r][c] {
+				res = append(res, []int{r, c})
+			}
+		}
+	}
+	return res
+}
+// test
+H := [][]int{{1, 2, 2, 3, 5}, {3, 2, 3, 4, 4}, {2, 4, 5, 3, 1}, {6, 7, 1, 4, 5}, {5, 1, 1, 2, 4}}
+assertUnordered(pacificAtlantic(H), [][]int{{0, 4}, {1, 3}, {1, 4}, {2, 2}, {3, 0}, {3, 1}, {4, 0}})
+assertEq(pacificAtlantic([][]int{{1}}), [][]int{{0, 0}})
+assertUnordered(pacificAtlantic([][]int{{2, 1}, {1, 2}}), [][]int{{0, 0}, {0, 1}, {1, 0}, {1, 1}})
+```
+
 ## 130. Surrounded Regions | Medium
 related: 200, 417
 tags: border-dfs
@@ -395,6 +589,52 @@ new Solution().solve(b);
 check(new String(b[1]) + new String(b[3]), "XXXXXOXX");
 ```
 
+```go
+func solve(board [][]byte) {
+	R, C := len(board), len(board[0])
+	var mark func(r, c int) // "O"s connected to the border are safe
+	mark = func(r, c int) {
+		if r >= 0 && r < R && c >= 0 && c < C && board[r][c] == 'O' {
+			board[r][c] = 'S'
+			mark(r+1, c)
+			mark(r-1, c)
+			mark(r, c+1)
+			mark(r, c-1)
+		}
+	}
+	for r := 0; r < R; r++ {
+		mark(r, 0)
+		mark(r, C-1)
+	}
+	for c := 0; c < C; c++ {
+		mark(0, c)
+		mark(R-1, c)
+	}
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if board[r][c] == 'S' {
+				board[r][c] = 'O'
+			} else {
+				board[r][c] = 'X'
+			}
+		}
+	}
+}
+// test
+b := byteGrid("XXXX", "XOOX", "XXOX", "XOXX")
+solve(b)
+assertEq(b, byteGrid("XXXX", "XXXX", "XXXX", "XOXX"))
+b2 := byteGrid("X")
+solve(b2)
+assertEq(b2, byteGrid("X"))
+b3 := byteGrid("XXX", "XOX", "XXX")
+solve(b3)
+assertEq(b3, byteGrid("XXX", "XXX", "XXX"))
+b4 := byteGrid("OO", "OO")
+solve(b4)
+assertEq(b4, byteGrid("OO", "OO"))
+```
+
 ## 286. Walls and Gates | Medium
 related: 994, 542
 tags: multi-source-bfs, premium
@@ -451,6 +691,43 @@ int I = Integer.MAX_VALUE;
 int[][] g = {{I, -1, 0, I}, {I, I, I, -1}, {I, -1, I, -1}, {0, -1, I, I}};
 new Solution().wallsAndGates(g);
 check(g, new int[][]{{3, -1, 0, 1}, {2, 2, 1, -1}, {1, -1, 2, -1}, {0, -1, 3, 4}});
+```
+
+```go
+func wallsAndGates(rooms [][]int) {
+	const INF = 2147483647
+	R, C := len(rooms), len(rooms[0])
+	q := [][2]int{}
+	for r := 0; r < R; r++ { // BFS from every gate at once
+		for c := 0; c < C; c++ {
+			if rooms[r][c] == 0 {
+				q = append(q, [2]int{r, c})
+			}
+		}
+	}
+	for len(q) > 0 {
+		p := q[0]
+		q = q[1:]
+		for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+			nr, nc := p[0]+d[0], p[1]+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C && rooms[nr][nc] == INF {
+				rooms[nr][nc] = rooms[p[0]][p[1]] + 1
+				q = append(q, [2]int{nr, nc})
+			}
+		}
+	}
+}
+// test
+const I = 2147483647
+g := [][]int{{I, -1, 0, I}, {I, I, I, -1}, {I, -1, I, -1}, {0, -1, I, I}}
+wallsAndGates(g)
+assertEq(g, [][]int{{3, -1, 0, 1}, {2, 2, 1, -1}, {1, -1, 2, -1}, {0, -1, 3, 4}})
+g2 := [][]int{{-1}}
+wallsAndGates(g2)
+assertEq(g2, [][]int{{-1}})
+g3 := [][]int{{I, 0}}
+wallsAndGates(g3)
+assertEq(g3, [][]int{{1, 0}})
 ```
 
 ## 207. Course Schedule | Medium
@@ -512,6 +789,37 @@ check(new Solution().canFinish(2, new int[][]{{1, 0}}), true);
 check(new Solution().canFinish(2, new int[][]{{1, 0}, {0, 1}}), false);
 ```
 
+```go
+func canFinish(numCourses int, prerequisites [][]int) bool {
+	g, indeg := make([][]int, numCourses), make([]int, numCourses)
+	for _, p := range prerequisites {
+		g[p[1]] = append(g[p[1]], p[0])
+		indeg[p[0]]++
+	}
+	q := []int{}
+	for i, d := range indeg {
+		if d == 0 {
+			q = append(q, i)
+		}
+	}
+	taken := 0
+	for len(q) > 0 { // Kahn's algorithm: a cycle leaves courses with indegree > 0
+		u := q[0]
+		q = q[1:]
+		taken++
+		for _, v := range g[u] {
+			if indeg[v]--; indeg[v] == 0 {
+				q = append(q, v)
+			}
+		}
+	}
+	return taken == numCourses
+}
+// test
+assertEq(canFinish(2, [][]int{{1, 0}}), true)
+assertEq(canFinish(2, [][]int{{1, 0}, {0, 1}}), false)
+```
+
 ## 210. Course Schedule II | Medium
 related: 207, 269
 tags: topological-sort
@@ -569,6 +877,58 @@ class Solution {
 check(new Solution().findOrder(4, new int[][]{{1, 0}, {2, 0}, {3, 1}, {3, 2}}), new int[]{0, 1, 2, 3});
 ```
 
+```go
+func findOrder(numCourses int, prerequisites [][]int) []int {
+	g, indeg := make([][]int, numCourses), make([]int, numCourses)
+	for _, p := range prerequisites {
+		g[p[1]] = append(g[p[1]], p[0])
+		indeg[p[0]]++
+	}
+	q := []int{}
+	for i, d := range indeg {
+		if d == 0 {
+			q = append(q, i)
+		}
+	}
+	order := []int{}
+	for len(q) > 0 {
+		u := q[0]
+		q = q[1:]
+		order = append(order, u)
+		for _, v := range g[u] {
+			if indeg[v]--; indeg[v] == 0 {
+				q = append(q, v)
+			}
+		}
+	}
+	if len(order) < numCourses {
+		return []int{}
+	}
+	return order
+}
+// test
+// any valid topological order is accepted
+valid := func(n int, pre [][]int, order []int) bool {
+	pos := map[int]int{}
+	for i, c := range order {
+		pos[c] = i
+	}
+	if len(order) != n || len(pos) != n {
+		return false
+	}
+	for _, p := range pre {
+		if pos[p[1]] >= pos[p[0]] {
+			return false
+		}
+	}
+	return true
+}
+pre := [][]int{{1, 0}, {2, 0}, {3, 1}, {3, 2}}
+assertEq(valid(4, pre, findOrder(4, pre)), true)
+assertEq(valid(2, [][]int{{1, 0}}, findOrder(2, [][]int{{1, 0}})), true)
+assertEq(findOrder(2, [][]int{{0, 1}, {1, 0}}), []int{})
+```
+
 ## 684. Redundant Connection | Medium
 related: 323, 261, 685
 tags: union-find
@@ -623,6 +983,33 @@ class Solution {
 check(new Solution().findRedundantConnection(new int[][]{{1, 2}, {2, 3}, {3, 4}, {1, 4}, {1, 5}}), new int[]{1, 4});
 ```
 
+```go
+func findRedundantConnection(edges [][]int) []int {
+	parent := make([]int, len(edges)+1)
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]] // path halving
+			x = parent[x]
+		}
+		return x
+	}
+	for _, e := range edges {
+		ra, rb := find(e[0]), find(e[1])
+		if ra == rb { // already connected: this edge closes the cycle
+			return e
+		}
+		parent[ra] = rb
+	}
+	return nil
+}
+// test
+assertEq(findRedundantConnection([][]int{{1, 2}, {1, 3}, {2, 3}}), []int{2, 3})
+assertEq(findRedundantConnection([][]int{{1, 2}, {2, 3}, {3, 4}, {1, 4}, {1, 5}}), []int{1, 4})
+```
+
 ## 323. Number of Connected Components in an Undirected Graph | Medium
 related: 200, 547, 684
 tags: blind75, union-find, premium
@@ -674,6 +1061,33 @@ class Solution {
 }
 // test
 check(new Solution().countComponents(5, new int[][]{{0, 1}, {1, 2}, {3, 4}}), 2);
+```
+
+```go
+func countComponents(n int, edges [][]int) int {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	comps := n
+	for _, e := range edges {
+		if ra, rb := find(e[0]), find(e[1]); ra != rb {
+			parent[ra] = rb
+			comps-- // each successful union merges two components
+		}
+	}
+	return comps
+}
+// test
+assertEq(countComponents(5, [][]int{{0, 1}, {1, 2}, {3, 4}}), 2)
+assertEq(countComponents(5, [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 4}}), 1)
 ```
 
 ## 261. Graph Valid Tree | Medium
@@ -732,6 +1146,36 @@ check(new Solution().validTree(5, new int[][]{{0, 1}, {0, 2}, {0, 3}, {1, 4}}), 
 check(new Solution().validTree(5, new int[][]{{0, 1}, {1, 2}, {2, 3}, {1, 3}, {1, 4}}), false);
 ```
 
+```go
+func validTree(n int, edges [][]int) bool {
+	if len(edges) != n-1 { // a tree has exactly n-1 edges
+		return false
+	}
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	for _, e := range edges {
+		ra, rb := find(e[0]), find(e[1])
+		if ra == rb { // ...and no cycle
+			return false
+		}
+		parent[ra] = rb
+	}
+	return true
+}
+// test
+assertEq(validTree(5, [][]int{{0, 1}, {0, 2}, {0, 3}, {1, 4}}), true)
+assertEq(validTree(5, [][]int{{0, 1}, {1, 2}, {2, 3}, {1, 3}, {1, 4}}), false)
+```
+
 ## 547. Number of Provinces | Medium
 related: 200, 323
 tags: dfs, union-find
@@ -780,6 +1224,34 @@ class Solution {
 }
 // test
 check(new Solution().findCircleNum(new int[][]{{1, 1, 0}, {1, 1, 0}, {0, 0, 1}}), 2);
+```
+
+```go
+func findCircleNum(isConnected [][]int) int {
+	n := len(isConnected)
+	seen := make([]bool, n)
+	var dfs func(u int)
+	dfs = func(u int) {
+		for v := 0; v < n; v++ {
+			if isConnected[u][v] == 1 && !seen[v] {
+				seen[v] = true
+				dfs(v)
+			}
+		}
+	}
+	count := 0
+	for u := 0; u < n; u++ {
+		if !seen[u] {
+			seen[u] = true
+			dfs(u)
+			count++
+		}
+	}
+	return count
+}
+// test
+assertEq(findCircleNum([][]int{{1, 1, 0}, {1, 1, 0}, {0, 0, 1}}), 2)
+assertEq(findCircleNum([][]int{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}), 3)
 ```
 
 ## 127. Word Ladder | Hard
@@ -849,6 +1321,45 @@ class Solution {
 // test
 check(new Solution().ladderLength("hit", "cog", Arrays.asList("hot", "dot", "dog", "lot", "log", "cog")), 5);
 check(new Solution().ladderLength("hit", "cog", Arrays.asList("hot", "dot", "dog", "lot", "log")), 0);
+```
+
+```go
+func ladderLength(beginWord string, endWord string, wordList []string) int {
+	words := map[string]bool{}
+	for _, w := range wordList {
+		words[w] = true
+	}
+	if !words[endWord] {
+		return 0
+	}
+	delete(words, beginWord)
+	q := []string{beginWord}
+	for steps := 1; len(q) > 0; steps++ { // BFS, one level per step
+		next := []string{}
+		for _, w := range q {
+			if w == endWord {
+				return steps
+			}
+			b := []byte(w)
+			for i := range b {
+				orig := b[i]
+				for ch := byte('a'); ch <= 'z'; ch++ {
+					b[i] = ch
+					if s := string(b); words[s] {
+						delete(words, s) // visited
+						next = append(next, s)
+					}
+				}
+				b[i] = orig
+			}
+		}
+		q = next
+	}
+	return 0
+}
+// test
+assertEq(ladderLength("hit", "cog", []string{"hot", "dot", "dog", "lot", "log", "cog"}), 5)
+assertEq(ladderLength("hit", "cog", []string{"hot", "dot", "dog", "lot", "log"}), 0)
 ```
 
 ## 399. Evaluate Division | Medium
@@ -922,6 +1433,53 @@ List<List<String>> qs = List.of(List.of("a", "c"), List.of("b", "a"), List.of("a
 check(new Solution().calcEquation(eq, new double[]{2.0, 3.0}, qs), new double[]{6.0, 0.5, -1.0, 1.0, -1.0});
 ```
 
+```go
+func calcEquation(equations [][]string, values []float64, queries [][]string) []float64 {
+	g := map[string]map[string]float64{} // a -> b -> a/b
+	for i, e := range equations {
+		a, b := e[0], e[1]
+		if g[a] == nil {
+			g[a] = map[string]float64{}
+		}
+		if g[b] == nil {
+			g[b] = map[string]float64{}
+		}
+		g[a][b] = values[i]
+		g[b][a] = 1 / values[i]
+	}
+	var dfs func(x, y string, seen map[string]bool) float64
+	dfs = func(x, y string, seen map[string]bool) float64 { // product of weights along a path, or -1
+		if x == y {
+			return 1
+		}
+		seen[x] = true
+		for nb, w := range g[x] {
+			if !seen[nb] {
+				if r := dfs(nb, y, seen); r != -1 {
+					return w * r
+				}
+			}
+		}
+		return -1
+	}
+	res := make([]float64, len(queries))
+	for i, q := range queries {
+		if g[q[0]] == nil || g[q[1]] == nil {
+			res[i] = -1
+		} else {
+			res[i] = dfs(q[0], q[1], map[string]bool{})
+		}
+	}
+	return res
+}
+// test
+eq, val := [][]string{{"a", "b"}, {"b", "c"}}, []float64{2.0, 3.0}
+qs := [][]string{{"a", "c"}, {"b", "a"}, {"a", "e"}, {"a", "a"}, {"x", "x"}}
+assertEq(calcEquation(eq, val, qs), []float64{6.0, 0.5, -1.0, 1.0, -1.0})
+assertEq(calcEquation([][]string{{"a", "b"}, {"b", "c"}, {"bc", "cd"}}, []float64{1.5, 2.5, 5.0}, [][]string{{"a", "c"}, {"c", "b"}, {"bc", "cd"}, {"cd", "bc"}}), []float64{3.75, 0.4, 5.0, 0.2})
+assertEq(calcEquation([][]string{{"a", "b"}}, []float64{0.5}, [][]string{{"a", "b"}, {"b", "a"}, {"a", "c"}, {"x", "y"}}), []float64{0.5, 2.0, -1.0, -1.0})
+```
+
 ## 785. Is Graph Bipartite? | Medium
 related: 886
 tags: bfs, coloring
@@ -976,6 +1534,38 @@ class Solution {
 }
 // test
 check(new Solution().isBipartite(new int[][]{{1, 3}, {0, 2}, {1, 3}, {0, 2}}), true);
+```
+
+```go
+func isBipartite(graph [][]int) bool {
+	color := make([]int, len(graph))
+	for i := range color {
+		color[i] = -1
+	}
+	for s := range graph { // the graph may be disconnected
+		if color[s] != -1 {
+			continue
+		}
+		color[s] = 0
+		q := []int{s}
+		for len(q) > 0 {
+			u := q[0]
+			q = q[1:]
+			for _, v := range graph[u] {
+				if color[v] == -1 {
+					color[v] = 1 - color[u]
+					q = append(q, v)
+				} else if color[v] == color[u] {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+// test
+assertEq(isBipartite([][]int{{1, 2, 3}, {0, 2}, {0, 1, 3}, {0, 2}}), false)
+assertEq(isBipartite([][]int{{1, 3}, {0, 2}, {1, 3}, {0, 2}}), true)
 ```
 
 ## 542. 01 Matrix | Medium
@@ -1039,6 +1629,40 @@ class Solution {
 check(new Solution().updateMatrix(new int[][]{{0, 0, 0}, {0, 1, 0}, {1, 1, 1}}), new int[][]{{0, 0, 0}, {0, 1, 0}, {1, 2, 1}});
 ```
 
+```go
+func updateMatrix(mat [][]int) [][]int {
+	R, C := len(mat), len(mat[0])
+	dist := make([][]int, R)
+	q := [][2]int{}
+	for r := range dist {
+		dist[r] = make([]int, C)
+		for c := range dist[r] {
+			if mat[r][c] == 0 {
+				q = append(q, [2]int{r, c}) // BFS from every 0 at once
+			} else {
+				dist[r][c] = -1
+			}
+		}
+	}
+	for len(q) > 0 {
+		p := q[0]
+		q = q[1:]
+		for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+			nr, nc := p[0]+d[0], p[1]+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C && dist[nr][nc] == -1 {
+				dist[nr][nc] = dist[p[0]][p[1]] + 1
+				q = append(q, [2]int{nr, nc})
+			}
+		}
+	}
+	return dist
+}
+// test
+assertEq(updateMatrix([][]int{{0, 0, 0}, {0, 1, 0}, {1, 1, 1}}), [][]int{{0, 0, 0}, {0, 1, 0}, {1, 2, 1}})
+assertEq(updateMatrix([][]int{{0}, {1}, {1}}), [][]int{{0}, {1}, {2}})
+assertEq(updateMatrix([][]int{{1, 1, 1}, {1, 1, 1}, {1, 1, 0}}), [][]int{{4, 3, 2}, {3, 2, 1}, {2, 1, 0}})
+```
+
 ## 1091. Shortest Path in Binary Matrix | Medium
 related: 542, 994
 tags: bfs
@@ -1097,6 +1721,38 @@ class Solution {
 }
 // test
 check(new Solution().shortestPathBinaryMatrix(new int[][]{{0, 0, 0}, {1, 1, 0}, {1, 1, 0}}), 4);
+```
+
+```go
+func shortestPathBinaryMatrix(grid [][]int) int {
+	n := len(grid)
+	if grid[0][0] == 1 || grid[n-1][n-1] == 1 {
+		return -1
+	}
+	q := [][3]int{{0, 0, 1}} // (r, c, path length)
+	grid[0][0] = 1
+	for len(q) > 0 {
+		p := q[0]
+		q = q[1:]
+		if p[0] == n-1 && p[1] == n-1 {
+			return p[2]
+		}
+		for dr := -1; dr <= 1; dr++ { // 8 directions
+			for dc := -1; dc <= 1; dc++ {
+				nr, nc := p[0]+dr, p[1]+dc
+				if nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] == 0 {
+					grid[nr][nc] = 1
+					q = append(q, [3]int{nr, nc, p[2] + 1})
+				}
+			}
+		}
+	}
+	return -1
+}
+// test
+assertEq(shortestPathBinaryMatrix([][]int{{0, 1}, {1, 0}}), 2)
+assertEq(shortestPathBinaryMatrix([][]int{{0, 0, 0}, {1, 1, 0}, {1, 1, 0}}), 4)
+assertEq(shortestPathBinaryMatrix([][]int{{1, 0, 0}, {1, 1, 0}, {1, 1, 0}}), -1)
 ```
 
 ## 721. Accounts Merge | Medium
@@ -1176,6 +1832,48 @@ r.sort((p, q) -> p.get(1).compareTo(q.get(1)));
 check(r, "[[John, a@x, b@x, c@x], [Mary, m@x]]");
 ```
 
+```go
+func accountsMerge(accounts [][]string) [][]string {
+	parent, owner := map[string]string{}, map[string]string{}
+	var find func(x string) string
+	find = func(x string) string {
+		if _, ok := parent[x]; !ok {
+			parent[x] = x
+		}
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	for _, acc := range accounts { // union every email of an account with its first
+		for _, e := range acc[1:] {
+			owner[e] = acc[0]
+			parent[find(e)] = find(acc[1])
+		}
+	}
+	groups := map[string][]string{}
+	for e := range owner {
+		root := find(e)
+		groups[root] = append(groups[root], e)
+	}
+	res := [][]string{}
+	for root, emails := range groups {
+		sort.Strings(emails)
+		res = append(res, append([]string{owner[root]}, emails...))
+	}
+	return res
+}
+// test
+acc := [][]string{{"John", "johnsmith@mail.com", "john_newyork@mail.com"}, {"John", "johnsmith@mail.com", "john00@mail.com"},
+	{"Mary", "mary@mail.com"}, {"John", "johnnybravo@mail.com"}}
+assertUnordered(accountsMerge(acc), [][]string{
+	{"John", "john00@mail.com", "john_newyork@mail.com", "johnsmith@mail.com"},
+	{"John", "johnnybravo@mail.com"}, {"Mary", "mary@mail.com"}})
+assertUnordered(accountsMerge([][]string{{"Alex", "a@x.com"}, {"Alex", "b@x.com"}}), [][]string{{"Alex", "a@x.com"}, {"Alex", "b@x.com"}})
+assertEq(accountsMerge([][]string{{"Bo", "b@x.com", "a@x.com", "b@x.com"}}), [][]string{{"Bo", "a@x.com", "b@x.com"}})
+```
+
 ## 329. Longest Increasing Path in a Matrix | Hard
 related: 300, 417
 tags: dfs, memoization
@@ -1231,6 +1929,41 @@ class Solution {
 check(new Solution().longestIncreasingPath(new int[][]{{9, 9, 4}, {6, 6, 8}, {2, 1, 1}}), 4);
 ```
 
+```go
+func longestIncreasingPath(matrix [][]int) int {
+	R, C := len(matrix), len(matrix[0])
+	memo := make([][]int, R) // longest path starting at (r, c); 0 = not computed
+	for i := range memo {
+		memo[i] = make([]int, C)
+	}
+	var best func(r, c int) int
+	best = func(r, c int) int {
+		if memo[r][c] > 0 {
+			return memo[r][c]
+		}
+		res := 1
+		for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+			nr, nc := r+d[0], c+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C && matrix[nr][nc] > matrix[r][c] {
+				res = max(res, 1+best(nr, nc))
+			}
+		}
+		memo[r][c] = res
+		return res
+	}
+	ans := 0
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			ans = max(ans, best(r, c))
+		}
+	}
+	return ans
+}
+// test
+assertEq(longestIncreasingPath([][]int{{9, 9, 4}, {6, 6, 8}, {2, 1, 1}}), 4)
+assertEq(longestIncreasingPath([][]int{{3, 4, 5}, {3, 2, 6}, {2, 2, 1}}), 4)
+```
+
 
 ## 1971. Find if Path Exists in Graph | Easy
 related: 323, 547
@@ -1277,6 +2010,29 @@ class Solution {
 check(new Solution().validPath(6, new int[][]{{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}}, 0, 5), false);
 ```
 
+```go
+func validPath(n int, edges [][]int, source int, destination int) bool {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	for _, e := range edges {
+		parent[find(e[0])] = find(e[1])
+	}
+	return find(source) == find(destination)
+}
+// test
+assertEq(validPath(3, [][]int{{0, 1}, {1, 2}, {2, 0}}, 0, 2), true)
+assertEq(validPath(6, [][]int{{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}}, 0, 5), false)
+```
+
 ## 841. Keys and Rooms | Medium
 related: 547, 1971
 tags: dfs
@@ -1315,6 +2071,26 @@ class Solution {
 }
 // test
 check(new Solution().canVisitAllRooms(List.of(List.of(1), List.of(2), List.of(3), List.of())), true);
+```
+
+```go
+func canVisitAllRooms(rooms [][]int) bool {
+	seen, st := map[int]bool{0: true}, []int{0}
+	for len(st) > 0 {
+		room := st[len(st)-1]
+		st = st[:len(st)-1]
+		for _, k := range rooms[room] {
+			if !seen[k] {
+				seen[k] = true
+				st = append(st, k)
+			}
+		}
+	}
+	return len(seen) == len(rooms)
+}
+// test
+assertEq(canVisitAllRooms([][]int{{1}, {2}, {3}, {}}), true)
+assertEq(canVisitAllRooms([][]int{{1, 3}, {3, 0, 1}, {2}, {0}}), false)
 ```
 
 ## 886. Possible Bipartition | Medium
@@ -1379,6 +2155,40 @@ class Solution {
 check(new Solution().possibleBipartition(3, new int[][]{{1, 2}, {1, 3}, {2, 3}}), false);
 ```
 
+```go
+func possibleBipartition(n int, dislikes [][]int) bool {
+	g := make([][]int, n+1)
+	for _, d := range dislikes {
+		g[d[0]] = append(g[d[0]], d[1])
+		g[d[1]] = append(g[d[1]], d[0])
+	}
+	color := make([]int, n+1) // 0 = uncolored, 1 / 2 = the two groups
+	for s := 1; s <= n; s++ {
+		if color[s] != 0 {
+			continue
+		}
+		color[s] = 1
+		q := []int{s}
+		for len(q) > 0 {
+			u := q[0]
+			q = q[1:]
+			for _, v := range g[u] {
+				if color[v] == 0 {
+					color[v] = 3 - color[u]
+					q = append(q, v)
+				} else if color[v] == color[u] {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+// test
+assertEq(possibleBipartition(4, [][]int{{1, 2}, {1, 3}, {2, 4}}), true)
+assertEq(possibleBipartition(3, [][]int{{1, 2}, {1, 3}, {2, 3}}), false)
+```
+
 ## 990. Satisfiability of Equality Equations | Medium
 related: 399, 684
 tags: union-find
@@ -1428,6 +2238,37 @@ class Solution {
 check(new Solution().equationsPossible(new String[]{"a==b", "b!=a"}), false);
 ```
 
+```go
+func equationsPossible(equations []string) bool {
+	var parent [26]int
+	for i := range parent {
+		parent[i] = i
+	}
+	find := func(x int) int {
+		for parent[x] != x {
+			parent[x] = parent[parent[x]]
+			x = parent[x]
+		}
+		return x
+	}
+	for _, e := range equations { // union all "==" first
+		if e[1] == '=' {
+			parent[find(int(e[0]-'a'))] = find(int(e[3] - 'a'))
+		}
+	}
+	for _, e := range equations { // then every "!=" must span two groups
+		if e[1] == '!' && find(int(e[0]-'a')) == find(int(e[3]-'a')) {
+			return false
+		}
+	}
+	return true
+}
+// test
+assertEq(equationsPossible([]string{"a==b", "b!=a"}), false)
+assertEq(equationsPossible([]string{"b==a", "a==b"}), true)
+assertEq(equationsPossible([]string{"a==b", "b==c", "a==c"}), true)
+```
+
 ## 1466. Reorder Routes to Make All Paths Lead to the City Zero | Medium
 related: 207
 tags: dfs, directed-graph
@@ -1475,6 +2316,33 @@ class Solution {
 }
 // test
 check(new Solution().minReorder(6, new int[][]{{0, 1}, {1, 3}, {2, 3}, {4, 0}, {4, 5}}), 3);
+```
+
+```go
+func minReorder(n int, connections [][]int) int {
+	g := make([][][2]int, n) // (neighbor, 1 if the road points away from city 0's side)
+	for _, c := range connections {
+		g[c[0]] = append(g[c[0]], [2]int{c[1], 1})
+		g[c[1]] = append(g[c[1]], [2]int{c[0], 0})
+	}
+	seen, st, flips := make([]bool, n), []int{0}, 0
+	seen[0] = true
+	for len(st) > 0 {
+		u := st[len(st)-1]
+		st = st[:len(st)-1]
+		for _, e := range g[u] {
+			if !seen[e[0]] {
+				seen[e[0]] = true
+				flips += e[1]
+				st = append(st, e[0])
+			}
+		}
+	}
+	return flips
+}
+// test
+assertEq(minReorder(6, [][]int{{0, 1}, {1, 3}, {2, 3}, {4, 0}, {4, 5}}), 3)
+assertEq(minReorder(5, [][]int{{1, 0}, {1, 2}, {3, 2}, {3, 4}}), 2)
 ```
 
 ## 752. Open the Lock | Medium
@@ -1541,6 +2409,45 @@ class Solution {
 check(new Solution().openLock(new String[]{"0201", "0101", "0102", "1212", "2002"}, "0202"), 6);
 ```
 
+```go
+func openLock(deadends []string, target string) int {
+	dead := map[string]bool{}
+	for _, d := range deadends {
+		dead[d] = true
+	}
+	if dead["0000"] {
+		return -1
+	}
+	q, seen := []string{"0000"}, map[string]bool{"0000": true}
+	for steps := 0; len(q) > 0; steps++ {
+		next := []string{}
+		for _, cur := range q {
+			if cur == target {
+				return steps
+			}
+			b := []byte(cur)
+			for i := 0; i < 4; i++ {
+				orig := b[i]
+				for _, delta := range []byte{1, 9} { // +1 or -1 (mod 10)
+					b[i] = '0' + (orig-'0'+delta)%10
+					if s := string(b); !seen[s] && !dead[s] {
+						seen[s] = true
+						next = append(next, s)
+					}
+				}
+				b[i] = orig
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(openLock([]string{"0201", "0101", "0102", "1212", "2002"}, "0202"), 6)
+assertEq(openLock([]string{"8888"}, "0009"), 1)
+assertEq(openLock([]string{"8887", "8889", "8878", "8898", "8788", "8988", "7888", "9888"}, "8888"), -1)
+```
+
 ## 433. Minimum Genetic Mutation | Medium
 related: 127, 752
 tags: bfs
@@ -1598,6 +2505,42 @@ class Solution {
 }
 // test
 check(new Solution().minMutation("AACCGGTT", "AAACGGTA", new String[]{"AACCGGTA", "AACCGCTA", "AAACGGTA"}), 2);
+```
+
+```go
+func minMutation(startGene string, endGene string, bank []string) int {
+	valid := map[string]bool{}
+	for _, g := range bank {
+		valid[g] = true
+	}
+	q, seen := []string{startGene}, map[string]bool{startGene: true}
+	for steps := 0; len(q) > 0; steps++ {
+		next := []string{}
+		for _, g := range q {
+			if g == endGene {
+				return steps
+			}
+			b := []byte(g)
+			for i := range b {
+				orig := b[i]
+				for _, ch := range []byte("ACGT") {
+					b[i] = ch
+					if s := string(b); valid[s] && !seen[s] {
+						seen[s] = true
+						next = append(next, s)
+					}
+				}
+				b[i] = orig
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(minMutation("AACCGGTT", "AACCGGTA", []string{"AACCGGTA"}), 1)
+assertEq(minMutation("AACCGGTT", "AAACGGTA", []string{"AACCGGTA", "AACCGCTA", "AAACGGTA"}), 2)
+assertEq(minMutation("AAAAACCC", "AACCCCCC", []string{"AAAACCCC", "AAACCCCC", "AACCCCCC"}), 3)
 ```
 
 ## 909. Snakes and Ladders | Medium
@@ -1664,6 +2607,45 @@ class Solution {
 int[][] B = {{-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1},
              {-1, 35, -1, -1, 13, -1}, {-1, -1, -1, -1, -1, -1}, {-1, 15, -1, -1, -1, -1}};
 check(new Solution().snakesAndLadders(B), 4);
+```
+
+```go
+func snakesAndLadders(board [][]int) int {
+	n := len(board)
+	cell := func(s int) int { // board value of square s (boustrophedon from the bottom-left)
+		r, c := (s-1)/n, (s-1)%n
+		if r%2 == 1 {
+			c = n - 1 - c
+		}
+		return board[n-1-r][c]
+	}
+	q, seen := []int{1}, map[int]bool{1: true}
+	for moves := 0; len(q) > 0; moves++ {
+		next := []int{}
+		for _, s := range q {
+			if s == n*n {
+				return moves
+			}
+			for nxt := s + 1; nxt <= min(s+6, n*n); nxt++ {
+				dest := nxt
+				if v := cell(nxt); v != -1 {
+					dest = v
+				}
+				if !seen[dest] {
+					seen[dest] = true
+					next = append(next, dest)
+				}
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+B := [][]int{{-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1},
+	{-1, 35, -1, -1, 13, -1}, {-1, -1, -1, -1, -1, -1}, {-1, 15, -1, -1, -1, -1}}
+assertEq(snakesAndLadders(B), 4)
+assertEq(snakesAndLadders([][]int{{-1, -1}, {-1, 3}}), 1)
 ```
 
 ## 934. Shortest Bridge | Medium
@@ -1741,6 +2723,59 @@ class Solution {
 check(new Solution().shortestBridge(new int[][]{{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}), 2);
 ```
 
+```go
+func shortestBridge(grid [][]int) int {
+	n := len(grid)
+	dirs := [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	var start [2]int
+	for r := 0; r < n; r++ {
+		for c := 0; c < n; c++ {
+			if grid[r][c] == 1 {
+				start = [2]int{r, c}
+			}
+		}
+	}
+	q, st := [][2]int{}, [][2]int{start}
+	grid[start[0]][start[1]] = 2
+	for len(st) > 0 { // mark one island as 2; it seeds the BFS
+		p := st[len(st)-1]
+		st = st[:len(st)-1]
+		q = append(q, p)
+		for _, d := range dirs {
+			nr, nc := p[0]+d[0], p[1]+d[1]
+			if nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] == 1 {
+				grid[nr][nc] = 2
+				st = append(st, [2]int{nr, nc})
+			}
+		}
+	}
+	for steps := 0; len(q) > 0; steps++ { // expand over water until the other island
+		next := [][2]int{}
+		for _, p := range q {
+			for _, d := range dirs {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr < 0 || nr >= n || nc < 0 || nc >= n {
+					continue
+				}
+				if grid[nr][nc] == 1 {
+					return steps
+				}
+				if grid[nr][nc] == 0 {
+					grid[nr][nc] = 2
+					next = append(next, [2]int{nr, nc})
+				}
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(shortestBridge([][]int{{0, 1}, {1, 0}}), 1)
+assertEq(shortestBridge([][]int{{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}), 2)
+assertEq(shortestBridge([][]int{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1}, {1, 0, 0, 0, 1}, {1, 1, 1, 1, 1}}), 1)
+```
+
 ## 733. Flood Fill | Easy
 related: 200, 695, 463
 tags: grid-dfs
@@ -1792,6 +2827,35 @@ class Solution {
 // test
 check(new Solution().floodFill(new int[][]{{1, 1, 1}, {1, 1, 0}, {1, 0, 1}}, 1, 1, 2), new int[][]{{2, 2, 2}, {2, 2, 0}, {2, 0, 1}});
 check(new Solution().floodFill(new int[][]{{0, 0, 0}, {0, 0, 0}}, 0, 0, 0), new int[][]{{0, 0, 0}, {0, 0, 0}});
+```
+
+```go
+func floodFill(image [][]int, sr int, sc int, color int) [][]int {
+	old := image[sr][sc]
+	if old == color {
+		return image
+	}
+	R, C := len(image), len(image[0])
+	image[sr][sc] = color
+	st := [][2]int{{sr, sc}}
+	for len(st) > 0 {
+		p := st[len(st)-1]
+		st = st[:len(st)-1]
+		for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+			nr, nc := p[0]+d[0], p[1]+d[1]
+			if nr >= 0 && nr < R && nc >= 0 && nc < C && image[nr][nc] == old {
+				image[nr][nc] = color
+				st = append(st, [2]int{nr, nc})
+			}
+		}
+	}
+	return image
+}
+// test
+assertEq(floodFill([][]int{{1, 1, 1}, {1, 1, 0}, {1, 0, 1}}, 1, 1, 2), [][]int{{2, 2, 2}, {2, 2, 0}, {2, 0, 1}})
+assertEq(floodFill([][]int{{0, 0, 0}, {0, 0, 0}}, 0, 0, 0), [][]int{{0, 0, 0}, {0, 0, 0}})
+assertEq(floodFill([][]int{{0, 0, 0}, {0, 1, 1}}, 1, 1, 1), [][]int{{0, 0, 0}, {0, 1, 1}})
+assertEq(floodFill([][]int{{1}}, 0, 0, 3), [][]int{{3}})
 ```
 
 ## 1730. Shortest Path to Get Food | Medium
@@ -1857,6 +2921,44 @@ check(new Solution().getFood(new char[][]{"XXXXXX".toCharArray(), "X*OOOX".toCha
 check(new Solution().getFood(new char[][]{"*#".toCharArray()}), 1);
 ```
 
+```go
+func getFood(grid [][]byte) int {
+	R, C := len(grid), len(grid[0])
+	var start [2]int
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if grid[r][c] == '*' {
+				start = [2]int{r, c}
+			}
+		}
+	}
+	seen, q := map[[2]int]bool{start: true}, [][2]int{start}
+	for steps := 1; len(q) > 0; steps++ {
+		next := [][2]int{}
+		for _, p := range q {
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nb := [2]int{p[0] + d[0], p[1] + d[1]}
+				if nb[0] < 0 || nb[0] >= R || nb[1] < 0 || nb[1] >= C || grid[nb[0]][nb[1]] == 'X' || seen[nb] {
+					continue
+				}
+				if grid[nb[0]][nb[1]] == '#' {
+					return steps
+				}
+				seen[nb] = true
+				next = append(next, nb)
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(getFood(byteGrid("XXXXXX", "X*OOOX", "XOO#OX", "XXXXXX")), 3)
+assertEq(getFood(byteGrid("XXXXX", "X*XOX", "XOX#X", "XXXXX")), -1)
+assertEq(getFood(byteGrid("XXXXXXXX", "X*OXO#OX", "XOOXOOXX", "XOOOO#OX", "XXXXXXXX")), 6)
+assertEq(getFood(byteGrid("*#")), 1)
+```
+
 ## 1197. Minimum Knight Moves | Medium
 related: 1730, 752
 tags: bfs, premium
@@ -1919,6 +3021,45 @@ class Solution {
 check(new Solution().minKnightMoves(5, 5), 4);
 check(new Solution().minKnightMoves(1, 0), 3);
 check(new Solution().minKnightMoves(300, 0), 150);
+```
+
+```go
+func minKnightMoves(x int, y int) int {
+	if x < 0 { // the board is symmetric
+		x = -x
+	}
+	if y < 0 {
+		y = -y
+	}
+	type state struct{ a, b int }
+	seen := map[state]bool{{0, 0}: true}
+	q := []state{{0, 0}}
+	for d := 0; len(q) > 0; d++ {
+		next := []state{}
+		for _, s := range q {
+			if s.a == x && s.b == y {
+				return d
+			}
+			for _, m := range [][2]int{{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}} {
+				n := state{s.a + m[0], s.b + m[1]}
+				if n.a >= -2 && n.a <= x+2 && n.b >= -2 && n.b <= y+2 && !seen[n] { // a small margin is enough
+					seen[n] = true
+					next = append(next, n)
+				}
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(minKnightMoves(2, 1), 1)
+assertEq(minKnightMoves(5, 5), 4)
+assertEq(minKnightMoves(0, 0), 0)
+assertEq(minKnightMoves(1, 1), 2)
+assertEq(minKnightMoves(1, 0), 3)
+assertEq(minKnightMoves(-1, -2), 1)
+assertEq(minKnightMoves(300, 0), 150)
 ```
 
 ## 815. Bus Routes | Hard
@@ -1996,6 +3137,49 @@ check(new Solution().numBusesToDestination(new int[][]{{1, 2, 7}, {3, 6, 7}}, 1,
 check(new Solution().numBusesToDestination(new int[][]{{7, 12}, {4, 5, 15}, {6}, {15, 19}, {9, 12, 13}}, 15, 12), -1);
 ```
 
+```go
+func numBusesToDestination(routes [][]int, source int, target int) int {
+	if source == target {
+		return 0
+	}
+	at := map[int][]int{} // stop -> routes through it
+	for i, route := range routes {
+		for _, s := range route {
+			at[s] = append(at[s], i)
+		}
+	}
+	used, seen, q := map[int]bool{}, map[int]bool{source: true}, []int{source}
+	for buses := 1; len(q) > 0; buses++ { // BFS over stops, one level per bus taken
+		next := []int{}
+		for _, stop := range q {
+			for _, r := range at[stop] {
+				if used[r] {
+					continue
+				}
+				used[r] = true
+				for _, s := range routes[r] {
+					if s == target {
+						return buses
+					}
+					if !seen[s] {
+						seen[s] = true
+						next = append(next, s)
+					}
+				}
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(numBusesToDestination([][]int{{1, 2, 7}, {3, 6, 7}}, 1, 6), 2)
+assertEq(numBusesToDestination([][]int{{7, 12}, {4, 5, 15}, {6}, {15, 19}, {9, 12, 13}}, 15, 12), -1)
+assertEq(numBusesToDestination([][]int{{1, 2}}, 1, 1), 0)
+assertEq(numBusesToDestination([][]int{{1, 2}}, 3, 1), -1)
+assertEq(numBusesToDestination([][]int{{1, 7}, {3, 5}}, 5, 5), 0)
+```
+
 ## 1926. Nearest Exit from Entrance in Maze | Medium
 related: 1730, 286
 tags: bfs, grid
@@ -2056,6 +3240,36 @@ check(new Solution().nearestExit(new char[][]{"++.+".toCharArray(), "...+".toCha
 check(new Solution().nearestExit(new char[][]{".+".toCharArray()}, new int[]{0, 0}), -1);
 ```
 
+```go
+func nearestExit(maze [][]byte, entrance []int) int {
+	R, C := len(maze), len(maze[0])
+	start := [2]int{entrance[0], entrance[1]}
+	seen, q := map[[2]int]bool{start: true}, [][2]int{start}
+	for steps := 1; len(q) > 0; steps++ {
+		next := [][2]int{}
+		for _, p := range q {
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr < 0 || nr >= R || nc < 0 || nc >= C || maze[nr][nc] != '.' || seen[[2]int{nr, nc}] {
+					continue
+				}
+				if nr == 0 || nr == R-1 || nc == 0 || nc == C-1 { // a border cell that is not the entrance
+					return steps
+				}
+				seen[[2]int{nr, nc}] = true
+				next = append(next, [2]int{nr, nc})
+			}
+		}
+		q = next
+	}
+	return -1
+}
+// test
+assertEq(nearestExit(byteGrid("++.+", "...+", "+++."), []int{1, 2}), 1)
+assertEq(nearestExit(byteGrid("+++", "...", "+++"), []int{1, 0}), 2)
+assertEq(nearestExit(byteGrid(".+"), []int{0, 0}), -1)
+```
+
 ## 463. Island Perimeter | Easy
 related: 200, 695
 tags: grid, counting
@@ -2099,6 +3313,31 @@ class Solution {
 check(new Solution().islandPerimeter(new int[][]{{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}}), 16);
 ```
 
+```go
+func islandPerimeter(grid [][]int) int {
+	land, shared := 0, 0
+	for r, row := range grid {
+		for c, v := range row {
+			if v == 1 {
+				land++
+				if r+1 < len(grid) && grid[r+1][c] == 1 { // each shared edge hides two sides
+					shared++
+				}
+				if c+1 < len(row) && row[c+1] == 1 {
+					shared++
+				}
+			}
+		}
+	}
+	return 4*land - 2*shared
+}
+// test
+assertEq(islandPerimeter([][]int{{0, 1, 0, 0}, {1, 1, 1, 0}, {0, 1, 0, 0}, {1, 1, 0, 0}}), 16)
+assertEq(islandPerimeter([][]int{{1}}), 4)
+assertEq(islandPerimeter([][]int{{1, 0}}), 4)
+assertEq(islandPerimeter([][]int{{1, 1}, {1, 1}}), 8)
+```
+
 ## 997. Find the Town Judge | Easy
 related: 277, 1971
 tags: graph, degree
@@ -2134,6 +3373,27 @@ class Solution {
 // test
 check(new Solution().findJudge(3, new int[][]{{1, 3}, {2, 3}}), 3);
 check(new Solution().findJudge(3, new int[][]{{1, 3}, {2, 3}, {3, 1}}), -1);
+```
+
+```go
+func findJudge(n int, trust [][]int) int {
+	score := make([]int, n+1) // trusted-by count minus trusts count
+	for _, t := range trust {
+		score[t[0]]--
+		score[t[1]]++
+	}
+	for p := 1; p <= n; p++ {
+		if score[p] == n-1 {
+			return p
+		}
+	}
+	return -1
+}
+// test
+assertEq(findJudge(2, [][]int{{1, 2}}), 2)
+assertEq(findJudge(3, [][]int{{1, 3}, {2, 3}}), 3)
+assertEq(findJudge(3, [][]int{{1, 3}, {2, 3}, {3, 1}}), -1)
+assertEq(findJudge(1, [][]int{}), 1)
 ```
 
 ## 1462. Course Schedule IV | Medium
@@ -2182,4 +3442,38 @@ class Solution {
 }
 // test
 check(new Solution().checkIfPrerequisite(3, new int[][]{{1, 2}, {1, 0}, {2, 0}}, new int[][]{{1, 0}, {1, 2}}), List.of(true, true));
+```
+
+```go
+func checkIfPrerequisite(numCourses int, prerequisites [][]int, queries [][]int) []bool {
+	n := numCourses
+	reach := make([][]bool, n)
+	for i := range reach {
+		reach[i] = make([]bool, n)
+	}
+	for _, p := range prerequisites {
+		reach[p[0]][p[1]] = true
+	}
+	for k := 0; k < n; k++ { // Floyd-Warshall transitive closure
+		for i := 0; i < n; i++ {
+			if reach[i][k] {
+				for j := 0; j < n; j++ {
+					if reach[k][j] {
+						reach[i][j] = true
+					}
+				}
+			}
+		}
+	}
+	res := make([]bool, len(queries))
+	for i, q := range queries {
+		res[i] = reach[q[0]][q[1]]
+	}
+	return res
+}
+// test
+assertEq(checkIfPrerequisite(2, [][]int{{1, 0}}, [][]int{{0, 1}, {1, 0}}), []bool{false, true})
+assertEq(checkIfPrerequisite(2, [][]int{}, [][]int{{1, 0}, {0, 1}}), []bool{false, false})
+assertEq(checkIfPrerequisite(3, [][]int{{1, 2}, {1, 0}, {2, 0}}, [][]int{{1, 0}, {1, 2}}), []bool{true, true})
+assertEq(checkIfPrerequisite(4, [][]int{{0, 1}, {1, 2}, {2, 3}}, [][]int{{0, 3}, {3, 0}, {1, 3}}), []bool{true, false, true})
 ```
