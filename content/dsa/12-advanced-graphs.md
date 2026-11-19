@@ -624,3 +624,324 @@ class Solution {
 // test
 check(new Solution().eventualSafeNodes(new int[][]{{1, 2}, {2, 3}, {5}, {0}, {5}, {}, {}}), "[2, 4, 5, 6]");
 ```
+
+
+## 1514. Path with Maximum Probability | Medium
+related: 743
+tags: dijkstra
+
+Dijkstra with a **max-heap** on probability: probabilities only shrink along a path (multiplying by ≤ 1), so the greedy "best first" argument still holds.
+
+**Complexity:** O(E log V).
+
+```python
+class Solution:
+    def maxProbability(self, n: int, edges: List[List[int]], succProb: List[float], start_node: int, end_node: int) -> float:
+        g = defaultdict(list)
+        for (a, b), p in zip(edges, succProb):
+            g[a].append((b, p))
+            g[b].append((a, p))
+        best = [0.0] * n
+        best[start_node] = 1.0
+        pq = [(-1.0, start_node)]
+        while pq:
+            p, u = heappop(pq)
+            p = -p
+            if u == end_node:
+                return p
+            if p < best[u]:
+                continue
+            for v, w in g[u]:
+                if p * w > best[v]:
+                    best[v] = p * w
+                    heappush(pq, (-best[v], v))
+        return 0.0
+# test
+assert abs(Solution().maxProbability(3, [[0, 1], [1, 2], [0, 2]], [0.5, 0.5, 0.2], 0, 2) - 0.25) < 1e-9
+assert Solution().maxProbability(3, [[0, 1]], [0.5], 0, 2) == 0.0
+```
+
+```java
+class Solution {
+    public double maxProbability(int n, int[][] edges, double[] succProb, int start, int end) {
+        List<List<double[]>> g = new ArrayList<>();
+        for (int i = 0; i < n; i++) g.add(new ArrayList<>());
+        for (int i = 0; i < edges.length; i++) {
+            g.get(edges[i][0]).add(new double[]{edges[i][1], succProb[i]});
+            g.get(edges[i][1]).add(new double[]{edges[i][0], succProb[i]});
+        }
+        double[] best = new double[n];
+        best[start] = 1;
+        PriorityQueue<double[]> pq = new PriorityQueue<>((a, b) -> Double.compare(b[0], a[0]));
+        pq.add(new double[]{1, start});
+        while (!pq.isEmpty()) {
+            double[] cur = pq.poll();
+            int u = (int) cur[1];
+            if (u == end) return cur[0];
+            if (cur[0] < best[u]) continue;
+            for (double[] e : g.get(u)) {
+                int v = (int) e[0];
+                if (cur[0] * e[1] > best[v]) { best[v] = cur[0] * e[1]; pq.add(new double[]{best[v], v}); }
+            }
+        }
+        return 0;
+    }
+}
+// test
+check(new Solution().maxProbability(3, new int[][]{{0, 1}, {1, 2}, {0, 2}}, new double[]{0.5, 0.5, 0.2}, 0, 2), 0.25);
+```
+
+## 1976. Number of Ways to Arrive at Destination | Medium
+related: 743
+tags: dijkstra, counting
+
+Dijkstra while counting shortest paths: a strictly shorter distance to `v` resets `ways[v] = ways[u]`; an equal distance adds `ways[u]`.
+
+**Complexity:** O(E log V).
+
+```python
+class Solution:
+    def countPaths(self, n: int, roads: List[List[int]]) -> int:
+        MOD = 10 ** 9 + 7
+        g = defaultdict(list)
+        for a, b, t in roads:
+            g[a].append((b, t))
+            g[b].append((a, t))
+        dist, ways = [float("inf")] * n, [0] * n
+        dist[0], ways[0] = 0, 1
+        pq = [(0, 0)]
+        while pq:
+            d, u = heappop(pq)
+            if d > dist[u]:
+                continue
+            for v, t in g[u]:
+                if d + t < dist[v]:
+                    dist[v], ways[v] = d + t, ways[u]
+                    heappush(pq, (dist[v], v))
+                elif d + t == dist[v]:
+                    ways[v] = (ways[v] + ways[u]) % MOD
+        return ways[n - 1]
+# test
+R = [[0, 6, 7], [0, 1, 2], [1, 2, 3], [1, 3, 3], [6, 3, 3], [3, 5, 1], [6, 5, 1], [2, 5, 1], [0, 4, 5], [4, 6, 2]]
+assert Solution().countPaths(7, R) == 4
+assert Solution().countPaths(2, [[1, 0, 10]]) == 1
+```
+
+```java
+class Solution {
+    public int countPaths(int n, int[][] roads) {
+        final int MOD = 1_000_000_007;
+        List<List<int[]>> g = new ArrayList<>();
+        for (int i = 0; i < n; i++) g.add(new ArrayList<>());
+        for (int[] r : roads) { g.get(r[0]).add(new int[]{r[1], r[2]}); g.get(r[1]).add(new int[]{r[0], r[2]}); }
+        long[] dist = new long[n];
+        Arrays.fill(dist, Long.MAX_VALUE);
+        long[] ways = new long[n];
+        dist[0] = 0; ways[0] = 1;
+        PriorityQueue<long[]> pq = new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));
+        pq.add(new long[]{0, 0});
+        while (!pq.isEmpty()) {
+            long[] cur = pq.poll();
+            int u = (int) cur[1];
+            if (cur[0] > dist[u]) continue;
+            for (int[] e : g.get(u)) {
+                long nd = cur[0] + e[1];
+                if (nd < dist[e[0]]) { dist[e[0]] = nd; ways[e[0]] = ways[u]; pq.add(new long[]{nd, e[0]}); }
+                else if (nd == dist[e[0]]) ways[e[0]] = (ways[e[0]] + ways[u]) % MOD;
+            }
+        }
+        return (int) ways[n - 1];
+    }
+}
+// test
+int[][] R = {{0, 6, 7}, {0, 1, 2}, {1, 2, 3}, {1, 3, 3}, {6, 3, 3}, {3, 5, 1}, {6, 5, 1}, {2, 5, 1}, {0, 4, 5}, {4, 6, 2}};
+check(new Solution().countPaths(7, R), 4);
+```
+
+## 1334. Find the City With the Smallest Number of Neighbors at a Threshold Distance | Medium
+related: 743
+tags: floyd-warshall
+
+All-pairs shortest paths with **Floyd–Warshall** (`dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])` for every intermediate k). Count reachable cities within the threshold; ties go to the larger index.
+
+**Complexity:** O(n³).
+
+```python
+class Solution:
+    def findTheCity(self, n: int, edges: List[List[int]], distanceThreshold: int) -> int:
+        INF = float("inf")
+        d = [[0 if i == j else INF for j in range(n)] for i in range(n)]
+        for a, b, w in edges:
+            d[a][b] = d[b][a] = w
+        for k in range(n):
+            for i in range(n):
+                for j in range(n):
+                    if d[i][k] + d[k][j] < d[i][j]:
+                        d[i][j] = d[i][k] + d[k][j]
+        best, city = INF, -1
+        for i in range(n):
+            cnt = sum(d[i][j] <= distanceThreshold for j in range(n)) - 1
+            if cnt <= best:
+                best, city = cnt, i
+        return city
+# test
+assert Solution().findTheCity(4, [[0, 1, 3], [1, 2, 1], [1, 3, 4], [2, 3, 1]], 4) == 3
+assert Solution().findTheCity(5, [[0, 1, 2], [0, 4, 8], [1, 2, 3], [1, 4, 2], [2, 3, 1], [3, 4, 1]], 2) == 0
+```
+
+```java
+class Solution {
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        int INF = 1_000_000_000;
+        int[][] d = new int[n][n];
+        for (int[] row : d) Arrays.fill(row, INF);
+        for (int i = 0; i < n; i++) d[i][i] = 0;
+        for (int[] e : edges) d[e[0]][e[1]] = d[e[1]][e[0]] = e[2];
+        for (int k = 0; k < n; k++)
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++) d[i][j] = Math.min(d[i][j], d[i][k] + d[k][j]);
+        int best = Integer.MAX_VALUE, city = -1;
+        for (int i = 0; i < n; i++) {
+            int cnt = 0;
+            for (int j = 0; j < n; j++) if (j != i && d[i][j] <= distanceThreshold) cnt++;
+            if (cnt <= best) { best = cnt; city = i; }
+        }
+        return city;
+    }
+}
+// test
+check(new Solution().findTheCity(4, new int[][]{{0, 1, 3}, {1, 2, 1}, {1, 3, 4}, {2, 3, 1}}, 4), 3);
+```
+
+## 685. Redundant Connection II | Hard
+related: 684
+tags: union-find, directed
+
+A rooted tree plus one extra **directed** edge creates either (a) a node with two parents, (b) a cycle, or both. If some node has two parents, the answer is one of those two edges: skip the later one and check with Union-Find whether a cycle remains — if yes, the earlier edge is the culprit. Otherwise return the edge that closes the cycle.
+
+**Complexity:** O(n · α(n)).
+
+```python
+class Solution:
+    def findRedundantDirectedConnection(self, edges: List[List[int]]) -> List[int]:
+        n = len(edges)
+        parent_of, cand1, cand2 = {}, None, None
+        for u, v in edges:
+            if v in parent_of:
+                cand1, cand2 = [parent_of[v], v], [u, v]
+            else:
+                parent_of[v] = u
+        root = list(range(n + 1))
+
+        def find(x):
+            while root[x] != x:
+                root[x] = root[root[x]]
+                x = root[x]
+            return x
+
+        for u, v in edges:
+            if [u, v] == cand2:
+                continue
+            ru, rv = find(u), find(v)
+            if ru == rv:                       # cycle found
+                return cand1 if cand1 else [u, v]
+            root[rv] = ru
+        return cand2
+# test
+assert Solution().findRedundantDirectedConnection([[1, 2], [1, 3], [2, 3]]) == [2, 3]
+assert Solution().findRedundantDirectedConnection([[1, 2], [2, 3], [3, 4], [4, 1], [1, 5]]) == [4, 1]
+assert Solution().findRedundantDirectedConnection([[2, 1], [3, 1], [4, 2], [1, 4]]) == [2, 1]
+```
+
+```java
+class Solution {
+    private int[] root;
+
+    private int find(int x) {
+        while (root[x] != x) { root[x] = root[root[x]]; x = root[x]; }
+        return x;
+    }
+
+    public int[] findRedundantDirectedConnection(int[][] edges) {
+        int n = edges.length;
+        int[] parentOf = new int[n + 1];
+        int[] cand1 = null, cand2 = null;
+        for (int[] e : edges) {
+            if (parentOf[e[1]] != 0) { cand1 = new int[]{parentOf[e[1]], e[1]}; cand2 = e; }
+            else parentOf[e[1]] = e[0];
+        }
+        root = new int[n + 1];
+        for (int i = 0; i <= n; i++) root[i] = i;
+        for (int[] e : edges) {
+            if (e == cand2) continue;
+            int ru = find(e[0]), rv = find(e[1]);
+            if (ru == rv) return cand1 != null ? cand1 : e;
+            root[rv] = ru;
+        }
+        return cand2;
+    }
+}
+// test
+check(new Solution().findRedundantDirectedConnection(new int[][]{{1, 2}, {2, 3}, {3, 4}, {4, 1}, {1, 5}}), new int[]{4, 1});
+check(new Solution().findRedundantDirectedConnection(new int[][]{{2, 1}, {3, 1}, {4, 2}, {1, 4}}), new int[]{2, 1});
+```
+
+## 753. Cracking the Safe | Hard
+related: 332
+tags: de-bruijn, eulerian-path
+
+The shortest string containing every length-n password is a **De Bruijn sequence** of length `kⁿ + n − 1`. Nodes = length-(n−1) strings, each appended digit = an edge; an Eulerian circuit uses every edge (password) once. Hierholzer's DFS: append the edge digit after exploring it.
+
+**Complexity:** O(kⁿ).
+
+```python
+class Solution:
+    def crackSafe(self, n: int, k: int) -> str:
+        seen, out = set(), []
+
+        def dfs(node):
+            for d in map(str, range(k)):
+                edge = node + d
+                if edge not in seen:
+                    seen.add(edge)
+                    dfs(edge[1:])
+                    out.append(d)
+
+        start = "0" * (n - 1)
+        dfs(start)
+        return "".join(out) + start
+# test
+def covers(s, n, k):
+    return len({s[i:i + n] for i in range(len(s) - n + 1)}) == k ** n and len(s) == k ** n + n - 1
+assert covers(Solution().crackSafe(1, 2), 1, 2)
+assert covers(Solution().crackSafe(2, 2), 2, 2)
+assert covers(Solution().crackSafe(3, 3), 3, 3)
+```
+
+```java
+class Solution {
+    private final Set<String> seen = new HashSet<>();
+    private final StringBuilder out = new StringBuilder();
+
+    public String crackSafe(int n, int k) {
+        String start = "0".repeat(n - 1);
+        dfs(start, k);
+        return out.append(start).toString();
+    }
+
+    private void dfs(String node, int k) {
+        for (int d = 0; d < k; d++) {
+            String edge = node + d;
+            if (seen.add(edge)) {
+                dfs(edge.substring(1), k);
+                out.append(d);
+            }
+        }
+    }
+}
+// test
+String s = new Solution().crackSafe(3, 3);
+Set<String> all = new HashSet<>();
+for (int i = 0; i + 3 <= s.length(); i++) all.add(s.substring(i, i + 3));
+check(all.size() == 27 && s.length() == 29, true);
+```

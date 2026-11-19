@@ -1201,3 +1201,513 @@ class Solution {
 // test
 check(new Solution().longestIncreasingPath(new int[][]{{9, 9, 4}, {6, 6, 8}, {2, 1, 1}}), 4);
 ```
+
+
+## 1971. Find if Path Exists in Graph | Easy
+related: 323, 547
+tags: union-find, bfs
+
+Union every edge, then check whether `source` and `destination` share a root (or BFS from the source).
+
+**Complexity:** O(E · α(V)).
+
+```python
+class Solution:
+    def validPath(self, n: int, edges: List[List[int]], source: int, destination: int) -> bool:
+        parent = list(range(n))
+
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        for a, b in edges:
+            parent[find(a)] = find(b)
+        return find(source) == find(destination)
+# test
+assert Solution().validPath(3, [[0, 1], [1, 2], [2, 0]], 0, 2) is True
+assert Solution().validPath(6, [[0, 1], [0, 2], [3, 5], [5, 4], [4, 3]], 0, 5) is False
+```
+
+```java
+class Solution {
+    public boolean validPath(int n, int[][] edges, int source, int destination) {
+        int[] p = new int[n];
+        for (int i = 0; i < n; i++) p[i] = i;
+        for (int[] e : edges) p[find(p, e[0])] = find(p, e[1]);
+        return find(p, source) == find(p, destination);
+    }
+
+    private int find(int[] p, int x) {
+        while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; }
+        return x;
+    }
+}
+// test
+check(new Solution().validPath(6, new int[][]{{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}}, 0, 5), false);
+```
+
+## 841. Keys and Rooms | Medium
+related: 547, 1971
+tags: dfs
+
+Rooms are nodes, keys are edges. DFS from room 0; all rooms visited ⇔ true.
+
+**Complexity:** O(V + E).
+
+```python
+class Solution:
+    def canVisitAllRooms(self, rooms: List[List[int]]) -> bool:
+        seen, st = {0}, [0]
+        while st:
+            for k in rooms[st.pop()]:
+                if k not in seen:
+                    seen.add(k)
+                    st.append(k)
+        return len(seen) == len(rooms)
+# test
+assert Solution().canVisitAllRooms([[1], [2], [3], []]) is True
+assert Solution().canVisitAllRooms([[1, 3], [3, 0, 1], [2], [0]]) is False
+```
+
+```java
+class Solution {
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        boolean[] seen = new boolean[rooms.size()];
+        seen[0] = true;
+        Deque<Integer> st = new ArrayDeque<>(List.of(0));
+        int count = 1;
+        while (!st.isEmpty())
+            for (int k : rooms.get(st.pop()))
+                if (!seen[k]) { seen[k] = true; count++; st.push(k); }
+        return count == rooms.size();
+    }
+}
+// test
+check(new Solution().canVisitAllRooms(List.of(List.of(1), List.of(2), List.of(3), List.of())), true);
+```
+
+## 886. Possible Bipartition | Medium
+related: 785
+tags: bfs, coloring
+
+"Dislike" edges must cross groups → is the dislike graph bipartite? 2-color each component with BFS.
+
+**Complexity:** O(V + E).
+
+```python
+class Solution:
+    def possibleBipartition(self, n: int, dislikes: List[List[int]]) -> bool:
+        g = defaultdict(list)
+        for a, b in dislikes:
+            g[a].append(b)
+            g[b].append(a)
+        color = {}
+        for s in range(1, n + 1):
+            if s in color:
+                continue
+            color[s] = 0
+            q = deque([s])
+            while q:
+                u = q.popleft()
+                for v in g[u]:
+                    if v not in color:
+                        color[v] = 1 - color[u]
+                        q.append(v)
+                    elif color[v] == color[u]:
+                        return False
+        return True
+# test
+assert Solution().possibleBipartition(4, [[1, 2], [1, 3], [2, 4]]) is True
+assert Solution().possibleBipartition(3, [[1, 2], [1, 3], [2, 3]]) is False
+```
+
+```java
+class Solution {
+    public boolean possibleBipartition(int n, int[][] dislikes) {
+        List<List<Integer>> g = new ArrayList<>();
+        for (int i = 0; i <= n; i++) g.add(new ArrayList<>());
+        for (int[] d : dislikes) { g.get(d[0]).add(d[1]); g.get(d[1]).add(d[0]); }
+        int[] color = new int[n + 1];
+        Arrays.fill(color, -1);
+        for (int s = 1; s <= n; s++) {
+            if (color[s] != -1) continue;
+            color[s] = 0;
+            Deque<Integer> q = new ArrayDeque<>(List.of(s));
+            while (!q.isEmpty()) {
+                int u = q.poll();
+                for (int v : g.get(u)) {
+                    if (color[v] == -1) { color[v] = 1 - color[u]; q.add(v); }
+                    else if (color[v] == color[u]) return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+// test
+check(new Solution().possibleBipartition(3, new int[][]{{1, 2}, {1, 3}, {2, 3}}), false);
+```
+
+## 990. Satisfiability of Equality Equations | Medium
+related: 399, 684
+tags: union-find
+
+First union all `a==b`; then every `a!=b` must have different roots.
+
+**Complexity:** O(n · α(26)).
+
+```python
+class Solution:
+    def equationsPossible(self, equations: List[str]) -> bool:
+        parent = list(range(26))
+
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        for e in equations:
+            if e[1] == "=":
+                parent[find(ord(e[0]) - 97)] = find(ord(e[3]) - 97)
+        return all(find(ord(e[0]) - 97) != find(ord(e[3]) - 97) for e in equations if e[1] == "!")
+# test
+assert Solution().equationsPossible(["a==b", "b!=a"]) is False
+assert Solution().equationsPossible(["b==a", "a==b"]) is True
+assert Solution().equationsPossible(["a==b", "b==c", "a==c"]) is True
+```
+
+```java
+class Solution {
+    private final int[] p = new int[26];
+
+    private int find(int x) {
+        while (p[x] != x) { p[x] = p[p[x]]; x = p[x]; }
+        return x;
+    }
+
+    public boolean equationsPossible(String[] equations) {
+        for (int i = 0; i < 26; i++) p[i] = i;
+        for (String e : equations) if (e.charAt(1) == '=') p[find(e.charAt(0) - 'a')] = find(e.charAt(3) - 'a');
+        for (String e : equations) if (e.charAt(1) == '!' && find(e.charAt(0) - 'a') == find(e.charAt(3) - 'a')) return false;
+        return true;
+    }
+}
+// test
+check(new Solution().equationsPossible(new String[]{"a==b", "b!=a"}), false);
+```
+
+## 1466. Reorder Routes to Make All Paths Lead to the City Zero | Medium
+related: 207
+tags: dfs, directed-edges
+
+Treat roads as undirected but remember direction: an original edge `a → b` costs 1 when traversed away from 0 (it must be reversed), its reverse costs 0. DFS from 0 summing costs.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def minReorder(self, n: int, connections: List[List[int]]) -> int:
+        g = defaultdict(list)
+        for a, b in connections:
+            g[a].append((b, 1))     # original direction, points away from 0 -> needs flip
+            g[b].append((a, 0))
+        seen, st, flips = {0}, [0], 0
+        while st:
+            u = st.pop()
+            for v, cost in g[u]:
+                if v not in seen:
+                    seen.add(v)
+                    flips += cost
+                    st.append(v)
+        return flips
+# test
+assert Solution().minReorder(6, [[0, 1], [1, 3], [2, 3], [4, 0], [4, 5]]) == 3
+assert Solution().minReorder(5, [[1, 0], [1, 2], [3, 2], [3, 4]]) == 2
+```
+
+```java
+class Solution {
+    public int minReorder(int n, int[][] connections) {
+        List<List<int[]>> g = new ArrayList<>();
+        for (int i = 0; i < n; i++) g.add(new ArrayList<>());
+        for (int[] c : connections) { g.get(c[0]).add(new int[]{c[1], 1}); g.get(c[1]).add(new int[]{c[0], 0}); }
+        boolean[] seen = new boolean[n];
+        seen[0] = true;
+        Deque<Integer> st = new ArrayDeque<>(List.of(0));
+        int flips = 0;
+        while (!st.isEmpty())
+            for (int[] e : g.get(st.pop()))
+                if (!seen[e[0]]) { seen[e[0]] = true; flips += e[1]; st.push(e[0]); }
+        return flips;
+    }
+}
+// test
+check(new Solution().minReorder(6, new int[][]{{0, 1}, {1, 3}, {2, 3}, {4, 0}, {4, 5}}), 3);
+```
+
+## 752. Open the Lock | Medium
+related: 127, 433
+tags: bfs, implicit-graph
+
+States are 4-digit strings; each move turns one wheel ±1 → 8 neighbours. BFS from `"0000"`, skipping deadends.
+
+**Complexity:** O(10⁴ · 8).
+
+```python
+class Solution:
+    def openLock(self, deadends: List[str], target: str) -> int:
+        dead = set(deadends)
+        if "0000" in dead:
+            return -1
+        q, seen, steps = deque(["0000"]), {"0000"}, 0
+        while q:
+            for _ in range(len(q)):
+                cur = q.popleft()
+                if cur == target:
+                    return steps
+                for i in range(4):
+                    d = int(cur[i])
+                    for nd in ((d + 1) % 10, (d - 1) % 10):
+                        nxt = cur[:i] + str(nd) + cur[i + 1:]
+                        if nxt not in seen and nxt not in dead:
+                            seen.add(nxt)
+                            q.append(nxt)
+            steps += 1
+        return -1
+# test
+assert Solution().openLock(["0201", "0101", "0102", "1212", "2002"], "0202") == 6
+assert Solution().openLock(["8888"], "0009") == 1
+assert Solution().openLock(["8887", "8889", "8878", "8898", "8788", "8988", "7888", "9888"], "8888") == -1
+```
+
+```java
+class Solution {
+    public int openLock(String[] deadends, String target) {
+        Set<String> seen = new HashSet<>(Arrays.asList(deadends));
+        if (!seen.add("0000")) return -1;
+        Deque<String> q = new ArrayDeque<>(List.of("0000"));
+        for (int steps = 0; !q.isEmpty(); steps++) {
+            for (int k = q.size(); k > 0; k--) {
+                String cur = q.poll();
+                if (cur.equals(target)) return steps;
+                char[] c = cur.toCharArray();
+                for (int i = 0; i < 4; i++) {
+                    char orig = c[i];
+                    for (int delta : new int[]{1, 9}) {
+                        c[i] = (char) ('0' + (orig - '0' + delta) % 10);
+                        String nxt = new String(c);
+                        if (seen.add(nxt)) q.add(nxt);
+                    }
+                    c[i] = orig;
+                }
+            }
+        }
+        return -1;
+    }
+}
+// test
+check(new Solution().openLock(new String[]{"0201", "0101", "0102", "1212", "2002"}, "0202"), 6);
+```
+
+## 433. Minimum Genetic Mutation | Medium
+related: 127, 752
+tags: bfs
+
+Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank.
+
+**Complexity:** O(B · 8 · 4).
+
+```python
+class Solution:
+    def minMutation(self, startGene: str, endGene: str, bank: List[str]) -> int:
+        valid = set(bank)
+        q, seen, steps = deque([startGene]), {startGene}, 0
+        while q:
+            for _ in range(len(q)):
+                g = q.popleft()
+                if g == endGene:
+                    return steps
+                for i in range(len(g)):
+                    for ch in "ACGT":
+                        nxt = g[:i] + ch + g[i + 1:]
+                        if nxt in valid and nxt not in seen:
+                            seen.add(nxt)
+                            q.append(nxt)
+            steps += 1
+        return -1
+# test
+assert Solution().minMutation("AACCGGTT", "AACCGGTA", ["AACCGGTA"]) == 1
+assert Solution().minMutation("AACCGGTT", "AAACGGTA", ["AACCGGTA", "AACCGCTA", "AAACGGTA"]) == 2
+assert Solution().minMutation("AAAAACCC", "AACCCCCC", ["AAAACCCC", "AAACCCCC", "AACCCCCC"]) == 3
+```
+
+```java
+class Solution {
+    public int minMutation(String startGene, String endGene, String[] bank) {
+        Set<String> valid = new HashSet<>(Arrays.asList(bank)), seen = new HashSet<>(List.of(startGene));
+        Deque<String> q = new ArrayDeque<>(List.of(startGene));
+        for (int steps = 0; !q.isEmpty(); steps++)
+            for (int k = q.size(); k > 0; k--) {
+                String g = q.poll();
+                if (g.equals(endGene)) return steps;
+                char[] c = g.toCharArray();
+                for (int i = 0; i < c.length; i++) {
+                    char orig = c[i];
+                    for (char ch : "ACGT".toCharArray()) {
+                        c[i] = ch;
+                        String nxt = new String(c);
+                        if (valid.contains(nxt) && seen.add(nxt)) q.add(nxt);
+                    }
+                    c[i] = orig;
+                }
+            }
+        return -1;
+    }
+}
+// test
+check(new Solution().minMutation("AACCGGTT", "AAACGGTA", new String[]{"AACCGGTA", "AACCGCTA", "AAACGGTA"}), 2);
+```
+
+## 909. Snakes and Ladders | Medium
+related: 752
+tags: bfs, board-mapping
+
+BFS over squares 1..n². The only tricky part is mapping square `s` to `(row, col)` on a boustrophedon board: `r = (s−1) // n`, `c = (s−1) % n`, reversed on odd rows, and rows counted from the bottom.
+
+**Complexity:** O(n²).
+
+```python
+class Solution:
+    def snakesAndLadders(self, board: List[List[int]]) -> int:
+        n = len(board)
+
+        def cell(s):
+            r, c = divmod(s - 1, n)
+            if r % 2:
+                c = n - 1 - c
+            return board[n - 1 - r][c]
+
+        q, seen, moves = deque([1]), {1}, 0
+        while q:
+            for _ in range(len(q)):
+                s = q.popleft()
+                if s == n * n:
+                    return moves
+                for nxt in range(s + 1, min(s + 6, n * n) + 1):
+                    dest = cell(nxt) if cell(nxt) != -1 else nxt
+                    if dest not in seen:
+                        seen.add(dest)
+                        q.append(dest)
+            moves += 1
+        return -1
+# test
+B = [[-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1],
+     [-1, 35, -1, -1, 13, -1], [-1, -1, -1, -1, -1, -1], [-1, 15, -1, -1, -1, -1]]
+assert Solution().snakesAndLadders(B) == 4
+assert Solution().snakesAndLadders([[-1, -1], [-1, 3]]) == 1
+```
+
+```java
+class Solution {
+    public int snakesAndLadders(int[][] board) {
+        int n = board.length;
+        boolean[] seen = new boolean[n * n + 1];
+        Deque<Integer> q = new ArrayDeque<>(List.of(1));
+        seen[1] = true;
+        for (int moves = 0; !q.isEmpty(); moves++)
+            for (int k = q.size(); k > 0; k--) {
+                int s = q.poll();
+                if (s == n * n) return moves;
+                for (int nxt = s + 1; nxt <= Math.min(s + 6, n * n); nxt++) {
+                    int r = (nxt - 1) / n, c = (nxt - 1) % n;
+                    if (r % 2 == 1) c = n - 1 - c;
+                    int v = board[n - 1 - r][c], dest = v == -1 ? nxt : v;
+                    if (!seen[dest]) { seen[dest] = true; q.add(dest); }
+                }
+            }
+        return -1;
+    }
+}
+// test
+int[][] B = {{-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1},
+             {-1, 35, -1, -1, 13, -1}, {-1, -1, -1, -1, -1, -1}, {-1, 15, -1, -1, -1, -1}};
+check(new Solution().snakesAndLadders(B), 4);
+```
+
+## 934. Shortest Bridge | Medium
+related: 200, 542
+tags: dfs, multi-source-bfs
+
+Find one island with DFS and mark it; then multi-source BFS from all its cells across water. The BFS level at which you first touch the other island is the number of flips.
+
+**Complexity:** O(n²).
+
+```python
+class Solution:
+    def shortestBridge(self, grid: List[List[int]]) -> int:
+        n = len(grid)
+        start = next((r, c) for r in range(n) for c in range(n) if grid[r][c])
+        q, st = deque(), [start]
+        grid[start[0]][start[1]] = 2
+        while st:                                   # mark island A as 2
+            r, c = st.pop()
+            q.append((r, c))
+            for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 1:
+                    grid[nr][nc] = 2
+                    st.append((nr, nc))
+        steps = 0
+        while q:
+            for _ in range(len(q)):
+                r, c = q.popleft()
+                for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                    if 0 <= nr < n and 0 <= nc < n:
+                        if grid[nr][nc] == 1:
+                            return steps
+                        if grid[nr][nc] == 0:
+                            grid[nr][nc] = 2
+                            q.append((nr, nc))
+            steps += 1
+# test
+assert Solution().shortestBridge([[0, 1], [1, 0]]) == 1
+assert Solution().shortestBridge([[0, 1, 0], [0, 0, 0], [0, 0, 1]]) == 2
+assert Solution().shortestBridge([[1, 1, 1, 1, 1], [1, 0, 0, 0, 1], [1, 0, 1, 0, 1], [1, 0, 0, 0, 1], [1, 1, 1, 1, 1]]) == 1
+```
+
+```java
+class Solution {
+    public int shortestBridge(int[][] grid) {
+        int n = grid.length;
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        Deque<int[]> q = new ArrayDeque<>(), st = new ArrayDeque<>();
+        outer:
+        for (int r = 0; r < n; r++)
+            for (int c = 0; c < n; c++)
+                if (grid[r][c] == 1) { grid[r][c] = 2; st.push(new int[]{r, c}); break outer; }
+        while (!st.isEmpty()) {
+            int[] cur = st.pop();
+            q.add(cur);
+            for (int[] d : dirs) {
+                int nr = cur[0] + d[0], nc = cur[1] + d[1];
+                if (nr >= 0 && nc >= 0 && nr < n && nc < n && grid[nr][nc] == 1) { grid[nr][nc] = 2; st.push(new int[]{nr, nc}); }
+            }
+        }
+        for (int steps = 0; !q.isEmpty(); steps++)
+            for (int k = q.size(); k > 0; k--) {
+                int[] cur = q.poll();
+                for (int[] d : dirs) {
+                    int nr = cur[0] + d[0], nc = cur[1] + d[1];
+                    if (nr < 0 || nc < 0 || nr >= n || nc >= n) continue;
+                    if (grid[nr][nc] == 1) return steps;
+                    if (grid[nr][nc] == 0) { grid[nr][nc] = 2; q.add(new int[]{nr, nc}); }
+                }
+            }
+        return -1;
+    }
+}
+// test
+check(new Solution().shortestBridge(new int[][]{{0, 1, 0}, {0, 0, 0}, {0, 0, 1}}), 2);
+```
