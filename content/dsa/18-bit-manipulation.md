@@ -306,3 +306,161 @@ class Solution {
 check(new Solution().reverse(-123), -321);
 check(new Solution().reverse(1534236469), 0);
 ```
+
+
+## 231. Power of Two | Easy
+related: 191, 338
+tags: bit-trick
+
+A power of two has exactly one set bit: `n > 0 and n & (n − 1) == 0`.
+
+**Complexity:** O(1).
+
+```python
+class Solution:
+    def isPowerOfTwo(self, n: int) -> bool:
+        return n > 0 and n & (n - 1) == 0
+# test
+assert Solution().isPowerOfTwo(16) is True
+assert Solution().isPowerOfTwo(3) is False
+assert Solution().isPowerOfTwo(-16) is False
+```
+
+```java
+class Solution {
+    public boolean isPowerOfTwo(int n) { return n > 0 && (n & (n - 1)) == 0; }
+}
+// test
+check(new Solution().isPowerOfTwo(16), true);
+check(new Solution().isPowerOfTwo(Integer.MIN_VALUE), false);
+```
+
+## 461. Hamming Distance | Easy
+related: 191
+tags: xor, popcount
+
+Differing bits = set bits of `x ^ y`.
+
+**Complexity:** O(1).
+
+```python
+class Solution:
+    def hammingDistance(self, x: int, y: int) -> int:
+        return bin(x ^ y).count("1")
+# test
+assert Solution().hammingDistance(1, 4) == 2
+assert Solution().hammingDistance(3, 1) == 1
+```
+
+```java
+class Solution {
+    public int hammingDistance(int x, int y) { return Integer.bitCount(x ^ y); }
+}
+// test
+check(new Solution().hammingDistance(1, 4), 2);
+```
+
+## 260. Single Number III | Medium
+related: 136, 137
+tags: xor, partition
+
+XOR all → `a ^ b` (non-zero). Its lowest set bit `diff = x & −x` is a bit where a and b differ: split numbers by that bit and XOR each group separately.
+
+**Complexity:** O(n) time, O(1) space.
+
+```python
+class Solution:
+    def singleNumber(self, nums: List[int]) -> List[int]:
+        x = reduce(lambda a, b: a ^ b, nums)
+        diff = x & -x
+        a = 0
+        for v in nums:
+            if v & diff:
+                a ^= v
+        return sorted([a, x ^ a])
+# test
+assert Solution().singleNumber([1, 2, 1, 3, 2, 5]) == [3, 5]
+assert Solution().singleNumber([-1, 0]) == [-1, 0]
+```
+
+```java
+class Solution {
+    public int[] singleNumber(int[] nums) {
+        int x = 0;
+        for (int v : nums) x ^= v;
+        int diff = x & -x, a = 0;
+        for (int v : nums) if ((v & diff) != 0) a ^= v;
+        return new int[]{Math.min(a, x ^ a), Math.max(a, x ^ a)};
+    }
+}
+// test
+check(new Solution().singleNumber(new int[]{1, 2, 1, 3, 2, 5}), new int[]{3, 5});
+```
+
+## 201. Bitwise AND of Numbers Range | Medium
+related: 191
+tags: common-prefix
+
+Any bit that flips somewhere in `[left, right]` becomes 0. The result is the **common binary prefix** of left and right: shift both right until equal, then shift back.
+
+**Complexity:** O(32).
+
+```python
+class Solution:
+    def rangeBitwiseAnd(self, left: int, right: int) -> int:
+        shift = 0
+        while left != right:
+            left, right, shift = left >> 1, right >> 1, shift + 1
+        return left << shift
+# test
+assert Solution().rangeBitwiseAnd(5, 7) == 4
+assert Solution().rangeBitwiseAnd(0, 0) == 0
+assert Solution().rangeBitwiseAnd(1, 2147483647) == 0
+```
+
+```java
+class Solution {
+    public int rangeBitwiseAnd(int left, int right) {
+        while (right > left) right &= right - 1;   // drop lowest set bits until within the prefix
+        return right;
+    }
+}
+// test
+check(new Solution().rangeBitwiseAnd(5, 7), 4);
+check(new Solution().rangeBitwiseAnd(1, 2147483647), 0);
+```
+
+## 89. Gray Code | Medium
+related: 784
+tags: bit-trick
+
+The i-th Gray code is `i ^ (i >> 1)`: consecutive values differ in exactly one bit, and the sequence wraps around.
+
+```viz
+i     000 001 010 011 100 101 110 111
+gray  000 001 011 010 110 111 101 100
+```
+
+**Complexity:** O(2ⁿ).
+
+```python
+class Solution:
+    def grayCode(self, n: int) -> List[int]:
+        return [i ^ (i >> 1) for i in range(1 << n)]
+# test
+g = Solution().grayCode(3)
+assert g == [0, 1, 3, 2, 6, 7, 5, 4]
+assert all(bin(g[i] ^ g[(i + 1) % len(g)]).count("1") == 1 for i in range(len(g)))
+```
+
+```java
+class Solution {
+    public List<Integer> grayCode(int n) {
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < 1 << n; i++) res.add(i ^ (i >> 1));
+        return res;
+    }
+}
+// test
+check(new Solution().grayCode(2), "[0, 1, 3, 2]");
+```

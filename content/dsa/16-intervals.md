@@ -351,3 +351,153 @@ class Solution {
 // test
 check(new Solution().minInterval(new int[][]{{1, 4}, {2, 4}, {3, 6}, {4, 4}}, new int[]{2, 3, 4, 5}), new int[]{3, 3, 1, 4});
 ```
+
+
+## 1288. Remove Covered Intervals | Medium
+related: 56, 435
+tags: sort-by-start
+
+Sort by start ascending and end **descending** (so a longer interval with the same start comes first). Sweep tracking the max end; an interval whose end ≤ max end is covered.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def removeCoveredIntervals(self, intervals: List[List[int]]) -> int:
+        keep, max_end = 0, -1
+        for s, e in sorted(intervals, key=lambda x: (x[0], -x[1])):
+            if e > max_end:
+                keep += 1
+                max_end = e
+        return keep
+# test
+assert Solution().removeCoveredIntervals([[1, 4], [3, 6], [2, 8]]) == 2
+assert Solution().removeCoveredIntervals([[1, 4], [2, 3]]) == 1
+```
+
+```java
+class Solution {
+    public int removeCoveredIntervals(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> a[0] != b[0] ? a[0] - b[0] : b[1] - a[1]);
+        int keep = 0, maxEnd = -1;
+        for (int[] iv : intervals) if (iv[1] > maxEnd) { keep++; maxEnd = iv[1]; }
+        return keep;
+    }
+}
+// test
+check(new Solution().removeCoveredIntervals(new int[][]{{1, 4}, {3, 6}, {2, 8}}), 2);
+```
+
+## 729. My Calendar I | Medium
+related: 731, 56
+tags: sorted-map, design
+
+Keep booked intervals sorted by start. A new `[s, e)` is fine iff it ends before the next booking starts and starts after the previous booking ends — one binary search (Java `TreeMap.floorKey/ceilingKey`).
+
+**Complexity:** O(log n) per booking (O(n) insert for a Python list).
+
+```python
+class MyCalendar:
+    def __init__(self):
+        self.starts, self.ends = [], []
+
+    def book(self, start: int, end: int) -> bool:
+        i = bisect.bisect_right(self.starts, start)
+        if i > 0 and self.ends[i - 1] > start:          # previous overlaps
+            return False
+        if i < len(self.starts) and self.starts[i] < end:   # next overlaps
+            return False
+        self.starts.insert(i, start)
+        self.ends.insert(i, end)
+        return True
+# test
+c = MyCalendar()
+assert [c.book(10, 20), c.book(15, 25), c.book(20, 30)] == [True, False, True]
+```
+
+```java
+class MyCalendar {
+    private final TreeMap<Integer, Integer> cal = new TreeMap<>();   // start -> end
+
+    public boolean book(int start, int end) {
+        Integer prev = cal.floorKey(start), next = cal.ceilingKey(start);
+        if (prev != null && cal.get(prev) > start) return false;
+        if (next != null && next < end) return false;
+        cal.put(start, end);
+        return true;
+    }
+}
+// test
+MyCalendar c = new MyCalendar();
+check(c.book(10, 20), true);
+check(c.book(15, 25), false);
+check(c.book(20, 30), true);
+```
+
+## 352. Data Stream as Disjoint Intervals | Hard
+related: 57, 228
+tags: sorted-map, merging
+
+Store disjoint intervals keyed by start in a sorted structure. On `addNum(v)`: find the interval ending at or after `v−1` from the left and the one starting at `v+1`; merge with either, both, or create `[v, v]`.
+
+**Complexity:** O(log n) per add with a balanced tree; `getIntervals` O(n).
+
+```python
+class SummaryRanges:
+    def __init__(self):
+        self.iv = []                                   # sorted, disjoint [start, end]
+
+    def addNum(self, value: int) -> None:
+        iv = self.iv
+        i = bisect.bisect_left(iv, [value + 1])        # first interval starting > value
+        if i > 0 and iv[i - 1][1] >= value:            # already covered
+            return
+        left = i > 0 and iv[i - 1][1] == value - 1
+        right = i < len(iv) and iv[i][0] == value + 1
+        if left and right:
+            iv[i - 1][1] = iv[i][1]
+            iv.pop(i)
+        elif left:
+            iv[i - 1][1] = value
+        elif right:
+            iv[i][0] = value
+        else:
+            iv.insert(i, [value, value])
+
+    def getIntervals(self) -> List[List[int]]:
+        return [x[:] for x in self.iv]
+# test
+sr = SummaryRanges()
+out = []
+for v in (1, 3, 7, 2, 6):
+    sr.addNum(v)
+    out.append(sr.getIntervals())
+assert out == [[[1, 1]], [[1, 1], [3, 3]], [[1, 1], [3, 3], [7, 7]], [[1, 3], [7, 7]], [[1, 3], [6, 7]]]
+```
+
+```java
+class SummaryRanges {
+    private final TreeMap<Integer, Integer> iv = new TreeMap<>();   // start -> end
+
+    public void addNum(int value) {
+        Integer lo = iv.floorKey(value), hi = iv.ceilingKey(value + 1);
+        if (lo != null && iv.get(lo) >= value) return;
+        boolean left = lo != null && iv.get(lo) == value - 1, right = hi != null && hi == value + 1;
+        if (left && right) { iv.put(lo, iv.get(hi)); iv.remove(hi); }
+        else if (left) iv.put(lo, value);
+        else if (right) { iv.put(value, iv.get(hi)); iv.remove(hi); }
+        else iv.put(value, value);
+    }
+
+    public int[][] getIntervals() {
+        int[][] res = new int[iv.size()][];
+        int i = 0;
+        for (Map.Entry<Integer, Integer> e : iv.entrySet()) res[i++] = new int[]{e.getKey(), e.getValue()};
+        return res;
+    }
+}
+// test
+SummaryRanges sr = new SummaryRanges();
+for (int v : new int[]{1, 3, 7, 2, 6}) sr.addNum(v);
+check(sr.getIntervals(), new int[][]{{1, 3}, {6, 7}});
+```

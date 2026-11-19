@@ -598,3 +598,311 @@ check(ds.count(new int[]{11, 10}), 1);
 ds.add(new int[]{11, 2});
 check(ds.count(new int[]{11, 10}), 2);
 ```
+
+
+## 9. Palindrome Number | Easy
+related: 125, 7
+tags: math
+
+Negative numbers and numbers ending in 0 (except 0) aren't palindromes. Reverse only the **second half** of the digits and compare with the first half — no overflow risk.
+
+**Complexity:** O(log x).
+
+```python
+class Solution:
+    def isPalindrome(self, x: int) -> bool:
+        if x < 0 or (x % 10 == 0 and x != 0):
+            return False
+        rev = 0
+        while x > rev:
+            x, d = divmod(x, 10)
+            rev = rev * 10 + d
+        return x == rev or x == rev // 10
+# test
+assert Solution().isPalindrome(121) is True
+assert Solution().isPalindrome(-121) is False
+assert Solution().isPalindrome(10) is False
+assert Solution().isPalindrome(1221) is True
+```
+
+```java
+class Solution {
+    public boolean isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) return false;
+        int rev = 0;
+        while (x > rev) { rev = rev * 10 + x % 10; x /= 10; }
+        return x == rev || x == rev / 10;
+    }
+}
+// test
+check(new Solution().isPalindrome(121), true);
+check(new Solution().isPalindrome(10), false);
+```
+
+## 67. Add Binary | Easy
+related: 2, 415
+tags: carry
+
+Add from the right with a carry, like decimal addition in base 2.
+
+**Complexity:** O(max(m, n)).
+
+```python
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        i, j, carry, out = len(a) - 1, len(b) - 1, 0, []
+        while i >= 0 or j >= 0 or carry:
+            s = carry + (int(a[i]) if i >= 0 else 0) + (int(b[j]) if j >= 0 else 0)
+            out.append(str(s % 2))
+            carry = s // 2
+            i, j = i - 1, j - 1
+        return "".join(reversed(out))
+# test
+assert Solution().addBinary("11", "1") == "100"
+assert Solution().addBinary("1010", "1011") == "10101"
+```
+
+```java
+class Solution {
+    public String addBinary(String a, String b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = a.length() - 1, j = b.length() - 1, carry = 0; i >= 0 || j >= 0 || carry > 0; i--, j--) {
+            int s = carry + (i >= 0 ? a.charAt(i) - '0' : 0) + (j >= 0 ? b.charAt(j) - '0' : 0);
+            sb.append(s % 2);
+            carry = s / 2;
+        }
+        return sb.reverse().toString();
+    }
+}
+// test
+check(new Solution().addBinary("1010", "1011"), "10101");
+```
+
+## 172. Factorial Trailing Zeroes | Medium
+related: 204
+tags: math
+
+Each trailing zero needs a factor 10 = 2 · 5, and 2s are plentiful, so count factors of 5: `n/5 + n/25 + n/125 + …`.
+
+**Complexity:** O(log n).
+
+```python
+class Solution:
+    def trailingZeroes(self, n: int) -> int:
+        count = 0
+        while n:
+            n //= 5
+            count += n
+        return count
+# test
+assert Solution().trailingZeroes(3) == 0
+assert Solution().trailingZeroes(5) == 1
+assert Solution().trailingZeroes(100) == 24
+```
+
+```java
+class Solution {
+    public int trailingZeroes(int n) {
+        int count = 0;
+        while (n > 0) { n /= 5; count += n; }
+        return count;
+    }
+}
+// test
+check(new Solution().trailingZeroes(100), 24);
+```
+
+## 59. Spiral Matrix II | Medium
+related: 54
+tags: matrix, boundaries
+
+Same four boundaries as Spiral Matrix, but write `1..n²` instead of reading.
+
+**Complexity:** O(n²).
+
+```python
+class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        m = [[0] * n for _ in range(n)]
+        top, bottom, left, right, k = 0, n - 1, 0, n - 1, 1
+        while top <= bottom:
+            for c in range(left, right + 1):
+                m[top][c] = k; k += 1
+            for r in range(top + 1, bottom + 1):
+                m[r][right] = k; k += 1
+            for c in range(right - 1, left - 1, -1):
+                if top < bottom:
+                    m[bottom][c] = k; k += 1
+            for r in range(bottom - 1, top, -1):
+                if left < right:
+                    m[r][left] = k; k += 1
+            top, bottom, left, right = top + 1, bottom - 1, left + 1, right - 1
+        return m
+# test
+assert Solution().generateMatrix(3) == [[1, 2, 3], [8, 9, 4], [7, 6, 5]]
+assert Solution().generateMatrix(1) == [[1]]
+```
+
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] m = new int[n][n];
+        int top = 0, bottom = n - 1, left = 0, right = n - 1, k = 1;
+        while (top <= bottom) {
+            for (int c = left; c <= right; c++) m[top][c] = k++;
+            for (int r = top + 1; r <= bottom; r++) m[r][right] = k++;
+            if (top < bottom) for (int c = right - 1; c >= left; c--) m[bottom][c] = k++;
+            if (left < right) for (int r = bottom - 1; r > top; r--) m[r][left] = k++;
+            top++; bottom--; left++; right--;
+        }
+        return m;
+    }
+}
+// test
+check(new Solution().generateMatrix(3), new int[][]{{1, 2, 3}, {8, 9, 4}, {7, 6, 5}});
+```
+
+## 8. String to Integer (atoi) | Medium
+related: 7, 65
+tags: parsing, overflow
+
+Skip spaces, read an optional sign, read digits until a non-digit; clamp to `[−2³¹, 2³¹−1]` (check before multiplying in Java).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def myAtoi(self, s: str) -> int:
+        i, n = 0, len(s)
+        while i < n and s[i] == " ":
+            i += 1
+        sign = 1
+        if i < n and s[i] in "+-":
+            sign = -1 if s[i] == "-" else 1
+            i += 1
+        num = 0
+        while i < n and s[i].isdigit():
+            num = num * 10 + int(s[i])
+            i += 1
+        return max(-2 ** 31, min(2 ** 31 - 1, sign * num))
+# test
+assert Solution().myAtoi("42") == 42
+assert Solution().myAtoi("   -042") == -42
+assert Solution().myAtoi("1337c0d3") == 1337
+assert Solution().myAtoi("0-1") == 0
+assert Solution().myAtoi("-91283472332") == -2147483648
+```
+
+```java
+class Solution {
+    public int myAtoi(String s) {
+        int i = 0, n = s.length(), sign = 1, num = 0;
+        while (i < n && s.charAt(i) == ' ') i++;
+        if (i < n && (s.charAt(i) == '+' || s.charAt(i) == '-')) sign = s.charAt(i++) == '-' ? -1 : 1;
+        while (i < n && Character.isDigit(s.charAt(i))) {
+            int d = s.charAt(i++) - '0';
+            if (num > (Integer.MAX_VALUE - d) / 10) return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            num = num * 10 + d;
+        }
+        return sign * num;
+    }
+}
+// test
+check(new Solution().myAtoi("   -042"), -42);
+check(new Solution().myAtoi("-91283472332"), -2147483648);
+check(new Solution().myAtoi("2147483648"), 2147483647);
+```
+
+## 29. Divide Two Integers | Medium
+related: 50, 371
+tags: bit-shifting
+
+No `*`, `/`, `%`: subtract the **largest doubled divisor** (`divisor << k`) that fits, adding `1 << k` to the quotient. Work with negatives (or longs) to dodge the `−2³¹` overflow; the only overflow case is `−2³¹ / −1`.
+
+**Complexity:** O(log² n) (O(log n) with a precomputed shift list).
+
+```python
+class Solution:
+    def divide(self, dividend: int, divisor: int) -> int:
+        if dividend == -2 ** 31 and divisor == -1:
+            return 2 ** 31 - 1
+        neg = (dividend < 0) != (divisor < 0)
+        a, b, q = abs(dividend), abs(divisor), 0
+        while a >= b:
+            k = 0
+            while a >= b << (k + 1):
+                k += 1
+            a -= b << k
+            q += 1 << k
+        return -q if neg else q
+# test
+assert Solution().divide(10, 3) == 3
+assert Solution().divide(7, -3) == -2
+assert Solution().divide(-2147483648, -1) == 2147483647
+assert Solution().divide(-2147483648, 2) == -1073741824
+```
+
+```java
+class Solution {
+    public int divide(int dividend, int divisor) {
+        if (dividend == Integer.MIN_VALUE && divisor == -1) return Integer.MAX_VALUE;
+        boolean neg = (dividend < 0) != (divisor < 0);
+        long a = Math.abs((long) dividend), b = Math.abs((long) divisor), q = 0;
+        while (a >= b) {
+            int k = 0;
+            while (a >= (b << (k + 1))) k++;
+            a -= b << k;
+            q += 1L << k;
+        }
+        return (int) (neg ? -q : q);
+    }
+}
+// test
+check(new Solution().divide(7, -3), -2);
+check(new Solution().divide(-2147483648, -1), 2147483647);
+```
+
+## 470. Implement Rand10() Using Rand7() | Medium
+related: 528
+tags: rejection-sampling
+
+`(rand7() − 1) · 7 + rand7()` is uniform on 1..49. Accept values ≤ 40 (a multiple of 10) and return `(v − 1) % 10 + 1`; otherwise retry. Expected ~2.45 calls to rand7 per rand10.
+
+**Complexity:** O(1) expected.
+
+```python
+class Solution:
+    def rand10(self) -> int:
+        while True:
+            v = (rand7() - 1) * 7 + rand7()     # rand7 provided by LeetCode
+            if v <= 40:
+                return (v - 1) % 10 + 1
+# test
+random.seed(7)
+def rand7(): return random.randint(1, 7)
+cnt = Counter(Solution().rand10() for _ in range(20000))
+assert set(cnt) == set(range(1, 11)) and all(1800 < c < 2200 for c in cnt.values())
+```
+
+```java
+class SolBase { // provided by LeetCode
+    private final Random rnd = new Random(7);
+    int rand7() { return rnd.nextInt(7) + 1; }
+}
+
+class Solution extends SolBase {
+    public int rand10() {
+        while (true) {
+            int v = (rand7() - 1) * 7 + rand7();
+            if (v <= 40) return (v - 1) % 10 + 1;
+        }
+    }
+}
+// test
+Solution s = new Solution();
+int[] cnt = new int[11];
+for (int i = 0; i < 20000; i++) cnt[s.rand10()]++;
+boolean ok = true;
+for (int d = 1; d <= 10; d++) ok &= cnt[d] > 1800 && cnt[d] < 2200;
+check(ok, true);
+```

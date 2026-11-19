@@ -524,3 +524,273 @@ class Solution {
 int[][] P = {{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}};
 check(new Solution().reconstructQueue(P), new int[][]{{5, 0}, {7, 0}, {5, 2}, {6, 1}, {4, 4}, {7, 1}});
 ```
+
+
+## 455. Assign Cookies | Easy
+related: 881
+tags: sort, two-pointers
+
+Sort both. Give the smallest cookie that satisfies the least greedy child; a cookie too small for this child is too small for everyone after.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def findContentChildren(self, g: List[int], s: List[int]) -> int:
+        g.sort(); s.sort()
+        child = 0
+        for size in s:
+            if child < len(g) and size >= g[child]:
+                child += 1
+        return child
+# test
+assert Solution().findContentChildren([1, 2, 3], [1, 1]) == 1
+assert Solution().findContentChildren([1, 2], [1, 2, 3]) == 2
+```
+
+```java
+class Solution {
+    public int findContentChildren(int[] g, int[] s) {
+        Arrays.sort(g); Arrays.sort(s);
+        int child = 0;
+        for (int size : s) if (child < g.length && size >= g[child]) child++;
+        return child;
+    }
+}
+// test
+check(new Solution().findContentChildren(new int[]{1, 2}, new int[]{1, 2, 3}), 2);
+```
+
+## 860. Lemonade Change | Easy
+related: 455
+tags: simulation
+
+Track 5s and 10s. For a 20, prefer giving `10 + 5` (keeps 5s, which are more flexible) over `5 + 5 + 5`.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def lemonadeChange(self, bills: List[int]) -> bool:
+        five = ten = 0
+        for b in bills:
+            if b == 5:
+                five += 1
+            elif b == 10:
+                five, ten = five - 1, ten + 1
+            elif ten:
+                five, ten = five - 1, ten - 1
+            else:
+                five -= 3
+            if five < 0:
+                return False
+        return True
+# test
+assert Solution().lemonadeChange([5, 5, 5, 10, 20]) is True
+assert Solution().lemonadeChange([5, 5, 10, 10, 20]) is False
+```
+
+```java
+class Solution {
+    public boolean lemonadeChange(int[] bills) {
+        int five = 0, ten = 0;
+        for (int b : bills) {
+            if (b == 5) five++;
+            else if (b == 10) { five--; ten++; }
+            else if (ten > 0) { five--; ten--; }
+            else five -= 3;
+            if (five < 0) return false;
+        }
+        return true;
+    }
+}
+// test
+check(new Solution().lemonadeChange(new int[]{5, 5, 10, 10, 20}), false);
+```
+
+## 1029. Two City Scheduling | Medium
+related: 406
+tags: sort, exchange-argument
+
+Send everyone to A, then switch the n people with the most negative `costB − costA` to B. Equivalently, sort by `costA − costB`: first half → A, second half → B.
+
+**Complexity:** O(n log n).
+
+```python
+class Solution:
+    def twoCitySchedCost(self, costs: List[List[int]]) -> int:
+        costs.sort(key=lambda c: c[0] - c[1])
+        n = len(costs) // 2
+        return sum(a for a, _ in costs[:n]) + sum(b for _, b in costs[n:])
+# test
+assert Solution().twoCitySchedCost([[10, 20], [30, 200], [400, 50], [30, 20]]) == 110
+assert Solution().twoCitySchedCost([[259, 770], [448, 54], [926, 667], [184, 139], [840, 118], [577, 469]]) == 1859
+```
+
+```java
+class Solution {
+    public int twoCitySchedCost(int[][] costs) {
+        Arrays.sort(costs, (x, y) -> (x[0] - x[1]) - (y[0] - y[1]));
+        int n = costs.length / 2, total = 0;
+        for (int i = 0; i < costs.length; i++) total += i < n ? costs[i][0] : costs[i][1];
+        return total;
+    }
+}
+// test
+check(new Solution().twoCitySchedCost(new int[][]{{10, 20}, {30, 200}, {400, 50}, {30, 20}}), 110);
+```
+
+## 649. Dota2 Senate | Medium
+related: 1834
+tags: queue, simulation
+
+Two queues of senator indices. The earlier senator bans the other; the winner re-enters with index `+ n` (next round).
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def predictPartyVictory(self, senate: str) -> str:
+        n = len(senate)
+        r = deque(i for i, c in enumerate(senate) if c == "R")
+        d = deque(i for i, c in enumerate(senate) if c == "D")
+        while r and d:
+            a, b = r.popleft(), d.popleft()
+            if a < b:
+                r.append(a + n)
+            else:
+                d.append(b + n)
+        return "Radiant" if r else "Dire"
+# test
+assert Solution().predictPartyVictory("RD") == "Radiant"
+assert Solution().predictPartyVictory("RDD") == "Dire"
+```
+
+```java
+class Solution {
+    public String predictPartyVictory(String senate) {
+        int n = senate.length();
+        Deque<Integer> r = new ArrayDeque<>(), d = new ArrayDeque<>();
+        for (int i = 0; i < n; i++) (senate.charAt(i) == 'R' ? r : d).add(i);
+        while (!r.isEmpty() && !d.isEmpty()) {
+            int a = r.poll(), b = d.poll();
+            if (a < b) r.add(a + n); else d.add(b + n);
+        }
+        return r.isEmpty() ? "Dire" : "Radiant";
+    }
+}
+// test
+check(new Solution().predictPartyVictory("RDD"), "Dire");
+```
+
+## 659. Split Array into Consecutive Subsequences | Medium
+related: 846
+tags: greedy, hash-map
+
+Greedy: each number first tries to **extend** a sequence ending at `x−1` (`ends[x−1] > 0`); otherwise it must **start** a new sequence `x, x+1, x+2` (needs those available). If neither works → false.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def isPossible(self, nums: List[int]) -> bool:
+        left, ends = Counter(nums), Counter()
+        for x in nums:
+            if not left[x]:
+                continue
+            left[x] -= 1
+            if ends[x - 1]:
+                ends[x - 1] -= 1
+                ends[x] += 1
+            elif left[x + 1] and left[x + 2]:
+                left[x + 1] -= 1
+                left[x + 2] -= 1
+                ends[x + 2] += 1
+            else:
+                return False
+        return True
+# test
+assert Solution().isPossible([1, 2, 3, 3, 4, 5]) is True
+assert Solution().isPossible([1, 2, 3, 3, 4, 4, 5, 5]) is True
+assert Solution().isPossible([1, 2, 3, 4, 4, 5]) is False
+```
+
+```java
+class Solution {
+    public boolean isPossible(int[] nums) {
+        Map<Integer, Integer> left = new HashMap<>(), ends = new HashMap<>();
+        for (int x : nums) left.merge(x, 1, Integer::sum);
+        for (int x : nums) {
+            if (left.getOrDefault(x, 0) == 0) continue;
+            left.merge(x, -1, Integer::sum);
+            if (ends.getOrDefault(x - 1, 0) > 0) {
+                ends.merge(x - 1, -1, Integer::sum);
+                ends.merge(x, 1, Integer::sum);
+            } else if (left.getOrDefault(x + 1, 0) > 0 && left.getOrDefault(x + 2, 0) > 0) {
+                left.merge(x + 1, -1, Integer::sum);
+                left.merge(x + 2, -1, Integer::sum);
+                ends.merge(x + 2, 1, Integer::sum);
+            } else return false;
+        }
+        return true;
+    }
+}
+// test
+check(new Solution().isPossible(new int[]{1, 2, 3, 3, 4, 4, 5, 5}), true);
+check(new Solution().isPossible(new int[]{1, 2, 3, 4, 4, 5}), false);
+```
+
+## 1326. Minimum Number of Taps to Open to Water a Garden | Hard
+related: 45, 1024
+tags: greedy, reach
+
+Convert each tap to an interval and record, for every left end, the farthest right reach. Then it's **Jump Game II** over `[0, n]`: greedily extend the covered range level by level; a gap → −1.
+
+**Complexity:** O(n).
+
+```python
+class Solution:
+    def minTaps(self, n: int, ranges: List[int]) -> int:
+        reach = [0] * (n + 1)
+        for i, r in enumerate(ranges):
+            lo, hi = max(0, i - r), min(n, i + r)
+            reach[lo] = max(reach[lo], hi)
+        taps = end = far = 0
+        for i in range(n):
+            far = max(far, reach[i])
+            if i == end:
+                if far <= i:
+                    return -1
+                taps += 1
+                end = far
+        return taps
+# test
+assert Solution().minTaps(5, [3, 4, 1, 1, 0, 0]) == 1
+assert Solution().minTaps(3, [0, 0, 0, 0]) == -1
+assert Solution().minTaps(7, [1, 2, 1, 0, 2, 1, 0, 1]) == 3
+```
+
+```java
+class Solution {
+    public int minTaps(int n, int[] ranges) {
+        int[] reach = new int[n + 1];
+        for (int i = 0; i <= n; i++) {
+            int lo = Math.max(0, i - ranges[i]), hi = Math.min(n, i + ranges[i]);
+            reach[lo] = Math.max(reach[lo], hi);
+        }
+        int taps = 0, end = 0, far = 0;
+        for (int i = 0; i < n; i++) {
+            far = Math.max(far, reach[i]);
+            if (i == end) {
+                if (far <= i) return -1;
+                taps++;
+                end = far;
+            }
+        }
+        return taps;
+    }
+}
+// test
+check(new Solution().minTaps(7, new int[]{1, 2, 1, 0, 2, 1, 0, 1}), 3);
+check(new Solution().minTaps(3, new int[]{0, 0, 0, 0}), -1);
+```
