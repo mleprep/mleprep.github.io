@@ -631,3 +631,455 @@ check(hm.get(1010), 7);
 hm.remove(2);
 check(hm.get(2), -1);
 ```
+
+
+## 1472. Design Browser History | Medium
+related: 155
+tags: array, pointer
+
+Array of pages + `cur` index + `last` (the end of the valid forward history). `visit` overwrites at `cur+1` and truncates forward history by setting `last = cur`.
+
+**Complexity:** O(1) per operation.
+
+```python
+class BrowserHistory:
+    def __init__(self, homepage: str):
+        self.pages, self.cur, self.last = [homepage], 0, 0
+
+    def visit(self, url: str) -> None:
+        self.cur += 1
+        if self.cur == len(self.pages):
+            self.pages.append(url)
+        else:
+            self.pages[self.cur] = url
+        self.last = self.cur
+
+    def back(self, steps: int) -> str:
+        self.cur = max(0, self.cur - steps)
+        return self.pages[self.cur]
+
+    def forward(self, steps: int) -> str:
+        self.cur = min(self.last, self.cur + steps)
+        return self.pages[self.cur]
+# test
+b = BrowserHistory("leetcode.com")
+for u in ("google.com", "facebook.com", "youtube.com"):
+    b.visit(u)
+assert b.back(1) == "facebook.com" and b.back(1) == "google.com" and b.forward(1) == "facebook.com"
+b.visit("linkedin.com")
+assert b.forward(2) == "linkedin.com" and b.back(2) == "google.com" and b.back(7) == "leetcode.com"
+```
+
+```java
+class BrowserHistory {
+    private final List<String> pages = new ArrayList<>();
+    private int cur = 0, last = 0;
+
+    public BrowserHistory(String homepage) { pages.add(homepage); }
+
+    public void visit(String url) {
+        cur++;
+        if (cur == pages.size()) pages.add(url); else pages.set(cur, url);
+        last = cur;
+    }
+
+    public String back(int steps) { cur = Math.max(0, cur - steps); return pages.get(cur); }
+    public String forward(int steps) { cur = Math.min(last, cur + steps); return pages.get(cur); }
+}
+// test
+BrowserHistory b = new BrowserHistory("leetcode.com");
+b.visit("google.com"); b.visit("facebook.com"); b.visit("youtube.com");
+check(b.back(2), "google.com");
+b.visit("linkedin.com");
+check(b.forward(2), "linkedin.com");
+check(b.back(7), "leetcode.com");
+```
+
+## 1396. Design Underground System | Medium
+related: 146
+tags: hash-map
+
+`checkIn` stores `id → (station, time)`; `checkOut` pops it and accumulates `(start, end) → [total time, trips]`.
+
+**Complexity:** O(1) per operation.
+
+```python
+class UndergroundSystem:
+    def __init__(self):
+        self.active, self.stats = {}, defaultdict(lambda: [0, 0])
+
+    def checkIn(self, id: int, stationName: str, t: int) -> None:
+        self.active[id] = (stationName, t)
+
+    def checkOut(self, id: int, stationName: str, t: int) -> None:
+        start, t0 = self.active.pop(id)
+        s = self.stats[(start, stationName)]
+        s[0] += t - t0
+        s[1] += 1
+
+    def getAverageTime(self, startStation: str, endStation: str) -> float:
+        total, n = self.stats[(startStation, endStation)]
+        return total / n
+# test
+u = UndergroundSystem()
+u.checkIn(45, "Leyton", 3); u.checkIn(32, "Paradise", 8); u.checkIn(27, "Leyton", 10)
+u.checkOut(45, "Waterloo", 15); u.checkOut(27, "Waterloo", 20); u.checkOut(32, "Cambridge", 22)
+assert u.getAverageTime("Paradise", "Cambridge") == 14.0 and u.getAverageTime("Leyton", "Waterloo") == 11.0
+```
+
+```java
+class UndergroundSystem {
+    private final Map<Integer, Object[]> active = new HashMap<>();   // id -> {station, time}
+    private final Map<String, long[]> stats = new HashMap<>();       // "a->b" -> {total, trips}
+
+    public void checkIn(int id, String stationName, int t) { active.put(id, new Object[]{stationName, t}); }
+
+    public void checkOut(int id, String stationName, int t) {
+        Object[] in = active.remove(id);
+        long[] s = stats.computeIfAbsent(in[0] + "->" + stationName, k -> new long[2]);
+        s[0] += t - (int) in[1];
+        s[1]++;
+    }
+
+    public double getAverageTime(String startStation, String endStation) {
+        long[] s = stats.get(startStation + "->" + endStation);
+        return (double) s[0] / s[1];
+    }
+}
+// test
+UndergroundSystem u = new UndergroundSystem();
+u.checkIn(45, "Leyton", 3); u.checkIn(27, "Leyton", 10);
+u.checkOut(45, "Waterloo", 15); u.checkOut(27, "Waterloo", 20);
+check(u.getAverageTime("Leyton", "Waterloo"), 11.0);
+```
+
+## 1352. Product of the Last K Numbers | Medium
+related: 238, 303
+tags: prefix-product
+
+Keep prefix products; a 0 resets the list (any window containing it is 0). `getProduct(k)` = `pre[-1] / pre[-1-k]`, or 0 if k reaches past the last reset.
+
+**Complexity:** O(1) per operation.
+
+```python
+class ProductOfNumbers:
+    def __init__(self):
+        self.pre = [1]
+
+    def add(self, num: int) -> None:
+        if num == 0:
+            self.pre = [1]
+        else:
+            self.pre.append(self.pre[-1] * num)
+
+    def getProduct(self, k: int) -> int:
+        if k >= len(self.pre):
+            return 0
+        return self.pre[-1] // self.pre[-1 - k]
+# test
+p = ProductOfNumbers()
+for x in (3, 0, 2, 5, 4):
+    p.add(x)
+assert [p.getProduct(2), p.getProduct(3), p.getProduct(4)] == [20, 40, 0]
+p.add(8)
+assert p.getProduct(2) == 32
+```
+
+```java
+class ProductOfNumbers {
+    private final List<Integer> pre = new ArrayList<>(List.of(1));
+
+    public void add(int num) {
+        if (num == 0) { pre.clear(); pre.add(1); }
+        else pre.add(pre.get(pre.size() - 1) * num);
+    }
+
+    public int getProduct(int k) {
+        int n = pre.size();
+        return k >= n ? 0 : pre.get(n - 1) / pre.get(n - 1 - k);
+    }
+}
+// test
+ProductOfNumbers p = new ProductOfNumbers();
+for (int x : new int[]{3, 0, 2, 5, 4}) p.add(x);
+check(p.getProduct(3), 40);
+check(p.getProduct(4), 0);
+```
+
+## 284. Peeking Iterator | Medium
+related: 341, 173
+tags: iterator, design
+
+Cache the next element: `peek` returns the cache; `next` returns it and refills from the underlying iterator.
+
+**Complexity:** O(1) per call.
+
+```python
+class PeekingIterator:
+    def __init__(self, iterator):
+        self.it = iterator
+        self.nxt = iterator.next() if iterator.hasNext() else None
+        self.has = self.nxt is not None or iterator.hasNext()
+
+    def peek(self):
+        return self.nxt
+
+    def next(self):
+        val = self.nxt
+        self.has = self.it.hasNext()
+        self.nxt = self.it.next() if self.has else None
+        return val
+
+    def hasNext(self):
+        return self.has
+# test
+class Iterator:   # LeetCode's interface, minimal stand-in
+    def __init__(self, nums): self.nums, self.i = nums, 0
+    def hasNext(self): return self.i < len(self.nums)
+    def next(self): self.i += 1; return self.nums[self.i - 1]
+pi = PeekingIterator(Iterator([1, 2, 3]))
+assert [pi.next(), pi.peek(), pi.next(), pi.next(), pi.hasNext()] == [1, 2, 2, 3, False]
+```
+
+```java
+class PeekingIterator implements Iterator<Integer> {
+    private final Iterator<Integer> it;
+    private Integer nxt;
+
+    public PeekingIterator(Iterator<Integer> iterator) {
+        it = iterator;
+        nxt = it.hasNext() ? it.next() : null;
+    }
+
+    public Integer peek() { return nxt; }
+
+    @Override
+    public Integer next() {
+        Integer val = nxt;
+        nxt = it.hasNext() ? it.next() : null;
+        return val;
+    }
+
+    @Override
+    public boolean hasNext() { return nxt != null; }
+}
+// test
+PeekingIterator pi = new PeekingIterator(List.of(1, 2, 3).iterator());
+check(pi.next(), 1);
+check(pi.peek(), 2);
+check(pi.next(), 2);
+check(pi.next(), 3);
+check(pi.hasNext(), false);
+```
+
+## 341. Flatten Nested List Iterator | Medium
+related: 284, 385
+tags: stack, iterator
+
+Keep a stack of lists in **reverse** order. `hasNext` does the real work: while the top is a list, pop it and push its children reversed; stop when the top is an integer.
+
+**Complexity:** amortized O(1) per element.
+
+```python
+class NestedInteger:  # LeetCode's interface (minimal stand-in)
+    def __init__(self, v): self.v = v
+    def isInteger(self): return isinstance(self.v, int)
+    def getInteger(self): return self.v
+    def getList(self): return self.v
+
+class NestedIterator:
+    def __init__(self, nestedList: List["NestedInteger"]):
+        self.st = nestedList[::-1]
+
+    def next(self) -> int:
+        return self.st.pop().getInteger()      # hasNext() guarantees an integer on top
+
+    def hasNext(self) -> bool:
+        while self.st and not self.st[-1].isInteger():
+            self.st.extend(reversed(self.st.pop().getList()))
+        return bool(self.st)
+# test
+def wrap(x): return NestedInteger(x if isinstance(x, int) else [wrap(y) for y in x])
+it, out = NestedIterator([wrap(x) for x in [[1, 1], 2, [1, 1]]]), []
+while it.hasNext():
+    out.append(it.next())
+assert out == [1, 1, 2, 1, 1]
+it, out = NestedIterator([wrap(x) for x in [1, [4, [6]], [[]]]]), []
+while it.hasNext():
+    out.append(it.next())
+assert out == [1, 4, 6]
+```
+
+```java
+interface NestedInteger { // provided by LeetCode
+    boolean isInteger();
+    Integer getInteger();
+    List<NestedInteger> getList();
+}
+
+class NI implements NestedInteger { // local stand-in for tests
+    private final Integer v; private final List<NestedInteger> l;
+    NI(int v) { this.v = v; this.l = null; }
+    NI(NestedInteger... xs) { this.v = null; this.l = List.of(xs); }
+    public boolean isInteger() { return v != null; }
+    public Integer getInteger() { return v; }
+    public List<NestedInteger> getList() { return l; }
+}
+
+class NestedIterator implements Iterator<Integer> {
+    private final Deque<NestedInteger> st = new ArrayDeque<>();
+
+    public NestedIterator(List<NestedInteger> nestedList) {
+        for (int i = nestedList.size() - 1; i >= 0; i--) st.push(nestedList.get(i));
+    }
+
+    @Override
+    public Integer next() { hasNext(); return st.pop().getInteger(); }
+
+    @Override
+    public boolean hasNext() {
+        while (!st.isEmpty() && !st.peek().isInteger()) {
+            List<NestedInteger> l = st.pop().getList();
+            for (int i = l.size() - 1; i >= 0; i--) st.push(l.get(i));
+        }
+        return !st.isEmpty();
+    }
+}
+// test
+NestedIterator it = new NestedIterator(List.of(new NI(new NI(1), new NI(1)), new NI(2), new NI(new NI(1), new NI(1))));
+List<Integer> out = new ArrayList<>();
+while (it.hasNext()) out.add(it.next());
+check(out, "[1, 1, 2, 1, 1]");
+```
+
+## 432. All O`one Data Structure | Hard
+related: 460, 146
+tags: linked-list, buckets
+
+Like LFU: a doubly linked list of **count buckets** in increasing order, each holding a set of keys, plus `key → bucket`. `inc`/`dec` move a key to the neighbouring bucket (creating it if the count isn't there), deleting emptied buckets. Min/max = first/last bucket.
+
+```viz
+head <-> [1: {b}] <-> [2: {a, c}] <-> [5: {d}] <-> tail
+getMinKey -> b      getMaxKey -> d      inc(c) -> c moves to new bucket [3]
+```
+
+**Complexity:** O(1) per operation.
+
+```python
+class Bucket:
+    def __init__(self, cnt):
+        self.cnt, self.keys, self.prev, self.next = cnt, set(), None, None
+
+class AllOne:
+    def __init__(self):
+        self.head, self.tail = Bucket(0), Bucket(0)
+        self.head.next, self.tail.prev = self.tail, self.head
+        self.where = {}
+
+    def _after(self, node, cnt):
+        b = Bucket(cnt)
+        b.prev, b.next = node, node.next
+        node.next.prev = b
+        node.next = b
+        return b
+
+    def _drop_if_empty(self, b):
+        if not b.keys:
+            b.prev.next, b.next.prev = b.next, b.prev
+
+    def inc(self, key: str) -> None:
+        cur = self.where.get(key, self.head)
+        nxt = cur.next
+        if nxt is self.tail or nxt.cnt != cur.cnt + 1:
+            nxt = self._after(cur, cur.cnt + 1)
+        nxt.keys.add(key)
+        self.where[key] = nxt
+        if cur is not self.head:
+            cur.keys.discard(key)
+            self._drop_if_empty(cur)
+
+    def dec(self, key: str) -> None:
+        cur = self.where[key]
+        if cur.cnt == 1:
+            del self.where[key]
+        else:
+            prv = cur.prev
+            if prv is self.head or prv.cnt != cur.cnt - 1:
+                prv = self._after(cur.prev, cur.cnt - 1)
+            prv.keys.add(key)
+            self.where[key] = prv
+        cur.keys.discard(key)
+        self._drop_if_empty(cur)
+
+    def getMaxKey(self) -> str:
+        return next(iter(self.tail.prev.keys)) if self.tail.prev is not self.head else ""
+
+    def getMinKey(self) -> str:
+        return next(iter(self.head.next.keys)) if self.head.next is not self.tail else ""
+# test
+a = AllOne()
+a.inc("hello"); a.inc("hello")
+assert a.getMaxKey() == "hello" and a.getMinKey() == "hello"
+a.inc("leet")
+assert a.getMaxKey() == "hello" and a.getMinKey() == "leet"
+a.dec("hello"); a.dec("hello")
+assert a.getMaxKey() == "leet" and a.getMinKey() == "leet"
+a.dec("leet")
+assert a.getMaxKey() == "" and a.getMinKey() == ""
+```
+
+```java
+class AllOne {
+    private static class Bucket {
+        int cnt; Set<String> keys = new HashSet<>(); Bucket prev, next;
+        Bucket(int c) { cnt = c; }
+    }
+
+    private final Bucket head = new Bucket(0), tail = new Bucket(0);
+    private final Map<String, Bucket> where = new HashMap<>();
+
+    public AllOne() { head.next = tail; tail.prev = head; }
+
+    private Bucket after(Bucket node, int cnt) {
+        Bucket b = new Bucket(cnt);
+        b.prev = node; b.next = node.next;
+        node.next.prev = b; node.next = b;
+        return b;
+    }
+
+    private void dropIfEmpty(Bucket b) {
+        if (b.keys.isEmpty()) { b.prev.next = b.next; b.next.prev = b.prev; }
+    }
+
+    public void inc(String key) {
+        Bucket cur = where.getOrDefault(key, head), nxt = cur.next;
+        if (nxt == tail || nxt.cnt != cur.cnt + 1) nxt = after(cur, cur.cnt + 1);
+        nxt.keys.add(key);
+        where.put(key, nxt);
+        if (cur != head) { cur.keys.remove(key); dropIfEmpty(cur); }
+    }
+
+    public void dec(String key) {
+        Bucket cur = where.get(key);
+        if (cur.cnt == 1) where.remove(key);
+        else {
+            Bucket prv = cur.prev;
+            if (prv == head || prv.cnt != cur.cnt - 1) prv = after(cur.prev, cur.cnt - 1);
+            prv.keys.add(key);
+            where.put(key, prv);
+        }
+        cur.keys.remove(key);
+        dropIfEmpty(cur);
+    }
+
+    public String getMaxKey() { return tail.prev == head ? "" : tail.prev.keys.iterator().next(); }
+    public String getMinKey() { return head.next == tail ? "" : head.next.keys.iterator().next(); }
+}
+// test
+AllOne a = new AllOne();
+a.inc("hello"); a.inc("hello"); a.inc("leet");
+check(a.getMaxKey(), "hello");
+check(a.getMinKey(), "leet");
+a.dec("hello"); a.dec("hello");
+check(a.getMaxKey(), "leet");
+```
