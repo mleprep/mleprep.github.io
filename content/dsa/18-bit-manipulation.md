@@ -46,6 +46,20 @@ class Solution {
 check(new Solution().singleNumber(new int[]{4, 1, 2, 1, 2}), 4);
 ```
 
+```go
+func singleNumber(nums []int) int {
+	x := 0
+	for _, v := range nums { // pairs cancel: a ^ a = 0
+		x ^= v
+	}
+	return x
+}
+// test
+assertEq(singleNumber([]int{4, 1, 2, 1, 2}), 4)
+assertEq(singleNumber([]int{2, 2, 1}), 1)
+assertEq(singleNumber([]int{1}), 1)
+```
+
 ## 137. Single Number II | Medium
 related: 136
 tags: bit-counting
@@ -85,6 +99,26 @@ check(new Solution().singleNumber(new int[]{2, 2, 3, 2}), 3);
 check(new Solution().singleNumber(new int[]{-2, -2, 1, 1, 4, 1, 4, 4, -4, -2}), -4);
 ```
 
+```go
+func singleNumber(nums []int) int {
+	res := 0
+	for b := 0; b < 32; b++ { // each bit's count mod 3 is the single number's bit
+		cnt := 0
+		for _, x := range nums {
+			cnt += (x >> b) & 1
+		}
+		if cnt%3 != 0 {
+			res |= 1 << b
+		}
+	}
+	return int(int32(res)) // bit 31 is the sign of a 32-bit int
+}
+// test
+assertEq(singleNumber([]int{2, 2, 3, 2}), 3)
+assertEq(singleNumber([]int{0, 1, 0, 1, 0, 1, 99}), 99)
+assertEq(singleNumber([]int{-2, -2, 1, 1, 4, 1, 4, 4, -4, -2}), -4)
+```
+
 ## 191. Number of 1 Bits | Easy
 related: 338, 190
 tags: blind75, brian-kernighan
@@ -119,6 +153,19 @@ check(new Solution().hammingWeight(11), 3);
 check(new Solution().hammingWeight(-3), 31);
 ```
 
+```go
+func hammingWeight(n int) int {
+	count := 0
+	for ; n != 0; n &= n - 1 { // n & (n-1) clears the lowest set bit
+		count++
+	}
+	return count
+}
+// test
+assertEq(hammingWeight(11), 3)
+assertEq(hammingWeight(2147483645), 30)
+```
+
 ## 338. Counting Bits | Easy
 related: 191
 tags: blind75, dp
@@ -150,6 +197,20 @@ class Solution {
 }
 // test
 check(new Solution().countBits(5), new int[]{0, 1, 1, 2, 1, 2});
+```
+
+```go
+func countBits(n int) []int {
+	bits := make([]int, n+1)
+	for i := 1; i <= n; i++ {
+		bits[i] = bits[i>>1] + i&1 // i's bits = (i/2)'s bits + the last bit
+	}
+	return bits
+}
+// test
+assertEq(countBits(5), []int{0, 1, 1, 2, 1, 2})
+assertEq(countBits(0), []int{0})
+assertEq(countBits(2), []int{0, 1, 1})
 ```
 
 ## 190. Reverse Bits | Easy
@@ -189,6 +250,20 @@ check(new Solution().reverseBits(43261596), 964176192);
 check(new Solution().reverseBits(-3), -1073741825);
 ```
 
+```go
+func reverseBits(num uint32) uint32 {
+	var res uint32
+	for i := 0; i < 32; i++ {
+		res = res<<1 | num&1 // shift the lowest bit of num into res
+		num >>= 1
+	}
+	return res
+}
+// test
+assertEq(reverseBits(43261596), 964176192)
+assertEq(reverseBits(4294967293), 3221225471)
+```
+
 ## 268. Missing Number | Easy
 related: 41, 136, 287
 tags: blind75, xor
@@ -219,6 +294,19 @@ class Solution {
 }
 // test
 check(new Solution().missingNumber(new int[]{9, 6, 4, 2, 3, 5, 7, 0, 1}), 8);
+```
+
+```go
+func missingNumber(nums []int) int {
+	x := len(nums)
+	for i, v := range nums { // xor all indices 0..n and all values: only the missing one survives
+		x ^= i ^ v
+	}
+	return x
+}
+// test
+assertEq(missingNumber([]int{3, 0, 1}), 2)
+assertEq(missingNumber([]int{9, 6, 4, 2, 3, 5, 7, 0, 1}), 8)
 ```
 
 ## 371. Sum of Two Integers | Medium
@@ -268,6 +356,20 @@ check(new Solution().getSum(-12, -8), -20);
 check(new Solution().getSum(-1, 1), 0);
 ```
 
+```go
+func getSum(a int, b int) int {
+	for b != 0 { // sum without carry, then the carry shifted left; ints wrap, so negatives work
+		a, b = a^b, (a&b)<<1
+	}
+	return a
+}
+// test
+assertEq(getSum(1, 2), 3)
+assertEq(getSum(2, 3), 5)
+assertEq(getSum(-1, 1), 0)
+assertEq(getSum(-12, -8), -20)
+```
+
 ## 7. Reverse Integer | Medium
 related: 190, 8
 tags: overflow
@@ -311,6 +413,24 @@ check(new Solution().reverse(-123), -321);
 check(new Solution().reverse(1534236469), 0);
 ```
 
+```go
+func reverse(x int) int {
+	res := 0
+	for ; x != 0; x /= 10 { // Go's % keeps the sign, so negatives just work
+		res = res*10 + x%10
+	}
+	if res < math.MinInt32 || res > math.MaxInt32 {
+		return 0
+	}
+	return res
+}
+// test
+assertEq(reverse(123), 321)
+assertEq(reverse(-123), -321)
+assertEq(reverse(120), 21)
+assertEq(reverse(1534236469), 0)
+```
+
 
 ## 231. Power of Two | Easy
 related: 191, 338
@@ -339,6 +459,16 @@ check(new Solution().isPowerOfTwo(16), true);
 check(new Solution().isPowerOfTwo(Integer.MIN_VALUE), false);
 ```
 
+```go
+func isPowerOfTwo(n int) bool {
+	return n > 0 && n&(n-1) == 0 // exactly one bit set
+}
+// test
+assertEq(isPowerOfTwo(16), true)
+assertEq(isPowerOfTwo(3), false)
+assertEq(isPowerOfTwo(-16), false)
+```
+
 ## 461. Hamming Distance | Easy
 related: 191
 tags: xor, popcount
@@ -362,6 +492,15 @@ class Solution {
 }
 // test
 check(new Solution().hammingDistance(1, 4), 2);
+```
+
+```go
+func hammingDistance(x int, y int) int {
+	return bits.OnesCount(uint(x ^ y)) // the differing bits
+}
+// test
+assertEq(hammingDistance(1, 4), 2)
+assertEq(hammingDistance(3, 1), 1)
 ```
 
 ## 260. Single Number III | Medium
@@ -401,6 +540,26 @@ class Solution {
 check(new Solution().singleNumber(new int[]{1, 2, 1, 3, 2, 5}), new int[]{3, 5});
 ```
 
+```go
+func singleNumber(nums []int) []int {
+	x := 0
+	for _, v := range nums {
+		x ^= v // = a ^ b
+	}
+	diff := x & -x // a bit where a and b differ splits the numbers into two groups
+	a := 0
+	for _, v := range nums {
+		if v&diff != 0 {
+			a ^= v
+		}
+	}
+	return []int{a, x ^ a}
+}
+// test
+assertUnordered(singleNumber([]int{1, 2, 1, 3, 2, 5}), []int{3, 5})
+assertUnordered(singleNumber([]int{-1, 0}), []int{-1, 0})
+```
+
 ## 201. Bitwise AND of Numbers Range | Medium
 related: 191
 tags: common-prefix
@@ -432,6 +591,21 @@ class Solution {
 // test
 check(new Solution().rangeBitwiseAnd(5, 7), 4);
 check(new Solution().rangeBitwiseAnd(1, 2147483647), 0);
+```
+
+```go
+func rangeBitwiseAnd(left int, right int) int {
+	shift := 0
+	for left != right { // the answer is the common binary prefix
+		left, right = left>>1, right>>1
+		shift++
+	}
+	return left << shift
+}
+// test
+assertEq(rangeBitwiseAnd(5, 7), 4)
+assertEq(rangeBitwiseAnd(0, 0), 0)
+assertEq(rangeBitwiseAnd(1, 2147483647), 0)
 ```
 
 ## 89. Gray Code | Medium
@@ -471,6 +645,28 @@ class Solution {
 check(new Solution().grayCode(2), "[0, 1, 3, 2]");
 ```
 
+```go
+func grayCode(n int) []int {
+	res := make([]int, 1<<n)
+	for i := range res {
+		res[i] = i ^ i>>1 // reflected binary code
+	}
+	return res
+}
+// test
+// any valid Gray code: starts at 0, visits all 2^n values once, neighbours (incl. wrap-around) differ by one bit
+for n := 1; n <= 4; n++ {
+	g := grayCode(n)
+	ok := len(g) == 1<<n && g[0] == 0
+	seen := map[int]bool{}
+	for i := 0; ok && i < len(g); i++ {
+		ok = g[i] >= 0 && g[i] < 1<<n && !seen[g[i]] && bits.OnesCount(uint(g[i]^g[(i+1)%len(g)])) == 1
+		seen[g[i]] = true
+	}
+	assertEq(ok, true)
+}
+```
+
 ## 1318. Minimum Flips to Make a OR b Equal to c | Medium
 related: 191, 461
 tags: bit-trick
@@ -506,6 +702,36 @@ class Solution {
 // test
 check(new Solution().minFlips(2, 6, 5), 3);
 check(new Solution().minFlips(4, 2, 7), 1);
+```
+
+```go
+func minFlips(a int, b int, c int) int {
+	flips := 0
+	for a > 0 || b > 0 || c > 0 {
+		x, y, z := a&1, b&1, c&1
+		if z == 1 {
+			flips += (x | y) ^ 1 // need at least one 1
+		} else {
+			flips += x + y // both must be 0
+		}
+		a, b, c = a>>1, b>>1, c>>1
+	}
+	return flips
+}
+// test
+assertEq(minFlips(2, 6, 5), 3)
+assertEq(minFlips(4, 2, 7), 1)
+assertEq(minFlips(1, 2, 3), 0)
+assertEq(minFlips(8, 3, 5), 3)
+ok := true
+for a := 0; a < 16; a++ {
+	for b := 0; b < 16; b++ {
+		for c := 0; c < 16; c++ {
+			ok = ok && minFlips(a, b, c) == bits.OnesCount(uint((a|b)^c))+bits.OnesCount(uint(a&b&^c))
+		}
+	}
+}
+assertEq(ok, true)
 ```
 
 ## 3133. Minimum Array End | Medium
@@ -564,4 +790,39 @@ class Solution {
 // test
 check(new Solution().minEnd(3, 4), 6L);
 check(new Solution().minEnd(2, 7), 15L);
+```
+
+```go
+func minEnd(n int, x int) int64 {
+	res, k := int64(x), int64(n-1)
+	for bit := int64(1); k > 0; bit <<= 1 {
+		if int64(x)&bit == 0 { // free position: place the next bit of n - 1
+			res |= (k & 1) * bit
+			k >>= 1
+		}
+	}
+	return res
+}
+// test
+assertEq(minEnd(3, 4), 6)
+assertEq(minEnd(2, 7), 15)
+assertEq(minEnd(1, 5), 5)
+assertEq(minEnd(5, 1), 9)
+brute := func(n, x int) int { // n-th smallest number containing all bits of x
+	for v, seen := x, 0; ; v++ {
+		if v&x == x {
+			seen++
+			if seen == n {
+				return v
+			}
+		}
+	}
+}
+ok := true
+for n := 1; n < 25; n++ {
+	for x := 1; x < 33; x++ {
+		ok = ok && minEnd(n, x) == int64(brute(n, x))
+	}
+}
+assertEq(ok, true)
 ```
