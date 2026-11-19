@@ -120,3 +120,54 @@ Skew = the model sees different feature values in production than in training (d
 - Monitor: input feature stats, prediction distribution, calibration, latency/errors, business KPIs; and model quality once labels arrive (possibly delayed).
 - Responses: alerts → investigate (upstream pipeline bug is the most common cause!) → retrain on recent data (scheduled or triggered) → shadow/canary deploy new models → automatic rollback.
 - **Feedback loops**: the model influences its own future training data (recommendations, fraud blocking) → keep exploration traffic / holdouts to collect unbiased labels.
+
+
+## People You May Know (Friend Recommendation)
+
+**Goal**: suggest connections a user is likely to accept, increasing healthy network growth.
+
+```viz
+candidates: friends-of-friends (2-hop), same school/company/contacts upload, co-engagement
+     -> features: mutual friends count, Adamic-Adar, graph embeddings (node2vec/GNN), profile similarity,
+                  recency of interactions, geography
+     -> ranker (GBDT / two-tower + MLP) predicting p(request sent) and p(accept)
+     -> re-rank: diversity, spam/fake-account filters, privacy rules, de-dupe shown recently
+```
+
+Labels: invitations sent/accepted (impressions without action = negatives, careful with position bias). Graph computations (2-hop counts) are heavy → precompute in batch daily, refresh hot users incrementally. Metrics: accept rate, connections per DAU, long-term retention; guardrails against spammy invites.
+
+## Visual Search (Search by Image)
+
+**Goal**: given a photo, return visually similar items (Pinterest Lens, Google Lens, product search).
+
+```viz
+offline: catalog images -> embedding model (CNN/ViT, trained contrastively on (query, clicked item) pairs)
+                        -> vectors -> ANN index (HNSW / IVF-PQ), sharded + replicated
+online:  query image -> object detection / crop -> embed (GPU) -> ANN top-k -> re-rank
+         (metadata filters, freshness, personalization) -> results
+```
+
+Key points: train embeddings with **contrastive / triplet loss** using engagement data; hard-negative mining; quantization (PQ) to fit billions of vectors in memory; index refresh for new items; evaluate with recall@k on labeled pairs + online CTR; dedupe near-identical images.
+
+## ETA Prediction (Maps / Food Delivery)
+
+**Goal**: predict arrival time accurately (MAE / percentile errors) at request time, < 50 ms.
+
+- **Features**: route segments with real-time speeds (from GPS probes), historical speeds by time-of-week, weather, events, road type; for delivery: restaurant prep time, courier state.
+- **Model**: route-level baseline = sum of segment times (graph routing) + ML correction (GBDT or GNN over road graph); quantile regression for P90 promises.
+- **Training data**: completed trips (label = actual duration); watch for distribution shift (holidays, construction).
+- **Serving**: precompute segment speeds every minute in a streaming job; cache popular routes.
+- Metrics: MAE, MAPE, % within ±2 min, calibration of P90 (late rate ≈ 10%).
+
+## LLM-Powered Support Assistant
+
+**Goal**: answer customer questions from help-center docs and account data, escalate to humans when needed; reduce resolution time without hurting satisfaction.
+
+```viz
+user message -> safety + intent classifier -> retrieval (help docs, past tickets) + account tools (order status API)
+             -> LLM with system prompt, retrieved context, tool results -> answer with citations
+             -> confidence / policy check -> respond | hand off to human agent (with summary)
+feedback: thumbs, resolution, CSAT, agent edits -> eval set -> prompt / retrieval / fine-tune iterations
+```
+
+Design points: **RAG** over curated docs (freshness pipeline when docs change); **tools** for personal data with strict auth scoping; guardrails (no unsupported promises, PII redaction, prompt-injection defenses); offline eval set of real conversations graded by rubric + LLM-as-judge validated by humans; online metrics: containment rate, CSAT, escalation quality, hallucination reports; cost and latency budgets (smaller model for routing, bigger for hard cases).

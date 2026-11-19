@@ -300,3 +300,151 @@ assert y.shape == (1, 1, 2, 2) and y[0, 0].tolist() == [[10, 18], [42, 50]]
 assert conv2d(np.ones((2, 3, 5, 5)), np.ones((4, 3, 3, 3)), np.zeros(4), pad=1).shape == (2, 4, 5, 5)
 print("ok")
 ```
+
+
+## Batch Normalization (Forward & Backward)
+
+**Key idea:** normalize per feature over the batch, scale/shift with γ, β. The backward pass has a compact closed form; verify it with a **numerical gradient check** (a must-know debugging technique).
+
+```python
+import numpy as np
+
+def bn_forward(x, gamma, beta, eps=1e-5):
+    mu, var = x.mean(0), x.var(0)
+    xhat = (x - mu) / np.sqrt(var + eps)
+    return gamma * xhat + beta, (xhat, var, eps, gamma)
+
+def bn_backward(dout, cache):
+    xhat, var, eps, gamma = cache
+    N = dout.shape[0]
+    dgamma, dbeta = (dout * xhat).sum(0), dout.sum(0)
+    dxhat = dout * gamma
+    dx = (N * dxhat - dxhat.sum(0) - xhat * (dxhat * xhat).sum(0)) / (N * np.sqrt(var + eps))
+    return dx, dgamma, dbeta
+
+rng = np.random.default_rng(0)
+x, g, b = rng.normal(size=(8, 3)), rng.normal(size=3), rng.normal(size=3)
+dout = rng.normal(size=(8, 3))
+y, cache = bn_forward(x, g, b)
+assert np.allclose(y.mean(0), b) and np.allclose(y.std(0), np.abs(g), atol=1e-3)
+dx, dg, db = bn_backward(dout, cache)
+num = np.zeros_like(x); h = 1e-5                     # numerical gradient check
+for i in np.ndindex(x.shape):
+    xp, xm = x.copy(), x.copy(); xp[i] += h; xm[i] -= h
+    num[i] = ((bn_forward(xp, g, b)[0] - bn_forward(xm, g, b)[0]) * dout).sum() / (2 * h)
+assert np.allclose(dx, num, atol=1e-6)
+print("ok, max grad error", float(np.abs(dx - num).max()))
+```
+
+## PCA via SVD
+
+**Key idea:** center the data, take the SVD `X = UΣVᵀ`; principal directions are the rows of `Vᵀ`, explained variance is `σ² / (n − 1)`.
+
+```python
+import numpy as np
+
+def pca(X, k):
+    Xc = X - X.mean(0)
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    var = S ** 2 / (len(X) - 1)
+    return Xc @ Vt[:k].T, Vt[:k], var[:k] / var.sum()
+
+rng = np.random.default_rng(0)
+z = rng.normal(size=(500, 1))
+X = np.hstack([z, 2 * z, -z]) + 0.01 * rng.normal(size=(500, 3))   # essentially 1-D data
+proj, comps, ratio = pca(X, 1)
+assert ratio[0] > 0.999
+assert np.allclose(np.abs(comps[0]), np.array([1, 2, 1]) / np.sqrt(6), atol=1e-3)
+print("ok explained", round(float(ratio[0]), 5))
+```
+
+## Adam Optimizer
+
+**Key idea:** first moment (momentum) + second moment (per-parameter scale) with **bias correction** for the zero initialization. Test it on an ill-conditioned quadratic where plain SGD with the same step is slow.
+
+```python
+import numpy as np
+
+class Adam:
+    def __init__(self, lr=0.1, b1=0.9, b2=0.999, eps=1e-8):
+        self.lr, self.b1, self.b2, self.eps, self.t, self.m, self.v = lr, b1, b2, eps, 0, 0, 0
+
+    def step(self, w, g):
+        self.t += 1
+        self.m = self.b1 * self.m + (1 - self.b1) * g
+        self.v = self.b2 * self.v + (1 - self.b2) * g * g
+        mhat = self.m / (1 - self.b1 ** self.t)
+        vhat = self.v / (1 - self.b2 ** self.t)
+        return w - self.lr * mhat / (np.sqrt(vhat) + self.eps)
+
+A = np.diag([100.0, 1.0])                  # f(w) = 0.5 wᵀAw, minimum at 0
+grad = lambda w: A @ w
+w, opt = np.array([1.0, 1.0]), Adam(lr=0.05)
+for _ in range(500):
+    w = opt.step(w, grad(w))
+assert np.linalg.norm(w) < 1e-2
+print("ok", w.round(5))
+```
+
+## Gaussian Naive Bayes
+
+**Key idea:** per class, model each feature as an independent Gaussian. Predict `argmax_c log p(c) + Σ_j log N(x_j; μ_cj, σ²_cj)` — work in log space to avoid underflow.
+
+```python
+import numpy as np
+
+class GaussianNB:
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        self.mu = np.array([X[y == c].mean(0) for c in self.classes])
+        self.var = np.array([X[y == c].var(0) + 1e-9 for c in self.classes])
+        self.logprior = np.log(np.array([(y == c).mean() for c in self.classes]))
+        return self
+
+    def predict(self, X):
+        # (N, C): log prior + sum of per-feature Gaussian log-likelihoods
+        ll = -0.5 * (np.log(2 * np.pi * self.var)[None] + (X[:, None, :] - self.mu[None]) ** 2 / self.var[None]).sum(-1)
+        return self.classes[(ll + self.logprior).argmax(1)]
+
+rng = np.random.default_rng(3)
+X = np.vstack([rng.normal([0, 0], 1, (200, 2)), rng.normal([3, 3], 1, (200, 2))])
+y = np.r_[np.zeros(200, int), np.ones(200, int)]
+acc = (GaussianNB().fit(X, y).predict(X) == y).mean()
+assert acc > 0.95
+print("ok acc", acc)
+```
+
+## Beam Search Decoding
+
+**Key idea:** keep the `b` highest-scoring partial sequences (sum of log-probs); expand each with every token, keep the top `b`; finished beams (EOS) are set aside. Greedy decoding is beam size 1 — and can miss the best sequence.
+
+```python
+import numpy as np
+
+def beam_search(step_logprobs, beam=3, max_len=5, eos=0):
+    """step_logprobs(prefix) -> log-prob vector over the vocabulary for the next token."""
+    beams, done = [((), 0.0)], []
+    for _ in range(max_len):
+        cand = []
+        for seq, score in beams:
+            lp = step_logprobs(seq)
+            for tok in np.argsort(lp)[-beam:]:
+                cand.append((seq + (int(tok),), score + float(lp[tok])))
+        cand.sort(key=lambda c: c[1], reverse=True)
+        beams = []
+        for seq, score in cand[:beam]:
+            (done if seq[-1] == eos else beams).append((seq, score))
+        if not beams:
+            break
+    return max(done + beams, key=lambda c: c[1])
+
+# toy model: first token 1 looks best (0.6) but leads to a weak continuation; token 2 (0.4) leads to a sure EOS
+P = {(): [0.0, 0.6, 0.4], (1,): [0.3, 0.4, 0.3], (2,): [1.0, 0.0, 0.0]}
+def model(seq):
+    p = np.array(P.get(seq, [1.0, 0.0, 0.0])) + 1e-12
+    return np.log(p)
+greedy = beam_search(model, beam=1, max_len=2)
+best = beam_search(model, beam=3, max_len=2)
+assert greedy[0] == (1, 1) and best[0] == (2, 0)          # beam finds the higher-probability sequence
+print("ok greedy", greedy[0], round(np.exp(greedy[1]), 3), "beam", best[0], round(np.exp(best[1]), 3))
+```

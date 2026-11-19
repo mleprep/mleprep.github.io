@@ -185,3 +185,33 @@ Find orthogonal directions of **maximum variance**: eigenvectors of the covarian
 **Q: When does nearest-neighbour search break down?**
 
 KNN predicts from the k closest training points (no training, expensive inference). In high dimensions, distances concentrate — **all points become almost equally far apart**, and the data needed to cover the space grows exponentially. Remedies: dimensionality reduction, learned embeddings, feature selection. At scale, use **approximate nearest neighbour** indexes (HNSW, IVF-PQ, ScaNN, FAISS).
+
+
+## MLE vs MAP and Bayes' Theorem
+
+**Q: What's the difference between maximum likelihood and MAP estimation?**
+
+- **Bayes**: `p(θ | D) = p(D | θ) p(θ) / p(D)` — posterior ∝ likelihood × prior.
+- **MLE**: `argmax p(D | θ)`; e.g. MSE regression = MLE under Gaussian noise, cross-entropy = MLE for categorical labels.
+- **MAP**: `argmax p(D | θ) p(θ)` = MLE + regularizer: Gaussian prior ⇒ **L2**, Laplace prior ⇒ **L1**.
+- Full Bayesian inference keeps the whole posterior (uncertainty estimates) instead of a point estimate.
+
+Classic worked example (base-rate fallacy): a test is 99% sensitive and 95% specific for a disease with 1% prevalence. `P(sick | +) = 0.99·0.01 / (0.99·0.01 + 0.05·0.99) ≈ 16.7%` — most positives are false positives when the condition is rare.
+
+## Hyperparameter Tuning
+
+**Q: How do you tune hyperparameters efficiently?**
+
+- **Grid search** wastes budget on unimportant dimensions; **random search** covers important ones better (Bergstra & Bengio).
+- **Bayesian optimization** (Gaussian process / TPE surrogate + acquisition function) for expensive trainings; **Hyperband / ASHA** stop bad trials early.
+- Tune the most sensitive first: learning rate (log scale!), batch size, regularization strength, model size.
+- Always tune on a validation set (or CV), never on the test set; fix seeds and report variance across seeds.
+
+## Ensembles & Stacking
+
+**Q: Why do ensembles work, and what is stacking?**
+
+Averaging models with **uncorrelated errors** reduces variance (`Var(mean) = ρσ² + (1−ρ)σ²/M`). Techniques:
+- **Bagging** (bootstrap + average: random forest), **boosting** (sequential bias reduction: GBDT), **snapshot/seed ensembles** for neural nets.
+- **Stacking**: train a meta-model on **out-of-fold** predictions of base models (never in-fold → leakage).
+- Costs: latency and complexity at serving time → often **distill** the ensemble into one model.

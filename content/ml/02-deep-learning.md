@@ -134,3 +134,44 @@ Efficiency: **mixed precision** (bf16/fp16 + loss scaling), gradient accumulatio
 **Q: How do you regularize a large neural network?**
 
 Weight decay (AdamW), dropout (less common in big transformers), **data augmentation** (images: random crop/flip/color jitter, Mixup/CutMix; text: back-translation, token masking; audio: SpecAugment), label smoothing, stochastic depth, early stopping, and — most effective — **more data**. Large models also regularize implicitly through SGD noise and architecture choices.
+
+
+## Self-Supervised & Contrastive Learning
+
+**Q: How do models learn without labels?**
+
+Create a supervised task from the data itself:
+- **Masked prediction**: BERT (mask tokens), MAE (mask image patches) — reconstruct what's hidden.
+- **Next-token prediction**: GPT-style language modelling.
+- **Contrastive**: SimCLR/MoCo (two augmentations of the same image are positives, others negatives), CLIP (image–caption pairs). Loss = **InfoNCE**: `−log exp(sim(q,k⁺)/τ) / Σ exp(sim(q,k)/τ)`; needs many negatives (large batches or memory queues).
+- **Non-contrastive**: BYOL, DINO — avoid collapse with stop-gradient / momentum teachers.
+Pretrain on huge unlabeled data, then fine-tune or linear-probe with few labels.
+
+## Mixture of Experts (MoE)
+
+**Q: What is a mixture-of-experts layer and why use it?**
+
+Replace a dense FFN with E expert FFNs and a **router** that sends each token to the top-k experts (k = 1–2). Parameters grow ~E×, compute per token stays ~constant → more capacity for the same FLOPs (Switch Transformer, Mixtral, many frontier LLMs).
+Challenges: **load balancing** (auxiliary loss so experts are used evenly), expert capacity limits / token dropping, all-to-all communication across devices (expert parallelism), and higher memory to hold all experts.
+
+## Distributed Training
+
+**Q: How do you train a model that doesn't fit on one GPU?**
+
+| Strategy | Splits | Communication |
+|---|---|---|
+| **Data parallel** (DDP) | batch across GPUs, full model copy each | all-reduce gradients every step |
+| **ZeRO / FSDP** | shards optimizer states, gradients and parameters | gather params on demand |
+| **Tensor parallel** | individual matrices across GPUs (within a node) | all-reduce per layer (needs NVLink) |
+| **Pipeline parallel** | layers across GPUs/nodes; micro-batches fill the pipeline | activations between stages; "bubble" overhead |
+| **Expert parallel** | MoE experts across GPUs | all-to-all token routing |
+
+Large runs combine them ("3D parallelism"), plus mixed precision (bf16), activation checkpointing, and gradient accumulation to reach large effective batch sizes.
+
+## Graph Neural Networks
+
+**Q: How do GNNs work and where are they used?**
+
+**Message passing**: each node updates its embedding by aggregating its neighbours' messages: `h_v' = σ(W·h_v + Σ_{u∈N(v)} W'·h_u / |N(v)|)` (GCN, GraphSAGE; GAT uses attention weights). k layers ⇒ k-hop receptive field.
+Uses: fraud rings, recommendations (user–item graphs, PinSage), molecules/drug discovery, traffic/ETA, knowledge graphs.
+Issues: **over-smoothing** with many layers, neighbourhood explosion → **neighbour sampling** (GraphSAGE) or cluster batching for large graphs.

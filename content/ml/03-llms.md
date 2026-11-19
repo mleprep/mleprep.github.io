@@ -106,3 +106,37 @@ Design points:
 - **Task-specific evals**: a curated, versioned test set from real traffic; exact match / unit tests where possible; **LLM-as-judge** with rubrics (validated against humans); pairwise preference win rates.
 - Track quality, latency, cost, and safety (toxicity, jailbreaks, PII leakage) per release; A/B test in production.
 - **Hallucinations** (fluent but false): ground with RAG and citations, constrain to the provided context, lower temperature, self-consistency (sample several answers and compare), verification steps/tools (calculators, code execution, search), and teach the model to abstain.
+
+
+## Agents & Tool Use
+
+**Q: How do LLM agents work, and what makes them reliable?**
+
+An agent runs a loop: the model receives the goal + available **tools** (function schemas), decides on a call, the runtime executes it, results go back into the context, repeat until done.
+
+```viz
+user goal -> LLM (plan / choose tool) -> tool call {name, args} -> runtime executes (search, code, DB, API)
+                ^                                                         |
+                +-------------------- observation / result ---------------+
+                stop when the model returns a final answer (or a step/cost budget is hit)
+```
+
+Reliability levers: clear tool descriptions and typed schemas; small, composable tools; structured outputs; guardrails on side-effecting actions (confirmation, sandboxing, least privilege); step limits and timeouts; memory (summaries, retrieval) for long tasks; evaluating end-to-end task success, not single responses. Beware **prompt injection** from tool outputs (treat retrieved content as data, not instructions).
+
+## Prompt Engineering
+
+**Q: What prompting techniques actually matter?**
+
+- Be specific about the task, audience, format and constraints; give the **why**.
+- **Few-shot examples** that cover edge cases; consistent formatting.
+- **Structured output** (JSON schema / tags) for downstream parsing.
+- Let the model **reason before answering** (chain-of-thought / extended thinking) on multi-step problems; ask it to verify against criteria.
+- Put long documents first and the question last; quote the relevant parts before answering.
+- Decompose complex tasks into chained prompts; evaluate prompts against a test set like code.
+
+## Long Context
+
+**Q: How do models handle very long inputs, and what breaks?**
+
+Techniques: RoPE scaling / position interpolation, training on long sequences, efficient attention (FlashAttention, sliding window + global tokens), KV-cache compression, ring/sequence parallelism.
+Failure modes: "lost in the middle" (information in the middle is used less), cost growing with length, distractors reducing accuracy. Mitigations: RAG to select relevant chunks, put key instructions at the start/end, summarize or structure long inputs, evaluate with needle-in-a-haystack *and* realistic multi-hop tasks.
