@@ -79,6 +79,26 @@ class Solution {
 check(new Solution().subsets(new int[]{1, 2, 3}), "[[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]");
 ```
 
+```go
+func subsets(nums []int) [][]int {
+	res, path := [][]int{}, []int{}
+	var bt func(start int)
+	bt = func(start int) {
+		res = append(res, append([]int{}, path...)) // every node of the tree is a subset
+		for i := start; i < len(nums); i++ {
+			path = append(path, nums[i])
+			bt(i + 1)
+			path = path[:len(path)-1]
+		}
+	}
+	bt(0)
+	return res
+}
+// test
+assertUnorderedDeep(subsets([]int{1, 2, 3}), [][]int{{}, {1}, {1, 2}, {1, 2, 3}, {1, 3}, {2}, {2, 3}, {3}})
+assertUnorderedDeep(subsets([]int{0}), [][]int{{}, {0}})
+```
+
 ## 90. Subsets II | Medium
 related: 78, 40, 47
 tags: subsets, dedupe
@@ -131,6 +151,31 @@ class Solution {
 }
 // test
 check(new Solution().subsetsWithDup(new int[]{1, 2, 2}), "[[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]");
+```
+
+```go
+func subsetsWithDup(nums []int) [][]int {
+	sort.Ints(nums)
+	res, path := [][]int{}, []int{}
+	var bt func(start int)
+	bt = func(start int) {
+		res = append(res, append([]int{}, path...))
+		for i := start; i < len(nums); i++ {
+			if i > start && nums[i] == nums[i-1] { // same value at the same depth: skip
+				continue
+			}
+			path = append(path, nums[i])
+			bt(i + 1)
+			path = path[:len(path)-1]
+		}
+	}
+	bt(0)
+	return res
+}
+// test
+assertUnorderedDeep(subsetsWithDup([]int{1, 2, 2}), [][]int{{}, {1}, {1, 2}, {1, 2, 2}, {2}, {2, 2}})
+assertUnorderedDeep(subsetsWithDup([]int{0}), [][]int{{}, {0}})
+assertUnorderedDeep(subsetsWithDup([]int{4, 4, 1, 4}), [][]int{{}, {1}, {1, 4}, {1, 4, 4}, {1, 4, 4, 4}, {4}, {4, 4}, {4, 4, 4}})
 ```
 
 ## 39. Combination Sum | Medium
@@ -186,6 +231,30 @@ class Solution {
 }
 // test
 check(new Solution().combinationSum(new int[]{2, 3, 6, 7}, 7), "[[2, 2, 3], [7]]");
+```
+
+```go
+func combinationSum(candidates []int, target int) [][]int {
+	sort.Ints(candidates)
+	res, path := [][]int{}, []int{}
+	var bt func(start, rest int)
+	bt = func(start, rest int) {
+		if rest == 0 {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i := start; i < len(candidates) && candidates[i] <= rest; i++ {
+			path = append(path, candidates[i])
+			bt(i, rest-candidates[i]) // i: the same number may be reused
+			path = path[:len(path)-1]
+		}
+	}
+	bt(0, target)
+	return res
+}
+// test
+assertUnorderedDeep(combinationSum([]int{2, 3, 6, 7}, 7), [][]int{{2, 2, 3}, {7}})
+assertUnorderedDeep(combinationSum([]int{2, 3, 5}, 8), [][]int{{2, 2, 2, 2}, {2, 3, 3}, {3, 5}})
 ```
 
 ## 40. Combination Sum II | Medium
@@ -246,6 +315,34 @@ class Solution {
 check(new Solution().combinationSum2(new int[]{10, 1, 2, 7, 6, 1, 5}, 8), "[[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]");
 ```
 
+```go
+func combinationSum2(candidates []int, target int) [][]int {
+	sort.Ints(candidates)
+	res, path := [][]int{}, []int{}
+	var bt func(start, rest int)
+	bt = func(start, rest int) {
+		if rest == 0 {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i := start; i < len(candidates) && candidates[i] <= rest; i++ {
+			if i > start && candidates[i] == candidates[i-1] {
+				continue
+			}
+			path = append(path, candidates[i])
+			bt(i+1, rest-candidates[i])
+			path = path[:len(path)-1]
+		}
+	}
+	bt(0, target)
+	return res
+}
+// test
+assertUnorderedDeep(combinationSum2([]int{10, 1, 2, 7, 6, 1, 5}, 8), [][]int{{1, 1, 6}, {1, 2, 5}, {1, 7}, {2, 6}})
+assertUnorderedDeep(combinationSum2([]int{2, 5, 2, 1, 2}, 5), [][]int{{1, 2, 2}, {5}})
+assertEq(combinationSum2([]int{1}, 2), [][]int{})
+```
+
 ## 46. Permutations | Medium
 related: 47, 78
 tags: permutations
@@ -300,6 +397,34 @@ class Solution {
 // test
 check(new Solution().permute(new int[]{1, 2, 3}).size(), 6);
 check(new Solution().permute(new int[]{0, 1}), "[[0, 1], [1, 0]]");
+```
+
+```go
+func permute(nums []int) [][]int {
+	res, path, used := [][]int{}, []int{}, make([]bool, len(nums))
+	var bt func()
+	bt = func() {
+		if len(path) == len(nums) {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i, x := range nums {
+			if !used[i] {
+				used[i] = true
+				path = append(path, x)
+				bt()
+				path = path[:len(path)-1]
+				used[i] = false
+			}
+		}
+	}
+	bt()
+	return res
+}
+// test
+assertUnordered(permute([]int{1, 2, 3}), [][]int{{1, 2, 3}, {1, 3, 2}, {2, 1, 3}, {2, 3, 1}, {3, 1, 2}, {3, 2, 1}})
+assertUnordered(permute([]int{0, 1}), [][]int{{0, 1}, {1, 0}})
+assertEq(permute([]int{1}), [][]int{{1}})
 ```
 
 ## 47. Permutations II | Medium
@@ -360,6 +485,37 @@ class Solution {
 check(new Solution().permuteUnique(new int[]{1, 1, 2}), "[[1, 1, 2], [1, 2, 1], [2, 1, 1]]");
 ```
 
+```go
+func permuteUnique(nums []int) [][]int {
+	sort.Ints(nums)
+	res, path, used := [][]int{}, []int{}, make([]bool, len(nums))
+	var bt func()
+	bt = func() {
+		if len(path) == len(nums) {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i := range nums {
+			// equal values are used left to right only, so each arrangement appears once
+			if used[i] || (i > 0 && nums[i] == nums[i-1] && !used[i-1]) {
+				continue
+			}
+			used[i] = true
+			path = append(path, nums[i])
+			bt()
+			path = path[:len(path)-1]
+			used[i] = false
+		}
+	}
+	bt()
+	return res
+}
+// test
+assertUnordered(permuteUnique([]int{1, 1, 2}), [][]int{{1, 1, 2}, {1, 2, 1}, {2, 1, 1}})
+assertUnordered(permuteUnique([]int{1, 2, 3}), [][]int{{1, 2, 3}, {1, 3, 2}, {2, 1, 3}, {2, 3, 1}, {3, 1, 2}, {3, 2, 1}})
+assertEq(permuteUnique([]int{2, 2}), [][]int{{2, 2}})
+```
+
 ## 77. Combinations | Medium
 related: 78, 39
 tags: combinations, pruning
@@ -408,6 +564,29 @@ class Solution {
 }
 // test
 check(new Solution().combine(4, 2), "[[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]");
+```
+
+```go
+func combine(n int, k int) [][]int {
+	res, path := [][]int{}, []int{}
+	var bt func(start int)
+	bt = func(start int) {
+		if len(path) == k {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+		for i := start; i <= n-(k-len(path))+1; i++ { // leave room for the remaining picks
+			path = append(path, i)
+			bt(i + 1)
+			path = path[:len(path)-1]
+		}
+	}
+	bt(1)
+	return res
+}
+// test
+assertUnorderedDeep(combine(4, 2), [][]int{{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}})
+assertUnorderedDeep(combine(1, 1), [][]int{{1}})
 ```
 
 ## 17. Letter Combinations of a Phone Number | Medium
@@ -461,6 +640,31 @@ class Solution {
 }
 // test
 check(new Solution().letterCombinations("23"), "[ad, ae, af, bd, be, bf, cd, ce, cf]");
+```
+
+```go
+func letterCombinations(digits string) []string {
+	if digits == "" {
+		return []string{}
+	}
+	pad := []string{"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"}
+	res := []string{}
+	var bt func(i int, cur string)
+	bt = func(i int, cur string) {
+		if i == len(digits) {
+			res = append(res, cur)
+			return
+		}
+		for _, ch := range pad[digits[i]-'0'] {
+			bt(i+1, cur+string(ch))
+		}
+	}
+	bt(0, "")
+	return res
+}
+// test
+assertUnordered(letterCombinations("23"), []string{"ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"})
+assertEq(letterCombinations(""), []string{})
 ```
 
 ## 22. Generate Parentheses | Medium
@@ -519,6 +723,31 @@ class Solution {
 check(new Solution().generateParenthesis(3), "[((())), (()()), (())(), ()(()), ()()()]");
 ```
 
+```go
+func generateParenthesis(n int) []string {
+	res := []string{}
+	var bt func(cur string, open, closed int)
+	bt = func(cur string, open, closed int) {
+		if len(cur) == 2*n {
+			res = append(res, cur)
+			return
+		}
+		if open < n {
+			bt(cur+"(", open+1, closed)
+		}
+		if closed < open { // only close what is open
+			bt(cur+")", open, closed+1)
+		}
+	}
+	bt("", 0, 0)
+	return res
+}
+// test
+assertUnordered(generateParenthesis(3), []string{"((()))", "(()())", "(())()", "()(())", "()()()"})
+assertEq(generateParenthesis(1), []string{"()"})
+assertUnordered(generateParenthesis(4), []string{"(((())))", "((()()))", "((())())", "((()))()", "(()(()))", "(()()())", "(()())()", "(())(())", "(())()()", "()((()))", "()(()())", "()(())()", "()()(())", "()()()()"})
+```
+
 ## 79. Word Search | Medium
 related: 212, 200
 tags: blind75, grid-dfs
@@ -573,6 +802,38 @@ class Solution {
 char[][] B = {"ABCE".toCharArray(), "SFCS".toCharArray(), "ADEE".toCharArray()};
 check(new Solution().exist(B, "ABCCED"), true);
 check(new Solution().exist(B, "ABCB"), false);
+```
+
+```go
+func exist(board [][]byte, word string) bool {
+	R, C := len(board), len(board[0])
+	var dfs func(r, c, i int) bool
+	dfs = func(r, c, i int) bool {
+		if i == len(word) {
+			return true
+		}
+		if r < 0 || r >= R || c < 0 || c >= C || board[r][c] != word[i] {
+			return false
+		}
+		board[r][c] = '#' // mark as used on this path
+		found := dfs(r+1, c, i+1) || dfs(r-1, c, i+1) || dfs(r, c+1, i+1) || dfs(r, c-1, i+1)
+		board[r][c] = word[i]
+		return found
+	}
+	for r := 0; r < R; r++ {
+		for c := 0; c < C; c++ {
+			if dfs(r, c, 0) {
+				return true
+			}
+		}
+	}
+	return false
+}
+// test
+B := byteGrid("ABCE", "SFCS", "ADEE")
+assertEq(exist(B, "ABCCED"), true)
+assertEq(exist(B, "SEE"), true)
+assertEq(exist(B, "ABCB"), false)
 ```
 
 ## 131. Palindrome Partitioning | Medium
@@ -634,6 +895,40 @@ class Solution {
 check(new Solution().partition("aab"), "[[a, a, b], [aa, b]]");
 ```
 
+```go
+func partition(s string) [][]string {
+	isPal := func(i, j int) bool {
+		for ; i < j; i, j = i+1, j-1 {
+			if s[i] != s[j] {
+				return false
+			}
+		}
+		return true
+	}
+	res, path := [][]string{}, []string{}
+	var bt func(i int)
+	bt = func(i int) {
+		if i == len(s) {
+			res = append(res, append([]string{}, path...))
+			return
+		}
+		for j := i; j < len(s); j++ {
+			if isPal(i, j) {
+				path = append(path, s[i:j+1])
+				bt(j + 1)
+				path = path[:len(path)-1]
+			}
+		}
+	}
+	bt(0)
+	return res
+}
+// test
+assertUnordered(partition("aab"), [][]string{{"a", "a", "b"}, {"aa", "b"}})
+assertEq(partition("a"), [][]string{{"a"}})
+assertUnordered(partition("aba"), [][]string{{"a", "b", "a"}, {"aba"}})
+```
+
 ## 93. Restore IP Addresses | Medium
 related: 131
 tags: partition
@@ -693,6 +988,38 @@ class Solution {
 // test
 check(new Solution().restoreIpAddresses("25525511135"), "[255.255.11.135, 255.255.111.35]");
 check(new Solution().restoreIpAddresses("0000"), "[0.0.0.0]");
+```
+
+```go
+func restoreIpAddresses(s string) []string {
+	res := []string{}
+	var bt func(i int, parts []string)
+	bt = func(i int, parts []string) {
+		if len(parts) == 4 {
+			if i == len(s) {
+				res = append(res, strings.Join(parts, "."))
+			}
+			return
+		}
+		rem := 4 - len(parts)
+		if left := len(s) - i; left < rem || left > 3*rem { // too few or too many digits left
+			return
+		}
+		for L := 1; L <= 3 && i+L <= len(s); L++ {
+			p := s[i : i+L]
+			if v, _ := strconv.Atoi(p); (p[0] == '0' && L > 1) || v > 255 {
+				break
+			}
+			bt(i+L, append(parts, p))
+		}
+	}
+	bt(0, []string{})
+	return res
+}
+// test
+assertUnordered(restoreIpAddresses("25525511135"), []string{"255.255.11.135", "255.255.111.35"})
+assertUnordered(restoreIpAddresses("0000"), []string{"0.0.0.0"})
+assertUnordered(restoreIpAddresses("101023"), []string{"1.0.10.23", "1.0.102.3", "10.1.0.23", "10.10.2.3", "101.0.2.3"})
 ```
 
 ## 51. N-Queens | Hard
@@ -766,6 +1093,43 @@ class Solution {
 // test
 check(new Solution().solveNQueens(4), "[[.Q.., ...Q, Q..., ..Q.], [..Q., Q..., ...Q, .Q..]]");
 check(new Solution().solveNQueens(8).size(), 92);
+```
+
+```go
+func solveNQueens(n int) [][]string {
+	res := [][]string{}
+	cols, d1, d2 := map[int]bool{}, map[int]bool{}, map[int]bool{} // columns and both diagonals in use
+	board := make([][]byte, n)
+	for i := range board {
+		board[i] = []byte(strings.Repeat(".", n))
+	}
+	var bt func(r int)
+	bt = func(r int) {
+		if r == n {
+			rows := make([]string, n)
+			for i, row := range board {
+				rows[i] = string(row)
+			}
+			res = append(res, rows)
+			return
+		}
+		for c := 0; c < n; c++ {
+			if cols[c] || d1[r-c] || d2[r+c] {
+				continue
+			}
+			cols[c], d1[r-c], d2[r+c] = true, true, true
+			board[r][c] = 'Q'
+			bt(r + 1)
+			board[r][c] = '.'
+			cols[c], d1[r-c], d2[r+c] = false, false, false
+		}
+	}
+	bt(0)
+	return res
+}
+// test
+assertUnordered(solveNQueens(4), [][]string{{".Q..", "...Q", "Q...", "..Q."}, {"..Q.", "Q...", "...Q", ".Q.."}})
+assertEq(len(solveNQueens(8)), 92)
 ```
 
 ## 37. Sudoku Solver | Hard
@@ -851,6 +1215,49 @@ new Solution().solveSudoku(b);
 check(new String(b[0]) + new String(b[8]), "534678912345286179");
 ```
 
+```go
+func solveSudoku(board [][]byte) {
+	var rows, cols, boxes [9][10]bool
+	empty := [][2]int{}
+	for r := 0; r < 9; r++ {
+		for c := 0; c < 9; c++ {
+			if board[r][c] == '.' {
+				empty = append(empty, [2]int{r, c})
+			} else {
+				v := board[r][c] - '0'
+				rows[r][v], cols[c][v], boxes[r/3*3+c/3][v] = true, true, true
+			}
+		}
+	}
+	var bt func(k int) bool
+	bt = func(k int) bool {
+		if k == len(empty) {
+			return true
+		}
+		r, c := empty[k][0], empty[k][1]
+		b := r/3*3 + c/3
+		for v := byte(1); v <= 9; v++ {
+			if rows[r][v] || cols[c][v] || boxes[b][v] {
+				continue
+			}
+			board[r][c] = '0' + v
+			rows[r][v], cols[c][v], boxes[b][v] = true, true, true
+			if bt(k + 1) {
+				return true
+			}
+			rows[r][v], cols[c][v], boxes[b][v] = false, false, false
+		}
+		board[r][c] = '.'
+		return false
+	}
+	bt(0)
+}
+// test
+board := byteGrid("53..7....", "6..195...", ".98....6.", "8...6...3", "4..8.3..1", "7...2...6", ".6....28.", "...419..5", "....8..79")
+solveSudoku(board)
+assertEq(board, byteGrid("534678912", "672195348", "198342567", "859761423", "426853791", "713924856", "961537284", "287419635", "345286179"))
+```
+
 
 ## 216. Combination Sum III | Medium
 related: 39, 40, 77
@@ -906,6 +1313,32 @@ class Solution {
 check(new Solution().combinationSum3(3, 9), "[[1, 2, 6], [1, 3, 5], [2, 3, 4]]");
 ```
 
+```go
+func combinationSum3(k int, n int) [][]int {
+	res, path := [][]int{}, []int{}
+	var bt func(start, rest int)
+	bt = func(start, rest int) {
+		if len(path) == k {
+			if rest == 0 {
+				res = append(res, append([]int{}, path...))
+			}
+			return
+		}
+		for d := start; d <= 9 && d <= rest; d++ {
+			path = append(path, d)
+			bt(d+1, rest-d)
+			path = path[:len(path)-1]
+		}
+	}
+	bt(1, n)
+	return res
+}
+// test
+assertUnorderedDeep(combinationSum3(3, 7), [][]int{{1, 2, 4}})
+assertUnorderedDeep(combinationSum3(3, 9), [][]int{{1, 2, 6}, {1, 3, 5}, {2, 3, 4}})
+assertEq(combinationSum3(4, 1), [][]int{})
+```
+
 ## 784. Letter Case Permutation | Medium
 related: 78, 17
 tags: branching
@@ -947,6 +1380,28 @@ class Solution {
 }
 // test
 check(new Solution().letterCasePermutation("3z4"), "[3z4, 3Z4]");
+```
+
+```go
+func letterCasePermutation(s string) []string {
+	res := []string{""}
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		next := []string{}
+		for _, p := range res {
+			if unicode.IsLetter(rune(ch)) { // branch: lower then upper
+				next = append(next, p+strings.ToLower(string(ch)), p+strings.ToUpper(string(ch)))
+			} else {
+				next = append(next, p+string(ch))
+			}
+		}
+		res = next
+	}
+	return res
+}
+// test
+assertUnordered(letterCasePermutation("a1b2"), []string{"A1B2", "A1b2", "a1B2", "a1b2"})
+assertEq(letterCasePermutation("3z4"), []string{"3z4", "3Z4"})
 ```
 
 ## 52. N-Queens II | Hard
@@ -1001,6 +1456,30 @@ class Solution {
 }
 // test
 check(new Solution().totalNQueens(8), 92);
+```
+
+```go
+func totalNQueens(n int) int {
+	full := 1<<n - 1
+	var bt func(cols, d1, d2 int) int // bitmasks of attacked columns in the current row
+	bt = func(cols, d1, d2 int) int {
+		if cols == full {
+			return 1
+		}
+		count := 0
+		for free := ^(cols | d1 | d2) & full; free != 0; {
+			bit := free & -free // lowest free column
+			free -= bit
+			count += bt(cols|bit, (d1|bit)<<1&full, (d2|bit)>>1)
+		}
+		return count
+	}
+	return bt(0, 0, 0)
+}
+// test
+assertEq(totalNQueens(4), 2)
+assertEq(totalNQueens(1), 1)
+assertEq(totalNQueens(8), 92)
 ```
 
 ## 140. Word Break II | Hard
@@ -1059,6 +1538,45 @@ class Solution {
 List<String> r = new Solution().wordBreak("catsanddog", List.of("cat", "cats", "and", "sand", "dog"));
 Collections.sort(r);
 check(r, "[cat sand dog, cats and dog]");
+```
+
+```go
+func wordBreak(s string, wordDict []string) []string {
+	words := map[string]bool{}
+	for _, w := range wordDict {
+		words[w] = true
+	}
+	memo := map[int][]string{}
+	var gen func(i int) []string // all sentences for s[i:]
+	gen = func(i int) []string {
+		if i == len(s) {
+			return []string{""}
+		}
+		if out, ok := memo[i]; ok {
+			return out
+		}
+		out := []string{}
+		for j := i + 1; j <= len(s); j++ {
+			if w := s[i:j]; words[w] {
+				for _, rest := range gen(j) {
+					if rest == "" {
+						out = append(out, w)
+					} else {
+						out = append(out, w+" "+rest)
+					}
+				}
+			}
+		}
+		memo[i] = out
+		return out
+	}
+	return gen(0)
+}
+// test
+assertUnordered(wordBreak("catsanddog", []string{"cat", "cats", "and", "sand", "dog"}), []string{"cat sand dog", "cats and dog"})
+assertUnordered(wordBreak("pineapplepenapple", []string{"apple", "pen", "applepen", "pine", "pineapple"}), []string{
+	"pine apple pen apple", "pine applepen apple", "pineapple pen apple"})
+assertEq(wordBreak("catsandog", []string{"cats", "dog", "sand", "and", "cat"}), []string{})
 ```
 
 ## 282. Expression Add Operators | Hard
@@ -1135,6 +1653,43 @@ Collections.sort(r);
 check(r, "[2*3+2, 2+3*2]");
 ```
 
+```go
+func addOperators(num string, target int) []string {
+	res := []string{}
+	// prev is the last multiplicative term, so "*" can undo it: value - prev + prev*cur
+	var bt func(i int, expr string, value, prev int)
+	bt = func(i int, expr string, value, prev int) {
+		if i == len(num) {
+			if value == target {
+				res = append(res, expr)
+			}
+			return
+		}
+		for j := i + 1; j <= len(num); j++ {
+			s := num[i:j]
+			if len(s) > 1 && s[0] == '0' { // no leading zeros
+				break
+			}
+			cur, _ := strconv.Atoi(s)
+			if i == 0 {
+				bt(j, s, cur, cur)
+			} else {
+				bt(j, expr+"+"+s, value+cur, cur)
+				bt(j, expr+"-"+s, value-cur, -cur)
+				bt(j, expr+"*"+s, value-prev+prev*cur, prev*cur)
+			}
+		}
+	}
+	bt(0, "", 0, 0)
+	return res
+}
+// test
+assertUnordered(addOperators("123", 6), []string{"1*2*3", "1+2+3"})
+assertUnordered(addOperators("232", 8), []string{"2*3+2", "2+3*2"})
+assertEq(addOperators("3456237490", 9191), []string{})
+assertUnordered(addOperators("105", 5), []string{"1*0+5", "10-5"})
+```
+
 ## 301. Remove Invalid Parentheses | Hard
 related: 1249, 20
 tags: bfs, backtracking
@@ -1198,6 +1753,49 @@ class Solution {
 List<String> r = new Solution().removeInvalidParentheses("()())()");
 Collections.sort(r);
 check(r, "[(())(), ()()()]");
+```
+
+```go
+func removeInvalidParentheses(s string) []string {
+	valid := func(t string) bool {
+		bal := 0
+		for i := 0; i < len(t); i++ {
+			if t[i] == '(' {
+				bal++
+			} else if t[i] == ')' {
+				if bal--; bal < 0 {
+					return false
+				}
+			}
+		}
+		return bal == 0
+	}
+	level := map[string]bool{s: true}
+	for { // BFS by number of removals: the first level with a valid string wins
+		good := []string{}
+		for t := range level {
+			if valid(t) {
+				good = append(good, t)
+			}
+		}
+		if len(good) > 0 {
+			return good
+		}
+		next := map[string]bool{}
+		for t := range level {
+			for i := 0; i < len(t); i++ {
+				if t[i] == '(' || t[i] == ')' {
+					next[t[:i]+t[i+1:]] = true
+				}
+			}
+		}
+		level = next
+	}
+}
+// test
+assertUnordered(removeInvalidParentheses("()())()"), []string{"(())()", "()()()"})
+assertUnordered(removeInvalidParentheses("(a)())()"), []string{"(a())()", "(a)()()"})
+assertEq(removeInvalidParentheses(")("), []string{""})
 ```
 
 ## 698. Partition to K Equal Sum Subsets | Medium
@@ -1269,6 +1867,47 @@ check(new Solution().canPartitionKSubsets(new int[]{4, 3, 2, 3, 5, 2, 1}, 4), tr
 check(new Solution().canPartitionKSubsets(new int[]{1, 2, 3, 4}, 3), false);
 ```
 
+```go
+func canPartitionKSubsets(nums []int, k int) bool {
+	total := 0
+	for _, x := range nums {
+		total += x
+	}
+	if total%k != 0 {
+		return false
+	}
+	target := total / k
+	sort.Sort(sort.Reverse(sort.IntSlice(nums))) // big numbers first fail fast
+	if nums[0] > target {
+		return false
+	}
+	buckets := make([]int, k)
+	var bt func(i int) bool
+	bt = func(i int) bool {
+		if i == len(nums) {
+			return true
+		}
+		for b := 0; b < k; b++ {
+			if buckets[b]+nums[i] <= target {
+				buckets[b] += nums[i]
+				if bt(i + 1) {
+					return true
+				}
+				buckets[b] -= nums[i]
+			}
+			if buckets[b] == 0 { // empty buckets are interchangeable
+				break
+			}
+		}
+		return false
+	}
+	return bt(0)
+}
+// test
+assertEq(canPartitionKSubsets([]int{4, 3, 2, 3, 5, 2, 1}, 4), true)
+assertEq(canPartitionKSubsets([]int{1, 2, 3, 4}, 3), false)
+```
+
 ## 1863. Sum of All Subset XOR Totals | Easy
 related: 78, 136
 tags: subsets, bit-trick
@@ -1301,6 +1940,33 @@ class Solution {
 // test
 check(new Solution().subsetXORSum(new int[]{5, 1, 6}), 28);
 check(new Solution().subsetXORSum(new int[]{3, 4, 5, 6, 7, 8}), 480);
+```
+
+```go
+func subsetXORSum(nums []int) int {
+	or := 0
+	for _, x := range nums {
+		or |= x
+	}
+	// each bit set in some number is set in exactly half of the 2^n subset XORs
+	return or << (len(nums) - 1)
+}
+// test
+assertEq(subsetXORSum([]int{1, 3}), 6)
+assertEq(subsetXORSum([]int{5, 1, 6}), 28)
+assertEq(subsetXORSum([]int{3, 4, 5, 6, 7, 8}), 480)
+nums := []int{9, 2, 7, 12, 1}
+brute := 0
+for mask := 0; mask < 1<<len(nums); mask++ {
+	x := 0
+	for i, v := range nums {
+		if mask>>i&1 == 1 {
+			x ^= v
+		}
+	}
+	brute += x
+}
+assertEq(subsetXORSum(nums), brute)
 ```
 
 ## 473. Matchsticks to Square | Medium
@@ -1372,4 +2038,49 @@ class Solution {
 // test
 check(new Solution().makesquare(new int[]{1, 1, 2, 2, 2}), true);
 check(new Solution().makesquare(new int[]{3, 3, 3, 3, 4}), false);
+```
+
+```go
+func makesquare(matchsticks []int) bool {
+	total := 0
+	for _, x := range matchsticks {
+		total += x
+	}
+	if total%4 != 0 {
+		return false
+	}
+	side := total / 4
+	sticks := append([]int{}, matchsticks...)
+	sort.Sort(sort.Reverse(sort.IntSlice(sticks)))
+	if sticks[0] > side {
+		return false
+	}
+	var sides [4]int
+	var place func(i int) bool
+	place = func(i int) bool {
+		if i == len(sticks) { // every side <= side and the total is 4*side, so all are equal
+			return true
+		}
+		for k := 0; k < 4; k++ {
+			if sides[k]+sticks[i] <= side {
+				sides[k] += sticks[i]
+				if place(i + 1) {
+					return true
+				}
+				sides[k] -= sticks[i]
+			}
+			if sides[k] == 0 {
+				break
+			}
+		}
+		return false
+	}
+	return place(0)
+}
+// test
+assertEq(makesquare([]int{1, 1, 2, 2, 2}), true)
+assertEq(makesquare([]int{3, 3, 3, 3, 4}), false)
+assertEq(makesquare([]int{5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3}), true)
+assertEq(makesquare([]int{10, 6, 5, 5, 5, 3, 3, 3, 2, 2, 2, 2}), true)
+assertEq(makesquare([]int{1, 1, 1}), false)
 ```
