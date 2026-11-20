@@ -1,0 +1,52 @@
+<!doctype html>
+<!-- Source of assets/og.png (the link-preview image), favicon.ico and apple-touch-icon.png: see "Search engines" in README.md.
+     Serve the repo root (python -m http.server) so the counts load from /data/manifest.json. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<style>
+  html, body { margin: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #1c1d21;
+    background: radial-gradient(1200px 500px at 100% 0%, #e8effc 0%, rgba(232,239,252,0) 60%), #fafaf9; }
+  .icon { position: absolute; left: 80px; top: 76px; width: 112px; height: 112px; }
+  .apple .icon, .ico .icon { left: 0; top: 0; }
+  h1 { position: absolute; left: 80px; top: 200px; margin: 0; font-size: 92px; font-weight: 800; letter-spacing: -2.5px; }
+  h1 b { color: #2563d9; font-weight: 800; }
+  p { position: absolute; left: 82px; top: 322px; margin: 0; font-size: 38px; color: #3c3f46; font-weight: 500; }
+  .chips { position: absolute; left: 80px; top: 404px; display: flex; gap: 16px; flex-wrap: wrap; width: 1040px; }
+  .chips span { font-size: 26px; font-weight: 600; padding: 12px 22px; border-radius: 14px; background: #fff; border: 2px solid #e7e6e2; }
+  .chips span.k { color: #2563d9; border-color: #c9d8f6; background: #f3f7fe; }
+  .url { position: absolute; right: 80px; top: 104px; font-size: 30px; font-weight: 600; color: #6b6f78; }
+</style>
+</head>
+<body>
+<svg class="icon" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#2563d9"/><path d="M35 27V73M65 27V73M27 35H73M27 65H73M35 27A8 8 0 1 0 27 35M65 27A8 8 0 1 1 73 35M65 73A8 8 0 1 0 73 65M35 73A8 8 0 1 1 27 65" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg>
+<div class="url">mleprep.github.io</div>
+<h1>SDE &amp; MLE <b>Prep</b></h1>
+<p>LeetCode, system design and ML interview prep</p>
+<div class="chips">
+  <span class="k" id="n">LeetCode problems</span><span>Python · Java · Go</span><span class="k">Runs in your browser</span>
+  <span id="sd">System design</span><span id="ml">ML / deep learning</span>
+</div>
+<script>
+// ?icon=apple|ico&size=N renders just the icon, N px square, at the top-left corner
+const mode = new URLSearchParams(location.search).get('icon'), size = +new URLSearchParams(location.search).get('size') || 180;
+if (mode) {
+  document.body.className = mode;
+  document.body.style.cssText = `width:${size}px;height:${size}px;background:${mode === 'apple' ? '#2563d9' : 'transparent'}`;
+  [...document.body.children].forEach(el => { if (!el.classList.contains('icon')) el.remove(); });
+  const icon = document.querySelector('.icon');
+  icon.style.width = icon.style.height = size + 'px';
+  if (mode === 'apple') { icon.querySelector('rect').setAttribute('rx', 0); icon.setAttribute('viewBox', '8 8 84 84'); }
+} else {
+  fetch('/data/manifest.json').then(r => r.json()).then(m => {
+    const n = id => m.sections.find(s => s.id === id).topics.reduce((a, t) => a + t.items.length, 0);
+    document.getElementById('n').textContent = `${n('dsa')} LeetCode problems`;
+    document.getElementById('sd').textContent = `${n('system-design')} system design articles`;
+    document.getElementById('ml').textContent = `${n('ml')} ML / DL articles`;
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
