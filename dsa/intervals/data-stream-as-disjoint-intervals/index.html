@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>352. Data Stream as Disjoint Intervals – LeetCode Solution</title>
+<meta name="description" content="LeetCode 352. Data Stream as Disjoint Intervals (Hard): Store disjoint intervals keyed by start in a sorted structure. On addNum(v): find the interval ending…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/intervals/data-stream-as-disjoint-intervals/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="352. Data Stream as Disjoint Intervals – LeetCode Solution">
+<meta property="og:description" content="LeetCode 352. Data Stream as Disjoint Intervals (Hard): Store disjoint intervals keyed by start in a sorted structure. On addNum(v): find the interval ending…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/intervals/data-stream-as-disjoint-intervals/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Intervals","item":"https://mleprep.github.io/dsa/intervals/"},{"@type":"ListItem","position":3,"name":"352. Data Stream as Disjoint Intervals","item":"https://mleprep.github.io/dsa/intervals/data-stream-as-disjoint-intervals/"}]},{"@type":"TechArticle","headline":"352. Data Stream as Disjoint Intervals – LeetCode Solution","name":"352. Data Stream as Disjoint Intervals","description":"LeetCode 352. Data Stream as Disjoint Intervals (Hard): Store disjoint intervals keyed by start in a sorted structure. On addNum(v): find the interval ending…","url":"https://mleprep.github.io/dsa/intervals/data-stream-as-disjoint-intervals/","mainEntityOfPage":"https://mleprep.github.io/dsa/intervals/data-stream-as-disjoint-intervals/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"sorted-map, merging","about":"LeetCode problem 352: Data Stream as Disjoint Intervals","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class="on"><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/intervals/">Intervals</a></div><h1>352. Data Stream as Disjoint Intervals</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/data-stream-as-disjoint-intervals/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=sorted-map" title="Browse problems tagged sorted-map">sorted-map</a><a class="tag" href="/browse/?tag=merging" title="Browse problems tagged merging">merging</a><label class="done"><input type="checkbox" data-k="dsa/data-stream-as-disjoint-intervals"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 3</span><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 8.3 all time">Bloomberg<span>8.3</span></a><a class="co" href="/browse/?co=Google&sort=freq" title="Google: frequency 8.2 all time">Google<span>8.2</span></a><a class="co" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 7.2 all time">Amazon<span>7.2</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Store disjoint intervals keyed by start in a sorted structure. On <code>addNum(v)</code>: find the interval ending at or after <code>v−1</code> from the left and the one starting at <code>v+1</code>; merge with either, both, or create <code>[v, v]</code>.</p><p><strong>Complexity:</strong> O(log n) per add with a balanced tree; <code>getIntervals</code> O(n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/intervals/insert-interval/"><i class="dot Medium"></i>57. Insert Interval</a><a href="/dsa/arrays-hashing/summary-ranges/"><i class="dot Easy"></i>228. Summary Ranges</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class SummaryRanges:
+    def __init__(self):
+        self.iv = []                                   # sorted, disjoint [start, end]
+
+    def addNum(self, value: int) -&gt; None:
+        iv = self.iv
+        i = bisect.bisect_left(iv, [value + 1])        # first interval starting &gt; value
+        if i &gt; 0 and iv[i - 1][1] &gt;= value:            # already covered
+            return
+        left = i &gt; 0 and iv[i - 1][1] == value - 1
+        right = i &lt; len(iv) and iv[i][0] == value + 1
+        if left and right:
+            iv[i - 1][1] = iv[i][1]
+            iv.pop(i)
+        elif left:
+            iv[i - 1][1] = value
+        elif right:
+            iv[i][0] = value
+        else:
+            iv.insert(i, [value, value])
+
+    def getIntervals(self) -&gt; List[List[int]]:
+        return [x[:] for x in self.iv]
+</code></pre><pre class="test" hidden><code id="tsrc">sr = SummaryRanges()
+out = []
+for v in (1, 3, 7, 2, 6):
+    sr.addNum(v)
+    out.append(sr.getIntervals())
+assert out == [[[1, 1]], [[1, 1], [3, 3]], [[1, 1], [3, 3], [7, 7]], [[1, 3], [7, 7]], [[1, 3], [6, 7]]]
+</code></pre><pre hidden><code class="language-java">class SummaryRanges {
+    private final TreeMap&lt;Integer, Integer&gt; iv = new TreeMap&lt;&gt;();   // start -&gt; end
+
+    public void addNum(int value) {
+        Integer lo = iv.floorKey(value), hi = iv.ceilingKey(value + 1);
+        if (lo != null &amp;&amp; iv.get(lo) &gt;= value) return;
+        boolean left = lo != null &amp;&amp; iv.get(lo) == value - 1, right = hi != null &amp;&amp; hi == value + 1;
+        if (left &amp;&amp; right) { iv.put(lo, iv.get(hi)); iv.remove(hi); }
+        else if (left) iv.put(lo, value);
+        else if (right) { iv.put(value, iv.get(hi)); iv.remove(hi); }
+        else iv.put(value, value);
+    }
+
+    public int[][] getIntervals() {
+        int[][] res = new int[iv.size()][];
+        int i = 0;
+        for (Map.Entry&lt;Integer, Integer&gt; e : iv.entrySet()) res[i++] = new int[]{e.getKey(), e.getValue()};
+        return res;
+    }
+}
+</code></pre><pre hidden><code class="language-go">type SummaryRanges struct {
+	iv [][]int // sorted, disjoint [start, end]
+}
+
+func Constructor() SummaryRanges {
+	return SummaryRanges{}
+}
+
+func (this *SummaryRanges) AddNum(value int) {
+	iv := this.iv
+	i := sort.Search(len(iv), func(k int) bool { return iv[k][0] &gt; value }) // first interval starting after value
+	if i &gt; 0 &amp;&amp; iv[i-1][1] &gt;= value {
+		return // already covered
+	}
+	left := i &gt; 0 &amp;&amp; iv[i-1][1] == value-1
+	right := i &lt; len(iv) &amp;&amp; iv[i][0] == value+1
+	switch {
+	case left &amp;&amp; right: // value bridges two intervals
+		iv[i-1][1] = iv[i][1]
+		this.iv = append(iv[:i], iv[i+1:]...)
+	case left:
+		iv[i-1][1] = value
+	case right:
+		iv[i][0] = value
+	default:
+		iv = append(iv, []int{value, value})
+		copy(iv[i+1:], iv[i:])
+		iv[i] = []int{value, value}
+		this.iv = iv
+	}
+}
+
+func (this *SummaryRanges) GetIntervals() [][]int {
+	out := make([][]int, len(this.iv))
+	for i, x := range this.iv {
+		out[i] = []int{x[0], x[1]}
+	}
+	return out
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/intervals/my-calendar-i/">← My Calendar I</a></span><span><a href="/dsa/intervals/employee-free-time/">Employee Free Time →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

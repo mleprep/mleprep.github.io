@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ML System Design – ML / Deep Learning | SDE &amp; MLE Prep</title>
+<meta name="description" content="ML System Design: End-to-end ML design questions (recommendations, ranking, fraud, …) and the production concerns around them.">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-system-design/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="ML System Design – ML / Deep Learning | SDE &amp; MLE Prep">
+<meta property="og:description" content="ML System Design: End-to-end ML design questions (recommendations, ranking, fraud, …) and the production concerns around them.">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-system-design/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML System Design","item":"https://mleprep.github.io/ml/ml-system-design/"}]}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class=""><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class="on"><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a></div><h1>ML System Design</h1><div id="intro" class="article"><div class="md"><p>End-to-end ML design questions (recommendations, ranking, fraud, …) and the production concerns around them.</p></div></div><h2>Articles</h2><div id="lv"><div class="fsum">Showing <b>18</b> of 18</div><div class="list-wrap"><table class="list"><tbody><tr><td class="c"><input type="checkbox" data-k="ml/ml-system-design-framework" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/ml-system-design-framework/">ML System Design Framework</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/recommendation-system-youtube-netflix-tiktok" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/recommendation-system-youtube-netflix-tiktok/">Recommendation System (YouTube / Netflix / TikTok)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/search-ranking" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/search-ranking/">Search Ranking</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/ads-click-through-rate-prediction" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/ads-click-through-rate-prediction/">Ads Click-Through Rate Prediction</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/fraud-detection" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/fraud-detection/">Fraud Detection</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/harmful-content-moderation" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/harmful-content-moderation/">Harmful Content Moderation</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/feature-stores-trainingserving-skew" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/feature-stores-trainingserving-skew/">Feature Stores &amp; Training–Serving Skew</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/ab-testing-online-experimentation" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/ab-testing-online-experimentation/">A/B Testing &amp; Online Experimentation</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/model-monitoring-drift" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/model-monitoring-drift/">Model Monitoring &amp; Drift</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/people-you-may-know-friend-recommendation" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/people-you-may-know-friend-recommendation/">People You May Know (Friend Recommendation)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/visual-search-search-by-image" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/visual-search-search-by-image/">Visual Search (Search by Image)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/eta-prediction-maps-food-delivery" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/eta-prediction-maps-food-delivery/">ETA Prediction (Maps / Food Delivery)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/llm-powered-support-assistant" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/llm-powered-support-assistant/">LLM-Powered Support Assistant</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/news-feed-ranking-facebook-linkedin" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/news-feed-ranking-facebook-linkedin/">News Feed Ranking (Facebook / LinkedIn)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/similar-listings-airbnb-item-to-item-recommendations" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/similar-listings-airbnb-item-to-item-recommendations/">Similar Listings (Airbnb / Item-to-Item Recommendations)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/street-view-blurring-object-detection-system" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/street-view-blurring-object-detection-system/">Street View Blurring (Object Detection System)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/gmail-smart-compose-text-autocomplete" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/gmail-smart-compose-text-autocomplete/">Gmail Smart Compose (Text Autocomplete)</a><span class="tags"></span></td></tr><tr><td class="c"><input type="checkbox" data-k="ml/text-to-image-generation-service" aria-label="done"></td><td class="t"><a href="/ml/ml-system-design/text-to-image-generation-service/">Text-to-Image Generation Service</a><span class="tags"></span></td></tr></tbody></table></div></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

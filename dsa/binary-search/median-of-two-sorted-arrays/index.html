@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. Median of Two Sorted Arrays – LeetCode Solution</title>
+<meta name="description" content="LeetCode 4. Median of Two Sorted Arrays (Hard): Binary search a cut in the shorter array A at i, with cut j = half − i in B. The cut is correct when A[i-1] ≤…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/binary-search/median-of-two-sorted-arrays/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="4. Median of Two Sorted Arrays – LeetCode Solution">
+<meta property="og:description" content="LeetCode 4. Median of Two Sorted Arrays (Hard): Binary search a cut in the shorter array A at i, with cut j = half − i in B. The cut is correct when A[i-1] ≤…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/binary-search/median-of-two-sorted-arrays/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Binary Search","item":"https://mleprep.github.io/dsa/binary-search/"},{"@type":"ListItem","position":3,"name":"4. Median of Two Sorted Arrays","item":"https://mleprep.github.io/dsa/binary-search/median-of-two-sorted-arrays/"}]},{"@type":"TechArticle","headline":"4. Median of Two Sorted Arrays – LeetCode Solution","name":"4. Median of Two Sorted Arrays","description":"LeetCode 4. Median of Two Sorted Arrays (Hard): Binary search a cut in the shorter array A at i, with cut j = half − i in B. The cut is correct when A[i-1] ≤…","url":"https://mleprep.github.io/dsa/binary-search/median-of-two-sorted-arrays/","mainEntityOfPage":"https://mleprep.github.io/dsa/binary-search/median-of-two-sorted-arrays/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"partition","about":"LeetCode problem 4: Median of Two Sorted Arrays","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class="on"><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/binary-search/">Binary Search</a></div><h1>4. Median of Two Sorted Arrays</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/median-of-two-sorted-arrays/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=partition" title="Browse problems tagged partition">partition</a><label class="done"><input type="checkbox" data-k="dsa/median-of-two-sorted-arrays"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 41</span><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 79 all time, 76 in the last 6 months">Bloomberg<span>79</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 77 all time, 74 in the last 6 months">Amazon<span>77</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 75 all time, 64 in the last 6 months">Microsoft<span>75</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 74 all time, 70 in the last 6 months">Google<span>74</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 70 all time, 77 in the last 6 months">Meta<span>70</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 63 all time">Apple<span>63</span></a><a class="co hot" href="/browse/?co=Rippling&sort=freq" title="Rippling: frequency 100 all time, 100 in the last 6 months">Rippling<span>100</span></a><a class="co hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 80 all time, 68 in the last 6 months">Goldman Sachs<span>80</span></a><a class="co hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 63 all time, 53 in the last 6 months">tcs<span>63</span></a><a class="co hot" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 60 all time, 88 in the last 6 months">Zoho<span>60</span></a><a class="co hot" href="/browse/?co=eBay&sort=freq" title="eBay: frequency 53 all time, 81 in the last 6 months">eBay<span>53</span></a><a class="co hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 45 all time, 57 in the last 6 months">Infosys<span>45</span></a><a class="co extra" href="/browse/?co=Zenefits&sort=freq" title="Zenefits: frequency 100 all time">Zenefits<span>100</span></a><a class="co extra" href="/browse/?co=Yahoo&sort=freq" title="Yahoo: frequency 97 all time">Yahoo<span>97</span></a><a class="co extra" href="/browse/?co=Dropbox&sort=freq" title="Dropbox: frequency 92 all time">Dropbox<span>92</span></a><a class="co extra" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 86 all time">Adobe<span>86</span></a><a class="co extra" href="/browse/?co=Okta&sort=freq" title="Okta: frequency 71 all time">Okta<span>71</span></a><a class="co extra" href="/browse/?co=GE+Healthcare&sort=freq" title="GE Healthcare: frequency 70 all time">GE Healthcare<span>70</span></a><a class="co extra" href="/browse/?co=Autodesk&sort=freq" title="Autodesk: frequency 69 all time">Autodesk<span>69</span></a><a class="co extra" href="/browse/?co=Cognizant&sort=freq" title="Cognizant: frequency 69 all time">Cognizant<span>69</span></a><a class="co extra" href="/browse/?co=VMware&sort=freq" title="VMware: frequency 69 all time">VMware<span>69</span></a><a class="co extra" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 68 all time">Qualcomm<span>68</span></a><a class="co extra" href="/browse/?co=Zeta&sort=freq" title="Zeta: frequency 64 all time">Zeta<span>64</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 63 all time">Samsung<span>63</span></a><a class="co extra" href="/browse/?co=Capgemini&sort=freq" title="Capgemini: frequency 62 all time">Capgemini<span>62</span></a><a class="co extra" href="/browse/?co=Arcesium&sort=freq" title="Arcesium: frequency 61 all time">Arcesium<span>61</span></a><a class="co extra" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 61 all time">Accenture<span>61</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 60 all time">Walmart Labs<span>60</span></a><a class="co extra" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 59 all time">Palo Alto Networks<span>59</span></a><a class="co extra" href="/browse/?co=Sprinklr&sort=freq" title="Sprinklr: frequency 54 all time">Sprinklr<span>54</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 53 all time">DE Shaw<span>53</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 52 all time">Oracle<span>52</span></a><a class="co extra" href="/browse/?co=Tesla&sort=freq" title="Tesla: frequency 52 all time">Tesla<span>52</span></a><a class="co extra" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 49 all time">Yandex<span>49</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 42 all time">PayPal<span>42</span></a><a class="co extra" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 39 all time">Nvidia<span>39</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 35 all time">Uber<span>35</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 35 all time">IBM<span>35</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 28 all time">Salesforce<span>28</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 26 all time">TikTok<span>26</span></a><button id="comore" class="co more">+29 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Binary search a <strong>cut</strong> in the shorter array <code>A</code> at <code>i</code>, with cut <code>j = half − i</code> in <code>B</code>. The cut is correct when <code>A[i-1] ≤ B[j]</code> and <code>B[j-1] ≤ A[i]</code>; then the median comes from the four border values.</p><pre class="viz"><code class="language-viz">A:  1  3 | 8  9          left part: {1,3,2,4,5}   right: {8,9,7,10,...}
+B:  2  4  5 | 7  10      maxLeft = 5, minRight = 7
+</code></pre><p><strong>Complexity:</strong> O(log min(m, n)).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/heap/find-median-from-data-stream/"><i class="dot Hard"></i>295. Find Median from Data Stream</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -&gt; float:
+        A, B = (nums1, nums2) if len(nums1) &lt;= len(nums2) else (nums2, nums1)
+        m, n = len(A), len(B)
+        half = (m + n + 1) // 2
+        lo, hi = 0, m
+        while True:
+            i = (lo + hi) // 2
+            j = half - i
+            al = A[i - 1] if i else float(&quot;-inf&quot;)
+            ar = A[i] if i &lt; m else float(&quot;inf&quot;)
+            bl = B[j - 1] if j else float(&quot;-inf&quot;)
+            br = B[j] if j &lt; n else float(&quot;inf&quot;)
+            if al &lt;= br and bl &lt;= ar:
+                if (m + n) % 2:
+                    return float(max(al, bl))
+                return (max(al, bl) + min(ar, br)) / 2
+            if al &gt; br:
+                hi = i - 1
+            else:
+                lo = i + 1
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().findMedianSortedArrays([1, 3], [2]) == 2.0
+assert Solution().findMedianSortedArrays([1, 2], [3, 4]) == 2.5
+assert Solution().findMedianSortedArrays([], [1]) == 1.0
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int[] A = nums1.length &lt;= nums2.length ? nums1 : nums2, B = A == nums1 ? nums2 : nums1;
+        int m = A.length, n = B.length, half = (m + n + 1) / 2, lo = 0, hi = m;
+        while (true) {
+            int i = (lo + hi) / 2, j = half - i;
+            int al = i &gt; 0 ? A[i - 1] : Integer.MIN_VALUE, ar = i &lt; m ? A[i] : Integer.MAX_VALUE;
+            int bl = j &gt; 0 ? B[j - 1] : Integer.MIN_VALUE, br = j &lt; n ? B[j] : Integer.MAX_VALUE;
+            if (al &lt;= br &amp;&amp; bl &lt;= ar) {
+                if ((m + n) % 2 == 1) return Math.max(al, bl);
+                return (Math.max(al, bl) + (double) Math.min(ar, br)) / 2;
+            }
+            if (al &gt; br) hi = i - 1; else lo = i + 1;
+        }
+    }
+}
+</code></pre><pre hidden><code class="language-go">func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
+	A, B := nums1, nums2
+	if len(A) &gt; len(B) {
+		A, B = B, A // binary search the shorter array
+	}
+	m, n := len(A), len(B)
+	half := (m + n + 1) / 2
+	lo, hi := 0, m
+	for {
+		i := (lo + hi) / 2 // i elements from A, j from B on the left side
+		j := half - i
+		al, ar, bl, br := math.MinInt, math.MaxInt, math.MinInt, math.MaxInt
+		if i &gt; 0 {
+			al = A[i-1]
+		}
+		if i &lt; m {
+			ar = A[i]
+		}
+		if j &gt; 0 {
+			bl = B[j-1]
+		}
+		if j &lt; n {
+			br = B[j]
+		}
+		if al &lt;= br &amp;&amp; bl &lt;= ar {
+			if (m+n)%2 == 1 {
+				return float64(max(al, bl))
+			}
+			return float64(max(al, bl)+min(ar, br)) / 2
+		}
+		if al &gt; br {
+			hi = i - 1
+		} else {
+			lo = i + 1
+		}
+	}
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/binary-search/time-based-key-value-store/">← Time Based Key-Value Store</a></span><span><a href="/dsa/binary-search/capacity-to-ship-packages-within-d-days/">Capacity To Ship Packages Within D Days →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

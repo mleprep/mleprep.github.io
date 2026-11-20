@@ -1,5 +1,7 @@
-/* SDE & MLE Prep – tiny hash-routed SPA.
-   Routes: #/  #/browse?filters  #/<section>  #/<section>/<topic>?filters  #/<section>/<topic>/<slug>
+/* SDE & MLE Prep – tiny single-page app on real paths (History API). build.py prerenders a static HTML page for
+   every route (for search engines and first paint); this script re-renders it and handles navigation in place.
+   Routes: /  /browse/?filters  /<section>/  /<section>/<topic>/?filters  /<section>/<topic>/<slug>/
+   (old hash links like /#/dsa/trees redirect to the same path)
    Filters (in the URL so views are shareable): d=Easy,Medium  st=todo|done  tag=heap  topic=graphs  list=grind169 (b75=1 = list=blind75)
    co=Google  win=6m (company window: all time by default)  sort=num|diff|title|freq  q=text */
 const REPO = 'https://github.com/mleprep/mleprep.github.io/blob/main/';
@@ -19,12 +21,12 @@ const main = $('#main'), side = $('#side');
 
 const getJSON = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
 // cache topic files, but forget failed requests so a network blip doesn't break the topic until reload
-const topicData = (sec, t) => (S.cache[sec + '/' + t] ||= getJSON(`data/${sec}/${t}.json`).catch(e => { delete S.cache[sec + '/' + t]; throw e; }));
+const topicData = (sec, t) => (S.cache[sec + '/' + t] ||= getJSON(`/data/${sec}/${t}.json`).catch(e => { delete S.cache[sec + '/' + t]; throw e; }));
 const sec = id => S.m.sections.find(s => s.id === id);
-const href = (...p) => '#/' + p.join('/');
+const href = (...p) => '/' + p.map(x => x + '/').join('');
 const key = (s, it) => s + '/' + it.slug;
 const isDone = (s, it) => !!S.done[key(s, it)];
-const browse = params => '#/browse' + (params ? '?' + new URLSearchParams(params) : '');
+const browse = params => '/browse/' + (params ? '?' + new URLSearchParams(params) : '');
 
 // company tags (data/companies.json, optional): CO.by[slug] = [{c, a, r}] sorted by all-time frequency
 let CO = null;
@@ -78,11 +80,9 @@ const tagLabel = t => t === 'blind75' ? '★ Blind 75' : t === 'premium' ? '🔒
 const tagClass = t => t === 'blind75' ? ' star' : t === 'premium' ? ' prem' : '';
 
 // ---------------------------------------------------------------- filters
-function parseHash() {
-  const h = location.hash.replace(/^#\/?/, '');
-  const i = h.indexOf('?');
-  const path = (i < 0 ? h : h.slice(0, i)).split('/').filter(Boolean).map(decodeURIComponent);
-  return { path, params: new URLSearchParams(i < 0 ? '' : h.slice(i + 1)) };
+function parseLoc() {
+  const path = location.pathname.split('/').filter(x => x && x !== 'index.html').map(decodeURIComponent);
+  return { path, params: new URLSearchParams(location.search) };
 }
 function readF(p) {
   return {
@@ -140,7 +140,7 @@ function sortItems(list, how, F = {}) {
 
 /* Generic filterable list. scope = FLAT entries; base = route path used when filters change. */
 function listView(container, scope, base, opts = {}) {
-  let F = readF(parseHash().params);
+  let F = readF(parseLoc().params);
   const hasDiff = scope.some(f => f.it.difficulty), hasTags = scope.some(f => (f.it.tags || []).length);
   const draw = () => {
     const shown = sortItems(scope.filter(f => passes(f, F)), F.sort, F);
@@ -193,7 +193,7 @@ function listView(container, scope, base, opts = {}) {
       ${hasCo && (F.co || F.sort === 'freq') ? `<p class="muted src">${coSource()}</p>` : ''}`;
     bindChecks(container, draw);
     const update = () => {
-      history.replaceState(null, '', '#/' + base + (writeF(F) ? '?' + writeF(F) : ''));
+      history.replaceState(null, '', '/' + base + '/' + (writeF(F) ? '?' + writeF(F) : ''));
       draw();
     };
     container.querySelectorAll('[data-d]').forEach(b => b.onclick = e => {
@@ -255,7 +255,7 @@ function bindChecks(root, after) {
   root.querySelectorAll('input[data-k]').forEach(cb => cb.onchange = () => {
     if (cb.checked) S.done[cb.dataset.k] = 1; else delete S.done[cb.dataset.k];
     store.set('lc-done', S.done);
-    const { path } = parseHash();
+    const { path } = parseLoc();
     renderSide(path[0] === 'browse' ? 'dsa' : (path[0] || 'dsa'), path[1], path[0] === 'browse');
     if (after) after();
   });
@@ -271,7 +271,7 @@ function renderSide(secId, topicId, onBrowse) {
   const total = s.topics.reduce((a, t) => a + t.items.length, 0);
   const done = FLAT.filter(f => f.s === s.id && isDone(s.id, f.it)).length;
   side.innerHTML = `<h4>${esc(s.title)}</h4>` +
-    (s.id === 'dsa' ? `<a href="#/browse" class="all${onBrowse ? ' on' : ''}"><span>All problems</span><small>${done ? done + '/' : ''}${total}</small></a>` : '') +
+    (s.id === 'dsa' ? `<a href="/browse/" class="all${onBrowse ? ' on' : ''}"><span>All problems</span><small>${done ? done + '/' : ''}${total}</small></a>` : '') +
     s.topics.map(t => {
       const d = t.items.filter(it => isDone(s.id, it)).length;
       return `<a href="${href(s.id, t.id)}" title="${esc(t.title)}" class="${t.id === topicId ? 'on' : ''}"><span>${esc(t.title)}</span><small>${d ? d + '/' : ''}${t.items.length}</small></a>`;
@@ -286,7 +286,7 @@ function viewHome() {
   const b75 = FLAT.filter(f => (f.it.tags || []).includes('blind75')).length;
   main.innerHTML = `
     <h1>Interview prep, condensed.</h1>
-    <p class="lead">${total} problems — every one from Blind 75, NeetCode 150 &amp; 250, Grind 169, LeetCode 75 and Top Interview 150, plus
+    <p class="lead">${total} LeetCode problems — every one from Blind 75, NeetCode 150 &amp; 250, Grind 169, LeetCode 75 and Top Interview 150, plus
     frequently asked company problems — each with the key idea, a sketch, complexity and tested ${c.go >= total ? 'Python, Java &amp; Go'
       : `Python &amp; Java${c.go ? ` (and Go for ${c.go} so far)` : ''}`}. Open any problem and
     pick <b>Solve in browser</b> to write Python${c.go ? ' or Go' : ''} and run it against the tests right on this page (nothing runs on a server).
@@ -299,7 +299,7 @@ function viewHome() {
       <a href="#" id="rand">Random unsolved →</a>
     </div>
     <div class="cards">
-      <a class="card" href="#/browse"><b>Browse all problems</b><span>filter by difficulty, list, pattern, company, status</span></a>
+      <a class="card" href="/browse/"><b>Browse all problems</b><span>filter by difficulty, list, pattern, company, status</span></a>
       ${S.m.sections.map(s => {
         const n = s.topics.reduce((a, t) => a + t.items.length, 0);
         return `<a class="card" href="${href(s.id)}"><b>${esc(s.title)}</b><span>${s.topics.length} topics · ${n} ${s.id === 'dsa' ? 'problems' : 'articles'}</span></a>`;
@@ -318,7 +318,7 @@ function viewHome() {
     e.preventDefault();
     const all = FLAT.filter(f => f.s === 'dsa'), todo = all.filter(f => !isDone('dsa', f.it)), pool = todo.length ? todo : all;
     const f = pool[Math.floor(Math.random() * pool.length)];
-    location.hash = href(f.s, f.t, f.it.slug);
+    go(href(f.s, f.t, f.it.slug));
   };
 }
 function topicCards(s) {
@@ -331,11 +331,11 @@ function topicCards(s) {
   }).join('')}</div>`;
 }
 function viewSection(s) {
-  main.innerHTML = `<h1>${esc(s.title)}</h1>${s.id === 'dsa' ? '<p class="lead">Work through the topics in order, or <a href="#/browse">browse and filter all problems</a>.</p>' : ''}${topicCards(s)}`;
+  main.innerHTML = `<h1>${esc(s.title)}</h1>${s.id === 'dsa' ? '<p class="lead">Work through the topics in order, or <a href="/browse/">browse and filter all problems</a>.</p>' : ''}${topicCards(s)}`;
 }
 function viewBrowse() {
-  const F = readF(parseHash().params);
-  main.innerHTML = `<div class="crumbs"><a href="#/dsa">Algorithms</a></div><h1>${F.q ? 'Search' : 'All problems'}</h1><div id="lv"></div><div id="arts"></div>`;
+  const F = readF(parseLoc().params);
+  main.innerHTML = `<div class="crumbs"><a href="${href('dsa')}">Algorithms</a></div><h1>${F.q ? 'Search' : 'All problems'}</h1><div id="lv"></div><div id="arts"></div>`;
   listView($('#lv'), FLAT.filter(f => f.s === 'dsa'), 'browse', { topicFacet: true, showTopic: true });
   if (F.q) {   // search also covers system design / ML articles
     const arts = FLAT.filter(f => f.s !== 'dsa' && passes(f, { ...readF(new URLSearchParams()), q: F.q }));
@@ -617,7 +617,7 @@ function makeJudge(url, name) {
     },
   };
 }
-const PyJudge = makeJudge('assets/py-worker.js', 'Python'), GoJudge = makeJudge('assets/go-worker.js', 'Go');
+const PyJudge = makeJudge('/assets/py-worker.js', 'Python'), GoJudge = makeJudge('/assets/go-worker.js', 'Go');
 
 /* Code editor: CodeMirror 5 from cdnjs, loaded on first use; falls back to a plain textarea. */
 const CM = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/';
@@ -695,14 +695,51 @@ function askedAt(it) {
     `<a class="co${i >= TOP ? ' extra' : ''}${x.r ? ' hot' : ''}" href="${browse({ co: x.c, sort: 'freq' })}"
       title="${esc(x.c)}: frequency ${fmtF(x.a)} all time${x.r ? `, ${fmtF(x.r)} in the last 6 months` : ''}">${esc(x.c)}<span>${fmtF(x.a || x.r)}</span></a>`).join('')}${list.length > TOP ? `<button id="comore" class="co more">+${list.length - TOP} more</button>` : ''}</div>`;
 }
-function notFound() { main.innerHTML = `<h1>Not found</h1><p><a href="#/">Go home</a></p>`; }
+function notFound() { main.innerHTML = `<h1>Not found</h1><p><a href="/">Go home</a></p>`; }
 
 // ---------------------------------------------------------------- router
+// <title> per page: keep in sync with page_title() in tools/prerender.py
+const SITE = 'SDE & MLE Prep';
+function pageTitle(s, t, f, onBrowse, q) {
+  const n = id => sec(id).topics.reduce((a, x) => a + x.items.length, 0);
+  if (onBrowse) return q ? `Search: ${q} | ${SITE}` : `All ${n('dsa')} Problems: Filter by Company, List & Pattern | ${SITE}`;
+  if (main.querySelector('h1')?.textContent === 'Not found') return `Not found | ${SITE}`;
+  if (!s) return `${SITE}: LeetCode, System Design & ML Interview Prep`;
+  if (!t) return ({ dsa: `Algorithms: ${n('dsa')} LeetCode Problems by Pattern`, 'system-design': `System Design Interview: ${n(s.id)} Articles`,
+    ml: `ML & Deep Learning Interview: ${n(s.id)} Articles` }[s.id] || s.title) + ` | ${SITE}`;
+  const fit = (...c) => c.find(x => x.length <= 70) || c[c.length - 1];   // most descriptive title within 70 chars
+  if (!f) return s.id === 'dsa' ? fit(`${t.title}: LeetCode Problems & Solutions | ${SITE}`, `${t.title}: LeetCode Problems & Solutions`, t.title)
+    : fit(`${t.title} – ${s.title} | ${SITE}`, `${t.title} – ${s.title}`, t.title);
+  const b = s.id === 'dsa' ? `${f.it.id}. ${f.it.title}` : f.it.title, k = s.id === 'ml' ? 'ML Interview' : 'System Design';
+  return s.id === 'dsa' ? fit(`${b} – LeetCode Solution in Python, Java & Go`, `${b} – LeetCode Solution`, b) : fit(`${b} – ${k} | ${SITE}`, `${b} – ${k}`, b);
+}
+// in-app navigation: same-origin links to app routes swap the view instead of loading a new page
+const isRoute = p => { const x = p.split('/').filter(Boolean)[0]; return !x || x === 'index.html' || x === 'browse' || S.m.sections.some(s => s.id === x); };
+function go(url) { history.pushState(null, '', url); route(); }
+document.addEventListener('click', e => {
+  if (!S.m || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest('a[href]');
+  if (!a || a.target || a.hasAttribute('download') || a.origin !== location.origin || !isRoute(a.pathname)) return;
+  if (a.hash && a.pathname === location.pathname && a.search === location.search) return;   // in-page anchor
+  e.preventDefault();
+  if (a.pathname + a.search !== location.pathname + location.search) go(a.pathname + a.search);
+});
+// old hash links (/#/dsa/trees/invert-binary-tree) -> /dsa/trees/invert-binary-tree/
+function fromHash() {
+  if (!location.hash.startsWith('#/')) return false;
+  const h = location.hash.slice(2), i = h.indexOf('?');
+  const path = (i < 0 ? h : h.slice(0, i)).split('/').filter(Boolean);
+  history.replaceState(null, '', '/' + path.map(x => x + '/').join('') + (i < 0 ? '' : '?' + h.slice(i + 1)));
+  return true;
+}
+window.addEventListener('popstate', () => { if (fromHash() || !location.hash) route(); });
+window.addEventListener('hashchange', () => { if (fromHash()) route(); });
+
 let lastPath = null, routeSeq = 0;
 async function route() {
   const my = ++routeSeq, stale = () => my !== routeSeq;   // a newer navigation started while we awaited data
   document.body.classList.remove('open');
-  const { path, params } = parseHash();
+  const { path, params } = parseLoc();
   const [sid, tid, slug] = path;
   const onBrowse = sid === 'browse';
   const s = !onBrowse && sid && sec(sid), t = s && tid && s.topics.find(x => x.id === tid);
@@ -719,7 +756,9 @@ async function route() {
     else await viewItem(s, t, slug, stale);
   } catch (e) { if (!stale()) main.innerHTML = `<h1>Error</h1><pre>${esc(e.message)}</pre>`; }
   if (stale()) return;
-  document.title = (main.querySelector('h1')?.textContent || '') + ' · SDE & MLE Prep';
+  document.title = pageTitle(s, t, slug && t ? FLAT.find(f => f.s === s.id && f.t === t.id && f.it.slug === slug) : null, onBrowse, params.get('q'));
+  const canon = $('link[rel=canonical]');   // follow in-app navigation (filters are not part of the canonical URL)
+  if (canon) canon.href = new URL(location.pathname, canon.href).href;
   const p = path.join('/');
   if (p !== lastPath) window.scrollTo(0, 0);   // keep scroll when only filters change
   lastPath = p;
@@ -731,14 +770,14 @@ $('#q').addEventListener('input', e => {
   clearTimeout(qTimer);
   qTimer = setTimeout(() => {
     const q = e.target.value.trim();
-    if (!location.hash.startsWith('#/browse')) preSearch = location.hash;
+    if (parseLoc().path[0] !== 'browse') preSearch = location.pathname + location.search;
     if (q) {
-      const F = readF(parseHash().path[0] === 'browse' ? parseHash().params : new URLSearchParams());
+      const F = readF(parseLoc().path[0] === 'browse' ? parseLoc().params : new URLSearchParams());
       F.q = q;
-      history.replaceState(null, '', '#/browse?' + writeF(F));
+      history.replaceState(null, '', '/browse/?' + writeF(F));
       route();
-    } else if (preSearch) { location.hash = preSearch; preSearch = null; }
-    else { const F = readF(parseHash().params); F.q = ''; history.replaceState(null, '', '#/browse' + (writeF(F) ? '?' + writeF(F) : '')); route(); }
+    } else if (preSearch) { go(preSearch); preSearch = null; }
+    else { const F = readF(parseLoc().params); F.q = ''; history.replaceState(null, '', '/browse/' + (writeF(F) ? '?' + writeF(F) : '')); route(); }
   }, 150);
 });
 document.addEventListener('keydown', e => {
@@ -754,8 +793,8 @@ $('#theme').onclick = () => {
   document.documentElement.dataset.theme = nxt;
   store.set('lc-theme', nxt);
 };
-window.addEventListener('hashchange', route);
 
-Promise.all([getJSON('data/manifest.json'), getJSON('data/companies.json').catch(() => null), getJSON('data/lists.json').catch(() => null)])
+fromHash();
+Promise.all([getJSON('/data/manifest.json'), getJSON('/data/companies.json').catch(() => null), getJSON('/data/lists.json').catch(() => null)])
   .then(([m, co, lists]) => { S.m = m; if (co) loadCompanies(co); if (lists) loadLists(lists); index(); route(); })
   .catch(e => { main.innerHTML = `<h1>Could not load data</h1><pre>${esc(e.message)}</pre>`; });

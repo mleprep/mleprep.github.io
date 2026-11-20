@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>460. LFU Cache – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 460. LFU Cache (Hard): key → (value, freq), freq → OrderedDict of keys (LRU order within a frequency), plus minFreq. On access, move the key from…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/design/lfu-cache/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="460. LFU Cache – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 460. LFU Cache (Hard): key → (value, freq), freq → OrderedDict of keys (LRU order within a frequency), plus minFreq. On access, move the key from…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/design/lfu-cache/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Design","item":"https://mleprep.github.io/dsa/design/"},{"@type":"ListItem","position":3,"name":"460. LFU Cache","item":"https://mleprep.github.io/dsa/design/lfu-cache/"}]},{"@type":"TechArticle","headline":"460. LFU Cache – LeetCode Solution in Python, Java & Go","name":"460. LFU Cache","description":"LeetCode 460. LFU Cache (Hard): key → (value, freq), freq → OrderedDict of keys (LRU order within a frequency), plus minFreq. On access, move the key from…","url":"https://mleprep.github.io/dsa/design/lfu-cache/","mainEntityOfPage":"https://mleprep.github.io/dsa/design/lfu-cache/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"hash-map, bucket-sort","about":"LeetCode problem 460: LFU Cache","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class="on"><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/design/">Design</a></div><h1>460. LFU Cache</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/lfu-cache/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=hash-map" title="Browse problems tagged hash-map">hash-map</a><a class="tag" href="/browse/?tag=bucket-sort" title="Browse problems tagged bucket-sort">bucket-sort</a><label class="done"><input type="checkbox" data-k="dsa/lfu-cache"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 29</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 54 all time, 30 in the last 6 months">Amazon<span>54</span></a><a class="co hot" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 49 all time, 47 in the last 6 months">Apple<span>49</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 41 all time">Microsoft<span>41</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 37 all time, 22 in the last 6 months">Google<span>37</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 15 all time">Meta<span>15</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 14 all time">Bloomberg<span>14</span></a><a class="co hot" href="/browse/?co=IMC&sort=freq" title="IMC: frequency 96 all time, 100 in the last 6 months">IMC<span>96</span></a><a class="co hot" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 80 all time, 72 in the last 6 months">Salesforce<span>80</span></a><a class="co hot" href="/browse/?co=BNY+Mellon&sort=freq" title="BNY Mellon: frequency 75 all time, 78 in the last 6 months">BNY Mellon<span>75</span></a><a class="co hot" href="/browse/?co=Arista+Networks&sort=freq" title="Arista Networks: frequency 60 all time, 100 in the last 6 months">Arista Networks<span>60</span></a><a class="co hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 28 all time, 48 in the last 6 months">Goldman Sachs<span>28</span></a><a class="co" href="/browse/?co=Netskope&sort=freq" title="Netskope: frequency 100 all time">Netskope<span>100</span></a><a class="co extra" href="/browse/?co=Coupang&sort=freq" title="Coupang: frequency 94 all time">Coupang<span>94</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 74 all time">Citadel<span>74</span></a><a class="co extra" href="/browse/?co=DevRev&sort=freq" title="DevRev: frequency 72 all time">DevRev<span>72</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 70 all time">Oracle<span>70</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 66 all time">Walmart Labs<span>66</span></a><a class="co extra" href="/browse/?co=Wells+Fargo&sort=freq" title="Wells Fargo: frequency 65 all time">Wells Fargo<span>65</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 60 all time">Nutanix<span>60</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 58 all time">PayPal<span>58</span></a><a class="co extra" href="/browse/?co=ServiceNow&sort=freq" title="ServiceNow: frequency 55 all time">ServiceNow<span>55</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 55 all time">Snap<span>55</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 54 all time">Expedia<span>54</span></a><a class="co extra" href="/browse/?co=Netflix&sort=freq" title="Netflix: frequency 49 all time">Netflix<span>49</span></a><a class="co extra" href="/browse/?co=Rippling&sort=freq" title="Rippling: frequency 46 all time">Rippling<span>46</span></a><a class="co extra" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 39 all time">Visa<span>39</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 35 all time">Uber<span>35</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 35 all time">TikTok<span>35</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 32 all time">LinkedIn<span>32</span></a><button id="comore" class="co more">+17 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p><code>key → (value, freq)</code>, <code>freq → OrderedDict of keys</code> (LRU order within a frequency), plus <code>minFreq</code>. On access, move the key from bucket <code>f</code> to <code>f+1</code> (bump <code>minFreq</code> if bucket <code>f</code> emptied and was the min). On insert, evict the oldest key in <code>minFreq</code>&#x27;s bucket, then set <code>minFreq = 1</code>.</p><pre class="viz"><code class="language-viz">freq 1: [k3]            minFreq = 1  -&gt; evict k3 first
+freq 2: [k1, k4]        (k1 older than k4)
+freq 5: [k2]
+</code></pre><p><strong>Complexity:</strong> O(1) per operation.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/design/lru-cache/"><i class="dot Medium"></i>146. LRU Cache</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class LFUCache:
+    def __init__(self, capacity: int):
+        self.cap = capacity
+        self.kv = {}                                 # key -&gt; [value, freq]
+        self.buckets = defaultdict(OrderedDict)      # freq -&gt; keys in LRU order
+        self.min_f = 0
+
+    def _touch(self, key):
+        val, f = self.kv[key]
+        del self.buckets[f][key]
+        if not self.buckets[f]:
+            del self.buckets[f]
+            if self.min_f == f:
+                self.min_f += 1
+        self.kv[key][1] = f + 1
+        self.buckets[f + 1][key] = None
+
+    def get(self, key: int) -&gt; int:
+        if key not in self.kv:
+            return -1
+        self._touch(key)
+        return self.kv[key][0]
+
+    def put(self, key: int, value: int) -&gt; None:
+        if self.cap == 0:
+            return
+        if key in self.kv:
+            self.kv[key][0] = value
+            self._touch(key)
+            return
+        if len(self.kv) == self.cap:
+            old, _ = self.buckets[self.min_f].popitem(last=False)
+            del self.kv[old]
+        self.kv[key] = [value, 1]
+        self.buckets[1][key] = None
+        self.min_f = 1
+</code></pre><pre class="test" hidden><code id="tsrc">c = LFUCache(2)
+c.put(1, 1); c.put(2, 2)
+assert c.get(1) == 1
+c.put(3, 3)                       # evicts 2 (freq 1)
+assert c.get(2) == -1 and c.get(3) == 3
+c.put(4, 4)                       # 1 and 3 both freq 2 -&gt; evict LRU among them = 1
+assert c.get(1) == -1 and c.get(3) == 3 and c.get(4) == 4
+</code></pre><pre hidden><code class="language-java">class LFUCache {
+    private final int cap;
+    private int minF = 0;
+    private final Map&lt;Integer, int[]&gt; kv = new HashMap&lt;&gt;();                    // key -&gt; {value, freq}
+    private final Map&lt;Integer, LinkedHashSet&lt;Integer&gt;&gt; buckets = new HashMap&lt;&gt;(); // freq -&gt; keys (LRU order)
+
+    public LFUCache(int capacity) { cap = capacity; }
+
+    private void touch(int key) {
+        int[] e = kv.get(key);
+        LinkedHashSet&lt;Integer&gt; b = buckets.get(e[1]);
+        b.remove(key);
+        if (b.isEmpty()) { buckets.remove(e[1]); if (minF == e[1]) minF++; }
+        e[1]++;
+        buckets.computeIfAbsent(e[1], k -&gt; new LinkedHashSet&lt;&gt;()).add(key);
+    }
+
+    public int get(int key) {
+        if (!kv.containsKey(key)) return -1;
+        touch(key);
+        return kv.get(key)[0];
+    }
+
+    public void put(int key, int value) {
+        if (cap == 0) return;
+        if (kv.containsKey(key)) { kv.get(key)[0] = value; touch(key); return; }
+        if (kv.size() == cap) {
+            LinkedHashSet&lt;Integer&gt; b = buckets.get(minF);
+            int old = b.iterator().next();
+            b.remove(old);
+            if (b.isEmpty()) buckets.remove(minF);
+            kv.remove(old);
+        }
+        kv.put(key, new int[]{value, 1});
+        buckets.computeIfAbsent(1, k -&gt; new LinkedHashSet&lt;&gt;()).add(key);
+        minF = 1;
+    }
+}
+</code></pre><pre hidden><code class="language-go">type lfuEntry struct {
+	key, val, freq int
+}
+
+type LFUCache struct {
+	cap, minFreq int
+	items        map[int]*list.Element // key -&gt; its element in lists[freq]
+	lists        map[int]*list.List    // freq -&gt; entries, most recently used at the front
+}
+
+func Constructor(capacity int) LFUCache {
+	return LFUCache{cap: capacity, items: map[int]*list.Element{}, lists: map[int]*list.List{}}
+}
+
+func (this *LFUCache) touch(el *list.Element) { // one more use: move to the next frequency list
+	e := el.Value.(*lfuEntry)
+	old := this.lists[e.freq]
+	old.Remove(el)
+	if old.Len() == 0 {
+		delete(this.lists, e.freq)
+		if this.minFreq == e.freq {
+			this.minFreq++
+		}
+	}
+	e.freq++
+	if this.lists[e.freq] == nil {
+		this.lists[e.freq] = list.New()
+	}
+	this.items[e.key] = this.lists[e.freq].PushFront(e)
+}
+
+func (this *LFUCache) Get(key int) int {
+	el, ok := this.items[key]
+	if !ok {
+		return -1
+	}
+	e := el.Value.(*lfuEntry)
+	this.touch(el)
+	return e.val
+}
+
+func (this *LFUCache) Put(key int, value int) {
+	if this.cap == 0 {
+		return
+	}
+	if el, ok := this.items[key]; ok {
+		e := el.Value.(*lfuEntry)
+		e.val = value
+		this.touch(el)
+		return
+	}
+	if len(this.items) == this.cap { // evict the LRU entry among the least frequent
+		l := this.lists[this.minFreq]
+		victim := l.Back()
+		l.Remove(victim)
+		if l.Len() == 0 {
+			delete(this.lists, this.minFreq)
+		}
+		delete(this.items, victim.Value.(*lfuEntry).key)
+	}
+	if this.lists[1] == nil {
+		this.lists[1] = list.New()
+	}
+	this.items[key] = this.lists[1].PushFront(&amp;lfuEntry{key: key, val: value, freq: 1})
+	this.minFreq = 1
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/design/lru-cache/">← LRU Cache</a></span><span><a href="/dsa/design/insert-delete-getrandom-o1/">Insert Delete GetRandom O(1) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>33. Search in Rotated Sorted Array – LeetCode Solution</title>
+<meta name="description" content="LeetCode 33. Search in Rotated Sorted Array (Medium): At least one half around mid is sorted. If nums[lo] ≤ nums[mid] the left half is sorted: target in…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/binary-search/search-in-rotated-sorted-array/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="33. Search in Rotated Sorted Array – LeetCode Solution">
+<meta property="og:description" content="LeetCode 33. Search in Rotated Sorted Array (Medium): At least one half around mid is sorted. If nums[lo] ≤ nums[mid] the left half is sorted: target in…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/binary-search/search-in-rotated-sorted-array/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Binary Search","item":"https://mleprep.github.io/dsa/binary-search/"},{"@type":"ListItem","position":3,"name":"33. Search in Rotated Sorted Array","item":"https://mleprep.github.io/dsa/binary-search/search-in-rotated-sorted-array/"}]},{"@type":"TechArticle","headline":"33. Search in Rotated Sorted Array – LeetCode Solution","name":"33. Search in Rotated Sorted Array","description":"LeetCode 33. Search in Rotated Sorted Array (Medium): At least one half around mid is sorted. If nums[lo] ≤ nums[mid] the left half is sorted: target in…","url":"https://mleprep.github.io/dsa/binary-search/search-in-rotated-sorted-array/","mainEntityOfPage":"https://mleprep.github.io/dsa/binary-search/search-in-rotated-sorted-array/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"blind75, rotated","about":"LeetCode problem 33: Search in Rotated Sorted Array","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class="on"><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/binary-search/">Binary Search</a></div><h1>33. Search in Rotated Sorted Array</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/search-in-rotated-sorted-array/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag star" href="/browse/?list=blind75" title="Browse problems tagged blind75">★ Blind 75</a><a class="tag" href="/browse/?tag=rotated" title="Browse problems tagged rotated">rotated</a><label class="done"><input type="checkbox" data-k="dsa/search-in-rotated-sorted-array"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 45</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 72 all time, 68 in the last 6 months">Amazon<span>72</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 69 all time, 61 in the last 6 months">Bloomberg<span>69</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 69 all time, 53 in the last 6 months">Microsoft<span>69</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 59 all time, 55 in the last 6 months">Meta<span>59</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 57 all time, 54 in the last 6 months">Google<span>57</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 40 all time">Apple<span>40</span></a><a class="co hot" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 73 all time, 53 in the last 6 months">TikTok<span>73</span></a><a class="co hot" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 70 all time, 86 in the last 6 months">Oracle<span>70</span></a><a class="co hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 61 all time, 53 in the last 6 months">tcs<span>61</span></a><a class="co hot" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 57 all time, 65 in the last 6 months">Yandex<span>57</span></a><a class="co hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 50 all time, 46 in the last 6 months">Infosys<span>50</span></a><a class="co" href="/browse/?co=Cohesity&sort=freq" title="Cohesity: frequency 100 all time">Cohesity<span>100</span></a><a class="co extra" href="/browse/?co=Delhivery&sort=freq" title="Delhivery: frequency 100 all time">Delhivery<span>100</span></a><a class="co extra" href="/browse/?co=Tinkoff&sort=freq" title="Tinkoff: frequency 94 all time">Tinkoff<span>94</span></a><a class="co extra" href="/browse/?co=Grammarly&sort=freq" title="Grammarly: frequency 90 all time">Grammarly<span>90</span></a><a class="co extra" href="/browse/?co=Autodesk&sort=freq" title="Autodesk: frequency 82 all time">Autodesk<span>82</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 82 all time">Walmart Labs<span>82</span></a><a class="co extra" href="/browse/?co=FreshWorks&sort=freq" title="FreshWorks: frequency 81 all time">FreshWorks<span>81</span></a><a class="co extra" href="/browse/?co=Arista+Networks&sort=freq" title="Arista Networks: frequency 78 all time">Arista Networks<span>78</span></a><a class="co extra" href="/browse/?co=Criteo&sort=freq" title="Criteo: frequency 78 all time">Criteo<span>78</span></a><a class="co extra" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 74 all time">Nvidia<span>74</span></a><a class="co extra" href="/browse/?co=Paytm&sort=freq" title="Paytm: frequency 71 all time">Paytm<span>71</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 70 all time">Zoho<span>70</span></a><a class="co extra" href="/browse/?co=Wish&sort=freq" title="Wish: frequency 70 all time">Wish<span>70</span></a><a class="co extra" href="/browse/?co=PayPay&sort=freq" title="PayPay: frequency 68 all time">PayPay<span>68</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 67 all time">LinkedIn<span>67</span></a><a class="co extra" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 65 all time">Palo Alto Networks<span>65</span></a><a class="co extra" href="/browse/?co=ZScaler&sort=freq" title="ZScaler: frequency 63 all time">ZScaler<span>63</span></a><a class="co extra" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 63 all time">Adobe<span>63</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 63 all time">PayPal<span>63</span></a><a class="co extra" href="/browse/?co=SAP&sort=freq" title="SAP: frequency 62 all time">SAP<span>62</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 60 all time">Nutanix<span>60</span></a><a class="co extra" href="/browse/?co=ByteDance&sort=freq" title="ByteDance: frequency 59 all time">ByteDance<span>59</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 59 all time">Flipkart<span>59</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 58 all time">Goldman Sachs<span>58</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 57 all time">Uber<span>57</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 54 all time">Expedia<span>54</span></a><a class="co extra" href="/browse/?co=eBay&sort=freq" title="eBay: frequency 53 all time">eBay<span>53</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 53 all time">Samsung<span>53</span></a><a class="co extra" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 49 all time">Anduril<span>49</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 45 all time">Snap<span>45</span></a><a class="co extra" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 39 all time">Visa<span>39</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 37 all time">Cisco<span>37</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 35 all time">IBM<span>35</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 28 all time">Salesforce<span>28</span></a><button id="comore" class="co more">+33 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>At least one half around <code>mid</code> is sorted. If <code>nums[lo] ≤ nums[mid]</code> the left half is sorted: target in <code>[nums[lo], nums[mid])</code> → go left, else right. Mirror for the right half.</p><p><strong>Complexity:</strong> O(log n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/binary-search/find-minimum-in-rotated-sorted-array/"><i class="dot Medium"></i>153. Find Minimum in Rotated Sorted Array</a><a href="/dsa/binary-search/search-in-rotated-sorted-array-ii/"><i class="dot Medium"></i>81. Search in Rotated Sorted Array II</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def search(self, nums: List[int], target: int) -&gt; int:
+        lo, hi = 0, len(nums) - 1
+        while lo &lt;= hi:
+            mid = (lo + hi) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[lo] &lt;= nums[mid]:                    # left half sorted
+                if nums[lo] &lt;= target &lt; nums[mid]:
+                    hi = mid - 1
+                else:
+                    lo = mid + 1
+            else:                                        # right half sorted
+                if nums[mid] &lt; target &lt;= nums[hi]:
+                    lo = mid + 1
+                else:
+                    hi = mid - 1
+        return -1
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().search([4, 5, 6, 7, 0, 1, 2], 0) == 4
+assert Solution().search([4, 5, 6, 7, 0, 1, 2], 3) == -1
+assert Solution().search([1], 0) == -1
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int search(int[] nums, int target) {
+        int lo = 0, hi = nums.length - 1;
+        while (lo &lt;= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[lo] &lt;= nums[mid]) {
+                if (nums[lo] &lt;= target &amp;&amp; target &lt; nums[mid]) hi = mid - 1; else lo = mid + 1;
+            } else {
+                if (nums[mid] &lt; target &amp;&amp; target &lt;= nums[hi]) lo = mid + 1; else hi = mid - 1;
+            }
+        }
+        return -1;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func search(nums []int, target int) int {
+	lo, hi := 0, len(nums)-1
+	for lo &lt;= hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] == target {
+			return mid
+		}
+		if nums[lo] &lt;= nums[mid] { // left half sorted
+			if nums[lo] &lt;= target &amp;&amp; target &lt; nums[mid] {
+				hi = mid - 1
+			} else {
+				lo = mid + 1
+			}
+		} else { // right half sorted
+			if nums[mid] &lt; target &amp;&amp; target &lt;= nums[hi] {
+				lo = mid + 1
+			} else {
+				hi = mid - 1
+			}
+		}
+	}
+	return -1
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/binary-search/find-minimum-in-rotated-sorted-array/">← Find Minimum in Rotated Sorted Array</a></span><span><a href="/dsa/binary-search/find-peak-element/">Find Peak Element →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Positional Encodings: Sinusoidal &amp; RoPE – ML Interview</title>
+<meta name="description" content="Key idea: sinusoidal encodings add sin/cos(pos / 10000^(2i/d)) to the embeddings. RoPE instead rotates each pair of query/key dimensions by an angle…">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-coding/positional-encodings-sinusoidal-rope/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Positional Encodings: Sinusoidal &amp; RoPE – ML Interview">
+<meta property="og:description" content="Key idea: sinusoidal encodings add sin/cos(pos / 10000^(2i/d)) to the embeddings. RoPE instead rotates each pair of query/key dimensions by an angle…">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-coding/positional-encodings-sinusoidal-rope/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML Coding from Scratch","item":"https://mleprep.github.io/ml/ml-coding/"},{"@type":"ListItem","position":3,"name":"Positional Encodings: Sinusoidal & RoPE","item":"https://mleprep.github.io/ml/ml-coding/positional-encodings-sinusoidal-rope/"}]},{"@type":"TechArticle","headline":"Positional Encodings: Sinusoidal & RoPE – ML Interview","name":"Positional Encodings: Sinusoidal & RoPE","description":"Key idea: sinusoidal encodings add sin/cos(pos / 10000^(2i/d)) to the embeddings. RoPE instead rotates each pair of query/key dimensions by an angle…","url":"https://mleprep.github.io/ml/ml-coding/positional-encodings-sinusoidal-rope/","mainEntityOfPage":"https://mleprep.github.io/ml/ml-coding/positional-encodings-sinusoidal-rope/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class="on"><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class=""><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/ml-coding/">ML Coding from Scratch</a></div><h1>Positional Encodings: Sinusoidal &amp; RoPE</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/positional-encodings-sinusoidal-rope"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Key idea:</strong> sinusoidal encodings add <code>sin/cos(pos / 10000^(2i/d))</code> to the embeddings. <strong>RoPE</strong> instead rotates each pair of query/key dimensions by an angle proportional to the position, so the dot product <code>q_m · k_n</code> depends only on the <strong>offset</strong> <code>m − n</code>.</p><pre><code class="language-python">import numpy as np
+
+def sinusoidal(n_pos, d):
+    pos = np.arange(n_pos)[:, None]
+    angle = pos / 10000 ** (np.arange(0, d, 2)[None, :] / d)
+    pe = np.zeros((n_pos, d))
+    pe[:, 0::2], pe[:, 1::2] = np.sin(angle), np.cos(angle)
+    return pe
+
+def rope(x, pos, base=10000.0):           # x: (..., d), d even; rotate pairs (x[2i], x[2i+1])
+    d = x.shape[-1]
+    ang = np.asarray(pos)[..., None] * base ** (-np.arange(0, d, 2) / d)
+    cos, sin = np.cos(ang), np.sin(ang)
+    x1, x2 = x[..., 0::2], x[..., 1::2]
+    out = np.empty_like(x)
+    out[..., 0::2] = x1 * cos - x2 * sin
+    out[..., 1::2] = x1 * sin + x2 * cos
+    return out
+
+pe = sinusoidal(50, 16)
+assert pe.shape == (50, 16) and np.allclose(pe[0], np.tile([0, 1], 8))
+rng = np.random.default_rng(0)
+q, k = rng.normal(size=8), rng.normal(size=8)
+assert np.isclose(rope(q, 3) @ rope(k, 7), rope(q, 10) @ rope(k, 14))   # only the offset (4) matters
+assert np.isclose(np.linalg.norm(rope(q, 5)), np.linalg.norm(q))        # rotation preserves norms
+X = rng.normal(size=(5, 8))
+assert np.allclose(rope(X, np.arange(5))[2], rope(X[2], 2))              # batched == per position
+print(&quot;ok&quot;, round(float(rope(q, 3) @ rope(k, 7)), 4))
+</code></pre></div></div><nav class="rail"><h4>In ML Coding from Scratch</h4><a href="/ml/ml-coding/softmax-cross-entropy-numerically-stable/" class="">Softmax &amp; Cross-Entropy (Numerically Stable)</a><a href="/ml/ml-coding/linear-regression-with-gradient-descent/" class="">Linear Regression with Gradient Descent</a><a href="/ml/ml-coding/logistic-regression/" class="">Logistic Regression</a><a href="/ml/ml-coding/k-means/" class="">K-Means</a><a href="/ml/ml-coding/k-nearest-neighbors/" class="">K-Nearest Neighbors</a><a href="/ml/ml-coding/scaled-dot-product-multi-head-attention/" class="">Scaled Dot-Product &amp; Multi-Head Attention</a><a href="/ml/ml-coding/two-layer-mlp-with-backprop/" class="">Two-Layer MLP with Backprop</a><a href="/ml/ml-coding/decision-tree-split-gini/" class="">Decision Tree Split (Gini)</a><a href="/ml/ml-coding/roc-auc-from-scratch/" class="">ROC-AUC from Scratch</a><a href="/ml/ml-coding/conv2d-forward-im2col/" class="">Conv2D Forward (im2col)</a><a href="/ml/ml-coding/batch-normalization-forward-backward/" class="">Batch Normalization (Forward &amp; Backward)</a><a href="/ml/ml-coding/pca-via-svd/" class="">PCA via SVD</a><a href="/ml/ml-coding/adam-optimizer/" class="">Adam Optimizer</a><a href="/ml/ml-coding/gaussian-naive-bayes/" class="">Gaussian Naive Bayes</a><a href="/ml/ml-coding/beam-search-decoding/" class="">Beam Search Decoding</a><a href="/ml/ml-coding/iou-non-maximum-suppression/" class="">IoU &amp; Non-Maximum Suppression</a><a href="/ml/ml-coding/byte-pair-encoding-bpe-tokenizer/" class="">Byte-Pair Encoding (BPE) Tokenizer</a><a href="/ml/ml-coding/sampling-temperature-top-k-top-p/" class="">Sampling: Temperature, Top-k, Top-p</a><a href="/ml/ml-coding/layernorm-rmsnorm-forward-backward/" class="">LayerNorm &amp; RMSNorm (Forward &amp; Backward)</a><a href="/ml/ml-coding/positional-encodings-sinusoidal-rope/" class="on">Positional Encodings: Sinusoidal &amp; RoPE</a><a href="/ml/ml-coding/causal-self-attention-with-a-kv-cache/" class="">Causal Self-Attention with a KV Cache</a><a href="/ml/ml-coding/matrix-factorization-als-for-recommendations/" class="">Matrix Factorization (ALS) for Recommendations</a><a href="/ml/ml-coding/ranking-metrics-precisionk-map-mrr-ndcg/" class="">Ranking Metrics: Precision@k, MAP, MRR, NDCG</a><a href="/ml/ml-coding/dropout-forward-backward/" class="">Dropout (Forward &amp; Backward)</a><a href="/ml/ml-coding/lora-linear-layer/" class="">LoRA Linear Layer</a></nav></div><div class="pager"><span><a href="/ml/ml-coding/layernorm-rmsnorm-forward-backward/">← LayerNorm &amp; RMSNorm (Forward &amp; Backward)</a></span><span><a href="/ml/ml-coding/causal-self-attention-with-a-kv-cache/">Causal Self-Attention with a KV Cache →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

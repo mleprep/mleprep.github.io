@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ensembles &amp; Stacking – ML Interview | SDE &amp; MLE Prep</title>
+<meta name="description" content="Q: Why do ensembles work, and what is stacking? Averaging models with uncorrelated errors reduces variance (Var(mean) = ρσ² + (1−ρ)σ²/M). Techniques: Bagging…">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-fundamentals/ensembles-stacking/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Ensembles &amp; Stacking – ML Interview | SDE &amp; MLE Prep">
+<meta property="og:description" content="Q: Why do ensembles work, and what is stacking? Averaging models with uncorrelated errors reduces variance (Var(mean) = ρσ² + (1−ρ)σ²/M). Techniques: Bagging…">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-fundamentals/ensembles-stacking/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML Fundamentals","item":"https://mleprep.github.io/ml/ml-fundamentals/"},{"@type":"ListItem","position":3,"name":"Ensembles & Stacking","item":"https://mleprep.github.io/ml/ml-fundamentals/ensembles-stacking/"}]},{"@type":"TechArticle","headline":"Ensembles & Stacking – ML Interview","name":"Ensembles & Stacking","description":"Q: Why do ensembles work, and what is stacking? Averaging models with uncorrelated errors reduces variance (Var(mean) = ρσ² + (1−ρ)σ²/M). Techniques: Bagging…","url":"https://mleprep.github.io/ml/ml-fundamentals/ensembles-stacking/","mainEntityOfPage":"https://mleprep.github.io/ml/ml-fundamentals/ensembles-stacking/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class="on"><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class=""><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class=""><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/ml-fundamentals/">ML Fundamentals</a></div><h1>Ensembles &amp; Stacking</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/ensembles-stacking"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Q: Why do ensembles work, and what is stacking?</strong></p><p>Averaging models with <strong>uncorrelated errors</strong> reduces variance (<code>Var(mean) = ρσ² + (1−ρ)σ²/M</code>). Techniques:</p><ul><li><strong>Bagging</strong> (bootstrap + average: random forest), <strong>boosting</strong> (sequential bias reduction: GBDT), <strong>snapshot/seed ensembles</strong> for neural nets.</li><li><strong>Stacking</strong>: train a meta-model on <strong>out-of-fold</strong> predictions of base models (never in-fold → leakage).</li><li>Costs: latency and complexity at serving time → often <strong>distill</strong> the ensemble into one model.</li></ul></div></div><nav class="rail"><h4>In ML Fundamentals</h4><a href="/ml/ml-fundamentals/biasvariance-trade-off/" class="">Bias–Variance Trade-off</a><a href="/ml/ml-fundamentals/regularization-l1-l2-dropout-early-stopping/" class="">Regularization (L1, L2, Dropout, Early Stopping)</a><a href="/ml/ml-fundamentals/train-validation-test-cross-validation-leakage/" class="">Train / Validation / Test, Cross-Validation &amp; Leakage</a><a href="/ml/ml-fundamentals/evaluation-metrics/" class="">Evaluation Metrics</a><a href="/ml/ml-fundamentals/handling-class-imbalance/" class="">Handling Class Imbalance</a><a href="/ml/ml-fundamentals/gradient-descent-optimizers/" class="">Gradient Descent &amp; Optimizers</a><a href="/ml/ml-fundamentals/linear-logistic-regression/" class="">Linear &amp; Logistic Regression</a><a href="/ml/ml-fundamentals/decision-trees-random-forests-gradient-boosting/" class="">Decision Trees, Random Forests &amp; Gradient Boosting</a><a href="/ml/ml-fundamentals/k-means-clustering/" class="">K-Means &amp; Clustering</a><a href="/ml/ml-fundamentals/pca-dimensionality-reduction/" class="">PCA &amp; Dimensionality Reduction</a><a href="/ml/ml-fundamentals/feature-engineering-missing-data/" class="">Feature Engineering &amp; Missing Data</a><a href="/ml/ml-fundamentals/generative-vs-discriminative-models/" class="">Generative vs Discriminative Models</a><a href="/ml/ml-fundamentals/svm-kernels/" class="">SVM &amp; Kernels</a><a href="/ml/ml-fundamentals/knn-and-the-curse-of-dimensionality/" class="">KNN and the Curse of Dimensionality</a><a href="/ml/ml-fundamentals/mle-vs-map-and-bayes-theorem/" class="">MLE vs MAP and Bayes&#x27; Theorem</a><a href="/ml/ml-fundamentals/hyperparameter-tuning/" class="">Hyperparameter Tuning</a><a href="/ml/ml-fundamentals/ensembles-stacking/" class="on">Ensembles &amp; Stacking</a><a href="/ml/ml-fundamentals/statistics-hypothesis-tests-p-values-confidence-intervals/" class="">Statistics: Hypothesis Tests, p-values &amp; Confidence Intervals</a><a href="/ml/ml-fundamentals/information-theory-entropy-cross-entropy-kl/" class="">Information Theory: Entropy, Cross-Entropy, KL</a><a href="/ml/ml-fundamentals/loss-functions-cheat-sheet/" class="">Loss Functions Cheat Sheet</a><a href="/ml/ml-fundamentals/bandits-exploration/" class="">Bandits &amp; Exploration</a><a href="/ml/ml-fundamentals/collaborative-filtering-matrix-factorization/" class="">Collaborative Filtering &amp; Matrix Factorization</a><a href="/ml/ml-fundamentals/model-interpretability/" class="">Model Interpretability</a><a href="/ml/ml-fundamentals/time-series-forecasting/" class="">Time-Series Forecasting</a></nav></div><div class="pager"><span><a href="/ml/ml-fundamentals/hyperparameter-tuning/">← Hyperparameter Tuning</a></span><span><a href="/ml/ml-fundamentals/statistics-hypothesis-tests-p-values-confidence-intervals/">Statistics: Hypothesis Tests, p-values &amp; Confidence Intervals →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

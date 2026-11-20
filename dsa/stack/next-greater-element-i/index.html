@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>496. Next Greater Element I – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 496. Next Greater Element I (Easy): Compute next-greater for every value of nums2 with a decreasing stack and store it in a map; answer queries from…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/stack/next-greater-element-i/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="496. Next Greater Element I – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 496. Next Greater Element I (Easy): Compute next-greater for every value of nums2 with a decreasing stack and store it in a map; answer queries from…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/stack/next-greater-element-i/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Stack & Monotonic Stack","item":"https://mleprep.github.io/dsa/stack/"},{"@type":"ListItem","position":3,"name":"496. Next Greater Element I","item":"https://mleprep.github.io/dsa/stack/next-greater-element-i/"}]},{"@type":"TechArticle","headline":"496. Next Greater Element I – LeetCode Solution in Python, Java & Go","name":"496. Next Greater Element I","description":"LeetCode 496. Next Greater Element I (Easy): Compute next-greater for every value of nums2 with a decreasing stack and store it in a map; answer queries from…","url":"https://mleprep.github.io/dsa/stack/next-greater-element-i/","mainEntityOfPage":"https://mleprep.github.io/dsa/stack/next-greater-element-i/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"monotonic-stack","about":"LeetCode problem 496: Next Greater Element I","educationalLevel":"Easy"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class="on"><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/stack/">Stack &amp; Monotonic Stack</a></div><h1>496. Next Greater Element I</h1><div class="meta"><a class="badge Easy" href="/browse/?d=Easy" title="All Easy problems">Easy</a><a href="https://leetcode.com/problems/next-greater-element-i/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=monotonic-stack" title="Browse problems tagged monotonic-stack">monotonic-stack</a><label class="done"><input type="checkbox" data-k="dsa/next-greater-element-i"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 14</span><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 60 all time, 56 in the last 6 months">Bloomberg<span>60</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 56 all time, 51 in the last 6 months">Amazon<span>56</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 49 all time, 43 in the last 6 months">Microsoft<span>49</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 45 all time, 52 in the last 6 months">Google<span>45</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 43 all time, 38 in the last 6 months">Meta<span>43</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 30 all time">Apple<span>30</span></a><a class="co hot" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 64 all time, 63 in the last 6 months">Flipkart<span>64</span></a><a class="co" href="/browse/?co=Swiggy&sort=freq" title="Swiggy: frequency 82 all time">Swiggy<span>82</span></a><a class="co" href="/browse/?co=Barclays&sort=freq" title="Barclays: frequency 53 all time">Barclays<span>53</span></a><a class="co" href="/browse/?co=Agoda&sort=freq" title="Agoda: frequency 48 all time">Agoda<span>48</span></a><a class="co" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 44 all time">Accenture<span>44</span></a><a class="co" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 36 all time">tcs<span>36</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 26 all time">TikTok<span>26</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 22 all time">Uber<span>22</span></a><button id="comore" class="co more">+2 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Compute next-greater for every value of <code>nums2</code> with a decreasing stack and store it in a map; answer queries from <code>nums1</code>.</p><p><strong>Complexity:</strong> O(n + m).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/stack/next-greater-element-ii/"><i class="dot Medium"></i>503. Next Greater Element II</a><a href="/dsa/stack/daily-temperatures/"><i class="dot Medium"></i>739. Daily Temperatures</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def nextGreaterElement(self, nums1: List[int], nums2: List[int]) -&gt; List[int]:
+        nxt, st = {}, []
+        for x in nums2:
+            while st and st[-1] &lt; x:
+                nxt[st.pop()] = x
+            st.append(x)
+        return [nxt.get(x, -1) for x in nums1]
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().nextGreaterElement([4, 1, 2], [1, 3, 4, 2]) == [-1, 3, -1]
+assert Solution().nextGreaterElement([2, 4], [1, 2, 3, 4]) == [3, -1]
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        Map&lt;Integer, Integer&gt; nxt = new HashMap&lt;&gt;();
+        Deque&lt;Integer&gt; st = new ArrayDeque&lt;&gt;();
+        for (int x : nums2) {
+            while (!st.isEmpty() &amp;&amp; st.peek() &lt; x) nxt.put(st.pop(), x);
+            st.push(x);
+        }
+        int[] res = new int[nums1.length];
+        for (int i = 0; i &lt; nums1.length; i++) res[i] = nxt.getOrDefault(nums1[i], -1);
+        return res;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func nextGreaterElement(nums1 []int, nums2 []int) []int {
+	nxt, st := map[int]int{}, []int{}
+	for _, x := range nums2 {
+		for len(st) &gt; 0 &amp;&amp; st[len(st)-1] &lt; x {
+			nxt[st[len(st)-1]] = x
+			st = st[:len(st)-1]
+		}
+		st = append(st, x)
+	}
+	res := make([]int, len(nums1))
+	for i, x := range nums1 {
+		if v, ok := nxt[x]; ok {
+			res[i] = v
+		} else {
+			res[i] = -1
+		}
+	}
+	return res
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/stack/maximal-rectangle/">← Maximal Rectangle</a></span><span><a href="/dsa/stack/next-greater-element-ii/">Next Greater Element II →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

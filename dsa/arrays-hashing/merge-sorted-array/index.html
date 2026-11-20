@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>88. Merge Sorted Array – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 88. Merge Sorted Array (Easy): Fill nums1 from the back: the largest remaining element goes to position k. Working backwards never overwrites unread…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/arrays-hashing/merge-sorted-array/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="88. Merge Sorted Array – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 88. Merge Sorted Array (Easy): Fill nums1 from the back: the largest remaining element goes to position k. Working backwards never overwrites unread…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/arrays-hashing/merge-sorted-array/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Arrays & Hashing","item":"https://mleprep.github.io/dsa/arrays-hashing/"},{"@type":"ListItem","position":3,"name":"88. Merge Sorted Array","item":"https://mleprep.github.io/dsa/arrays-hashing/merge-sorted-array/"}]},{"@type":"TechArticle","headline":"88. Merge Sorted Array – LeetCode Solution in Python, Java & Go","name":"88. Merge Sorted Array","description":"LeetCode 88. Merge Sorted Array (Easy): Fill nums1 from the back: the largest remaining element goes to position k. Working backwards never overwrites unread…","url":"https://mleprep.github.io/dsa/arrays-hashing/merge-sorted-array/","mainEntityOfPage":"https://mleprep.github.io/dsa/arrays-hashing/merge-sorted-array/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"two-pointers","about":"LeetCode problem 88: Merge Sorted Array","educationalLevel":"Easy"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class="on"><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/arrays-hashing/">Arrays &amp; Hashing</a></div><h1>88. Merge Sorted Array</h1><div class="meta"><a class="badge Easy" href="/browse/?d=Easy" title="All Easy problems">Easy</a><a href="https://leetcode.com/problems/merge-sorted-array/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=two-pointers" title="Browse problems tagged two-pointers">two-pointers</a><label class="done"><input type="checkbox" data-k="dsa/merge-sorted-array"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 34</span><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 87 all time, 55 in the last 6 months">Meta<span>87</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 73 all time, 61 in the last 6 months">Bloomberg<span>73</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 72 all time, 50 in the last 6 months">Microsoft<span>72</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 69 all time, 60 in the last 6 months">Google<span>69</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 67 all time, 57 in the last 6 months">Amazon<span>67</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 57 all time">Apple<span>57</span></a><a class="co hot" href="/browse/?co=EPAM+Systems&sort=freq" title="EPAM Systems: frequency 80 all time, 83 in the last 6 months">EPAM Systems<span>80</span></a><a class="co hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 73 all time, 77 in the last 6 months">tcs<span>73</span></a><a class="co hot" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 63 all time, 65 in the last 6 months">Yandex<span>63</span></a><a class="co" href="/browse/?co=Squarespace&sort=freq" title="Squarespace: frequency 100 all time">Squarespace<span>100</span></a><a class="co" href="/browse/?co=Avito&sort=freq" title="Avito: frequency 83 all time">Avito<span>83</span></a><a class="co" href="/browse/?co=Hubspot&sort=freq" title="Hubspot: frequency 80 all time">Hubspot<span>80</span></a><a class="co extra" href="/browse/?co=HCL&sort=freq" title="HCL: frequency 76 all time">HCL<span>76</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 70 all time">Zoho<span>70</span></a><a class="co extra" href="/browse/?co=Swiggy&sort=freq" title="Swiggy: frequency 69 all time">Swiggy<span>69</span></a><a class="co extra" href="/browse/?co=persistent+systems&sort=freq" title="persistent systems: frequency 69 all time">persistent systems<span>69</span></a><a class="co extra" href="/browse/?co=AMD&sort=freq" title="AMD: frequency 69 all time">AMD<span>69</span></a><a class="co extra" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 65 all time">Palo Alto Networks<span>65</span></a><a class="co extra" href="/browse/?co=Wipro&sort=freq" title="Wipro: frequency 63 all time">Wipro<span>63</span></a><a class="co extra" href="/browse/?co=Verkada&sort=freq" title="Verkada: frequency 60 all time">Verkada<span>60</span></a><a class="co extra" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 58 all time">Qualcomm<span>58</span></a><a class="co extra" href="/browse/?co=Cognizant&sort=freq" title="Cognizant: frequency 57 all time">Cognizant<span>57</span></a><a class="co extra" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 55 all time">Nvidia<span>55</span></a><a class="co extra" href="/browse/?co=Morgan+Stanley&sort=freq" title="Morgan Stanley: frequency 54 all time">Morgan Stanley<span>54</span></a><a class="co extra" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 54 all time">Accenture<span>54</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 53 all time">Samsung<span>53</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 45 all time">Cisco<span>45</span></a><a class="co extra" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 39 all time">Infosys<span>39</span></a><a class="co extra" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 39 all time">Visa<span>39</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 38 all time">DE Shaw<span>38</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 35 all time">IBM<span>35</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 33 all time">Goldman Sachs<span>33</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 26 all time">TikTok<span>26</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 20 all time">LinkedIn<span>20</span></a><button id="comore" class="co more">+22 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Fill <code>nums1</code> <strong>from the back</strong>: the largest remaining element goes to position <code>k</code>. Working backwards never overwrites unread data.</p><p><strong>Complexity:</strong> O(m + n) time, O(1) space.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/linked-list/merge-two-sorted-lists/"><i class="dot Easy"></i>21. Merge Two Sorted Lists</a><a href="/dsa/two-pointers/squares-of-a-sorted-array/"><i class="dot Easy"></i>977. Squares of a Sorted Array</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -&gt; None:
+        i, j, k = m - 1, n - 1, m + n - 1
+        while j &gt;= 0:
+            if i &gt;= 0 and nums1[i] &gt; nums2[j]:
+                nums1[k] = nums1[i]; i -= 1
+            else:
+                nums1[k] = nums2[j]; j -= 1
+            k -= 1
+</code></pre><pre class="test" hidden><code id="tsrc">a = [1, 2, 3, 0, 0, 0]; Solution().merge(a, 3, [2, 5, 6], 3)
+assert a == [1, 2, 2, 3, 5, 6]
+b = [0]; Solution().merge(b, 0, [1], 1)
+assert b == [1]
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int i = m - 1, j = n - 1, k = m + n - 1;
+        while (j &gt;= 0) {
+            if (i &gt;= 0 &amp;&amp; nums1[i] &gt; nums2[j]) nums1[k--] = nums1[i--];
+            else nums1[k--] = nums2[j--];
+        }
+    }
+}
+</code></pre><pre hidden><code class="language-go">func merge(nums1 []int, m int, nums2 []int, n int) {
+	i, j, k := m-1, n-1, m+n-1 // fill from the back
+	for j &gt;= 0 {
+		if i &gt;= 0 &amp;&amp; nums1[i] &gt; nums2[j] {
+			nums1[k] = nums1[i]
+			i--
+		} else {
+			nums1[k] = nums2[j]
+			j--
+		}
+		k--
+	}
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/arrays-hashing/rotate-array/">← Rotate Array</a></span><span><a href="/dsa/arrays-hashing/remove-duplicates-from-sorted-array/">Remove Duplicates from Sorted Array →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>42. Trapping Rain Water – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 42. Trapping Rain Water (Hard): Water at i = min(maxLeft, maxRight) - h[i]. With two pointers, the side with the smaller running max is the…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/two-pointers/trapping-rain-water/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="42. Trapping Rain Water – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 42. Trapping Rain Water (Hard): Water at i = min(maxLeft, maxRight) - h[i]. With two pointers, the side with the smaller running max is the…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/two-pointers/trapping-rain-water/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Two Pointers","item":"https://mleprep.github.io/dsa/two-pointers/"},{"@type":"ListItem","position":3,"name":"42. Trapping Rain Water","item":"https://mleprep.github.io/dsa/two-pointers/trapping-rain-water/"}]},{"@type":"TechArticle","headline":"42. Trapping Rain Water – LeetCode Solution in Python, Java & Go","name":"42. Trapping Rain Water","description":"LeetCode 42. Trapping Rain Water (Hard): Water at i = min(maxLeft, maxRight) - h[i]. With two pointers, the side with the smaller running max is the…","url":"https://mleprep.github.io/dsa/two-pointers/trapping-rain-water/","mainEntityOfPage":"https://mleprep.github.io/dsa/two-pointers/trapping-rain-water/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"opposite-ends, prefix-max","about":"LeetCode problem 42: Trapping Rain Water","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class="on"><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/two-pointers/">Two Pointers</a></div><h1>42. Trapping Rain Water</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/trapping-rain-water/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=opposite-ends" title="Browse problems tagged opposite-ends">opposite-ends</a><a class="tag" href="/browse/?tag=prefix-max" title="Browse problems tagged prefix-max">prefix-max</a><label class="done"><input type="checkbox" data-k="dsa/trapping-rain-water"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 70</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 88 all time, 85 in the last 6 months">Amazon<span>88</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 80 all time, 74 in the last 6 months">Bloomberg<span>80</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 78 all time, 66 in the last 6 months">Microsoft<span>78</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 74 all time, 68 in the last 6 months">Google<span>74</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 64 all time, 62 in the last 6 months">Meta<span>64</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 63 all time">Apple<span>63</span></a><a class="co hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 100 all time, 100 in the last 6 months">Goldman Sachs<span>100</span></a><a class="co hot" href="/browse/?co=Rakuten&sort=freq" title="Rakuten: frequency 100 all time, 100 in the last 6 months">Rakuten<span>100</span></a><a class="co hot" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 86 all time, 79 in the last 6 months">Snowflake<span>86</span></a><a class="co hot" href="/browse/?co=Media.net&sort=freq" title="Media.net: frequency 76 all time, 74 in the last 6 months">Media.net<span>76</span></a><a class="co hot" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 71 all time, 74 in the last 6 months">Nvidia<span>71</span></a><a class="co hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 66 all time, 75 in the last 6 months">Infosys<span>66</span></a><a class="co extra hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 57 all time, 53 in the last 6 months">tcs<span>57</span></a><a class="co extra" href="/browse/?co=ThousandEyes&sort=freq" title="ThousandEyes: frequency 100 all time">ThousandEyes<span>100</span></a><a class="co extra" href="/browse/?co=Zenefits&sort=freq" title="Zenefits: frequency 100 all time">Zenefits<span>100</span></a><a class="co extra" href="/browse/?co=X&sort=freq" title="X: frequency 97 all time">X<span>97</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 94 all time">Zoho<span>94</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 93 all time">Walmart Labs<span>93</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 92 all time">Samsung<span>92</span></a><a class="co extra" href="/browse/?co=Urban+Company&sort=freq" title="Urban Company: frequency 89 all time">Urban Company<span>89</span></a><a class="co extra" href="/browse/?co=ServiceNow&sort=freq" title="ServiceNow: frequency 88 all time">ServiceNow<span>88</span></a><a class="co extra" href="/browse/?co=Tekion&sort=freq" title="Tekion: frequency 88 all time">Tekion<span>88</span></a><a class="co extra" href="/browse/?co=Hive&sort=freq" title="Hive: frequency 87 all time">Hive<span>87</span></a><a class="co extra" href="/browse/?co=Wix&sort=freq" title="Wix: frequency 87 all time">Wix<span>87</span></a><a class="co extra" href="/browse/?co=Sigmoid&sort=freq" title="Sigmoid: frequency 87 all time">Sigmoid<span>87</span></a><a class="co extra" href="/browse/?co=PornHub&sort=freq" title="PornHub: frequency 87 all time">PornHub<span>87</span></a><a class="co extra" href="/browse/?co=Squarepoint+Capital&sort=freq" title="Squarepoint Capital: frequency 85 all time">Squarepoint Capital<span>85</span></a><a class="co extra" href="/browse/?co=Zopsmart&sort=freq" title="Zopsmart: frequency 84 all time">Zopsmart<span>84</span></a><a class="co extra" href="/browse/?co=IMC&sort=freq" title="IMC: frequency 83 all time">IMC<span>83</span></a><a class="co extra" href="/browse/?co=Moloco&sort=freq" title="Moloco: frequency 81 all time">Moloco<span>81</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 79 all time">TikTok<span>79</span></a><a class="co extra" href="/browse/?co=Tesla&sort=freq" title="Tesla: frequency 78 all time">Tesla<span>78</span></a><a class="co extra" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 76 all time">Qualcomm<span>76</span></a><a class="co extra" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 75 all time">Visa<span>75</span></a><a class="co extra" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 74 all time">Adobe<span>74</span></a><a class="co extra" href="/browse/?co=Zeta&sort=freq" title="Zeta: frequency 74 all time">Zeta<span>74</span></a><a class="co extra" href="/browse/?co=Airbnb&sort=freq" title="Airbnb: frequency 73 all time">Airbnb<span>73</span></a><a class="co extra" href="/browse/?co=HashedIn&sort=freq" title="HashedIn: frequency 72 all time">HashedIn<span>72</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 71 all time">Nutanix<span>71</span></a><a class="co extra" href="/browse/?co=Paytm&sort=freq" title="Paytm: frequency 71 all time">Paytm<span>71</span></a><a class="co extra" href="/browse/?co=Navi&sort=freq" title="Navi: frequency 70 all time">Navi<span>70</span></a><a class="co extra" href="/browse/?co=HCL&sort=freq" title="HCL: frequency 69 all time">HCL<span>69</span></a><a class="co extra" href="/browse/?co=Mindtickle&sort=freq" title="Mindtickle: frequency 69 all time">Mindtickle<span>69</span></a><a class="co extra" href="/browse/?co=Swiggy&sort=freq" title="Swiggy: frequency 69 all time">Swiggy<span>69</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 68 all time">Flipkart<span>68</span></a><a class="co extra" href="/browse/?co=Publicis+Sapient&sort=freq" title="Publicis Sapient: frequency 68 all time">Publicis Sapient<span>68</span></a><a class="co extra" href="/browse/?co=BitGo&sort=freq" title="BitGo: frequency 68 all time">BitGo<span>68</span></a><a class="co extra" href="/browse/?co=Huawei&sort=freq" title="Huawei: frequency 67 all time">Huawei<span>67</span></a><a class="co extra" href="/browse/?co=Intel&sort=freq" title="Intel: frequency 66 all time">Intel<span>66</span></a><a class="co extra" href="/browse/?co=CrowdStrike&sort=freq" title="CrowdStrike: frequency 65 all time">CrowdStrike<span>65</span></a><a class="co extra" href="/browse/?co=Docusign&sort=freq" title="Docusign: frequency 64 all time">Docusign<span>64</span></a><a class="co extra" href="/browse/?co=PhonePe&sort=freq" title="PhonePe: frequency 64 all time">PhonePe<span>64</span></a><a class="co extra" href="/browse/?co=EPAM+Systems&sort=freq" title="EPAM Systems: frequency 60 all time">EPAM Systems<span>60</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 58 all time">DE Shaw<span>58</span></a><a class="co extra" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 57 all time">Yandex<span>57</span></a><a class="co extra" href="/browse/?co=Dell&sort=freq" title="Dell: frequency 57 all time">Dell<span>57</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 57 all time">Citadel<span>57</span></a><a class="co extra" href="/browse/?co=Sprinklr&sort=freq" title="Sprinklr: frequency 54 all time">Sprinklr<span>54</span></a><a class="co extra" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 54 all time">Accenture<span>54</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 52 all time">Oracle<span>52</span></a><a class="co extra" href="/browse/?co=Capgemini&sort=freq" title="Capgemini: frequency 52 all time">Capgemini<span>52</span></a><a class="co extra" href="/browse/?co=Grammarly&sort=freq" title="Grammarly: frequency 51 all time">Grammarly<span>51</span></a><a class="co extra" href="/browse/?co=Roblox&sort=freq" title="Roblox: frequency 51 all time">Roblox<span>51</span></a><a class="co extra" href="/browse/?co=ByteDance&sort=freq" title="ByteDance: frequency 50 all time">ByteDance<span>50</span></a><a class="co extra" href="/browse/?co=OpenAI&sort=freq" title="OpenAI: frequency 49 all time">OpenAI<span>49</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 44 all time">IBM<span>44</span></a><a class="co extra" href="/browse/?co=Intuit&sort=freq" title="Intuit: frequency 43 all time">Intuit<span>43</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 42 all time">PayPal<span>42</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 41 all time">Salesforce<span>41</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 35 all time">Uber<span>35</span></a><button id="comore" class="co more">+58 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Water at <code>i</code> = <code>min(maxLeft, maxRight) - h[i]</code>. With two pointers, the side with the smaller running max is the bottleneck, so its water is already determined: process that side and move inward.</p><pre class="viz"><code class="language-viz">                        █
+                █ ~ ~ ~ █ █ ~ █
+            █ ~ █ █ ~ █ █ █ █ █ █    (~ = trapped water)
+height    0 1 0 2 1 0 1 3 2 1 2 1
+water     . . 1 . 1 2 1 . . 1 . .    total = 6
+</code></pre><p><strong>Complexity:</strong> O(n) time, O(1) space.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/two-pointers/container-with-most-water/"><i class="dot Medium"></i>11. Container With Most Water</a><a href="/dsa/stack/largest-rectangle-in-histogram/"><i class="dot Hard"></i>84. Largest Rectangle in Histogram</a><a href="/dsa/arrays-hashing/product-of-array-except-self/"><i class="dot Medium"></i>238. Product of Array Except Self</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def trap(self, height: List[int]) -&gt; int:
+        l, r = 0, len(height) - 1
+        lmax = rmax = water = 0
+        while l &lt; r:
+            if height[l] &lt; height[r]:
+                lmax = max(lmax, height[l])
+                water += lmax - height[l]
+                l += 1
+            else:
+                rmax = max(rmax, height[r])
+                water += rmax - height[r]
+                r -= 1
+        return water
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]) == 6
+assert Solution().trap([4, 2, 0, 3, 2, 5]) == 9
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int trap(int[] height) {
+        int l = 0, r = height.length - 1, lmax = 0, rmax = 0, water = 0;
+        while (l &lt; r) {
+            if (height[l] &lt; height[r]) {
+                lmax = Math.max(lmax, height[l]);
+                water += lmax - height[l++];
+            } else {
+                rmax = Math.max(rmax, height[r]);
+                water += rmax - height[r--];
+            }
+        }
+        return water;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func trap(height []int) int {
+	l, r := 0, len(height)-1
+	lmax, rmax, water := 0, 0, 0
+	for l &lt; r {
+		if height[l] &lt; height[r] { // the left side is bounded by lmax
+			lmax = max(lmax, height[l])
+			water += lmax - height[l]
+			l++
+		} else {
+			rmax = max(rmax, height[r])
+			water += rmax - height[r]
+			r--
+		}
+	}
+	return water
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/two-pointers/container-with-most-water/">← Container With Most Water</a></span><span><a href="/dsa/two-pointers/move-zeroes/">Move Zeroes →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

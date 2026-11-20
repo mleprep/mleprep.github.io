@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News Feed (Twitter / Instagram / Facebook) – System Design</title>
+<meta name="description" content="Requirements: post, follow, view home timeline (reverse-chronological or ranked), low-latency feed reads; eventual consistency is fine. Estimates: 200 M DAU…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/classic-designs/news-feed-twitter-instagram-facebook/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="News Feed (Twitter / Instagram / Facebook) – System Design">
+<meta property="og:description" content="Requirements: post, follow, view home timeline (reverse-chronological or ranked), low-latency feed reads; eventual consistency is fine. Estimates: 200 M DAU…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/classic-designs/news-feed-twitter-instagram-facebook/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"Classic Designs","item":"https://mleprep.github.io/system-design/classic-designs/"},{"@type":"ListItem","position":3,"name":"News Feed (Twitter / Instagram / Facebook)","item":"https://mleprep.github.io/system-design/classic-designs/news-feed-twitter-instagram-facebook/"}]},{"@type":"TechArticle","headline":"News Feed (Twitter / Instagram / Facebook) – System Design","name":"News Feed (Twitter / Instagram / Facebook)","description":"Requirements: post, follow, view home timeline (reverse-chronological or ranked), low-latency feed reads; eventual consistency is fine. Estimates: 200 M DAU…","url":"https://mleprep.github.io/system-design/classic-designs/news-feed-twitter-instagram-facebook/","mainEntityOfPage":"https://mleprep.github.io/system-design/classic-designs/news-feed-twitter-instagram-facebook/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class=""><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class=""><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class=""><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class="on"><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class=""><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/classic-designs/">Classic Designs</a></div><h1>News Feed (Twitter / Instagram / Facebook)</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/news-feed-twitter-instagram-facebook"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Requirements</strong>: post, follow, view home timeline (reverse-chronological or ranked), low-latency feed reads; eventual consistency is fine.</p><p><strong>Estimates</strong>: 200 M DAU, 2 posts/day → 5k writes/s; 20 feed loads/day → ~50k reads/s. Average 200 followers; celebrities have 100 M.</p><pre class="viz"><code class="language-viz">post:  client -&gt; post svc -&gt; posts DB (sharded by post_id) + media -&gt; object store/CDN
+                         -&gt; Kafka &quot;new_post&quot; -&gt; fan-out workers
+                                                 | for each follower (non-celebrity author)
+                                                 v
+                                     feed cache: Redis list per user (post ids, capped ~800)
+
+read:  client -&gt; feed svc -&gt; Redis feed(user) ──merge── celebrity posts pulled at read time
+                          -&gt; hydrate ids via post cache -&gt; rank -&gt; page with cursor
+</code></pre><p><strong>Deep dives</strong></p><ul><li><strong>Fan-out on write (push)</strong>: precompute each follower&#x27;s feed → fast reads, expensive writes for big accounts.</li><li><strong>Fan-out on read (pull)</strong>: build the feed at read time from followees → cheap writes, slow reads.</li><li><strong>Hybrid</strong> (the classic answer): push for normal users, pull for celebrities (and for inactive users, don&#x27;t push at all).</li><li><strong>Pagination</strong>: cursor-based (<code>max_id</code>) instead of offsets.</li><li><strong>Ranking</strong>: candidate generation → feature lookup → ML scoring → re-ranking with diversity rules.</li><li><strong>Data</strong>: follow graph in a sharded store (<code>follower → followees</code> and reverse index); posts keyed by <code>post_id</code> (Snowflake = time-sortable).</li></ul></div></div><nav class="rail"><h4>In Classic Designs</h4><a href="/system-design/classic-designs/url-shortener-tinyurl-bitly/" class="">URL Shortener (TinyURL / bit.ly)</a><a href="/system-design/classic-designs/rate-limiter/" class="">Rate Limiter</a><a href="/system-design/classic-designs/key-value-store-dynamo-style/" class="">Key-Value Store (Dynamo-style)</a><a href="/system-design/classic-designs/news-feed-twitter-instagram-facebook/" class="on">News Feed (Twitter / Instagram / Facebook)</a><a href="/system-design/classic-designs/chat-system-whatsapp-messenger/" class="">Chat System (WhatsApp / Messenger)</a><a href="/system-design/classic-designs/notification-system/" class="">Notification System</a><a href="/system-design/classic-designs/web-crawler/" class="">Web Crawler</a><a href="/system-design/classic-designs/search-autocomplete-typeahead/" class="">Search Autocomplete (Typeahead)</a><a href="/system-design/classic-designs/video-streaming-youtube-netflix/" class="">Video Streaming (YouTube / Netflix)</a><a href="/system-design/classic-designs/ride-sharing-uber-lyft/" class="">Ride Sharing (Uber / Lyft)</a><a href="/system-design/classic-designs/file-sync-dropbox-google-drive/" class="">File Sync (Dropbox / Google Drive)</a><a href="/system-design/classic-designs/distributed-message-queue-kafka/" class="">Distributed Message Queue (Kafka)</a><a href="/system-design/classic-designs/payment-system/" class="">Payment System</a><a href="/system-design/classic-designs/leaderboard-top-k/" class="">Leaderboard / Top-K</a><a href="/system-design/classic-designs/ticket-booking-ticketmaster/" class="">Ticket Booking (Ticketmaster)</a></nav></div><div class="pager"><span><a href="/system-design/classic-designs/key-value-store-dynamo-style/">← Key-Value Store (Dynamo-style)</a></span><span><a href="/system-design/classic-designs/chat-system-whatsapp-messenger/">Chat System (WhatsApp / Messenger) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>433. Minimum Genetic Mutation – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 433. Minimum Genetic Mutation (Medium): Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank. Complexity: O(B · 8 · 4).">
+<link rel="canonical" href="https://mleprep.github.io/dsa/graphs/minimum-genetic-mutation/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="433. Minimum Genetic Mutation – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 433. Minimum Genetic Mutation (Medium): Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank. Complexity: O(B · 8 · 4).">
+<meta property="og:url" content="https://mleprep.github.io/dsa/graphs/minimum-genetic-mutation/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Graphs","item":"https://mleprep.github.io/dsa/graphs/"},{"@type":"ListItem","position":3,"name":"433. Minimum Genetic Mutation","item":"https://mleprep.github.io/dsa/graphs/minimum-genetic-mutation/"}]},{"@type":"TechArticle","headline":"433. Minimum Genetic Mutation – LeetCode Solution in Python, Java & Go","name":"433. Minimum Genetic Mutation","description":"LeetCode 433. Minimum Genetic Mutation (Medium): Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank. Complexity: O(B · 8 · 4).","url":"https://mleprep.github.io/dsa/graphs/minimum-genetic-mutation/","mainEntityOfPage":"https://mleprep.github.io/dsa/graphs/minimum-genetic-mutation/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"bfs","about":"LeetCode problem 433: Minimum Genetic Mutation","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class="on"><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/graphs/">Graphs</a></div><h1>433. Minimum Genetic Mutation</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/minimum-genetic-mutation/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=bfs" title="Browse problems tagged bfs">bfs</a><label class="done"><input type="checkbox" data-k="dsa/minimum-genetic-mutation"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 6</span><a class="co" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 25 all time">Amazon<span>25</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 22 all time">Bloomberg<span>22</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 18 all time, 18 in the last 6 months">Google<span>18</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 16 all time">Microsoft<span>16</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 12 all time">Meta<span>12</span></a><a class="co" href="/browse/?co=X&sort=freq" title="X: frequency 100 all time">X<span>100</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank.</p><p><strong>Complexity:</strong> O(B · 8 · 4).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/graphs/word-ladder/"><i class="dot Hard"></i>127. Word Ladder</a><a href="/dsa/graphs/open-the-lock/"><i class="dot Medium"></i>752. Open the Lock</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def minMutation(self, startGene: str, endGene: str, bank: List[str]) -&gt; int:
+        valid = set(bank)
+        q, seen, steps = deque([startGene]), {startGene}, 0
+        while q:
+            for _ in range(len(q)):
+                g = q.popleft()
+                if g == endGene:
+                    return steps
+                for i in range(len(g)):
+                    for ch in &quot;ACGT&quot;:
+                        nxt = g[:i] + ch + g[i + 1:]
+                        if nxt in valid and nxt not in seen:
+                            seen.add(nxt)
+                            q.append(nxt)
+            steps += 1
+        return -1
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().minMutation(&quot;AACCGGTT&quot;, &quot;AACCGGTA&quot;, [&quot;AACCGGTA&quot;]) == 1
+assert Solution().minMutation(&quot;AACCGGTT&quot;, &quot;AAACGGTA&quot;, [&quot;AACCGGTA&quot;, &quot;AACCGCTA&quot;, &quot;AAACGGTA&quot;]) == 2
+assert Solution().minMutation(&quot;AAAAACCC&quot;, &quot;AACCCCCC&quot;, [&quot;AAAACCCC&quot;, &quot;AAACCCCC&quot;, &quot;AACCCCCC&quot;]) == 3
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int minMutation(String startGene, String endGene, String[] bank) {
+        Set&lt;String&gt; valid = new HashSet&lt;&gt;(Arrays.asList(bank)), seen = new HashSet&lt;&gt;(List.of(startGene));
+        Deque&lt;String&gt; q = new ArrayDeque&lt;&gt;(List.of(startGene));
+        for (int steps = 0; !q.isEmpty(); steps++)
+            for (int k = q.size(); k &gt; 0; k--) {
+                String g = q.poll();
+                if (g.equals(endGene)) return steps;
+                char[] c = g.toCharArray();
+                for (int i = 0; i &lt; c.length; i++) {
+                    char orig = c[i];
+                    for (char ch : &quot;ACGT&quot;.toCharArray()) {
+                        c[i] = ch;
+                        String nxt = new String(c);
+                        if (valid.contains(nxt) &amp;&amp; seen.add(nxt)) q.add(nxt);
+                    }
+                    c[i] = orig;
+                }
+            }
+        return -1;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func minMutation(startGene string, endGene string, bank []string) int {
+	valid := map[string]bool{}
+	for _, g := range bank {
+		valid[g] = true
+	}
+	q, seen := []string{startGene}, map[string]bool{startGene: true}
+	for steps := 0; len(q) &gt; 0; steps++ {
+		next := []string{}
+		for _, g := range q {
+			if g == endGene {
+				return steps
+			}
+			b := []byte(g)
+			for i := range b {
+				orig := b[i]
+				for _, ch := range []byte(&quot;ACGT&quot;) {
+					b[i] = ch
+					if s := string(b); valid[s] &amp;&amp; !seen[s] {
+						seen[s] = true
+						next = append(next, s)
+					}
+				}
+				b[i] = orig
+			}
+		}
+		q = next
+	}
+	return -1
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/graphs/open-the-lock/">← Open the Lock</a></span><span><a href="/dsa/graphs/snakes-and-ladders/">Snakes and Ladders →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>146. LRU Cache – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 146. LRU Cache (Medium): Hash map from key to node of a doubly linked list ordered by recency. get moves the node to the front; put inserts at the…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/design/lru-cache/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="146. LRU Cache – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 146. LRU Cache (Medium): Hash map from key to node of a doubly linked list ordered by recency. get moves the node to the front; put inserts at the…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/design/lru-cache/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Design","item":"https://mleprep.github.io/dsa/design/"},{"@type":"ListItem","position":3,"name":"146. LRU Cache","item":"https://mleprep.github.io/dsa/design/lru-cache/"}]},{"@type":"TechArticle","headline":"146. LRU Cache – LeetCode Solution in Python, Java & Go","name":"146. LRU Cache","description":"LeetCode 146. LRU Cache (Medium): Hash map from key to node of a doubly linked list ordered by recency. get moves the node to the front; put inserts at the…","url":"https://mleprep.github.io/dsa/design/lru-cache/","mainEntityOfPage":"https://mleprep.github.io/dsa/design/lru-cache/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"hash-map, linked-list","about":"LeetCode problem 146: LRU Cache","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class="on"><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/design/">Design</a></div><h1>146. LRU Cache</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/lru-cache/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=hash-map" title="Browse problems tagged hash-map">hash-map</a><a class="tag" href="/browse/?tag=linked-list" title="Browse problems tagged linked-list">linked-list</a><label class="done"><input type="checkbox" data-k="dsa/lru-cache"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 103</span><a class="co hot" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 100 all time, 93 in the last 6 months">Apple<span>100</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 88 all time, 75 in the last 6 months">Amazon<span>88</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 79 all time, 43 in the last 6 months">Meta<span>79</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 78 all time, 64 in the last 6 months">Microsoft<span>78</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 72 all time, 67 in the last 6 months">Bloomberg<span>72</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 57 all time, 50 in the last 6 months">Google<span>57</span></a><a class="co hot" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 100 all time, 100 in the last 6 months">Nutanix<span>100</span></a><a class="co hot" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 100 all time, 100 in the last 6 months">TikTok<span>100</span></a><a class="co hot" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 100 all time, 94 in the last 6 months">Palo Alto Networks<span>100</span></a><a class="co hot" href="/browse/?co=ByteDance&sort=freq" title="ByteDance: frequency 100 all time, 88 in the last 6 months">ByteDance<span>100</span></a><a class="co hot" href="/browse/?co=Confluent&sort=freq" title="Confluent: frequency 95 all time, 100 in the last 6 months">Confluent<span>95</span></a><a class="co hot" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 93 all time, 94 in the last 6 months">Nvidia<span>93</span></a><a class="co extra hot" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 91 all time, 79 in the last 6 months">Adobe<span>91</span></a><a class="co extra hot" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 89 all time, 74 in the last 6 months">Visa<span>89</span></a><a class="co extra hot" href="/browse/?co=MongoDB&sort=freq" title="MongoDB: frequency 88 all time, 89 in the last 6 months">MongoDB<span>88</span></a><a class="co extra hot" href="/browse/?co=NetApp&sort=freq" title="NetApp: frequency 79 all time, 100 in the last 6 months">NetApp<span>79</span></a><a class="co extra hot" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 68 all time, 100 in the last 6 months">Cisco<span>68</span></a><a class="co extra hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 65 all time, 57 in the last 6 months">Goldman Sachs<span>65</span></a><a class="co extra hot" href="/browse/?co=Zomato&sort=freq" title="Zomato: frequency 62 all time, 88 in the last 6 months">Zomato<span>62</span></a><a class="co extra hot" href="/browse/?co=EPAM+Systems&sort=freq" title="EPAM Systems: frequency 60 all time, 72 in the last 6 months">EPAM Systems<span>60</span></a><a class="co extra hot" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 54 all time, 79 in the last 6 months">Accenture<span>54</span></a><a class="co extra hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 42 all time, 43 in the last 6 months">tcs<span>42</span></a><a class="co extra hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 39 all time, 57 in the last 6 months">Infosys<span>39</span></a><a class="co extra" href="/browse/?co=Airwallex&sort=freq" title="Airwallex: frequency 100 all time">Airwallex<span>100</span></a><a class="co extra" href="/browse/?co=AppFolio&sort=freq" title="AppFolio: frequency 100 all time">AppFolio<span>100</span></a><a class="co extra" href="/browse/?co=Aurora&sort=freq" title="Aurora: frequency 100 all time">Aurora<span>100</span></a><a class="co extra" href="/browse/?co=Moloco&sort=freq" title="Moloco: frequency 100 all time">Moloco<span>100</span></a><a class="co extra" href="/browse/?co=Okta&sort=freq" title="Okta: frequency 100 all time">Okta<span>100</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 100 all time">Oracle<span>100</span></a><a class="co extra" href="/browse/?co=Rivian&sort=freq" title="Rivian: frequency 100 all time">Rivian<span>100</span></a><a class="co extra" href="/browse/?co=ServiceNow&sort=freq" title="ServiceNow: frequency 100 all time">ServiceNow<span>100</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 100 all time">Snap<span>100</span></a><a class="co extra" href="/browse/?co=StackAdapt&sort=freq" title="StackAdapt: frequency 100 all time">StackAdapt<span>100</span></a><a class="co extra" href="/browse/?co=Yahoo&sort=freq" title="Yahoo: frequency 100 all time">Yahoo<span>100</span></a><a class="co extra" href="/browse/?co=Zenefits&sort=freq" title="Zenefits: frequency 100 all time">Zenefits<span>100</span></a><a class="co extra" href="/browse/?co=eBay&sort=freq" title="eBay: frequency 100 all time">eBay<span>100</span></a><a class="co extra" href="/browse/?co=smartnews&sort=freq" title="smartnews: frequency 100 all time">smartnews<span>100</span></a><a class="co extra" href="/browse/?co=X&sort=freq" title="X: frequency 97 all time">X<span>97</span></a><a class="co extra" href="/browse/?co=KLA&sort=freq" title="KLA: frequency 94 all time">KLA<span>94</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 93 all time">Walmart Labs<span>93</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 92 all time">Samsung<span>92</span></a><a class="co extra" href="/browse/?co=razorpay&sort=freq" title="razorpay: frequency 90 all time">razorpay<span>90</span></a><a class="co extra" href="/browse/?co=Navan&sort=freq" title="Navan: frequency 90 all time">Navan<span>90</span></a><a class="co extra" href="/browse/?co=Twitch&sort=freq" title="Twitch: frequency 89 all time">Twitch<span>89</span></a><a class="co extra" href="/browse/?co=Chewy&sort=freq" title="Chewy: frequency 89 all time">Chewy<span>89</span></a><a class="co extra" href="/browse/?co=Harness&sort=freq" title="Harness: frequency 89 all time">Harness<span>89</span></a><a class="co extra" href="/browse/?co=Rakuten&sort=freq" title="Rakuten: frequency 88 all time">Rakuten<span>88</span></a><a class="co extra" href="/browse/?co=Verkada&sort=freq" title="Verkada: frequency 88 all time">Verkada<span>88</span></a><a class="co extra" href="/browse/?co=Nokia&sort=freq" title="Nokia: frequency 87 all time">Nokia<span>87</span></a><a class="co extra" href="/browse/?co=Roku&sort=freq" title="Roku: frequency 87 all time">Roku<span>87</span></a><a class="co extra" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 87 all time">Qualcomm<span>87</span></a><a class="co extra" href="/browse/?co=Squarepoint+Capital&sort=freq" title="Squarepoint Capital: frequency 85 all time">Squarepoint Capital<span>85</span></a><a class="co extra" href="/browse/?co=BitGo&sort=freq" title="BitGo: frequency 84 all time">BitGo<span>84</span></a><a class="co extra" href="/browse/?co=Shopify&sort=freq" title="Shopify: frequency 83 all time">Shopify<span>83</span></a><a class="co extra" href="/browse/?co=Nordstrom&sort=freq" title="Nordstrom: frequency 83 all time">Nordstrom<span>83</span></a><a class="co extra" href="/browse/?co=Verily&sort=freq" title="Verily: frequency 83 all time">Verily<span>83</span></a><a class="co extra" href="/browse/?co=Docusign&sort=freq" title="Docusign: frequency 82 all time">Docusign<span>82</span></a><a class="co extra" href="/browse/?co=Coupang&sort=freq" title="Coupang: frequency 82 all time">Coupang<span>82</span></a><a class="co extra" href="/browse/?co=Squarespace&sort=freq" title="Squarespace: frequency 81 all time">Squarespace<span>81</span></a><a class="co extra" href="/browse/?co=SAP&sort=freq" title="SAP: frequency 81 all time">SAP<span>81</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 79 all time">PayPal<span>79</span></a><a class="co extra" href="/browse/?co=SoFi&sort=freq" title="SoFi: frequency 79 all time">SoFi<span>79</span></a><a class="co extra" href="/browse/?co=Arista+Networks&sort=freq" title="Arista Networks: frequency 78 all time">Arista Networks<span>78</span></a><a class="co extra" href="/browse/?co=Autodesk&sort=freq" title="Autodesk: frequency 77 all time">Autodesk<span>77</span></a><a class="co extra" href="/browse/?co=Millennium&sort=freq" title="Millennium: frequency 76 all time">Millennium<span>76</span></a><a class="co extra" href="/browse/?co=Intuit&sort=freq" title="Intuit: frequency 76 all time">Intuit<span>76</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 75 all time">Uber<span>75</span></a><a class="co extra" href="/browse/?co=Jane+Street&sort=freq" title="Jane Street: frequency 75 all time">Jane Street<span>75</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 74 all time">Citadel<span>74</span></a><a class="co extra" href="/browse/?co=ZScaler&sort=freq" title="ZScaler: frequency 73 all time">ZScaler<span>73</span></a><a class="co extra" href="/browse/?co=PhonePe&sort=freq" title="PhonePe: frequency 72 all time">PhonePe<span>72</span></a><a class="co extra" href="/browse/?co=Morgan+Stanley&sort=freq" title="Morgan Stanley: frequency 72 all time">Morgan Stanley<span>72</span></a><a class="co extra" href="/browse/?co=Optiver&sort=freq" title="Optiver: frequency 71 all time">Optiver<span>71</span></a><a class="co extra" href="/browse/?co=Rubrik&sort=freq" title="Rubrik: frequency 71 all time">Rubrik<span>71</span></a><a class="co extra" href="/browse/?co=Cloudflare&sort=freq" title="Cloudflare: frequency 70 all time">Cloudflare<span>70</span></a><a class="co extra" href="/browse/?co=Zoom&sort=freq" title="Zoom: frequency 70 all time">Zoom<span>70</span></a><a class="co extra" href="/browse/?co=Shopee&sort=freq" title="Shopee: frequency 69 all time">Shopee<span>69</span></a><a class="co extra" href="/browse/?co=Tesla&sort=freq" title="Tesla: frequency 68 all time">Tesla<span>68</span></a><a class="co extra" href="/browse/?co=Intel&sort=freq" title="Intel: frequency 66 all time">Intel<span>66</span></a><a class="co extra" href="/browse/?co=Wells+Fargo&sort=freq" title="Wells Fargo: frequency 65 all time">Wells Fargo<span>65</span></a><a class="co extra" href="/browse/?co=Siemens&sort=freq" title="Siemens: frequency 65 all time">Siemens<span>65</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 65 all time">Expedia<span>65</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 65 all time">LinkedIn<span>65</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 64 all time">Salesforce<span>64</span></a><a class="co extra" href="/browse/?co=Tripadvisor&sort=freq" title="Tripadvisor: frequency 62 all time">Tripadvisor<span>62</span></a><a class="co extra" href="/browse/?co=Paytm&sort=freq" title="Paytm: frequency 61 all time">Paytm<span>61</span></a><a class="co extra" href="/browse/?co=General+Motors&sort=freq" title="General Motors: frequency 60 all time">General Motors<span>60</span></a><a class="co extra" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 59 all time">Snowflake<span>59</span></a><a class="co extra" href="/browse/?co=Swiggy&sort=freq" title="Swiggy: frequency 59 all time">Swiggy<span>59</span></a><a class="co extra" href="/browse/?co=Booking.com&sort=freq" title="Booking.com: frequency 59 all time">Booking.com<span>59</span></a><a class="co extra" href="/browse/?co=Netflix&sort=freq" title="Netflix: frequency 58 all time">Netflix<span>58</span></a><a class="co extra" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 55 all time">Yandex<span>55</span></a><a class="co extra" href="/browse/?co=Sprinklr&sort=freq" title="Sprinklr: frequency 54 all time">Sprinklr<span>54</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 50 all time">IBM<span>50</span></a><a class="co extra" href="/browse/?co=OpenAI&sort=freq" title="OpenAI: frequency 49 all time">OpenAI<span>49</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 47 all time">DE Shaw<span>47</span></a><a class="co extra" href="/browse/?co=Rippling&sort=freq" title="Rippling: frequency 46 all time">Rippling<span>46</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=Atlassian&sort=freq" title="Atlassian: frequency 42 all time">Atlassian<span>42</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 42 all time">Zoho<span>42</span></a><a class="co extra" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 41 all time">Anduril<span>41</span></a><a class="co extra" href="/browse/?co=DoorDash&sort=freq" title="DoorDash: frequency 36 all time">DoorDash<span>36</span></a><a class="co extra" href="/browse/?co=Capital+One&sort=freq" title="Capital One: frequency 35 all time">Capital One<span>35</span></a><button id="comore" class="co more">+91 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Hash map from key to node of a doubly linked list ordered by recency. <code>get</code> moves the node to the front; <code>put</code> inserts at the front and evicts the node before the tail when over capacity. Sentinels (<code>head</code>, <code>tail</code>) remove edge cases. Python&#x27;s <code>OrderedDict</code> packages exactly this.</p><p><strong>Complexity:</strong> O(1) per operation.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/design/lfu-cache/"><i class="dot Hard"></i>460. LFU Cache</a><a href="/dsa/design/design-in-memory-file-system/"><i class="dot Hard"></i>588. Design In-Memory File System</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class LRUCache:
+    def __init__(self, capacity: int):
+        self.cap = capacity
+        self.od = OrderedDict()      # hash map + doubly linked list in one
+
+    def get(self, key: int) -&gt; int:
+        if key not in self.od:
+            return -1
+        self.od.move_to_end(key)     # most recent at the end
+        return self.od[key]
+
+    def put(self, key: int, value: int) -&gt; None:
+        self.od[key] = value
+        self.od.move_to_end(key)
+        if len(self.od) &gt; self.cap:
+            self.od.popitem(last=False)   # evict least recent
+</code></pre><pre class="test" hidden><code id="tsrc">c = LRUCache(2)
+c.put(1, 1); c.put(2, 2)
+assert c.get(1) == 1
+c.put(3, 3)                  # evicts 2
+assert c.get(2) == -1
+c.put(4, 4)                  # evicts 1
+assert c.get(1) == -1 and c.get(3) == 3 and c.get(4) == 4
+</code></pre><pre hidden><code class="language-java">class LRUCache {
+    private static class Node { int key, val; Node prev, next; Node(int k, int v) { key = k; val = v; } }
+
+    private final int cap;
+    private final Map&lt;Integer, Node&gt; map = new HashMap&lt;&gt;();
+    private final Node head = new Node(0, 0), tail = new Node(0, 0); // head.next = most recent
+
+    public LRUCache(int capacity) {
+        cap = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    private void unlink(Node n) { n.prev.next = n.next; n.next.prev = n.prev; }
+
+    private void addFront(Node n) {
+        n.next = head.next; n.prev = head;
+        head.next.prev = n; head.next = n;
+    }
+
+    public int get(int key) {
+        Node n = map.get(key);
+        if (n == null) return -1;
+        unlink(n);
+        addFront(n);
+        return n.val;
+    }
+
+    public void put(int key, int value) {
+        Node n = map.get(key);
+        if (n != null) { n.val = value; unlink(n); addFront(n); return; }
+        n = new Node(key, value);
+        map.put(key, n);
+        addFront(n);
+        if (map.size() &gt; cap) {
+            Node lru = tail.prev;
+            unlink(lru);
+            map.remove(lru.key);
+        }
+    }
+}
+</code></pre><pre hidden><code class="language-go">type lruNode struct {
+	key, val   int
+	prev, next *lruNode
+}
+
+type LRUCache struct {
+	cap        int
+	nodes      map[int]*lruNode
+	head, tail *lruNode // sentinels: head.next is the most recent, tail.prev the least
+}
+
+func Constructor(capacity int) LRUCache {
+	head, tail := &amp;lruNode{}, &amp;lruNode{}
+	head.next, tail.prev = tail, head
+	return LRUCache{cap: capacity, nodes: map[int]*lruNode{}, head: head, tail: tail}
+}
+
+func (this *LRUCache) unlink(n *lruNode) {
+	n.prev.next, n.next.prev = n.next, n.prev
+}
+
+func (this *LRUCache) pushFront(n *lruNode) {
+	n.prev, n.next = this.head, this.head.next
+	this.head.next.prev = n
+	this.head.next = n
+}
+
+func (this *LRUCache) Get(key int) int {
+	n, ok := this.nodes[key]
+	if !ok {
+		return -1
+	}
+	this.unlink(n) // used: move to the front
+	this.pushFront(n)
+	return n.val
+}
+
+func (this *LRUCache) Put(key int, value int) {
+	if n, ok := this.nodes[key]; ok {
+		n.val = value
+		this.unlink(n)
+		this.pushFront(n)
+		return
+	}
+	n := &amp;lruNode{key: key, val: value}
+	this.nodes[key] = n
+	this.pushFront(n)
+	if len(this.nodes) &gt; this.cap { // evict the least recently used
+		lru := this.tail.prev
+		this.unlink(lru)
+		delete(this.nodes, lru.key)
+	}
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/range-queries/find-pivot-index/">← Find Pivot Index</a></span><span><a href="/dsa/design/lfu-cache/">LFU Cache →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

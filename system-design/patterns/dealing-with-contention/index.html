@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealing with Contention – System Design | SDE &amp; MLE Prep</title>
+<meta name="description" content="When: many users compete for the same thing — the last concert seat, an item in a flash sale, a username, a bid, a bank balance. Atomic conditional update…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/patterns/dealing-with-contention/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Dealing with Contention – System Design | SDE &amp; MLE Prep">
+<meta property="og:description" content="When: many users compete for the same thing — the last concert seat, an item in a flash sale, a username, a bid, a bank balance. Atomic conditional update…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/patterns/dealing-with-contention/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"Common Patterns","item":"https://mleprep.github.io/system-design/patterns/"},{"@type":"ListItem","position":3,"name":"Dealing with Contention","item":"https://mleprep.github.io/system-design/patterns/dealing-with-contention/"}]},{"@type":"TechArticle","headline":"Dealing with Contention – System Design","name":"Dealing with Contention","description":"When: many users compete for the same thing — the last concert seat, an item in a flash sale, a username, a bid, a bank balance. Atomic conditional update…","url":"https://mleprep.github.io/system-design/patterns/dealing-with-contention/","mainEntityOfPage":"https://mleprep.github.io/system-design/patterns/dealing-with-contention/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class=""><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class=""><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class="on"><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class=""><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class=""><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/patterns/">Common Patterns</a></div><h1>Dealing with Contention</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/dealing-with-contention"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>When</strong>: many users compete for the same thing — the last concert seat, an item in a flash sale, a username, a bid, a bank balance.</p><table><thead><tr><th>Technique</th><th>How</th><th>Good for</th></tr></thead><tbody><tr><td><strong>Atomic conditional update</strong></td><td><code>UPDATE seats SET holder=? WHERE id=? AND holder IS NULL</code> (check rowcount)</td><td>single-row races; simplest correct answer</td></tr><tr><td><strong>Pessimistic lock</strong></td><td><code>SELECT … FOR UPDATE</code> inside a transaction</td><td>short critical sections on one DB</td></tr><tr><td><strong>Optimistic concurrency</strong></td><td>version column; <code>UPDATE … WHERE version = v</code>; retry on conflict</td><td>low contention, many readers</td></tr><tr><td><strong>Distributed lock / lease</strong></td><td>Redis <code>SET key val NX PX ttl</code>, ZooKeeper/etcd with fencing tokens</td><td>coordinating across services; holds with expiry</td></tr><tr><td><strong>Serialize through a queue</strong></td><td>partition by resource id, one consumer per partition applies requests in order</td><td>extreme contention (auctions, order books)</td></tr><tr><td><strong>Reservation / hold</strong></td><td>temporary hold with expiry, confirm on payment</td><td>multi-step checkout (tickets, hotels)</td></tr></tbody></table><p>Discuss: what happens when the lock holder crashes (TTL/lease), double-submits (idempotency key), and whether a <strong>virtual waiting room</strong> should limit how many users even reach the contended step.</p></div></div><nav class="rail"><h4>In Common Patterns</h4><a href="/system-design/patterns/scaling-reads/" class="">Scaling Reads</a><a href="/system-design/patterns/scaling-writes/" class="">Scaling Writes</a><a href="/system-design/patterns/dealing-with-contention/" class="on">Dealing with Contention</a><a href="/system-design/patterns/multi-step-processes-workflows-sagas/" class="">Multi-Step Processes (Workflows &amp; Sagas)</a><a href="/system-design/patterns/long-running-tasks/" class="">Long-Running Tasks</a><a href="/system-design/patterns/handling-large-files-blobs/" class="">Handling Large Files (Blobs)</a></nav></div><div class="pager"><span><a href="/system-design/patterns/scaling-writes/">← Scaling Writes</a></span><span><a href="/system-design/patterns/multi-step-processes-workflows-sagas/">Multi-Step Processes (Workflows &amp; Sagas) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

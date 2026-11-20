@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>474. Ones and Zeroes – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 474. Ones and Zeroes (Medium): 0/1 knapsack with two capacities (zeros ≤ m, ones ≤ n). For each string, iterate both capacities downward: dp[i][j] =…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/dp-2d/ones-and-zeroes/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="474. Ones and Zeroes – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 474. Ones and Zeroes (Medium): 0/1 knapsack with two capacities (zeros ≤ m, ones ≤ n). For each string, iterate both capacities downward: dp[i][j] =…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/dp-2d/ones-and-zeroes/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"2-D DP","item":"https://mleprep.github.io/dsa/dp-2d/"},{"@type":"ListItem","position":3,"name":"474. Ones and Zeroes","item":"https://mleprep.github.io/dsa/dp-2d/ones-and-zeroes/"}]},{"@type":"TechArticle","headline":"474. Ones and Zeroes – LeetCode Solution in Python, Java & Go","name":"474. Ones and Zeroes","description":"LeetCode 474. Ones and Zeroes (Medium): 0/1 knapsack with two capacities (zeros ≤ m, ones ≤ n). For each string, iterate both capacities downward: dp[i][j] =…","url":"https://mleprep.github.io/dsa/dp-2d/ones-and-zeroes/","mainEntityOfPage":"https://mleprep.github.io/dsa/dp-2d/ones-and-zeroes/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"0-1-knapsack, 2d-capacity","about":"LeetCode problem 474: Ones and Zeroes","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class="on"><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/dp-2d/">2-D DP</a></div><h1>474. Ones and Zeroes</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/ones-and-zeroes/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=0-1-knapsack" title="Browse problems tagged 0-1-knapsack">0-1-knapsack</a><a class="tag" href="/browse/?tag=2d-capacity" title="Browse problems tagged 2d-capacity">2d-capacity</a><label class="done"><input type="checkbox" data-k="dsa/ones-and-zeroes"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 5</span><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 27 all time, 12 in the last 6 months">Google<span>27</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 18 all time, 14 in the last 6 months">Amazon<span>18</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 18 all time">Bloomberg<span>18</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 5.0 all time">Meta<span>5.0</span></a><a class="co" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 22 all time">Uber<span>22</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>0/1 knapsack with <strong>two</strong> capacities (zeros ≤ m, ones ≤ n). For each string, iterate both capacities downward: <code>dp[i][j] = max(dp[i][j], dp[i−z][j−o] + 1)</code>.</p><p><strong>Complexity:</strong> O(L · m · n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/dp-1d/partition-equal-subset-sum/"><i class="dot Medium"></i>416. Partition Equal Subset Sum</a><a href="/dsa/dp-2d/target-sum/"><i class="dot Medium"></i>494. Target Sum</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findMaxForm(self, strs: List[str], m: int, n: int) -&gt; int:
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+        for s in strs:
+            z, o = s.count(&quot;0&quot;), s.count(&quot;1&quot;)
+            for i in range(m, z - 1, -1):
+                for j in range(n, o - 1, -1):
+                    dp[i][j] = max(dp[i][j], dp[i - z][j - o] + 1)
+        return dp[m][n]
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().findMaxForm([&quot;10&quot;, &quot;0001&quot;, &quot;111001&quot;, &quot;1&quot;, &quot;0&quot;], 5, 3) == 4
+assert Solution().findMaxForm([&quot;10&quot;, &quot;0&quot;, &quot;1&quot;], 1, 1) == 2
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int findMaxForm(String[] strs, int m, int n) {
+        int[][] dp = new int[m + 1][n + 1];
+        for (String s : strs) {
+            int z = 0, o = 0;
+            for (char c : s.toCharArray()) if (c == &#x27;0&#x27;) z++; else o++;
+            for (int i = m; i &gt;= z; i--)
+                for (int j = n; j &gt;= o; j--) dp[i][j] = Math.max(dp[i][j], dp[i - z][j - o] + 1);
+        }
+        return dp[m][n];
+    }
+}
+</code></pre><pre hidden><code class="language-go">func findMaxForm(strs []string, m int, n int) int {
+	dp := make([][]int, m+1) // dp[i][j] = most strings using at most i zeros and j ones
+	for i := range dp {
+		dp[i] = make([]int, n+1)
+	}
+	for _, s := range strs {
+		z := strings.Count(s, &quot;0&quot;)
+		o := len(s) - z
+		for i := m; i &gt;= z; i-- { // 0/1 knapsack in two dimensions, iterated downwards
+			for j := n; j &gt;= o; j-- {
+				dp[i][j] = max(dp[i][j], dp[i-z][j-o]+1)
+			}
+		}
+	}
+	return dp[m][n]
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/dp-2d/best-time-to-buy-and-sell-stock-iv/">← Best Time to Buy and Sell Stock IV</a></span><span><a href="/dsa/dp-2d/minimum-insertion-steps-to-make-a-string-palindrome/">Minimum Insertion Steps to Make a String Palindrome →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

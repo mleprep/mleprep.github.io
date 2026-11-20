@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worked Estimation Example – System Design | SDE &amp; MLE Prep</title>
+<meta name="description" content="&quot;Design Twitter: 300 M monthly users, 150 M daily, each posts 2 tweets and reads the feed 20 times a day.&quot; Conclusions you should say out loud: read:write =…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/framework/worked-estimation-example/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Worked Estimation Example – System Design | SDE &amp; MLE Prep">
+<meta property="og:description" content="&quot;Design Twitter: 300 M monthly users, 150 M daily, each posts 2 tweets and reads the feed 20 times a day.&quot; Conclusions you should say out loud: read:write =…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/framework/worked-estimation-example/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"Framework & Estimation","item":"https://mleprep.github.io/system-design/framework/"},{"@type":"ListItem","position":3,"name":"Worked Estimation Example","item":"https://mleprep.github.io/system-design/framework/worked-estimation-example/"}]},{"@type":"TechArticle","headline":"Worked Estimation Example – System Design","name":"Worked Estimation Example","description":"\"Design Twitter: 300 M monthly users, 150 M daily, each posts 2 tweets and reads the feed 20 times a day.\" Conclusions you should say out loud: read:write =…","url":"https://mleprep.github.io/system-design/framework/worked-estimation-example/","mainEntityOfPage":"https://mleprep.github.io/system-design/framework/worked-estimation-example/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class="on"><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class=""><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class=""><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class=""><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class=""><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/framework/">Framework &amp; Estimation</a></div><h1>Worked Estimation Example</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/worked-estimation-example"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><blockquote><p>&quot;Design Twitter: 300 M monthly users, 150 M daily, each posts 2 tweets and reads the feed 20 times a day.&quot;</p></blockquote><pre class="viz"><code class="language-viz">writes : 150M x 2  / 1e5 s  ≈   3,000 tweets/s     (peak ~ 10k/s)
+reads  : 150M x 20 / 1e5 s  ≈  30,000 feed reads/s (peak ~100k/s)   -&gt; read-heavy, cache!
+storage: 300M tweets/day x ~300 B ≈ 90 GB/day text  ≈ 33 TB/yr  (+ media in object store)
+media  : 10% tweets with 1 MB image -&gt; 30 TB/day   -&gt; CDN + blob storage
+</code></pre><p>Conclusions you should <em>say out loud</em>: read:write = 10:1 → precompute feeds and cache aggressively; media dominates storage → object store + CDN; text fits in a sharded key-value / wide-column store.</p></div></div><nav class="rail"><h4>In Framework &amp; Estimation</h4><a href="/system-design/framework/the-4-step-framework/" class="">The 4-Step Framework</a><a href="/system-design/framework/numbers-everyone-should-know/" class="">Numbers Everyone Should Know</a><a href="/system-design/framework/worked-estimation-example/" class="on">Worked Estimation Example</a><a href="/system-design/framework/requirements-checklist/" class="">Requirements Checklist</a><a href="/system-design/framework/scaling-from-zero-to-millions-of-users/" class="">Scaling from Zero to Millions of Users</a><a href="/system-design/framework/common-mistakes-in-the-interview/" class="">Common Mistakes in the Interview</a></nav></div><div class="pager"><span><a href="/system-design/framework/numbers-everyone-should-know/">← Numbers Everyone Should Know</a></span><span><a href="/system-design/framework/requirements-checklist/">Requirements Checklist →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

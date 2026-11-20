@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K-Means – ML Interview | SDE &amp; MLE Prep</title>
+<meta name="description" content="Key idea: alternate assignment (argmin distance, vectorized with broadcasting) and centroid update; k-means++ init; stop when centroids stop moving.">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-coding/k-means/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="K-Means – ML Interview | SDE &amp; MLE Prep">
+<meta property="og:description" content="Key idea: alternate assignment (argmin distance, vectorized with broadcasting) and centroid update; k-means++ init; stop when centroids stop moving.">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-coding/k-means/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML Coding from Scratch","item":"https://mleprep.github.io/ml/ml-coding/"},{"@type":"ListItem","position":3,"name":"K-Means","item":"https://mleprep.github.io/ml/ml-coding/k-means/"}]},{"@type":"TechArticle","headline":"K-Means – ML Interview","name":"K-Means","description":"Key idea: alternate assignment (argmin distance, vectorized with broadcasting) and centroid update; k-means++ init; stop when centroids stop moving.","url":"https://mleprep.github.io/ml/ml-coding/k-means/","mainEntityOfPage":"https://mleprep.github.io/ml/ml-coding/k-means/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class="on"><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class=""><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/ml-coding/">ML Coding from Scratch</a></div><h1>K-Means</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/k-means"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Key idea:</strong> alternate assignment (argmin distance, vectorized with broadcasting) and centroid update; k-means++ init; stop when centroids stop moving.</p><pre><code class="language-python">import numpy as np
+
+def kmeans(X, k, iters=100, seed=0):
+    rng = np.random.default_rng(seed)
+    C = [X[rng.integers(len(X))]]                          # k-means++ init
+    for _ in range(1, k):
+        d2 = ((X[:, None, :] - np.array(C)[None]) ** 2).sum(-1).min(1)
+        C.append(X[rng.choice(len(X), p=d2 / d2.sum())])
+    C = np.array(C)
+    for _ in range(iters):
+        dist = ((X[:, None, :] - C[None]) ** 2).sum(-1)    # (N, k)
+        labels = dist.argmin(1)
+        newC = np.array([X[labels == j].mean(0) if np.any(labels == j) else C[j] for j in range(k)])
+        if np.allclose(newC, C):
+            break
+        C = newC
+    return C, labels
+
+rng = np.random.default_rng(0)
+centers = np.array([[0, 0], [5, 5], [0, 5]])
+X = np.vstack([c + 0.3 * rng.normal(size=(100, 2)) for c in centers])
+C, labels = kmeans(X, 3)
+assert all(np.min(np.linalg.norm(C - c, axis=1)) &lt; 0.2 for c in centers)
+print(&quot;ok&quot;, np.round(C[np.lexsort(C.T[::-1])], 2).tolist())
+</code></pre></div></div><nav class="rail"><h4>In ML Coding from Scratch</h4><a href="/ml/ml-coding/softmax-cross-entropy-numerically-stable/" class="">Softmax &amp; Cross-Entropy (Numerically Stable)</a><a href="/ml/ml-coding/linear-regression-with-gradient-descent/" class="">Linear Regression with Gradient Descent</a><a href="/ml/ml-coding/logistic-regression/" class="">Logistic Regression</a><a href="/ml/ml-coding/k-means/" class="on">K-Means</a><a href="/ml/ml-coding/k-nearest-neighbors/" class="">K-Nearest Neighbors</a><a href="/ml/ml-coding/scaled-dot-product-multi-head-attention/" class="">Scaled Dot-Product &amp; Multi-Head Attention</a><a href="/ml/ml-coding/two-layer-mlp-with-backprop/" class="">Two-Layer MLP with Backprop</a><a href="/ml/ml-coding/decision-tree-split-gini/" class="">Decision Tree Split (Gini)</a><a href="/ml/ml-coding/roc-auc-from-scratch/" class="">ROC-AUC from Scratch</a><a href="/ml/ml-coding/conv2d-forward-im2col/" class="">Conv2D Forward (im2col)</a><a href="/ml/ml-coding/batch-normalization-forward-backward/" class="">Batch Normalization (Forward &amp; Backward)</a><a href="/ml/ml-coding/pca-via-svd/" class="">PCA via SVD</a><a href="/ml/ml-coding/adam-optimizer/" class="">Adam Optimizer</a><a href="/ml/ml-coding/gaussian-naive-bayes/" class="">Gaussian Naive Bayes</a><a href="/ml/ml-coding/beam-search-decoding/" class="">Beam Search Decoding</a><a href="/ml/ml-coding/iou-non-maximum-suppression/" class="">IoU &amp; Non-Maximum Suppression</a><a href="/ml/ml-coding/byte-pair-encoding-bpe-tokenizer/" class="">Byte-Pair Encoding (BPE) Tokenizer</a><a href="/ml/ml-coding/sampling-temperature-top-k-top-p/" class="">Sampling: Temperature, Top-k, Top-p</a><a href="/ml/ml-coding/layernorm-rmsnorm-forward-backward/" class="">LayerNorm &amp; RMSNorm (Forward &amp; Backward)</a><a href="/ml/ml-coding/positional-encodings-sinusoidal-rope/" class="">Positional Encodings: Sinusoidal &amp; RoPE</a><a href="/ml/ml-coding/causal-self-attention-with-a-kv-cache/" class="">Causal Self-Attention with a KV Cache</a><a href="/ml/ml-coding/matrix-factorization-als-for-recommendations/" class="">Matrix Factorization (ALS) for Recommendations</a><a href="/ml/ml-coding/ranking-metrics-precisionk-map-mrr-ndcg/" class="">Ranking Metrics: Precision@k, MAP, MRR, NDCG</a><a href="/ml/ml-coding/dropout-forward-backward/" class="">Dropout (Forward &amp; Backward)</a><a href="/ml/ml-coding/lora-linear-layer/" class="">LoRA Linear Layer</a></nav></div><div class="pager"><span><a href="/ml/ml-coding/logistic-regression/">← Logistic Regression</a></span><span><a href="/ml/ml-coding/k-nearest-neighbors/">K-Nearest Neighbors →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

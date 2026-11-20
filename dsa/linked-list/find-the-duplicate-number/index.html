@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>287. Find the Duplicate Number – LeetCode Solution</title>
+<meta name="description" content="LeetCode 287. Find the Duplicate Number (Medium): Values in [1, n] → view i → nums[i] as a linked list. The duplicate value is where two arrows enter the same…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/linked-list/find-the-duplicate-number/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="287. Find the Duplicate Number – LeetCode Solution">
+<meta property="og:description" content="LeetCode 287. Find the Duplicate Number (Medium): Values in [1, n] → view i → nums[i] as a linked list. The duplicate value is where two arrows enter the same…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/linked-list/find-the-duplicate-number/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Linked List","item":"https://mleprep.github.io/dsa/linked-list/"},{"@type":"ListItem","position":3,"name":"287. Find the Duplicate Number","item":"https://mleprep.github.io/dsa/linked-list/find-the-duplicate-number/"}]},{"@type":"TechArticle","headline":"287. Find the Duplicate Number – LeetCode Solution","name":"287. Find the Duplicate Number","description":"LeetCode 287. Find the Duplicate Number (Medium): Values in [1, n] → view i → nums[i] as a linked list. The duplicate value is where two arrows enter the same…","url":"https://mleprep.github.io/dsa/linked-list/find-the-duplicate-number/","mainEntityOfPage":"https://mleprep.github.io/dsa/linked-list/find-the-duplicate-number/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"fast-slow, cycle-detection","about":"LeetCode problem 287: Find the Duplicate Number","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class="on"><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/linked-list/">Linked List</a></div><h1>287. Find the Duplicate Number</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/find-the-duplicate-number/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=fast-slow" title="Browse problems tagged fast-slow">fast-slow</a><a class="tag" href="/browse/?tag=cycle-detection" title="Browse problems tagged cycle-detection">cycle-detection</a><label class="done"><input type="checkbox" data-k="dsa/find-the-duplicate-number"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 18</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 57 all time, 48 in the last 6 months">Amazon<span>57</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 50 all time, 26 in the last 6 months">Bloomberg<span>50</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 48 all time, 38 in the last 6 months">Microsoft<span>48</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 46 all time, 45 in the last 6 months">Google<span>46</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 39 all time, 38 in the last 6 months">Meta<span>39</span></a><a class="co hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 33 all time, 48 in the last 6 months">Goldman Sachs<span>33</span></a><a class="co" href="/browse/?co=Nike&sort=freq" title="Nike: frequency 89 all time">Nike<span>89</span></a><a class="co" href="/browse/?co=DP+world&sort=freq" title="DP world: frequency 88 all time">DP world<span>88</span></a><a class="co" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 64 all time">Citadel<span>64</span></a><a class="co" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 60 all time">Nvidia<span>60</span></a><a class="co" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 53 all time">Walmart Labs<span>53</span></a><a class="co" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 49 all time">Anduril<span>49</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 42 all time">Zoho<span>42</span></a><a class="co extra" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 42 all time">tcs<span>42</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 37 all time">Cisco<span>37</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 28 all time">Salesforce<span>28</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 26 all time">TikTok<span>26</span></a><button id="comore" class="co more">+6 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Values in <code>[1, n]</code> → view <code>i → nums[i]</code> as a linked list. The duplicate value is where two arrows enter the same node = <strong>cycle entrance</strong> (Floyd, like 142). No modification, O(1) space.</p><p><strong>Complexity:</strong> O(n) time, O(1) space.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/linked-list/linked-list-cycle-ii/"><i class="dot Medium"></i>142. Linked List Cycle II</a><a href="/dsa/arrays-hashing/first-missing-positive/"><i class="dot Hard"></i>41. First Missing Positive</a><a href="/dsa/bit-manipulation/missing-number/"><i class="dot Easy"></i>268. Missing Number</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findDuplicate(self, nums: List[int]) -&gt; int:
+        slow = fast = 0
+        while True:
+            slow, fast = nums[slow], nums[nums[fast]]
+            if slow == fast:
+                break
+        p = 0
+        while p != slow:
+            p, slow = nums[p], nums[slow]
+        return p
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().findDuplicate([1, 3, 4, 2, 2]) == 2
+assert Solution().findDuplicate([3, 1, 3, 4, 2]) == 3
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int findDuplicate(int[] nums) {
+        int slow = 0, fast = 0;
+        do { slow = nums[slow]; fast = nums[nums[fast]]; } while (slow != fast);
+        int p = 0;
+        while (p != slow) { p = nums[p]; slow = nums[slow]; }
+        return p;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func findDuplicate(nums []int) int {
+	slow, fast := 0, 0 // i -&gt; nums[i] is a linked list whose cycle starts at the duplicate
+	for {
+		slow, fast = nums[slow], nums[nums[fast]]
+		if slow == fast {
+			break
+		}
+	}
+	p := 0
+	for p != slow {
+		p, slow = nums[p], nums[slow]
+	}
+	return p
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/linked-list/add-two-numbers/">← Add Two Numbers</a></span><span><a href="/dsa/linked-list/merge-k-sorted-lists/">Merge k Sorted Lists →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

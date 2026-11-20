@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collaborative Editor (Google Docs) – System Design | SDE &amp; MLE Prep</title>
+<meta name="description" content="Requirements: many users edit the same document concurrently, see each other&#x27;s changes in ~100 ms, offline edits merge cleanly, version history…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/more-designs/collaborative-editor-google-docs/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Collaborative Editor (Google Docs) – System Design | SDE &amp; MLE Prep">
+<meta property="og:description" content="Requirements: many users edit the same document concurrently, see each other&#x27;s changes in ~100 ms, offline edits merge cleanly, version history…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/more-designs/collaborative-editor-google-docs/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"More Designs","item":"https://mleprep.github.io/system-design/more-designs/"},{"@type":"ListItem","position":3,"name":"Collaborative Editor (Google Docs)","item":"https://mleprep.github.io/system-design/more-designs/collaborative-editor-google-docs/"}]},{"@type":"TechArticle","headline":"Collaborative Editor (Google Docs) – System Design","name":"Collaborative Editor (Google Docs)","description":"Requirements: many users edit the same document concurrently, see each other's changes in ~100 ms, offline edits merge cleanly, version history…","url":"https://mleprep.github.io/system-design/more-designs/collaborative-editor-google-docs/","mainEntityOfPage":"https://mleprep.github.io/system-design/more-designs/collaborative-editor-google-docs/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class=""><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class=""><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class=""><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class=""><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class="on"><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/more-designs/">More Designs</a></div><h1>Collaborative Editor (Google Docs)</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/collaborative-editor-google-docs"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Requirements</strong>: many users edit the same document concurrently, see each other&#x27;s changes in ~100 ms, offline edits merge cleanly, version history, cursors/presence.</p><pre class="viz"><code class="language-viz">clients ==WebSocket==&gt; collab servers (one &quot;owner&quot; per document, via consistent hashing on doc_id)
+                             |  apply op -&gt; transform/merge -&gt; assign revision -&gt; broadcast
+                             v
+                   op log (append-only, per doc)  ---&gt;  snapshotter (periodic snapshots) -&gt; blob store
+                   presence (cursors) in memory / Redis pub-sub
+</code></pre><p><strong>Deep dives</strong></p><ul><li><strong>Concurrency control</strong>: <strong>OT</strong> (operational transformation) — the server transforms concurrent ops against each other (<code>insert(5,&quot;a&quot;)</code> vs <code>delete(3)</code> → shift index) and imposes a total order; or <strong>CRDTs</strong> (e.g. RGA, Yjs/Automerge): each character has a unique, ordered id, so replicas merge without a central server (great for offline/P2P, more metadata).</li><li>Single writer per document (route all sessions of a doc to one server) simplifies ordering; fail over by replaying the op log from the last snapshot.</li><li>Storage: op log + periodic snapshots; history = replay; compaction of old ops.</li><li>Client keeps pending ops, acks with server revision, rebases local changes (that&#x27;s OT client logic).</li></ul></div></div><nav class="rail"><h4>In More Designs</h4><a href="/system-design/more-designs/collaborative-editor-google-docs/" class="on">Collaborative Editor (Google Docs)</a><a href="/system-design/more-designs/distributed-cache-redis-cluster-memcached/" class="">Distributed Cache (Redis Cluster / Memcached)</a><a href="/system-design/more-designs/proximity-service-yelp-nearby-places/" class="">Proximity Service (Yelp / Nearby Places)</a><a href="/system-design/more-designs/metrics-monitoring-alerting/" class="">Metrics Monitoring &amp; Alerting</a><a href="/system-design/more-designs/distributed-job-scheduler/" class="">Distributed Job Scheduler</a><a href="/system-design/more-designs/ad-click-aggregation/" class="">Ad Click Aggregation</a><a href="/system-design/more-designs/hotel-reservation-booking-airbnb/" class="">Hotel Reservation (Booking / Airbnb)</a><a href="/system-design/more-designs/stock-exchange-order-matching/" class="">Stock Exchange (Order Matching)</a><a href="/system-design/more-designs/object-storage-amazon-s3/" class="">Object Storage (Amazon S3)</a><a href="/system-design/more-designs/email-service-gmail/" class="">Email Service (Gmail)</a><a href="/system-design/more-designs/live-comments-facebook-live-twitch-chat/" class="">Live Comments (Facebook Live / Twitch Chat)</a><a href="/system-design/more-designs/llm-inference-serving-chatgpt-like/" class="">LLM Inference Serving (ChatGPT-like)</a><a href="/system-design/more-designs/distributed-lock-service-zookeeper-chubby-etcd/" class="">Distributed Lock Service (ZooKeeper / Chubby / etcd)</a><a href="/system-design/more-designs/google-maps-navigation-routing/" class="">Google Maps (Navigation &amp; Routing)</a><a href="/system-design/more-designs/nearby-friends/" class="">Nearby Friends</a><a href="/system-design/more-designs/digital-wallet-balance-transfers/" class="">Digital Wallet (Balance Transfers)</a><a href="/system-design/more-designs/dating-app-tinder/" class="">Dating App (Tinder)</a><a href="/system-design/more-designs/online-judge-leetcode/" class="">Online Judge (LeetCode)</a><a href="/system-design/more-designs/post-search-facebook-twitter-search/" class="">Post Search (Facebook / Twitter Search)</a><a href="/system-design/more-designs/online-auction-ebay/" class="">Online Auction (eBay)</a><a href="/system-design/more-designs/food-delivery-doordash-uber-eats/" class="">Food Delivery (DoorDash / Uber Eats)</a><a href="/system-design/more-designs/top-k-trending-youtube-top-videos-heavy-hitters/" class="">Top-K Trending (YouTube Top Videos / Heavy Hitters)</a></nav></div><div class="pager"><span><a href="/system-design/classic-designs/ticket-booking-ticketmaster/">← Ticket Booking (Ticketmaster)</a></span><span><a href="/system-design/more-designs/distributed-cache-redis-cluster-memcached/">Distributed Cache (Redis Cluster / Memcached) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

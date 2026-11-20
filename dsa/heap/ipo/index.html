@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>502. IPO – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 502. IPO (Hard): Sort projects by capital. Each round, push every newly affordable project&#x27;s profit into a max-heap and take the best one. Repeat k…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/heap/ipo/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="502. IPO – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 502. IPO (Hard): Sort projects by capital. Each round, push every newly affordable project&#x27;s profit into a max-heap and take the best one. Repeat k…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/heap/ipo/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Heap / Priority Queue","item":"https://mleprep.github.io/dsa/heap/"},{"@type":"ListItem","position":3,"name":"502. IPO","item":"https://mleprep.github.io/dsa/heap/ipo/"}]},{"@type":"TechArticle","headline":"502. IPO – LeetCode Solution in Python, Java & Go","name":"502. IPO","description":"LeetCode 502. IPO (Hard): Sort projects by capital. Each round, push every newly affordable project's profit into a max-heap and take the best one. Repeat k…","url":"https://mleprep.github.io/dsa/heap/ipo/","mainEntityOfPage":"https://mleprep.github.io/dsa/heap/ipo/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"greedy, two-heaps","about":"LeetCode problem 502: IPO","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class="on"><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/heap/">Heap / Priority Queue</a></div><h1>502. IPO</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/ipo/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=greedy" title="Browse problems tagged greedy">greedy</a><a class="tag" href="/browse/?tag=two-heaps" title="Browse problems tagged two-heaps">two-heaps</a><label class="done"><input type="checkbox" data-k="dsa/ipo"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 8</span><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 30 all time">Microsoft<span>30</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 29 all time, 21 in the last 6 months">Amazon<span>29</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 22 all time">Bloomberg<span>22</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 21 all time, 18 in the last 6 months">Google<span>21</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 8.5 all time">Meta<span>8.5</span></a><a class="co" href="/browse/?co=Stackline&sort=freq" title="Stackline: frequency 81 all time">Stackline<span>81</span></a><a class="co" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 77 all time">Samsung<span>77</span></a><a class="co" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 30 all time">Uber<span>30</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Sort projects by capital. Each round, push every newly affordable project&#x27;s profit into a max-heap and take the best one. Repeat k times.</p><p><strong>Complexity:</strong> O(n log n + k log n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/heap/course-schedule-iii/"><i class="dot Hard"></i>630. Course Schedule III</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findMaximizedCapital(self, k: int, w: int, profits: List[int], capital: List[int]) -&gt; int:
+        projects = sorted(zip(capital, profits))
+        h, i = [], 0
+        for _ in range(k):
+            while i &lt; len(projects) and projects[i][0] &lt;= w:
+                heappush(h, -projects[i][1])
+                i += 1
+            if not h:
+                break
+            w -= heappop(h)
+        return w
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().findMaximizedCapital(2, 0, [1, 2, 3], [0, 1, 1]) == 4
+assert Solution().findMaximizedCapital(3, 0, [1, 2, 3], [0, 1, 2]) == 6
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {
+        int n = profits.length;
+        Integer[] idx = new Integer[n];
+        for (int i = 0; i &lt; n; i++) idx[i] = i;
+        Arrays.sort(idx, (a, b) -&gt; capital[a] - capital[b]);
+        PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;(Collections.reverseOrder());
+        int i = 0;
+        while (k-- &gt; 0) {
+            while (i &lt; n &amp;&amp; capital[idx[i]] &lt;= w) pq.add(profits[idx[i++]]);
+            if (pq.isEmpty()) break;
+            w += pq.poll();
+        }
+        return w;
+    }
+}
+</code></pre><pre hidden><code class="language-go">type MaxHeap []int
+
+func (h MaxHeap) Len() int           { return len(h) }
+func (h MaxHeap) Less(i, j int) bool { return h[i] &gt; h[j] }
+func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *MaxHeap) Push(x any)        { *h = append(*h, x.(int)) }
+func (h *MaxHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func findMaximizedCapital(k int, w int, profits []int, capital []int) int {
+	idx := make([]int, len(profits))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.Slice(idx, func(a, b int) bool { return capital[idx[a]] &lt; capital[idx[b]] })
+	h, i := &amp;MaxHeap{}, 0
+	for ; k &gt; 0; k-- {
+		for i &lt; len(idx) &amp;&amp; capital[idx[i]] &lt;= w { // newly affordable projects
+			heap.Push(h, profits[idx[i]])
+			i++
+		}
+		if h.Len() == 0 {
+			break
+		}
+		w += heap.Pop(h).(int) // take the most profitable one
+	}
+	return w
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/heap/reorganize-string/">← Reorganize String</a></span><span><a href="/dsa/heap/find-k-pairs-with-smallest-sums/">Find K Pairs with Smallest Sums →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

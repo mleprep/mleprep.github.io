@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>410. Split Array Largest Sum – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 410. Split Array Largest Sum (Hard): Same as shipping packages: minimize the largest piece sum when splitting into k parts. Binary search the answer…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/binary-search/split-array-largest-sum/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="410. Split Array Largest Sum – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 410. Split Array Largest Sum (Hard): Same as shipping packages: minimize the largest piece sum when splitting into k parts. Binary search the answer…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/binary-search/split-array-largest-sum/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Binary Search","item":"https://mleprep.github.io/dsa/binary-search/"},{"@type":"ListItem","position":3,"name":"410. Split Array Largest Sum","item":"https://mleprep.github.io/dsa/binary-search/split-array-largest-sum/"}]},{"@type":"TechArticle","headline":"410. Split Array Largest Sum – LeetCode Solution in Python, Java & Go","name":"410. Split Array Largest Sum","description":"LeetCode 410. Split Array Largest Sum (Hard): Same as shipping packages: minimize the largest piece sum when splitting into k parts. Binary search the answer…","url":"https://mleprep.github.io/dsa/binary-search/split-array-largest-sum/","mainEntityOfPage":"https://mleprep.github.io/dsa/binary-search/split-array-largest-sum/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"search-on-answer","about":"LeetCode problem 410: Split Array Largest Sum","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class="on"><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/binary-search/">Binary Search</a></div><h1>410. Split Array Largest Sum</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/split-array-largest-sum/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=search-on-answer" title="Browse problems tagged search-on-answer">search-on-answer</a><label class="done"><input type="checkbox" data-k="dsa/split-array-largest-sum"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 22</span><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 58 all time, 54 in the last 6 months">Google<span>58</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 54 all time, 55 in the last 6 months">Amazon<span>54</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 53 all time, 58 in the last 6 months">Bloomberg<span>53</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 46 all time, 47 in the last 6 months">Microsoft<span>46</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 46 all time">Meta<span>46</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 22 all time">Apple<span>22</span></a><a class="co hot" href="/browse/?co=UKG&sort=freq" title="UKG: frequency 72 all time, 100 in the last 6 months">UKG<span>72</span></a><a class="co hot" href="/browse/?co=Pinterest&sort=freq" title="Pinterest: frequency 70 all time, 73 in the last 6 months">Pinterest<span>70</span></a><a class="co hot" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 55 all time, 100 in the last 6 months">Snap<span>55</span></a><a class="co hot" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 52 all time, 57 in the last 6 months">Uber<span>52</span></a><a class="co" href="/browse/?co=Baidu&sort=freq" title="Baidu: frequency 100 all time">Baidu<span>100</span></a><a class="co" href="/browse/?co=Zeta&sort=freq" title="Zeta: frequency 82 all time">Zeta<span>82</span></a><a class="co extra" href="/browse/?co=Tekion&sort=freq" title="Tekion: frequency 74 all time">Tekion<span>74</span></a><a class="co extra" href="/browse/?co=Okta&sort=freq" title="Okta: frequency 71 all time">Okta<span>71</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 60 all time">Nutanix<span>60</span></a><a class="co extra" href="/browse/?co=PhonePe&sort=freq" title="PhonePe: frequency 53 all time">PhonePe<span>53</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 53 all time">Samsung<span>53</span></a><a class="co extra" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 50 all time">Infosys<span>50</span></a><a class="co extra" href="/browse/?co=Deloitte&sort=freq" title="Deloitte: frequency 50 all time">Deloitte<span>50</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 47 all time">DE Shaw<span>47</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 21 all time">Goldman Sachs<span>21</span></a><button id="comore" class="co more">+10 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Same as shipping packages: minimize the largest piece sum when splitting into <code>k</code> parts. Binary search the answer; greedily count parts needed.</p><p><strong>Complexity:</strong> O(n log sum).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/binary-search/capacity-to-ship-packages-within-d-days/"><i class="dot Medium"></i>1011. Capacity To Ship Packages Within D Days</a><a href="/dsa/binary-search/koko-eating-bananas/"><i class="dot Medium"></i>875. Koko Eating Bananas</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def splitArray(self, nums: List[int], k: int) -&gt; int:
+        def parts(cap):
+            cnt, s = 1, 0
+            for x in nums:
+                if s + x &gt; cap:
+                    cnt, s = cnt + 1, 0
+                s += x
+            return cnt
+
+        lo, hi = max(nums), sum(nums)
+        while lo &lt; hi:
+            mid = (lo + hi) // 2
+            if parts(mid) &lt;= k:
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().splitArray([7, 2, 5, 10, 8], 2) == 18
+assert Solution().splitArray([1, 2, 3, 4, 5], 2) == 9
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int splitArray(int[] nums, int k) {
+        long lo = 0, hi = 0;
+        for (int x : nums) { lo = Math.max(lo, x); hi += x; }
+        while (lo &lt; hi) {
+            long mid = (lo + hi) / 2;
+            int cnt = 1;
+            long s = 0;
+            for (int x : nums) {
+                if (s + x &gt; mid) { cnt++; s = 0; }
+                s += x;
+            }
+            if (cnt &lt;= k) hi = mid; else lo = mid + 1;
+        }
+        return (int) lo;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func splitArray(nums []int, k int) int {
+	parts := func(limit int) int { // pieces needed if no piece may exceed limit
+		cnt, s := 1, 0
+		for _, x := range nums {
+			if s+x &gt; limit {
+				cnt, s = cnt+1, 0
+			}
+			s += x
+		}
+		return cnt
+	}
+	lo, hi := 0, 0
+	for _, x := range nums {
+		lo = max(lo, x)
+		hi += x
+	}
+	for lo &lt; hi {
+		mid := lo + (hi-lo)/2
+		if parts(mid) &lt;= k {
+			hi = mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return lo
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/binary-search/capacity-to-ship-packages-within-d-days/">← Capacity To Ship Packages Within D Days</a></span><span><a href="/dsa/binary-search/sqrtx/">Sqrt(x) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

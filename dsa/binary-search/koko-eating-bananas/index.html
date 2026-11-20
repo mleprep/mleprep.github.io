@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>875. Koko Eating Bananas – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 875. Koko Eating Bananas (Medium): hours(speed) is decreasing in speed → find the smallest speed in [1, max(piles)] with hours ≤ h. Complexity: O(n…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/binary-search/koko-eating-bananas/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="875. Koko Eating Bananas – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 875. Koko Eating Bananas (Medium): hours(speed) is decreasing in speed → find the smallest speed in [1, max(piles)] with hours ≤ h. Complexity: O(n…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/binary-search/koko-eating-bananas/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Binary Search","item":"https://mleprep.github.io/dsa/binary-search/"},{"@type":"ListItem","position":3,"name":"875. Koko Eating Bananas","item":"https://mleprep.github.io/dsa/binary-search/koko-eating-bananas/"}]},{"@type":"TechArticle","headline":"875. Koko Eating Bananas – LeetCode Solution in Python, Java & Go","name":"875. Koko Eating Bananas","description":"LeetCode 875. Koko Eating Bananas (Medium): hours(speed) is decreasing in speed → find the smallest speed in [1, max(piles)] with hours ≤ h. Complexity: O(n…","url":"https://mleprep.github.io/dsa/binary-search/koko-eating-bananas/","mainEntityOfPage":"https://mleprep.github.io/dsa/binary-search/koko-eating-bananas/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"search-on-answer","about":"LeetCode problem 875: Koko Eating Bananas","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class="on"><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/binary-search/">Binary Search</a></div><h1>875. Koko Eating Bananas</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/koko-eating-bananas/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=search-on-answer" title="Browse problems tagged search-on-answer">search-on-answer</a><label class="done"><input type="checkbox" data-k="dsa/koko-eating-bananas"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 40</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 75 all time, 73 in the last 6 months">Amazon<span>75</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 64 all time, 49 in the last 6 months">Bloomberg<span>64</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 64 all time, 43 in the last 6 months">Microsoft<span>64</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 59 all time, 56 in the last 6 months">Google<span>59</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 59 all time, 52 in the last 6 months">Meta<span>59</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 22 all time">Apple<span>22</span></a><a class="co hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 61 all time, 79 in the last 6 months">Infosys<span>61</span></a><a class="co hot" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 55 all time, 85 in the last 6 months">Nvidia<span>55</span></a><a class="co hot" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 52 all time, 88 in the last 6 months">Zoho<span>52</span></a><a class="co" href="/browse/?co=Trexquant&sort=freq" title="Trexquant: frequency 100 all time">Trexquant<span>100</span></a><a class="co" href="/browse/?co=oyo&sort=freq" title="oyo: frequency 100 all time">oyo<span>100</span></a><a class="co" href="/browse/?co=Nokia&sort=freq" title="Nokia: frequency 87 all time">Nokia<span>87</span></a><a class="co extra" href="/browse/?co=Ripple&sort=freq" title="Ripple: frequency 82 all time">Ripple<span>82</span></a><a class="co extra" href="/browse/?co=Turing&sort=freq" title="Turing: frequency 80 all time">Turing<span>80</span></a><a class="co extra" href="/browse/?co=DoorDash&sort=freq" title="DoorDash: frequency 76 all time">DoorDash<span>76</span></a><a class="co extra" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 74 all time">Adobe<span>74</span></a><a class="co extra" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 71 all time">Accenture<span>71</span></a><a class="co extra" href="/browse/?co=Okta&sort=freq" title="Okta: frequency 71 all time">Okta<span>71</span></a><a class="co extra" href="/browse/?co=Swiggy&sort=freq" title="Swiggy: frequency 69 all time">Swiggy<span>69</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 65 all time">Expedia<span>65</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 62 all time">Oracle<span>62</span></a><a class="co extra" href="/browse/?co=HashedIn&sort=freq" title="HashedIn: frequency 62 all time">HashedIn<span>62</span></a><a class="co extra" href="/browse/?co=Autodesk&sort=freq" title="Autodesk: frequency 59 all time">Autodesk<span>59</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 59 all time">Flipkart<span>59</span></a><a class="co extra" href="/browse/?co=josh+technology&sort=freq" title="josh technology: frequency 58 all time">josh technology<span>58</span></a><a class="co extra" href="/browse/?co=Netflix&sort=freq" title="Netflix: frequency 58 all time">Netflix<span>58</span></a><a class="co extra" href="/browse/?co=Coupang&sort=freq" title="Coupang: frequency 58 all time">Coupang<span>58</span></a><a class="co extra" href="/browse/?co=Agoda&sort=freq" title="Agoda: frequency 57 all time">Agoda<span>57</span></a><a class="co extra" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 50 all time">Palo Alto Networks<span>50</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 50 all time">TikTok<span>50</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 47 all time">Citadel<span>47</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 45 all time">Snap<span>45</span></a><a class="co extra" href="/browse/?co=Atlassian&sort=freq" title="Atlassian: frequency 42 all time">Atlassian<span>42</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 42 all time">PayPal<span>42</span></a><a class="co extra" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 42 all time">tcs<span>42</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 41 all time">Salesforce<span>41</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 40 all time">Uber<span>40</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 36 all time">Goldman Sachs<span>36</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 35 all time">IBM<span>35</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 27 all time">LinkedIn<span>27</span></a><button id="comore" class="co more">+28 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p><code>hours(speed)</code> is decreasing in speed → find the smallest speed in <code>[1, max(piles)]</code> with <code>hours ≤ h</code>.</p><pre class="viz"><code class="language-viz">piles [3,6,7,11], h=8
+speed: 1  2  3  4  5 ...  11
+ok?    F  F  F  T  T ...  T     -&gt; 4
+</code></pre><p><strong>Complexity:</strong> O(n log max).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/binary-search/capacity-to-ship-packages-within-d-days/"><i class="dot Medium"></i>1011. Capacity To Ship Packages Within D Days</a><a href="/dsa/binary-search/split-array-largest-sum/"><i class="dot Hard"></i>410. Split Array Largest Sum</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def minEatingSpeed(self, piles: List[int], h: int) -&gt; int:
+        lo, hi = 1, max(piles)
+        while lo &lt; hi:
+            k = (lo + hi) // 2
+            if sum((p + k - 1) // k for p in piles) &lt;= h:
+                hi = k
+            else:
+                lo = k + 1
+        return lo
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().minEatingSpeed([3, 6, 7, 11], 8) == 4
+assert Solution().minEatingSpeed([30, 11, 23, 4, 20], 5) == 30
+assert Solution().minEatingSpeed([30, 11, 23, 4, 20], 6) == 23
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int minEatingSpeed(int[] piles, int h) {
+        int lo = 1, hi = 0;
+        for (int p : piles) hi = Math.max(hi, p);
+        while (lo &lt; hi) {
+            int k = lo + (hi - lo) / 2;
+            long hours = 0;
+            for (int p : piles) hours += (p + k - 1) / k;
+            if (hours &lt;= h) hi = k; else lo = k + 1;
+        }
+        return lo;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func minEatingSpeed(piles []int, h int) int {
+	lo, hi := 1, 0
+	for _, p := range piles {
+		hi = max(hi, p)
+	}
+	for lo &lt; hi { // smallest speed that finishes in h hours
+		k := lo + (hi-lo)/2
+		hours := 0
+		for _, p := range piles {
+			hours += (p + k - 1) / k
+		}
+		if hours &lt;= h {
+			hi = k
+		} else {
+			lo = k + 1
+		}
+	}
+	return lo
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/binary-search/search-a-2d-matrix/">← Search a 2D Matrix</a></span><span><a href="/dsa/binary-search/find-minimum-in-rotated-sorted-array/">Find Minimum in Rotated Sorted Array →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

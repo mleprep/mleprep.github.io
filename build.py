@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate the site data and runnable solution files from content/**/*.md.
 
-    python build.py            # write data/, python/, java/, go/
+    python build.py            # write data/, python/, java/, go/ and the static pages (index.html, dsa/, system-design/,
+                               #    ml/, browse/, 404.html, sitemap.xml, robots.txt: see tools/prerender.py)
     python build.py --test     # ...and run every Python, Java and Go test (Java needs `java` 11+ on PATH or
                                #    JAVA_HOME, Go needs `go` 1.22+ on PATH or GOROOT; missing ones are skipped)
     python build.py --test 146 # ...only run problems whose number is listed
@@ -44,6 +45,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "tools"))
+import prerender  # noqa: E402
 CONTENT = ROOT / "content"
 SECTIONS = [("dsa", "Algorithms"), ("system-design", "System Design"), ("ml", "ML / Deep Learning")]
 FENCE = re.compile(r"^```([\w-]*)[ \t]*\n(.*?)^```[ \t]*$", re.M | re.S)
@@ -521,10 +524,11 @@ def run_tests(files, only, snippets):
 
 # ---------------------------------------------------------------- main
 def main():
-    manifest, problems, snippets = {"sections": []}, [], []
+    manifest, problems, snippets, full = {"sections": []}, [], [], []
     for sec, sec_title in SECTIONS:
         sec_dir = CONTENT / sec
         topics = [parse_file(sec, f) for f in sorted(sec_dir.glob("*.md"))] if sec_dir.exists() else []
+        full.append({"id": sec, "title": sec_title, "topics": topics})
         if sec == "ml":
             snippets = list(ml_snippets([t for t in topics if t["id"] == "ml-coding"]))
         manifest["sections"].append({"id": sec, "title": sec_title, "topics": [
@@ -554,8 +558,12 @@ def main():
     (ROOT / "data" / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, separators=(",", ":")),
                                                  encoding="utf-8")
     files = write_runnables(problems)
+    side = lambda name: (json.loads((ROOT / "data" / name).read_text(encoding="utf-8"))
+                         if (ROOT / "data" / name).exists() else None)
+    n_pages = prerender.write_site(ROOT, full, side("companies.json"), side("lists.json"), ROOT / "tools" / "lastmod.json")
     print(f"built {len(problems)} problems ({manifest['counts']}), "
-          + ", ".join(f"{s['title']}: {sum(len(t['items']) for t in s['topics'])}" for s in manifest["sections"]))
+          + ", ".join(f"{s['title']}: {sum(len(t['items']) for t in s['topics'])}" for s in manifest["sections"])
+          + f"; {n_pages} pages")
 
     if "--test" in sys.argv:
         only = {int(a) for a in sys.argv[sys.argv.index("--test") + 1:] if a.isdigit()}

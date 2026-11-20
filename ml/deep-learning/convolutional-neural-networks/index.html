@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convolutional Neural Networks – ML Interview | SDE &amp; MLE Prep</title>
+<meta name="description" content="Q: Why do CNNs work well for images? Local connectivity + weight sharing → far fewer parameters than dense layers and translation equivariance…">
+<link rel="canonical" href="https://mleprep.github.io/ml/deep-learning/convolutional-neural-networks/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Convolutional Neural Networks – ML Interview | SDE &amp; MLE Prep">
+<meta property="og:description" content="Q: Why do CNNs work well for images? Local connectivity + weight sharing → far fewer parameters than dense layers and translation equivariance…">
+<meta property="og:url" content="https://mleprep.github.io/ml/deep-learning/convolutional-neural-networks/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"Deep Learning","item":"https://mleprep.github.io/ml/deep-learning/"},{"@type":"ListItem","position":3,"name":"Convolutional Neural Networks","item":"https://mleprep.github.io/ml/deep-learning/convolutional-neural-networks/"}]},{"@type":"TechArticle","headline":"Convolutional Neural Networks – ML Interview","name":"Convolutional Neural Networks","description":"Q: Why do CNNs work well for images? Local connectivity + weight sharing → far fewer parameters than dense layers and translation equivariance…","url":"https://mleprep.github.io/ml/deep-learning/convolutional-neural-networks/","mainEntityOfPage":"https://mleprep.github.io/ml/deep-learning/convolutional-neural-networks/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class="on"><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class=""><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class=""><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/deep-learning/">Deep Learning</a></div><h1>Convolutional Neural Networks</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/convolutional-neural-networks"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Q: Why do CNNs work well for images?</strong></p><ul><li><strong>Local connectivity</strong> + <strong>weight sharing</strong> → far fewer parameters than dense layers and <strong>translation equivariance</strong>; pooling/striding gives some invariance and growing receptive fields.</li><li>Output size: <code>(W − K + 2P) / S + 1</code>. Params of a conv layer: <code>K·K·C_in·C_out (+ C_out)</code>.</li><li>Milestones: LeNet → AlexNet (ReLU, dropout, GPUs) → VGG (3×3 stacks) → <strong>ResNet</strong> (residual connections, 100+ layers) → EfficientNet (compound scaling) → ConvNeXt; <strong>Vision Transformers</strong> (patches as tokens) win at large data scale.</li><li>1×1 convs mix channels cheaply; depthwise-separable convs (MobileNet) cut compute.</li></ul><pre class="viz"><code class="language-viz">input 32x32x3 --conv3x3x16--&gt; 32x32x16 --pool2--&gt; 16x16x16 --conv--&gt; ... --global avg pool--&gt; FC --&gt; logits
+</code></pre></div></div><nav class="rail"><h4>In Deep Learning</h4><a href="/ml/deep-learning/backpropagation/" class="">Backpropagation</a><a href="/ml/deep-learning/activation-functions-vanishing-gradients/" class="">Activation Functions &amp; Vanishing Gradients</a><a href="/ml/deep-learning/batch-norm-vs-layer-norm/" class="">Batch Norm vs Layer Norm</a><a href="/ml/deep-learning/convolutional-neural-networks/" class="on">Convolutional Neural Networks</a><a href="/ml/deep-learning/rnn-lstm-gru/" class="">RNN, LSTM &amp; GRU</a><a href="/ml/deep-learning/attention-transformers/" class="">Attention &amp; Transformers</a><a href="/ml/deep-learning/embeddings/" class="">Embeddings</a><a href="/ml/deep-learning/training-tricks-debugging/" class="">Training Tricks &amp; Debugging</a><a href="/ml/deep-learning/transfer-learning-fine-tuning/" class="">Transfer Learning &amp; Fine-Tuning</a><a href="/ml/deep-learning/generative-models-vae-gan-diffusion/" class="">Generative Models: VAE, GAN, Diffusion</a><a href="/ml/deep-learning/regularization-data-augmentation-in-deep-nets/" class="">Regularization &amp; Data Augmentation in Deep Nets</a><a href="/ml/deep-learning/self-supervised-contrastive-learning/" class="">Self-Supervised &amp; Contrastive Learning</a><a href="/ml/deep-learning/mixture-of-experts-moe/" class="">Mixture of Experts (MoE)</a><a href="/ml/deep-learning/distributed-training/" class="">Distributed Training</a><a href="/ml/deep-learning/graph-neural-networks/" class="">Graph Neural Networks</a><a href="/ml/deep-learning/object-detection-segmentation/" class="">Object Detection &amp; Segmentation</a><a href="/ml/deep-learning/model-compression-distillation-quantization-pruning/" class="">Model Compression: Distillation, Quantization, Pruning</a><a href="/ml/deep-learning/diffusion-models-in-depth/" class="">Diffusion Models in Depth</a><a href="/ml/deep-learning/vision-transformers-clip/" class="">Vision Transformers &amp; CLIP</a></nav></div><div class="pager"><span><a href="/ml/deep-learning/batch-norm-vs-layer-norm/">← Batch Norm vs Layer Norm</a></span><span><a href="/ml/deep-learning/rnn-lstm-gru/">RNN, LSTM &amp; GRU →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

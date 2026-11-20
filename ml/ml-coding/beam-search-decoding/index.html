@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beam Search Decoding – ML Interview | SDE &amp; MLE Prep</title>
+<meta name="description" content="Key idea: keep the b highest-scoring partial sequences (sum of log-probs); expand each with every token, keep the top b; finished beams (EOS) are set aside…">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-coding/beam-search-decoding/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Beam Search Decoding – ML Interview | SDE &amp; MLE Prep">
+<meta property="og:description" content="Key idea: keep the b highest-scoring partial sequences (sum of log-probs); expand each with every token, keep the top b; finished beams (EOS) are set aside…">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-coding/beam-search-decoding/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML Coding from Scratch","item":"https://mleprep.github.io/ml/ml-coding/"},{"@type":"ListItem","position":3,"name":"Beam Search Decoding","item":"https://mleprep.github.io/ml/ml-coding/beam-search-decoding/"}]},{"@type":"TechArticle","headline":"Beam Search Decoding – ML Interview","name":"Beam Search Decoding","description":"Key idea: keep the b highest-scoring partial sequences (sum of log-probs); expand each with every token, keep the top b; finished beams (EOS) are set aside…","url":"https://mleprep.github.io/ml/ml-coding/beam-search-decoding/","mainEntityOfPage":"https://mleprep.github.io/ml/ml-coding/beam-search-decoding/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class="on"><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class=""><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/ml-coding/">ML Coding from Scratch</a></div><h1>Beam Search Decoding</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/beam-search-decoding"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Key idea:</strong> keep the <code>b</code> highest-scoring partial sequences (sum of log-probs); expand each with every token, keep the top <code>b</code>; finished beams (EOS) are set aside. Greedy decoding is beam size 1 — and can miss the best sequence.</p><pre><code class="language-python">import numpy as np
+
+def beam_search(step_logprobs, beam=3, max_len=5, eos=0):
+    &quot;&quot;&quot;step_logprobs(prefix) -&gt; log-prob vector over the vocabulary for the next token.&quot;&quot;&quot;
+    beams, done = [((), 0.0)], []
+    for _ in range(max_len):
+        cand = []
+        for seq, score in beams:
+            lp = step_logprobs(seq)
+            for tok in np.argsort(lp)[-beam:]:
+                cand.append((seq + (int(tok),), score + float(lp[tok])))
+        cand.sort(key=lambda c: c[1], reverse=True)
+        beams = []
+        for seq, score in cand[:beam]:
+            (done if seq[-1] == eos else beams).append((seq, score))
+        if not beams:
+            break
+    return max(done + beams, key=lambda c: c[1])
+
+# toy model: first token 1 looks best (0.6) but leads to a weak continuation; token 2 (0.4) leads to a sure EOS
+P = {(): [0.0, 0.6, 0.4], (1,): [0.3, 0.4, 0.3], (2,): [1.0, 0.0, 0.0]}
+def model(seq):
+    p = np.array(P.get(seq, [1.0, 0.0, 0.0])) + 1e-12
+    return np.log(p)
+greedy = beam_search(model, beam=1, max_len=2)
+best = beam_search(model, beam=3, max_len=2)
+assert greedy[0] == (1, 1) and best[0] == (2, 0)          # beam finds the higher-probability sequence
+print(&quot;ok greedy&quot;, greedy[0], round(np.exp(greedy[1]), 3), &quot;beam&quot;, best[0], round(np.exp(best[1]), 3))
+</code></pre></div></div><nav class="rail"><h4>In ML Coding from Scratch</h4><a href="/ml/ml-coding/softmax-cross-entropy-numerically-stable/" class="">Softmax &amp; Cross-Entropy (Numerically Stable)</a><a href="/ml/ml-coding/linear-regression-with-gradient-descent/" class="">Linear Regression with Gradient Descent</a><a href="/ml/ml-coding/logistic-regression/" class="">Logistic Regression</a><a href="/ml/ml-coding/k-means/" class="">K-Means</a><a href="/ml/ml-coding/k-nearest-neighbors/" class="">K-Nearest Neighbors</a><a href="/ml/ml-coding/scaled-dot-product-multi-head-attention/" class="">Scaled Dot-Product &amp; Multi-Head Attention</a><a href="/ml/ml-coding/two-layer-mlp-with-backprop/" class="">Two-Layer MLP with Backprop</a><a href="/ml/ml-coding/decision-tree-split-gini/" class="">Decision Tree Split (Gini)</a><a href="/ml/ml-coding/roc-auc-from-scratch/" class="">ROC-AUC from Scratch</a><a href="/ml/ml-coding/conv2d-forward-im2col/" class="">Conv2D Forward (im2col)</a><a href="/ml/ml-coding/batch-normalization-forward-backward/" class="">Batch Normalization (Forward &amp; Backward)</a><a href="/ml/ml-coding/pca-via-svd/" class="">PCA via SVD</a><a href="/ml/ml-coding/adam-optimizer/" class="">Adam Optimizer</a><a href="/ml/ml-coding/gaussian-naive-bayes/" class="">Gaussian Naive Bayes</a><a href="/ml/ml-coding/beam-search-decoding/" class="on">Beam Search Decoding</a><a href="/ml/ml-coding/iou-non-maximum-suppression/" class="">IoU &amp; Non-Maximum Suppression</a><a href="/ml/ml-coding/byte-pair-encoding-bpe-tokenizer/" class="">Byte-Pair Encoding (BPE) Tokenizer</a><a href="/ml/ml-coding/sampling-temperature-top-k-top-p/" class="">Sampling: Temperature, Top-k, Top-p</a><a href="/ml/ml-coding/layernorm-rmsnorm-forward-backward/" class="">LayerNorm &amp; RMSNorm (Forward &amp; Backward)</a><a href="/ml/ml-coding/positional-encodings-sinusoidal-rope/" class="">Positional Encodings: Sinusoidal &amp; RoPE</a><a href="/ml/ml-coding/causal-self-attention-with-a-kv-cache/" class="">Causal Self-Attention with a KV Cache</a><a href="/ml/ml-coding/matrix-factorization-als-for-recommendations/" class="">Matrix Factorization (ALS) for Recommendations</a><a href="/ml/ml-coding/ranking-metrics-precisionk-map-mrr-ndcg/" class="">Ranking Metrics: Precision@k, MAP, MRR, NDCG</a><a href="/ml/ml-coding/dropout-forward-backward/" class="">Dropout (Forward &amp; Backward)</a><a href="/ml/ml-coding/lora-linear-layer/" class="">LoRA Linear Layer</a></nav></div><div class="pager"><span><a href="/ml/ml-coding/gaussian-naive-bayes/">← Gaussian Naive Bayes</a></span><span><a href="/ml/ml-coding/iou-non-maximum-suppression/">IoU &amp; Non-Maximum Suppression →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

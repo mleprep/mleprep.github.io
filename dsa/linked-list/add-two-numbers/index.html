@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2. Add Two Numbers – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 2. Add Two Numbers (Medium): Digits are stored least-significant first, so add node by node with a carry, like grade-school addition. Complexity…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/linked-list/add-two-numbers/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="2. Add Two Numbers – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 2. Add Two Numbers (Medium): Digits are stored least-significant first, so add node by node with a carry, like grade-school addition. Complexity…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/linked-list/add-two-numbers/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Linked List","item":"https://mleprep.github.io/dsa/linked-list/"},{"@type":"ListItem","position":3,"name":"2. Add Two Numbers","item":"https://mleprep.github.io/dsa/linked-list/add-two-numbers/"}]},{"@type":"TechArticle","headline":"2. Add Two Numbers – LeetCode Solution in Python, Java & Go","name":"2. Add Two Numbers","description":"LeetCode 2. Add Two Numbers (Medium): Digits are stored least-significant first, so add node by node with a carry, like grade-school addition. Complexity…","url":"https://mleprep.github.io/dsa/linked-list/add-two-numbers/","mainEntityOfPage":"https://mleprep.github.io/dsa/linked-list/add-two-numbers/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"dummy-head, carry","about":"LeetCode problem 2: Add Two Numbers","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class="on"><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/linked-list/">Linked List</a></div><h1>2. Add Two Numbers</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/add-two-numbers/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=dummy-head" title="Browse problems tagged dummy-head">dummy-head</a><a class="tag" href="/browse/?tag=carry" title="Browse problems tagged carry">carry</a><label class="done"><input type="checkbox" data-k="dsa/add-two-numbers"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 33</span><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 85 all time, 80 in the last 6 months">Bloomberg<span>85</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 82 all time, 80 in the last 6 months">Microsoft<span>82</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 80 all time, 77 in the last 6 months">Amazon<span>80</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 79 all time, 75 in the last 6 months">Google<span>79</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 75 all time, 73 in the last 6 months">Meta<span>75</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 40 all time">Apple<span>40</span></a><a class="co" href="/browse/?co=EarnIn&sort=freq" title="EarnIn: frequency 100 all time">EarnIn<span>100</span></a><a class="co" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 91 all time">Adobe<span>91</span></a><a class="co" href="/browse/?co=Wix&sort=freq" title="Wix: frequency 87 all time">Wix<span>87</span></a><a class="co" href="/browse/?co=LTI&sort=freq" title="LTI: frequency 81 all time">LTI<span>81</span></a><a class="co" href="/browse/?co=Jane+Street&sort=freq" title="Jane Street: frequency 68 all time">Jane Street<span>68</span></a><a class="co" href="/browse/?co=Airbnb&sort=freq" title="Airbnb: frequency 66 all time">Airbnb<span>66</span></a><a class="co extra" href="/browse/?co=AQR+Capital+Management&sort=freq" title="AQR Capital Management: frequency 66 all time">AQR Capital Management<span>66</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 65 all time">Zoho<span>65</span></a><a class="co extra" href="/browse/?co=SAP&sort=freq" title="SAP: frequency 62 all time">SAP<span>62</span></a><a class="co extra" href="/browse/?co=Arista+Networks&sort=freq" title="Arista Networks: frequency 60 all time">Arista Networks<span>60</span></a><a class="co extra" href="/browse/?co=ByteDance&sort=freq" title="ByteDance: frequency 59 all time">ByteDance<span>59</span></a><a class="co extra" href="/browse/?co=Palo+Alto+Networks&sort=freq" title="Palo Alto Networks: frequency 59 all time">Palo Alto Networks<span>59</span></a><a class="co extra" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 55 all time">Nvidia<span>55</span></a><a class="co extra" href="/browse/?co=Capgemini&sort=freq" title="Capgemini: frequency 52 all time">Capgemini<span>52</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 51 all time">Cisco<span>51</span></a><a class="co extra" href="/browse/?co=EPAM+Systems&sort=freq" title="EPAM Systems: frequency 51 all time">EPAM Systems<span>51</span></a><a class="co extra" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 50 all time">tcs<span>50</span></a><a class="co extra" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 50 all time">Infosys<span>50</span></a><a class="co extra" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 49 all time">Yandex<span>49</span></a><a class="co extra" href="/browse/?co=Media.net&sort=freq" title="Media.net: frequency 48 all time">Media.net<span>48</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 45 all time">Oracle<span>45</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 44 all time">IBM<span>44</span></a><a class="co extra" href="/browse/?co=Capital+One&sort=freq" title="Capital One: frequency 43 all time">Capital One<span>43</span></a><a class="co extra" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 39 all time">Snowflake<span>39</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 36 all time">Goldman Sachs<span>36</span></a><a class="co extra" href="/browse/?co=DoorDash&sort=freq" title="DoorDash: frequency 29 all time">DoorDash<span>29</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 22 all time">Uber<span>22</span></a><button id="comore" class="co more">+21 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Digits are stored least-significant first, so add node by node with a carry, like grade-school addition.</p><pre class="viz"><code class="language-viz">  2 -&gt; 4 -&gt; 3     (342)
++ 5 -&gt; 6 -&gt; 4     (465)
+= 7 -&gt; 0 -&gt; 8     (807)   carry: 0, 1, 0
+</code></pre><p><strong>Complexity:</strong> O(max(m, n)).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/linked-list/add-two-numbers-ii/"><i class="dot Medium"></i>445. Add Two Numbers II</a><a href="/dsa/math-geometry/add-binary/"><i class="dot Easy"></i>67. Add Binary</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -&gt; Optional[ListNode]:
+        dummy = tail = ListNode()
+        carry = 0
+        while l1 or l2 or carry:
+            s = carry + (l1.val if l1 else 0) + (l2.val if l2 else 0)
+            carry, d = divmod(s, 10)
+            tail.next = ListNode(d)
+            tail = tail.next
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
+        return dummy.next
+</code></pre><pre class="test" hidden><code id="tsrc">assert list_vals(Solution().addTwoNumbers(make_list([2, 4, 3]), make_list([5, 6, 4]))) == [7, 0, 8]
+assert list_vals(Solution().addTwoNumbers(make_list([9, 9, 9]), make_list([1]))) == [0, 0, 0, 1]
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(), tail = dummy;
+        int carry = 0;
+        while (l1 != null || l2 != null || carry != 0) {
+            int s = carry;
+            if (l1 != null) { s += l1.val; l1 = l1.next; }
+            if (l2 != null) { s += l2.val; l2 = l2.next; }
+            carry = s / 10;
+            tail = tail.next = new ListNode(s % 10);
+        }
+        return dummy.next;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+	dummy := &amp;ListNode{}
+	tail, carry := dummy, 0
+	for l1 != nil || l2 != nil || carry &gt; 0 {
+		s := carry
+		if l1 != nil {
+			s, l1 = s+l1.Val, l1.Next
+		}
+		if l2 != nil {
+			s, l2 = s+l2.Val, l2.Next
+		}
+		carry = s / 10
+		tail.Next = &amp;ListNode{Val: s % 10}
+		tail = tail.Next
+	}
+	return dummy.Next
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/linked-list/copy-list-with-random-pointer/">← Copy List with Random Pointer</a></span><span><a href="/dsa/linked-list/find-the-duplicate-number/">Find the Duplicate Number →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

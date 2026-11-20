@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>253. Meeting Rooms II – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 253. Meeting Rooms II (Medium): Max overlap at any time. Sweep: sort starts and ends separately; walk starts, freeing a room whenever the earliest…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/intervals/meeting-rooms-ii/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="253. Meeting Rooms II – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 253. Meeting Rooms II (Medium): Max overlap at any time. Sweep: sort starts and ends separately; walk starts, freeing a room whenever the earliest…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/intervals/meeting-rooms-ii/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Intervals","item":"https://mleprep.github.io/dsa/intervals/"},{"@type":"ListItem","position":3,"name":"253. Meeting Rooms II","item":"https://mleprep.github.io/dsa/intervals/meeting-rooms-ii/"}]},{"@type":"TechArticle","headline":"253. Meeting Rooms II – LeetCode Solution in Python, Java & Go","name":"253. Meeting Rooms II","description":"LeetCode 253. Meeting Rooms II (Medium): Max overlap at any time. Sweep: sort starts and ends separately; walk starts, freeing a room whenever the earliest…","url":"https://mleprep.github.io/dsa/intervals/meeting-rooms-ii/","mainEntityOfPage":"https://mleprep.github.io/dsa/intervals/meeting-rooms-ii/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"blind75, sweep-line","about":"LeetCode problem 253: Meeting Rooms II","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class="on"><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/intervals/">Intervals</a></div><h1>253. Meeting Rooms II</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/meeting-rooms-ii/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag star" href="/browse/?list=blind75" title="Browse problems tagged blind75">★ Blind 75</a><a class="tag" href="/browse/?tag=sweep-line" title="Browse problems tagged sweep-line">sweep-line</a><a class="tag prem" href="/browse/?tag=premium" title="Browse problems tagged premium">🔒 Premium</a><label class="done"><input type="checkbox" data-k="dsa/meeting-rooms-ii"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 40</span><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 65 all time, 58 in the last 6 months">Bloomberg<span>65</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 64 all time">Apple<span>64</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 61 all time, 55 in the last 6 months">Amazon<span>61</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 58 all time, 48 in the last 6 months">Google<span>58</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 54 all time">Meta<span>54</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 53 all time">Microsoft<span>53</span></a><a class="co hot" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 100 all time, 100 in the last 6 months">Snap<span>100</span></a><a class="co hot" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 86 all time, 78 in the last 6 months">TikTok<span>86</span></a><a class="co hot" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 71 all time, 86 in the last 6 months">Oracle<span>71</span></a><a class="co hot" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 41 all time, 55 in the last 6 months">Salesforce<span>41</span></a><a class="co" href="/browse/?co=WorldQuant&sort=freq" title="WorldQuant: frequency 100 all time">WorldQuant<span>100</span></a><a class="co" href="/browse/?co=FreshWorks&sort=freq" title="FreshWorks: frequency 92 all time">FreshWorks<span>92</span></a><a class="co extra" href="/browse/?co=Disney&sort=freq" title="Disney: frequency 88 all time">Disney<span>88</span></a><a class="co extra" href="/browse/?co=Waymo&sort=freq" title="Waymo: frequency 79 all time">Waymo<span>79</span></a><a class="co extra" href="/browse/?co=Wise&sort=freq" title="Wise: frequency 78 all time">Wise<span>78</span></a><a class="co extra" href="/browse/?co=Netflix&sort=freq" title="Netflix: frequency 77 all time">Netflix<span>77</span></a><a class="co extra" href="/browse/?co=Compass&sort=freq" title="Compass: frequency 74 all time">Compass<span>74</span></a><a class="co extra" href="/browse/?co=Docusign&sort=freq" title="Docusign: frequency 74 all time">Docusign<span>74</span></a><a class="co extra" href="/browse/?co=Atlassian&sort=freq" title="Atlassian: frequency 73 all time">Atlassian<span>73</span></a><a class="co extra" href="/browse/?co=Wells+Fargo&sort=freq" title="Wells Fargo: frequency 65 all time">Wells Fargo<span>65</span></a><a class="co extra" href="/browse/?co=Tekion&sort=freq" title="Tekion: frequency 63 all time">Tekion<span>63</span></a><a class="co extra" href="/browse/?co=Whatnot&sort=freq" title="Whatnot: frequency 63 all time">Whatnot<span>63</span></a><a class="co extra" href="/browse/?co=Hubspot&sort=freq" title="Hubspot: frequency 62 all time">Hubspot<span>62</span></a><a class="co extra" href="/browse/?co=Yahoo&sort=freq" title="Yahoo: frequency 61 all time">Yahoo<span>61</span></a><a class="co extra" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 60 all time">Anduril<span>60</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 60 all time">Nutanix<span>60</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 59 all time">Uber<span>59</span></a><a class="co extra" href="/browse/?co=Two+Sigma&sort=freq" title="Two Sigma: frequency 58 all time">Two Sigma<span>58</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 57 all time">Citadel<span>57</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 55 all time">IBM<span>55</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 54 all time">Expedia<span>54</span></a><a class="co extra" href="/browse/?co=eBay&sort=freq" title="eBay: frequency 53 all time">eBay<span>53</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 45 all time">Cisco<span>45</span></a><a class="co extra" href="/browse/?co=Lyft&sort=freq" title="Lyft: frequency 43 all time">Lyft<span>43</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 43 all time">Walmart Labs<span>43</span></a><a class="co extra" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 39 all time">Snowflake<span>39</span></a><a class="co extra" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 39 all time">Visa<span>39</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 38 all time">DE Shaw<span>38</span></a><a class="co extra" href="/browse/?co=Pinterest&sort=freq" title="Pinterest: frequency 36 all time">Pinterest<span>36</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 21 all time">Goldman Sachs<span>21</span></a><button id="comore" class="co more">+28 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Max overlap at any time. <strong>Sweep</strong>: sort starts and ends separately; walk starts, freeing a room whenever the earliest end ≤ current start. (Equivalent: min-heap of end times.)</p><pre class="viz"><code class="language-viz">time   0    5   10   15   20   30
+       [0----------------------30)
+            [5---10)  [15--20)
+rooms  1    2    1    2    1        max 2
+</code></pre><p><strong>Complexity:</strong> O(n log n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/intervals/meeting-rooms/"><i class="dot Easy"></i>252. Meeting Rooms</a><a href="/dsa/intervals/minimum-interval-to-include-each-query/"><i class="dot Hard"></i>1851. Minimum Interval to Include Each Query</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -&gt; int:
+        starts = sorted(s for s, _ in intervals)
+        ends = sorted(e for _, e in intervals)
+        rooms = best = j = 0
+        for s in starts:
+            while ends[j] &lt;= s:
+                rooms -= 1
+                j += 1
+            rooms += 1
+            best = max(best, rooms)
+        return best
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().minMeetingRooms([[0, 30], [5, 10], [15, 20]]) == 2
+assert Solution().minMeetingRooms([[7, 10], [2, 4]]) == 1
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int minMeetingRooms(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -&gt; Integer.compare(a[0], b[0]));
+        PriorityQueue&lt;Integer&gt; ends = new PriorityQueue&lt;&gt;();   // end times of rooms in use
+        for (int[] iv : intervals) {
+            if (!ends.isEmpty() &amp;&amp; ends.peek() &lt;= iv[0]) ends.poll();   // reuse the freed room
+            ends.add(iv[1]);
+        }
+        return ends.size();
+    }
+}
+</code></pre><pre hidden><code class="language-go">func minMeetingRooms(intervals [][]int) int {
+	n := len(intervals)
+	starts, ends := make([]int, n), make([]int, n)
+	for i, iv := range intervals {
+		starts[i], ends[i] = iv[0], iv[1]
+	}
+	sort.Ints(starts)
+	sort.Ints(ends)
+	rooms, best, j := 0, 0, 0
+	for _, s := range starts { // sweep: free the rooms whose meetings ended by s
+		for ends[j] &lt;= s {
+			rooms--
+			j++
+		}
+		rooms++
+		best = max(best, rooms)
+	}
+	return best
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/intervals/meeting-rooms/">← Meeting Rooms</a></span><span><a href="/dsa/intervals/interval-list-intersections/">Interval List Intersections →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

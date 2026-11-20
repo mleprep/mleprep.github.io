@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>713. Subarray Product Less Than K – LeetCode Solution</title>
+<meta name="description" content="LeetCode 713. Subarray Product Less Than K (Medium): For each right end r, shrink until product &lt; k; then every subarray ending at r and starting in [l, r]…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/sliding-window/subarray-product-less-than-k/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="713. Subarray Product Less Than K – LeetCode Solution">
+<meta property="og:description" content="LeetCode 713. Subarray Product Less Than K (Medium): For each right end r, shrink until product &lt; k; then every subarray ending at r and starting in [l, r]…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/sliding-window/subarray-product-less-than-k/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Sliding Window","item":"https://mleprep.github.io/dsa/sliding-window/"},{"@type":"ListItem","position":3,"name":"713. Subarray Product Less Than K","item":"https://mleprep.github.io/dsa/sliding-window/subarray-product-less-than-k/"}]},{"@type":"TechArticle","headline":"713. Subarray Product Less Than K – LeetCode Solution","name":"713. Subarray Product Less Than K","description":"LeetCode 713. Subarray Product Less Than K (Medium): For each right end r, shrink until product < k; then every subarray ending at r and starting in [l, r]…","url":"https://mleprep.github.io/dsa/sliding-window/subarray-product-less-than-k/","mainEntityOfPage":"https://mleprep.github.io/dsa/sliding-window/subarray-product-less-than-k/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"variable-window, counting","about":"LeetCode problem 713: Subarray Product Less Than K","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class="on"><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/sliding-window/">Sliding Window</a></div><h1>713. Subarray Product Less Than K</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/subarray-product-less-than-k/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=variable-window" title="Browse problems tagged variable-window">variable-window</a><a class="tag" href="/browse/?tag=counting" title="Browse problems tagged counting">counting</a><label class="done"><input type="checkbox" data-k="dsa/subarray-product-less-than-k"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 21</span><a class="co hot" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 68 all time, 73 in the last 6 months">Apple<span>68</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 38 all time, 30 in the last 6 months">Amazon<span>38</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 34 all time, 40 in the last 6 months">Google<span>34</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 32 all time">Bloomberg<span>32</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 32 all time, 43 in the last 6 months">Meta<span>32</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 23 all time">Microsoft<span>23</span></a><a class="co hot" href="/browse/?co=Squarepoint+Capital&sort=freq" title="Squarepoint Capital: frequency 91 all time, 89 in the last 6 months">Squarepoint Capital<span>91</span></a><a class="co hot" href="/browse/?co=Revolut&sort=freq" title="Revolut: frequency 77 all time, 91 in the last 6 months">Revolut<span>77</span></a><a class="co hot" href="/browse/?co=Wells+Fargo&sort=freq" title="Wells Fargo: frequency 65 all time, 100 in the last 6 months">Wells Fargo<span>65</span></a><a class="co hot" href="/browse/?co=Meesho&sort=freq" title="Meesho: frequency 57 all time, 100 in the last 6 months">Meesho<span>57</span></a><a class="co hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 30 all time, 46 in the last 6 months">Infosys<span>30</span></a><a class="co" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 71 all time">Samsung<span>71</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 66 all time">Salesforce<span>66</span></a><a class="co extra" href="/browse/?co=Tekion&sort=freq" title="Tekion: frequency 63 all time">Tekion<span>63</span></a><a class="co extra" href="/browse/?co=Airbnb&sort=freq" title="Airbnb: frequency 57 all time">Airbnb<span>57</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 54 all time">Expedia<span>54</span></a><a class="co extra" href="/browse/?co=Agoda&sort=freq" title="Agoda: frequency 48 all time">Agoda<span>48</span></a><a class="co extra" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 43 all time">Walmart Labs<span>43</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 35 all time">Oracle<span>35</span></a><a class="co extra" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 27 all time">tcs<span>27</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 21 all time">Goldman Sachs<span>21</span></a><button id="comore" class="co more">+9 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>For each right end <code>r</code>, shrink until <code>product &lt; k</code>; then every subarray ending at <code>r</code> and starting in <code>[l, r]</code> qualifies → add <code>r − l + 1</code>.</p><p><strong>Complexity:</strong> O(n) time, O(1) space.</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/sliding-window/minimum-size-subarray-sum/"><i class="dot Medium"></i>209. Minimum Size Subarray Sum</a><a href="/dsa/arrays-hashing/subarray-sum-equals-k/"><i class="dot Medium"></i>560. Subarray Sum Equals K</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def numSubarrayProductLessThanK(self, nums: List[int], k: int) -&gt; int:
+        if k &lt;= 1:
+            return 0
+        prod, l, count = 1, 0, 0
+        for r, x in enumerate(nums):
+            prod *= x
+            while prod &gt;= k:
+                prod //= nums[l]
+                l += 1
+            count += r - l + 1
+        return count
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().numSubarrayProductLessThanK([10, 5, 2, 6], 100) == 8
+assert Solution().numSubarrayProductLessThanK([1, 2, 3], 0) == 0
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int numSubarrayProductLessThanK(int[] nums, int k) {
+        if (k &lt;= 1) return 0;
+        int prod = 1, l = 0, count = 0;
+        for (int r = 0; r &lt; nums.length; r++) {
+            prod *= nums[r];
+            while (prod &gt;= k) prod /= nums[l++];
+            count += r - l + 1;
+        }
+        return count;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func numSubarrayProductLessThanK(nums []int, k int) int {
+	if k &lt;= 1 {
+		return 0
+	}
+	prod, l, count := 1, 0, 0
+	for r, x := range nums {
+		prod *= x
+		for prod &gt;= k {
+			prod /= nums[l]
+			l++
+		}
+		count += r - l + 1 // subarrays ending at r
+	}
+	return count
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/sliding-window/max-consecutive-ones-iii/">← Max Consecutive Ones III</a></span><span><a href="/dsa/sliding-window/maximum-average-subarray-i/">Maximum Average Subarray I →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>106. Construct Binary Tree from Inorder and Postorder Traversal</title>
+<meta name="description" content="LeetCode 106. Construct Binary Tree from Inorder and Postorder Traversal (Medium): Mirror of 105: the last postorder element is the root. Consume postorder…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="106. Construct Binary Tree from Inorder and Postorder Traversal">
+<meta property="og:description" content="LeetCode 106. Construct Binary Tree from Inorder and Postorder Traversal (Medium): Mirror of 105: the last postorder element is the root. Consume postorder…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Trees","item":"https://mleprep.github.io/dsa/trees/"},{"@type":"ListItem","position":3,"name":"106. Construct Binary Tree from Inorder and Postorder Traversal","item":"https://mleprep.github.io/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/"}]},{"@type":"TechArticle","headline":"106. Construct Binary Tree from Inorder and Postorder Traversal","name":"106. Construct Binary Tree from Inorder and Postorder Traversal","description":"LeetCode 106. Construct Binary Tree from Inorder and Postorder Traversal (Medium): Mirror of 105: the last postorder element is the root. Consume postorder…","url":"https://mleprep.github.io/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/","mainEntityOfPage":"https://mleprep.github.io/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"divide-and-conquer","about":"LeetCode problem 106: Construct Binary Tree from Inorder and Postorder Traversal","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class="on"><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/trees/">Trees</a></div><h1>106. Construct Binary Tree from Inorder and Postorder Traversal</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=divide-and-conquer" title="Browse problems tagged divide-and-conquer">divide-and-conquer</a><label class="done"><input type="checkbox" data-k="dsa/construct-binary-tree-from-inorder-and-postorder-traversal"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 7</span><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 36 all time">Microsoft<span>36</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 23 all time, 18 in the last 6 months">Google<span>23</span></a><a class="co" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 20 all time">Amazon<span>20</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 8.3 all time">Bloomberg<span>8.3</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 5.0 all time">Meta<span>5.0</span></a><a class="co" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 60 all time">Walmart Labs<span>60</span></a><a class="co" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 26 all time">TikTok<span>26</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Mirror of 105: the <strong>last</strong> postorder element is the root. Consume postorder from the end and build the <strong>right</strong> subtree first.</p><p><strong>Complexity:</strong> O(n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/trees/construct-binary-tree-from-preorder-and-inorder-traversal/"><i class="dot Medium"></i>105. Construct Binary Tree from Preorder and Inorder Traversal</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -&gt; Optional[TreeNode]:
+        pos = {v: i for i, v in enumerate(inorder)}
+
+        def build(lo, hi):
+            if lo &gt;= hi:
+                return None
+            root = TreeNode(postorder.pop())
+            m = pos[root.val]
+            root.right = build(m + 1, hi)
+            root.left = build(lo, m)
+            return root
+
+        return build(0, len(inorder))
+</code></pre><pre class="test" hidden><code id="tsrc">assert tree_vals(Solution().buildTree([9, 3, 15, 20, 7], [9, 15, 7, 20, 3])) == [3, 9, 20, None, None, 15, 7]
+assert tree_vals(Solution().buildTree([-1], [-1])) == [-1]
+assert tree_vals(Solution().buildTree([2, 1], [2, 1])) == [1, 2]
+</code></pre><pre hidden><code class="language-java">class Solution {
+    private int post;
+    private final Map&lt;Integer, Integer&gt; pos = new HashMap&lt;&gt;();
+
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        for (int i = 0; i &lt; inorder.length; i++) pos.put(inorder[i], i);
+        post = postorder.length - 1;
+        return build(postorder, 0, inorder.length);
+    }
+
+    private TreeNode build(int[] postorder, int lo, int hi) {
+        if (lo &gt;= hi) return null;
+        TreeNode root = new TreeNode(postorder[post--]);
+        int m = pos.get(root.val);
+        root.right = build(postorder, m + 1, hi);
+        root.left = build(postorder, lo, m);
+        return root;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func buildTree(inorder []int, postorder []int) *TreeNode {
+	pos := map[int]int{}
+	for i, v := range inorder {
+		pos[v] = i
+	}
+	next := len(postorder) - 1 // postorder read backwards: root, right subtree, left subtree
+	var build func(lo, hi int) *TreeNode
+	build = func(lo, hi int) *TreeNode {
+		if lo &gt;= hi {
+			return nil
+		}
+		root := &amp;TreeNode{Val: postorder[next]}
+		next--
+		m := pos[root.Val]
+		root.Right = build(m+1, hi)
+		root.Left = build(lo, m)
+		return root
+	}
+	return build(0, len(inorder))
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/trees/minimum-depth-of-binary-tree/">← Minimum Depth of Binary Tree</a></span><span><a href="/dsa/trees/convert-sorted-list-to-binary-search-tree/">Convert Sorted List to Binary Search Tree →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

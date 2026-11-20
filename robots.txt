@@ -1,0 +1,11 @@
+User-agent: *
+# filtered views (?d=, ?co=, ?tag=…) repeat the unfiltered pages
+Disallow: /*?
+# sources and generated runnable files; the pages already show this content
+Disallow: /content/
+Disallow: /tools/
+Disallow: /python/
+Disallow: /java/
+Disallow: /go/
+
+Sitemap: https://mleprep.github.io/sitemap.xml

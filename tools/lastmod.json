@@ -1,0 +1,2762 @@
+{
+"/": [
+"72f79670ea20b4c4",
+"2026-11-19"
+],
+"/browse/": [
+"99ff5365d2ec7d2e",
+"2026-11-19"
+],
+"/dsa/": [
+"517a5d3ccf45ab7a",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/": [
+"f866d399d53e797e",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/alien-dictionary/": [
+"f48ce80c04164a1f",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/build-a-matrix-with-conditions/": [
+"fc43ab03edf2d9d9",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/cheapest-flights-within-k-stops/": [
+"2fb01de7d773e930",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/cracking-the-safe/": [
+"e212be2ed9245dbd",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/critical-connections-in-a-network/": [
+"66a2588a6651d8f9",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/": [
+"c08b973426cd058c",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/find-eventual-safe-states/": [
+"ce057c1df59730f9",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/": [
+"2f802f0318914bd0",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/greatest-common-divisor-traversal/": [
+"e6a070946f5ccf43",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/min-cost-to-connect-all-points/": [
+"11c1fee6582fa252",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/minimum-height-trees/": [
+"3be0acad8a5f239f",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/network-delay-time/": [
+"c112dafc4034f6e9",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/number-of-ways-to-arrive-at-destination/": [
+"e75f0772c4a8c3af",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/path-with-maximum-probability/": [
+"93a7eea9b9e2019b",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/path-with-minimum-effort/": [
+"b608c6acc1b3f738",
+"2026-11-20"
+],
+"/dsa/advanced-graphs/reconstruct-itinerary/": [
+"84259a26649d7b8e",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/redundant-connection-ii/": [
+"48ea3726b3a85d5f",
+"2026-11-19"
+],
+"/dsa/advanced-graphs/swim-in-rising-water/": [
+"44137924593e0017",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/": [
+"f3f3be0abf95798a",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/concatenation-of-array/": [
+"acb9d13f9c3197c9",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/contains-duplicate/": [
+"313d874eb7d25619",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/contiguous-array/": [
+"c7b485a91517edfa",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/continuous-subarray-sum/": [
+"e108c1c3ea542051",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/determine-if-two-strings-are-close/": [
+"6d39b4f7cd0e0c02",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/encode-and-decode-strings/": [
+"1724ca36898ded6f",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/equal-row-and-column-pairs/": [
+"9bd2f70d6061a072",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/find-all-numbers-disappeared-in-an-array/": [
+"fa7683af164fb745",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/find-the-difference-of-two-arrays/": [
+"ff79088380e0188e",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/find-the-index-of-the-first-occurrence-in-a-string/": [
+"4b8e200e3e272748",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/first-missing-positive/": [
+"69b83ef9c9bd21c0",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/game-of-life/": [
+"dff40ab106e0992c",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/group-anagrams/": [
+"7462fc873829e55b",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/h-index/": [
+"b5d09ad5d7aa8919",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/isomorphic-strings/": [
+"82b097d53052415d",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/kids-with-the-greatest-number-of-candies/": [
+"8b9d15525b732a50",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/largest-number/": [
+"a302029187848c50",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/length-of-last-word/": [
+"9153a64432d074c7",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/longest-common-prefix/": [
+"53e9443ad8ed262e",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/longest-consecutive-sequence/": [
+"1afaa6b4c0306ed3",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/longest-palindrome/": [
+"3ece293e71f5a27c",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/majority-element-ii/": [
+"79aef4121a44acfc",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/majority-element/": [
+"45d3810690bbceeb",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/merge-sorted-array/": [
+"dac7859c08b525f7",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/next-permutation/": [
+"7ebaf81ba14a9ffc",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/pascals-triangle/": [
+"0e0dbe64d15f1b66",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/product-of-array-except-self/": [
+"440b78e23f885c58",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/ransom-note/": [
+"990dd2d6a7710af9",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/remove-duplicates-from-sorted-array/": [
+"590f05e062d3ab58",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/rotate-array/": [
+"d050f6671c1805be",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/sort-an-array/": [
+"067006fff6f427b2",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/subarray-sum-equals-k/": [
+"dec22fa4e58e2deb",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/subarray-sums-divisible-by-k/": [
+"e3d7300ae5e26f4d",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/summary-ranges/": [
+"81427b3ec46dad54",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/top-k-frequent-elements/": [
+"deafd11c0b4aa7dd",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/two-sum/": [
+"6ce7c4ab29a7e015",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/unique-number-of-occurrences/": [
+"b995d672f6c00241",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/valid-anagram/": [
+"d3b9a1d6f89bbd1e",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/valid-sudoku/": [
+"3c13dbce4ecf491a",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/verifying-an-alien-dictionary/": [
+"0bb2d32967347036",
+"2026-11-20"
+],
+"/dsa/arrays-hashing/word-pattern/": [
+"1e778c3441cc76eb",
+"2026-11-19"
+],
+"/dsa/arrays-hashing/zigzag-conversion/": [
+"5ff970e6a91632e6",
+"2026-11-19"
+],
+"/dsa/backtracking/": [
+"40852cf007b7129f",
+"2026-11-19"
+],
+"/dsa/backtracking/combination-sum-ii/": [
+"704d040a86b258a4",
+"2026-11-19"
+],
+"/dsa/backtracking/combination-sum-iii/": [
+"68966f4d081e0134",
+"2026-11-19"
+],
+"/dsa/backtracking/combination-sum/": [
+"3fd1f8b0f1dc5995",
+"2026-11-19"
+],
+"/dsa/backtracking/combinations/": [
+"88cf5d3f24839154",
+"2026-11-19"
+],
+"/dsa/backtracking/expression-add-operators/": [
+"55b3840852915c55",
+"2026-11-19"
+],
+"/dsa/backtracking/generate-parentheses/": [
+"e0c2aae16394c978",
+"2026-11-19"
+],
+"/dsa/backtracking/letter-case-permutation/": [
+"00128888d5c52c31",
+"2026-11-19"
+],
+"/dsa/backtracking/letter-combinations-of-a-phone-number/": [
+"73026e192e3a8791",
+"2026-11-20"
+],
+"/dsa/backtracking/matchsticks-to-square/": [
+"e892b9aef1c4a446",
+"2026-11-19"
+],
+"/dsa/backtracking/n-queens-ii/": [
+"f813fd7935f9d9f5",
+"2026-11-19"
+],
+"/dsa/backtracking/n-queens/": [
+"fa43b5a33ac4c35a",
+"2026-11-19"
+],
+"/dsa/backtracking/palindrome-partitioning/": [
+"360625d5ced4bb1f",
+"2026-11-19"
+],
+"/dsa/backtracking/partition-to-k-equal-sum-subsets/": [
+"b3e3401a19c04a4d",
+"2026-11-20"
+],
+"/dsa/backtracking/permutations-ii/": [
+"167e603dbe852855",
+"2026-11-19"
+],
+"/dsa/backtracking/permutations/": [
+"4d76f874185eef34",
+"2026-11-19"
+],
+"/dsa/backtracking/remove-invalid-parentheses/": [
+"971ac64058eec48e",
+"2026-11-20"
+],
+"/dsa/backtracking/restore-ip-addresses/": [
+"f97ce0c8643fdf7c",
+"2026-11-19"
+],
+"/dsa/backtracking/subsets-ii/": [
+"35c947f05920e3f9",
+"2026-11-19"
+],
+"/dsa/backtracking/subsets/": [
+"1d06b65d99ea3d7d",
+"2026-11-19"
+],
+"/dsa/backtracking/sudoku-solver/": [
+"51bc94104498cd50",
+"2026-11-19"
+],
+"/dsa/backtracking/sum-of-all-subset-xor-totals/": [
+"5ef32304d29bf65b",
+"2026-11-20"
+],
+"/dsa/backtracking/word-break-ii/": [
+"23c0c379937f9223",
+"2026-11-19"
+],
+"/dsa/backtracking/word-search/": [
+"8873df1cd71da420",
+"2026-11-19"
+],
+"/dsa/binary-search/": [
+"06f27f3eecef2867",
+"2026-11-19"
+],
+"/dsa/binary-search/binary-search/": [
+"84cb1f343da91040",
+"2026-11-19"
+],
+"/dsa/binary-search/capacity-to-ship-packages-within-d-days/": [
+"bd48a50e8c08791b",
+"2026-11-20"
+],
+"/dsa/binary-search/find-first-and-last-position-of-element-in-sorted-array/": [
+"5c1fddc49ccf71fd",
+"2026-11-20"
+],
+"/dsa/binary-search/find-in-mountain-array/": [
+"f29ffea089e92c71",
+"2026-11-19"
+],
+"/dsa/binary-search/find-minimum-in-rotated-sorted-array/": [
+"93617a30b6fa2bac",
+"2026-11-20"
+],
+"/dsa/binary-search/find-peak-element/": [
+"820dfb9b8a1a6d19",
+"2026-11-19"
+],
+"/dsa/binary-search/first-bad-version/": [
+"c2763d1a306d17c6",
+"2026-11-19"
+],
+"/dsa/binary-search/guess-number-higher-or-lower/": [
+"e1374c43104c6676",
+"2026-11-20"
+],
+"/dsa/binary-search/koko-eating-bananas/": [
+"c8ecb8dfb00cedb1",
+"2026-11-19"
+],
+"/dsa/binary-search/kth-missing-positive-number/": [
+"ea126dfabf6f178f",
+"2026-11-20"
+],
+"/dsa/binary-search/median-of-two-sorted-arrays/": [
+"4f37ec9a6ee32fba",
+"2026-11-20"
+],
+"/dsa/binary-search/minimum-number-of-days-to-make-m-bouquets/": [
+"f316964344586fb4",
+"2026-11-20"
+],
+"/dsa/binary-search/peak-index-in-a-mountain-array/": [
+"e12731a605827fd0",
+"2026-11-20"
+],
+"/dsa/binary-search/random-pick-with-weight/": [
+"b496e3bd1df3b74e",
+"2026-11-19"
+],
+"/dsa/binary-search/search-a-2d-matrix-ii/": [
+"31baa3fed40b7a40",
+"2026-11-19"
+],
+"/dsa/binary-search/search-a-2d-matrix/": [
+"8ea03fb6fc9af17f",
+"2026-11-19"
+],
+"/dsa/binary-search/search-in-rotated-sorted-array-ii/": [
+"58fd3b7b4313439a",
+"2026-11-20"
+],
+"/dsa/binary-search/search-in-rotated-sorted-array/": [
+"22aaabe5185fadef",
+"2026-11-20"
+],
+"/dsa/binary-search/search-insert-position/": [
+"43dfc49d563c9b1d",
+"2026-11-19"
+],
+"/dsa/binary-search/split-array-largest-sum/": [
+"43c5a8c326aa659b",
+"2026-11-19"
+],
+"/dsa/binary-search/sqrtx/": [
+"770767f2cbb29397",
+"2026-11-19"
+],
+"/dsa/binary-search/successful-pairs-of-spells-and-potions/": [
+"afee68050544d3a7",
+"2026-11-20"
+],
+"/dsa/binary-search/time-based-key-value-store/": [
+"3705371a3b966e5f",
+"2026-11-20"
+],
+"/dsa/bit-manipulation/": [
+"f1c1337cea167216",
+"2026-11-20"
+],
+"/dsa/bit-manipulation/bitwise-and-of-numbers-range/": [
+"0f729c50e4bb7623",
+"2026-11-20"
+],
+"/dsa/bit-manipulation/counting-bits/": [
+"2d48151722028e7d",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/gray-code/": [
+"d6dacbee69ffccb2",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/hamming-distance/": [
+"5e62c32e90b2ad6a",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/minimum-array-end/": [
+"7041029249ef20fe",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/minimum-flips-to-make-a-or-b-equal-to-c/": [
+"8d5e447d9501e3de",
+"2026-11-20"
+],
+"/dsa/bit-manipulation/missing-number/": [
+"3f958e2ffe250847",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/number-of-1-bits/": [
+"51d9a59e3a7aa020",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/power-of-two/": [
+"592057cb8f823574",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/reverse-bits/": [
+"e70fe57697d48142",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/reverse-integer/": [
+"2ff631dadaead89d",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/single-number-ii/": [
+"479dc0c3f94b872a",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/single-number-iii/": [
+"487dea5e28b10eda",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/single-number/": [
+"e2e4165e11ee6b9b",
+"2026-11-19"
+],
+"/dsa/bit-manipulation/sum-of-two-integers/": [
+"531f2876c059dea8",
+"2026-11-19"
+],
+"/dsa/design/": [
+"cab37c9325d7bea5",
+"2026-11-20"
+],
+"/dsa/design/all-oone-data-structure/": [
+"a0e83dfa24e129d0",
+"2026-11-19"
+],
+"/dsa/design/design-browser-history/": [
+"ed1ed7861b88da19",
+"2026-11-19"
+],
+"/dsa/design/design-circular-queue/": [
+"ea5d97d6bc2e375d",
+"2026-11-19"
+],
+"/dsa/design/design-hashmap/": [
+"07f6573aff49defc",
+"2026-11-19"
+],
+"/dsa/design/design-hashset/": [
+"13fb354b4f1e5b69",
+"2026-11-19"
+],
+"/dsa/design/design-hit-counter/": [
+"9898e1f94fe2b462",
+"2026-11-19"
+],
+"/dsa/design/design-in-memory-file-system/": [
+"d5e71cf3b11a5a0e",
+"2026-11-20"
+],
+"/dsa/design/design-underground-system/": [
+"66d435d57af6d130",
+"2026-11-20"
+],
+"/dsa/design/encode-and-decode-tinyurl/": [
+"3c2b42f7be75e2a9",
+"2026-11-20"
+],
+"/dsa/design/flatten-nested-list-iterator/": [
+"394a6421ecb95208",
+"2026-11-20"
+],
+"/dsa/design/implement-queue-using-stacks/": [
+"ff59ce6edc7436ae",
+"2026-11-20"
+],
+"/dsa/design/insert-delete-getrandom-o1/": [
+"66bccf4b83ffb661",
+"2026-11-20"
+],
+"/dsa/design/lfu-cache/": [
+"be691891de6aa2a5",
+"2026-11-19"
+],
+"/dsa/design/lru-cache/": [
+"7a95dd36bbad6522",
+"2026-11-19"
+],
+"/dsa/design/maximum-frequency-stack/": [
+"0e96d4b727d060be",
+"2026-11-19"
+],
+"/dsa/design/number-of-recent-calls/": [
+"d1f63ca9e20bcc5a",
+"2026-11-19"
+],
+"/dsa/design/peeking-iterator/": [
+"53afd53d9648ced7",
+"2026-11-19"
+],
+"/dsa/design/product-of-the-last-k-numbers/": [
+"ce5e0a4b6bb88fc1",
+"2026-11-20"
+],
+"/dsa/design/snapshot-array/": [
+"d33ca2a23d71a208",
+"2026-11-19"
+],
+"/dsa/dp-1d/": [
+"e578bc3894d448de",
+"2026-11-20"
+],
+"/dsa/dp-1d/climbing-stairs/": [
+"25401f74f7d7d6ab",
+"2026-11-19"
+],
+"/dsa/dp-1d/coin-change/": [
+"e2aaa4c1fae56f15",
+"2026-11-19"
+],
+"/dsa/dp-1d/combination-sum-iv/": [
+"f1e5c2fd32257288",
+"2026-11-19"
+],
+"/dsa/dp-1d/decode-ways/": [
+"959acd374b0c5121",
+"2026-11-19"
+],
+"/dsa/dp-1d/delete-and-earn/": [
+"1d03ddc69bc82963",
+"2026-11-19"
+],
+"/dsa/dp-1d/domino-and-tromino-tiling/": [
+"4c0f8adc166205d0",
+"2026-11-20"
+],
+"/dsa/dp-1d/extra-characters-in-a-string/": [
+"091ef1bb0657a88a",
+"2026-11-20"
+],
+"/dsa/dp-1d/house-robber-ii/": [
+"9c9bb5b78269f1d9",
+"2026-11-19"
+],
+"/dsa/dp-1d/house-robber/": [
+"946ef4de79392efb",
+"2026-11-19"
+],
+"/dsa/dp-1d/integer-break/": [
+"8d485c65b3343623",
+"2026-11-19"
+],
+"/dsa/dp-1d/largest-divisible-subset/": [
+"9951be68fa72290b",
+"2026-11-19"
+],
+"/dsa/dp-1d/longest-increasing-subsequence/": [
+"4bb5ad92ac234c1b",
+"2026-11-20"
+],
+"/dsa/dp-1d/longest-palindromic-substring/": [
+"c13ef3f34de2b7e5",
+"2026-11-20"
+],
+"/dsa/dp-1d/longest-string-chain/": [
+"a5de1bb367cdead6",
+"2026-11-19"
+],
+"/dsa/dp-1d/longest-valid-parentheses/": [
+"181d27964f46f312",
+"2026-11-19"
+],
+"/dsa/dp-1d/maximum-product-subarray/": [
+"55bafaf89aa909e9",
+"2026-11-19"
+],
+"/dsa/dp-1d/maximum-profit-in-job-scheduling/": [
+"9d66eaa9e0b60ecf",
+"2026-11-20"
+],
+"/dsa/dp-1d/min-cost-climbing-stairs/": [
+"b0bbd12a51fd2341",
+"2026-11-19"
+],
+"/dsa/dp-1d/minimum-cost-for-tickets/": [
+"34dda62b0ff3446b",
+"2026-11-19"
+],
+"/dsa/dp-1d/n-th-tribonacci-number/": [
+"68d23add610d5c20",
+"2026-11-19"
+],
+"/dsa/dp-1d/number-of-longest-increasing-subsequence/": [
+"bc75925a9fa0ecac",
+"2026-11-20"
+],
+"/dsa/dp-1d/palindrome-partitioning-ii/": [
+"b18659e8237ca6ef",
+"2026-11-20"
+],
+"/dsa/dp-1d/palindromic-substrings/": [
+"063fc2375bf60243",
+"2026-11-19"
+],
+"/dsa/dp-1d/partition-equal-subset-sum/": [
+"54affcc454edf7e3",
+"2026-11-20"
+],
+"/dsa/dp-1d/perfect-squares/": [
+"eaff92d85d76cdf1",
+"2026-11-19"
+],
+"/dsa/dp-1d/russian-doll-envelopes/": [
+"07538188b56264cd",
+"2026-11-19"
+],
+"/dsa/dp-1d/stone-game-iii/": [
+"729eb88f570c2884",
+"2026-11-19"
+],
+"/dsa/dp-1d/unique-binary-search-trees/": [
+"daa017fde5158c53",
+"2026-11-20"
+],
+"/dsa/dp-1d/word-break/": [
+"76e4a0ab6f26541e",
+"2026-11-19"
+],
+"/dsa/dp-2d/": [
+"98e7e25938886672",
+"2026-11-20"
+],
+"/dsa/dp-2d/best-time-to-buy-and-sell-stock-iii/": [
+"c8e88ad0ee4181f7",
+"2026-11-20"
+],
+"/dsa/dp-2d/best-time-to-buy-and-sell-stock-iv/": [
+"b63e585d0bfd5596",
+"2026-11-20"
+],
+"/dsa/dp-2d/best-time-to-buy-and-sell-stock-with-cooldown/": [
+"b6a11380a95aa0c6",
+"2026-11-20"
+],
+"/dsa/dp-2d/best-time-to-buy-and-sell-stock-with-transaction-fee/": [
+"a99578aedc4571b7",
+"2026-11-20"
+],
+"/dsa/dp-2d/burst-balloons/": [
+"95875a2b9ef623b5",
+"2026-11-19"
+],
+"/dsa/dp-2d/coin-change-ii/": [
+"308618bd06aa1a40",
+"2026-11-19"
+],
+"/dsa/dp-2d/delete-operation-for-two-strings/": [
+"772adb5b91d49008",
+"2026-11-20"
+],
+"/dsa/dp-2d/distinct-subsequences/": [
+"6e13a17e2c15cdee",
+"2026-11-19"
+],
+"/dsa/dp-2d/dungeon-game/": [
+"7a41d9a2bba412d8",
+"2026-11-19"
+],
+"/dsa/dp-2d/edit-distance/": [
+"265da6aed4c3f055",
+"2026-11-19"
+],
+"/dsa/dp-2d/interleaving-string/": [
+"18ab8b59746204ec",
+"2026-11-19"
+],
+"/dsa/dp-2d/last-stone-weight-ii/": [
+"c9082a7caf6d3123",
+"2026-11-19"
+],
+"/dsa/dp-2d/longest-common-subsequence/": [
+"2842fefa10ce57b6",
+"2026-11-20"
+],
+"/dsa/dp-2d/longest-palindromic-subsequence/": [
+"4777f243603901cb",
+"2026-11-20"
+],
+"/dsa/dp-2d/maximal-square/": [
+"3b78604ef4a3f38b",
+"2026-11-19"
+],
+"/dsa/dp-2d/minimum-falling-path-sum/": [
+"12d453aecb8b6266",
+"2026-11-19"
+],
+"/dsa/dp-2d/minimum-insertion-steps-to-make-a-string-palindrome/": [
+"aae8b39fa6b3c2ed",
+"2026-11-20"
+],
+"/dsa/dp-2d/minimum-path-sum/": [
+"624208a7ca70edd9",
+"2026-11-19"
+],
+"/dsa/dp-2d/minimum-score-triangulation-of-polygon/": [
+"db7f2ee1baf7f744",
+"2026-11-20"
+],
+"/dsa/dp-2d/ones-and-zeroes/": [
+"dcf538c5f3344227",
+"2026-11-19"
+],
+"/dsa/dp-2d/regular-expression-matching/": [
+"28e57606387e20bf",
+"2026-11-20"
+],
+"/dsa/dp-2d/stone-game-ii/": [
+"2e9eada8e0456845",
+"2026-11-19"
+],
+"/dsa/dp-2d/stone-game/": [
+"357d53a882c9b23a",
+"2026-11-19"
+],
+"/dsa/dp-2d/target-sum/": [
+"d131c25db48ecd8e",
+"2026-11-19"
+],
+"/dsa/dp-2d/triangle/": [
+"c80a25a1e2d4052a",
+"2026-11-19"
+],
+"/dsa/dp-2d/unique-paths-ii/": [
+"2c0d06aa3f99ba49",
+"2026-11-19"
+],
+"/dsa/dp-2d/unique-paths/": [
+"8239b12eeba44255",
+"2026-11-19"
+],
+"/dsa/dp-2d/wildcard-matching/": [
+"b4b2e227a6932990",
+"2026-11-19"
+],
+"/dsa/graphs/": [
+"593c7bca3fe4c8d0",
+"2026-11-20"
+],
+"/dsa/graphs/01-matrix/": [
+"1781252a96351cd4",
+"2026-11-19"
+],
+"/dsa/graphs/accounts-merge/": [
+"afe1e17e2598fc93",
+"2026-11-19"
+],
+"/dsa/graphs/bus-routes/": [
+"f61f6d944498d264",
+"2026-11-19"
+],
+"/dsa/graphs/clone-graph/": [
+"89cf21b85d41533f",
+"2026-11-19"
+],
+"/dsa/graphs/course-schedule-ii/": [
+"154238134001d8f1",
+"2026-11-19"
+],
+"/dsa/graphs/course-schedule-iv/": [
+"d703fe64f824251f",
+"2026-11-19"
+],
+"/dsa/graphs/course-schedule/": [
+"ad764ea90a1709bc",
+"2026-11-19"
+],
+"/dsa/graphs/evaluate-division/": [
+"71072bbecc546d73",
+"2026-11-19"
+],
+"/dsa/graphs/find-if-path-exists-in-graph/": [
+"c1f733a36e038e47",
+"2026-11-20"
+],
+"/dsa/graphs/find-the-town-judge/": [
+"e2dea45f5939b213",
+"2026-11-19"
+],
+"/dsa/graphs/flood-fill/": [
+"f7242e8f2b15ac1d",
+"2026-11-19"
+],
+"/dsa/graphs/graph-valid-tree/": [
+"ff521096ef37c832",
+"2026-11-19"
+],
+"/dsa/graphs/is-graph-bipartite/": [
+"b7252c8ae940404b",
+"2026-11-19"
+],
+"/dsa/graphs/island-perimeter/": [
+"bdd8a1b72cde6560",
+"2026-11-19"
+],
+"/dsa/graphs/keys-and-rooms/": [
+"1a1c6d0be7449ae9",
+"2026-11-19"
+],
+"/dsa/graphs/longest-increasing-path-in-a-matrix/": [
+"ff0a1b6b95d5bcc8",
+"2026-11-20"
+],
+"/dsa/graphs/max-area-of-island/": [
+"7d2b3e11740490bd",
+"2026-11-19"
+],
+"/dsa/graphs/minimum-genetic-mutation/": [
+"b613e8a21d995d76",
+"2026-11-19"
+],
+"/dsa/graphs/minimum-knight-moves/": [
+"7d82f4a39aef637b",
+"2026-11-19"
+],
+"/dsa/graphs/nearest-exit-from-entrance-in-maze/": [
+"e5a5faa05f4ef43f",
+"2026-11-20"
+],
+"/dsa/graphs/number-of-connected-components-in-an-undirected-graph/": [
+"70b1b1ceb1a9385d",
+"2026-11-20"
+],
+"/dsa/graphs/number-of-islands/": [
+"fd3e8d05e1849b99",
+"2026-11-19"
+],
+"/dsa/graphs/number-of-provinces/": [
+"73bc78112963189d",
+"2026-11-19"
+],
+"/dsa/graphs/open-the-lock/": [
+"a5094d4449308a0a",
+"2026-11-19"
+],
+"/dsa/graphs/pacific-atlantic-water-flow/": [
+"498fcdf9e66fc316",
+"2026-11-20"
+],
+"/dsa/graphs/possible-bipartition/": [
+"a08381e7abc5347c",
+"2026-11-19"
+],
+"/dsa/graphs/redundant-connection/": [
+"0d603ddd7875670a",
+"2026-11-19"
+],
+"/dsa/graphs/reorder-routes-to-make-all-paths-lead-to-the-city-zero/": [
+"ecfdc4bba8a6f1e5",
+"2026-11-20"
+],
+"/dsa/graphs/rotting-oranges/": [
+"00c843409fd160de",
+"2026-11-19"
+],
+"/dsa/graphs/satisfiability-of-equality-equations/": [
+"2242c92379237754",
+"2026-11-20"
+],
+"/dsa/graphs/shortest-bridge/": [
+"b4c7490259853ba6",
+"2026-11-19"
+],
+"/dsa/graphs/shortest-path-in-binary-matrix/": [
+"2cdff510ad882a37",
+"2026-11-20"
+],
+"/dsa/graphs/shortest-path-to-get-food/": [
+"7914190f22614e87",
+"2026-11-20"
+],
+"/dsa/graphs/snakes-and-ladders/": [
+"62b59545b1973a73",
+"2026-11-19"
+],
+"/dsa/graphs/surrounded-regions/": [
+"4ba163ea7130f948",
+"2026-11-19"
+],
+"/dsa/graphs/walls-and-gates/": [
+"b44b844b6bd2929a",
+"2026-11-19"
+],
+"/dsa/graphs/word-ladder/": [
+"0cec34aaff72294e",
+"2026-11-19"
+],
+"/dsa/greedy/": [
+"ee72f209617ef504",
+"2026-11-19"
+],
+"/dsa/greedy/assign-cookies/": [
+"4230a1da0dcafa68",
+"2026-11-19"
+],
+"/dsa/greedy/best-time-to-buy-and-sell-stock-ii/": [
+"b21a834917e2ddde",
+"2026-11-20"
+],
+"/dsa/greedy/can-place-flowers/": [
+"e88ad9ecda0fd8b5",
+"2026-11-19"
+],
+"/dsa/greedy/candy/": [
+"764929559637c009",
+"2026-11-19"
+],
+"/dsa/greedy/dota2-senate/": [
+"17edfba9b54bc034",
+"2026-11-19"
+],
+"/dsa/greedy/gas-station/": [
+"084a76d84f69d7b0",
+"2026-11-19"
+],
+"/dsa/greedy/hand-of-straights/": [
+"c050f7d0ab15d963",
+"2026-11-19"
+],
+"/dsa/greedy/increasing-triplet-subsequence/": [
+"1996a68a2c0995ff",
+"2026-11-20"
+],
+"/dsa/greedy/jump-game-ii/": [
+"1082e6026f9c4a9c",
+"2026-11-19"
+],
+"/dsa/greedy/jump-game-vii/": [
+"7290603d3117a872",
+"2026-11-19"
+],
+"/dsa/greedy/jump-game/": [
+"6306b68c9a79fd3b",
+"2026-11-19"
+],
+"/dsa/greedy/lemonade-change/": [
+"8e6fca2311fa0a08",
+"2026-11-19"
+],
+"/dsa/greedy/maximum-subarray/": [
+"9b836dbae067fb48",
+"2026-11-19"
+],
+"/dsa/greedy/maximum-sum-circular-subarray/": [
+"79f38fd80f33b9be",
+"2026-11-20"
+],
+"/dsa/greedy/merge-triplets-to-form-target-triplet/": [
+"d6478a87bcc40bb5",
+"2026-11-20"
+],
+"/dsa/greedy/minimum-number-of-taps-to-open-to-water-a-garden/": [
+"44c542e41273d744",
+"2026-11-20"
+],
+"/dsa/greedy/partition-labels/": [
+"97fe02c70095086b",
+"2026-11-19"
+],
+"/dsa/greedy/queue-reconstruction-by-height/": [
+"824c15036d2a164a",
+"2026-11-20"
+],
+"/dsa/greedy/split-array-into-consecutive-subsequences/": [
+"ad7d082ab1b192e2",
+"2026-11-20"
+],
+"/dsa/greedy/text-justification/": [
+"5506c0f24141d1f2",
+"2026-11-19"
+],
+"/dsa/greedy/two-city-scheduling/": [
+"2bda5bd74cc4bbcd",
+"2026-11-19"
+],
+"/dsa/greedy/valid-parenthesis-string/": [
+"df3e318b6191bb15",
+"2026-11-19"
+],
+"/dsa/heap/": [
+"f4f6492c24708048",
+"2026-11-19"
+],
+"/dsa/heap/course-schedule-iii/": [
+"fb56f65e2cd0151f",
+"2026-11-19"
+],
+"/dsa/heap/design-twitter/": [
+"663aa70a54b82589",
+"2026-11-19"
+],
+"/dsa/heap/find-k-closest-elements/": [
+"a4b034824eb94947",
+"2026-11-19"
+],
+"/dsa/heap/find-k-pairs-with-smallest-sums/": [
+"34f278201e572377",
+"2026-11-20"
+],
+"/dsa/heap/find-median-from-data-stream/": [
+"b58f7c7671986c22",
+"2026-11-20"
+],
+"/dsa/heap/furthest-building-you-can-reach/": [
+"9a2cee926d0f3164",
+"2026-11-20"
+],
+"/dsa/heap/ipo/": [
+"dd91c138e1285b51",
+"2026-11-19"
+],
+"/dsa/heap/k-closest-points-to-origin/": [
+"1eaa757d73919343",
+"2026-11-20"
+],
+"/dsa/heap/kth-largest-element-in-a-stream/": [
+"a754674c7e6cfd40",
+"2026-11-20"
+],
+"/dsa/heap/kth-largest-element-in-an-array/": [
+"e5253560fe28b3c0",
+"2026-11-20"
+],
+"/dsa/heap/kth-smallest-element-in-a-sorted-matrix/": [
+"950e4db93b99a578",
+"2026-11-20"
+],
+"/dsa/heap/last-stone-weight/": [
+"351029796f4f4c52",
+"2026-11-19"
+],
+"/dsa/heap/longest-happy-string/": [
+"f8d660332f69ab2c",
+"2026-11-19"
+],
+"/dsa/heap/maximum-subsequence-score/": [
+"c412ca37816dadca",
+"2026-11-20"
+],
+"/dsa/heap/minimum-number-of-refueling-stops/": [
+"da95f542f846439a",
+"2026-11-20"
+],
+"/dsa/heap/reorganize-string/": [
+"4c1121a717c1894b",
+"2026-11-19"
+],
+"/dsa/heap/single-threaded-cpu/": [
+"ebffb6261535a55b",
+"2026-11-19"
+],
+"/dsa/heap/sliding-window-median/": [
+"28da168fd286fac0",
+"2026-11-19"
+],
+"/dsa/heap/smallest-number-in-infinite-set/": [
+"b17bc6032ac73cf6",
+"2026-11-20"
+],
+"/dsa/heap/smallest-range-covering-elements-from-k-lists/": [
+"a73bd97803fd2ead",
+"2026-11-20"
+],
+"/dsa/heap/sort-characters-by-frequency/": [
+"ce4c5eba865339d0",
+"2026-11-20"
+],
+"/dsa/heap/task-scheduler/": [
+"c5d953bf781dedff",
+"2026-11-19"
+],
+"/dsa/heap/top-k-frequent-words/": [
+"cb5d19ff03f71e0c",
+"2026-11-19"
+],
+"/dsa/heap/total-cost-to-hire-k-workers/": [
+"da26813b25299550",
+"2026-11-20"
+],
+"/dsa/intervals/": [
+"32849ee18bd72ab3",
+"2026-11-19"
+],
+"/dsa/intervals/data-stream-as-disjoint-intervals/": [
+"2ea344ab84c3ccfc",
+"2026-11-20"
+],
+"/dsa/intervals/employee-free-time/": [
+"b9f3a0adc1b08667",
+"2026-11-19"
+],
+"/dsa/intervals/insert-interval/": [
+"16f7e90b50d3f477",
+"2026-11-19"
+],
+"/dsa/intervals/interval-list-intersections/": [
+"584ef271b903b35b",
+"2026-11-20"
+],
+"/dsa/intervals/meeting-rooms-ii/": [
+"0331886bf69a362e",
+"2026-11-19"
+],
+"/dsa/intervals/meeting-rooms-iii/": [
+"f59bf369ea5d4466",
+"2026-11-19"
+],
+"/dsa/intervals/meeting-rooms/": [
+"f4dbf24536703e3f",
+"2026-11-19"
+],
+"/dsa/intervals/merge-intervals/": [
+"791c28860d2e353d",
+"2026-11-19"
+],
+"/dsa/intervals/minimum-interval-to-include-each-query/": [
+"608ea9eb8c88a381",
+"2026-11-20"
+],
+"/dsa/intervals/minimum-number-of-arrows-to-burst-balloons/": [
+"55b489bddb3ed52b",
+"2026-11-20"
+],
+"/dsa/intervals/my-calendar-i/": [
+"e5a147e02b5ed5f7",
+"2026-11-19"
+],
+"/dsa/intervals/non-overlapping-intervals/": [
+"0747215d3e4a3d34",
+"2026-11-20"
+],
+"/dsa/intervals/remove-covered-intervals/": [
+"739d38f5a27e473e",
+"2026-11-20"
+],
+"/dsa/linked-list/": [
+"e3b3446ca1e5cc9e",
+"2026-11-20"
+],
+"/dsa/linked-list/add-two-numbers-ii/": [
+"aef747ad4372e591",
+"2026-11-19"
+],
+"/dsa/linked-list/add-two-numbers/": [
+"cc09bf1f0d5c6046",
+"2026-11-19"
+],
+"/dsa/linked-list/copy-list-with-random-pointer/": [
+"37215e78f2672e4d",
+"2026-11-20"
+],
+"/dsa/linked-list/delete-the-middle-node-of-a-linked-list/": [
+"b8ad2e22ebd54d27",
+"2026-11-20"
+],
+"/dsa/linked-list/find-the-duplicate-number/": [
+"b07954243e8d6353",
+"2026-11-20"
+],
+"/dsa/linked-list/insert-greatest-common-divisors-in-linked-list/": [
+"b3958d1804b429ac",
+"2026-11-20"
+],
+"/dsa/linked-list/intersection-of-two-linked-lists/": [
+"c56adc73a08c4ae9",
+"2026-11-20"
+],
+"/dsa/linked-list/linked-list-cycle-ii/": [
+"8aa1ded04aff4c28",
+"2026-11-19"
+],
+"/dsa/linked-list/linked-list-cycle/": [
+"80082453780b7bb8",
+"2026-11-19"
+],
+"/dsa/linked-list/maximum-twin-sum-of-a-linked-list/": [
+"9a4831cdc278f3d3",
+"2026-11-20"
+],
+"/dsa/linked-list/merge-k-sorted-lists/": [
+"f56c494cf73157e7",
+"2026-11-19"
+],
+"/dsa/linked-list/merge-two-sorted-lists/": [
+"e695e4003011ad2d",
+"2026-11-19"
+],
+"/dsa/linked-list/middle-of-the-linked-list/": [
+"9063c1cbde49845f",
+"2026-11-20"
+],
+"/dsa/linked-list/odd-even-linked-list/": [
+"b1f87ab95ced3855",
+"2026-11-19"
+],
+"/dsa/linked-list/palindrome-linked-list/": [
+"53fb74bdf1f64a61",
+"2026-11-19"
+],
+"/dsa/linked-list/partition-list/": [
+"574327bc07de6551",
+"2026-11-19"
+],
+"/dsa/linked-list/remove-duplicates-from-sorted-list-ii/": [
+"3e3f03af3fa29e4c",
+"2026-11-20"
+],
+"/dsa/linked-list/remove-duplicates-from-sorted-list/": [
+"a01159a18b78b497",
+"2026-11-20"
+],
+"/dsa/linked-list/remove-nth-node-from-end-of-list/": [
+"032ac651887fc22f",
+"2026-11-20"
+],
+"/dsa/linked-list/reorder-list/": [
+"a858d00f9d0423fd",
+"2026-11-19"
+],
+"/dsa/linked-list/reverse-linked-list-ii/": [
+"4983c6bd054d22e3",
+"2026-11-19"
+],
+"/dsa/linked-list/reverse-linked-list/": [
+"11ef8f8e5bec63fa",
+"2026-11-19"
+],
+"/dsa/linked-list/reverse-nodes-in-k-group/": [
+"ca01ca23a2199190",
+"2026-11-19"
+],
+"/dsa/linked-list/rotate-list/": [
+"026e3e00f6f49c03",
+"2026-11-19"
+],
+"/dsa/linked-list/sort-list/": [
+"e5bc5a429b74b82c",
+"2026-11-19"
+],
+"/dsa/linked-list/swap-nodes-in-pairs/": [
+"874526ec00769dd5",
+"2026-11-19"
+],
+"/dsa/math-geometry/": [
+"06dfd8380f97003f",
+"2026-11-20"
+],
+"/dsa/math-geometry/add-binary/": [
+"dc6cd2ec6de4fdd8",
+"2026-11-19"
+],
+"/dsa/math-geometry/count-primes/": [
+"74a99739229909cf",
+"2026-11-19"
+],
+"/dsa/math-geometry/detect-squares/": [
+"3952196891ce97cd",
+"2026-11-19"
+],
+"/dsa/math-geometry/divide-two-integers/": [
+"673031bcc06a7aeb",
+"2026-11-19"
+],
+"/dsa/math-geometry/excel-sheet-column-title/": [
+"53f3b1d911fe2222",
+"2026-11-19"
+],
+"/dsa/math-geometry/factorial-trailing-zeroes/": [
+"829b0a5d31d1bcfa",
+"2026-11-20"
+],
+"/dsa/math-geometry/greatest-common-divisor-of-strings/": [
+"437e1868c4995cfc",
+"2026-11-20"
+],
+"/dsa/math-geometry/happy-number/": [
+"4ee59daa6f8bc2cf",
+"2026-11-19"
+],
+"/dsa/math-geometry/implement-rand10-using-rand7/": [
+"1c61b694772a057e",
+"2026-11-20"
+],
+"/dsa/math-geometry/integer-to-roman/": [
+"24887da98ffe816b",
+"2026-11-19"
+],
+"/dsa/math-geometry/max-points-on-a-line/": [
+"cf4325e1a9ae8fc0",
+"2026-11-19"
+],
+"/dsa/math-geometry/multiply-strings/": [
+"301371aaa99766a7",
+"2026-11-19"
+],
+"/dsa/math-geometry/palindrome-number/": [
+"57290621c62c169f",
+"2026-11-19"
+],
+"/dsa/math-geometry/plus-one/": [
+"68b624ef2e756259",
+"2026-11-19"
+],
+"/dsa/math-geometry/powx-n/": [
+"2d66535317a93df6",
+"2026-11-19"
+],
+"/dsa/math-geometry/roman-to-integer/": [
+"0e45a8237a427be5",
+"2026-11-19"
+],
+"/dsa/math-geometry/rotate-image/": [
+"52dad0bab216bf10",
+"2026-11-19"
+],
+"/dsa/math-geometry/set-matrix-zeroes/": [
+"2a442baa32f1ccf9",
+"2026-11-19"
+],
+"/dsa/math-geometry/spiral-matrix-ii/": [
+"c0f6e42c575cb90d",
+"2026-11-19"
+],
+"/dsa/math-geometry/spiral-matrix/": [
+"4a6a9a888303e6ad",
+"2026-11-19"
+],
+"/dsa/math-geometry/string-to-integer-atoi/": [
+"d284a31e9f9cf77d",
+"2026-11-19"
+],
+"/dsa/math-geometry/transpose-matrix/": [
+"fec30fe89e904e16",
+"2026-11-19"
+],
+"/dsa/range-queries/": [
+"b5667b5696be06a7",
+"2026-11-20"
+],
+"/dsa/range-queries/car-pooling/": [
+"f21fc7744e25d764",
+"2026-11-19"
+],
+"/dsa/range-queries/corporate-flight-bookings/": [
+"33261da7ea1428cd",
+"2026-11-20"
+],
+"/dsa/range-queries/count-of-smaller-numbers-after-self/": [
+"946b8adb613ee594",
+"2026-11-20"
+],
+"/dsa/range-queries/find-pivot-index/": [
+"cd7b31e118e2f48a",
+"2026-11-19"
+],
+"/dsa/range-queries/find-the-highest-altitude/": [
+"2554d419f22adf32",
+"2026-11-20"
+],
+"/dsa/range-queries/range-sum-query-2d-immutable/": [
+"c4ed792482a41636",
+"2026-11-20"
+],
+"/dsa/range-queries/range-sum-query-immutable/": [
+"c6f7ca53bee1af62",
+"2026-11-20"
+],
+"/dsa/range-queries/range-sum-query-mutable/": [
+"458df1b555268861",
+"2026-11-20"
+],
+"/dsa/range-queries/reverse-pairs/": [
+"7154b1a412084cc7",
+"2026-11-19"
+],
+"/dsa/range-queries/the-skyline-problem/": [
+"b7464999ae4ca8dc",
+"2026-11-19"
+],
+"/dsa/sliding-window/": [
+"8316089da72dbba8",
+"2026-11-19"
+],
+"/dsa/sliding-window/best-time-to-buy-and-sell-stock/": [
+"87bce1f8d242a3ee",
+"2026-11-20"
+],
+"/dsa/sliding-window/contains-duplicate-ii/": [
+"820472925b1923be",
+"2026-11-19"
+],
+"/dsa/sliding-window/find-all-anagrams-in-a-string/": [
+"b12ab16f51555036",
+"2026-11-20"
+],
+"/dsa/sliding-window/frequency-of-the-most-frequent-element/": [
+"ff506cd6648a1d7d",
+"2026-11-20"
+],
+"/dsa/sliding-window/fruit-into-baskets/": [
+"abb1ef5e9382f887",
+"2026-11-19"
+],
+"/dsa/sliding-window/longest-repeating-character-replacement/": [
+"a7494650800eebb6",
+"2026-11-20"
+],
+"/dsa/sliding-window/longest-subarray-of-1s-after-deleting-one-element/": [
+"a6295289b5f24aa7",
+"2026-11-20"
+],
+"/dsa/sliding-window/longest-substring-without-repeating-characters/": [
+"2b8eb9b8b7f69abf",
+"2026-11-20"
+],
+"/dsa/sliding-window/longest-turbulent-subarray/": [
+"1f2461c19c528773",
+"2026-11-20"
+],
+"/dsa/sliding-window/max-consecutive-ones-iii/": [
+"362d914a7be07247",
+"2026-11-20"
+],
+"/dsa/sliding-window/maximum-average-subarray-i/": [
+"1b2faec72de9fc5b",
+"2026-11-20"
+],
+"/dsa/sliding-window/maximum-number-of-vowels-in-a-substring-of-given-length/": [
+"098f661b6395bb02",
+"2026-11-20"
+],
+"/dsa/sliding-window/maximum-points-you-can-obtain-from-cards/": [
+"d56551ae740ae6c5",
+"2026-11-20"
+],
+"/dsa/sliding-window/minimum-size-subarray-sum/": [
+"30a9ba0650bfd28f",
+"2026-11-20"
+],
+"/dsa/sliding-window/minimum-window-substring/": [
+"179134ea46603b80",
+"2026-11-19"
+],
+"/dsa/sliding-window/permutation-in-string/": [
+"bf13cd4f9e87f98c",
+"2026-11-19"
+],
+"/dsa/sliding-window/sliding-window-maximum/": [
+"d0b9467a0ff57b75",
+"2026-11-19"
+],
+"/dsa/sliding-window/subarray-product-less-than-k/": [
+"545cfb2aace4021e",
+"2026-11-20"
+],
+"/dsa/sliding-window/subarrays-with-k-different-integers/": [
+"fd9da525d9cb915f",
+"2026-11-20"
+],
+"/dsa/sliding-window/substring-with-concatenation-of-all-words/": [
+"1c365fe351d42be2",
+"2026-11-20"
+],
+"/dsa/stack/": [
+"9415e958b2fc3c21",
+"2026-11-20"
+],
+"/dsa/stack/132-pattern/": [
+"fd5b3f7b30d188d1",
+"2026-11-19"
+],
+"/dsa/stack/asteroid-collision/": [
+"e8f6187804f20570",
+"2026-11-19"
+],
+"/dsa/stack/baseball-game/": [
+"8fb3406d1b4603a4",
+"2026-11-19"
+],
+"/dsa/stack/basic-calculator-ii/": [
+"30cbf6d81ac55fef",
+"2026-11-19"
+],
+"/dsa/stack/basic-calculator/": [
+"e8da0b92e35eb962",
+"2026-11-19"
+],
+"/dsa/stack/car-fleet/": [
+"aaa837afc8874326",
+"2026-11-19"
+],
+"/dsa/stack/daily-temperatures/": [
+"3fe6a7f62d40bc84",
+"2026-11-19"
+],
+"/dsa/stack/decode-string/": [
+"97dc12fd38d99bcd",
+"2026-11-19"
+],
+"/dsa/stack/evaluate-reverse-polish-notation/": [
+"a5f8a0eed518328f",
+"2026-11-20"
+],
+"/dsa/stack/implement-stack-using-queues/": [
+"fdf09eea40acd439",
+"2026-11-20"
+],
+"/dsa/stack/largest-rectangle-in-histogram/": [
+"b972394cd3d25de1",
+"2026-11-20"
+],
+"/dsa/stack/maximal-rectangle/": [
+"73317df4dde6042f",
+"2026-11-19"
+],
+"/dsa/stack/min-stack/": [
+"3887a19fbd57d643",
+"2026-11-19"
+],
+"/dsa/stack/minimum-remove-to-make-valid-parentheses/": [
+"ae698cd4280801bb",
+"2026-11-20"
+],
+"/dsa/stack/next-greater-element-i/": [
+"21df5df36a4d6148",
+"2026-11-19"
+],
+"/dsa/stack/next-greater-element-ii/": [
+"3a538caf260eb8ec",
+"2026-11-19"
+],
+"/dsa/stack/online-stock-span/": [
+"1142b87a11d64a60",
+"2026-11-19"
+],
+"/dsa/stack/remove-all-adjacent-duplicates-in-string/": [
+"cecb0e38a089efa6",
+"2026-11-20"
+],
+"/dsa/stack/remove-duplicate-letters/": [
+"06ff0187e7f998de",
+"2026-11-19"
+],
+"/dsa/stack/remove-k-digits/": [
+"b0bdbd3169a31b86",
+"2026-11-19"
+],
+"/dsa/stack/removing-stars-from-a-string/": [
+"67bbdab30beab236",
+"2026-11-20"
+],
+"/dsa/stack/simplify-path/": [
+"140054927c954104",
+"2026-11-19"
+],
+"/dsa/stack/sum-of-subarray-minimums/": [
+"18ad7ffc20254a26",
+"2026-11-19"
+],
+"/dsa/stack/valid-parentheses/": [
+"38dbfd907bfcfe58",
+"2026-11-19"
+],
+"/dsa/trees/": [
+"6a7b68d9031c5bb1",
+"2026-11-20"
+],
+"/dsa/trees/all-nodes-distance-k-in-binary-tree/": [
+"9042ca5c82d93dc6",
+"2026-11-20"
+],
+"/dsa/trees/average-of-levels-in-binary-tree/": [
+"1d512bed951a750e",
+"2026-11-20"
+],
+"/dsa/trees/balanced-binary-tree/": [
+"c4ba6bebb178b0ca",
+"2026-11-19"
+],
+"/dsa/trees/binary-search-tree-iterator/": [
+"237e802044d6408a",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-inorder-traversal/": [
+"af9b5c30781e74df",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-level-order-traversal/": [
+"f146ac05cdda8cd7",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-maximum-path-sum/": [
+"1327c210c2eab5f8",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-paths/": [
+"d170144be64ff4be",
+"2026-11-19"
+],
+"/dsa/trees/binary-tree-postorder-traversal/": [
+"42258fd36aa7a5dc",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-preorder-traversal/": [
+"fd8b2c12694d3b27",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-right-side-view/": [
+"5e10d2c5d2ab3885",
+"2026-11-20"
+],
+"/dsa/trees/binary-tree-zigzag-level-order-traversal/": [
+"90e285f8f4480b02",
+"2026-11-20"
+],
+"/dsa/trees/check-completeness-of-a-binary-tree/": [
+"9702be6b5acb3611",
+"2026-11-20"
+],
+"/dsa/trees/construct-binary-tree-from-inorder-and-postorder-traversal/": [
+"ab7a9f33b4a371a7",
+"2026-11-20"
+],
+"/dsa/trees/construct-binary-tree-from-preorder-and-inorder-traversal/": [
+"e57a7d751df0b95d",
+"2026-11-20"
+],
+"/dsa/trees/construct-quad-tree/": [
+"6817782795aff48a",
+"2026-11-19"
+],
+"/dsa/trees/convert-sorted-array-to-binary-search-tree/": [
+"3a03377d3520a269",
+"2026-11-20"
+],
+"/dsa/trees/convert-sorted-list-to-binary-search-tree/": [
+"d5bf47500a1cedec",
+"2026-11-20"
+],
+"/dsa/trees/count-complete-tree-nodes/": [
+"010f20ce7d12c8b0",
+"2026-11-20"
+],
+"/dsa/trees/count-good-nodes-in-binary-tree/": [
+"72d2eefe3f19a5c5",
+"2026-11-20"
+],
+"/dsa/trees/delete-leaves-with-a-given-value/": [
+"e31356aea608489b",
+"2026-11-20"
+],
+"/dsa/trees/delete-node-in-a-bst/": [
+"0796b071fba592d7",
+"2026-11-19"
+],
+"/dsa/trees/diameter-of-binary-tree/": [
+"a8d48237a40b9416",
+"2026-11-19"
+],
+"/dsa/trees/flatten-binary-tree-to-linked-list/": [
+"b34f0185eb39fff1",
+"2026-11-20"
+],
+"/dsa/trees/house-robber-iii/": [
+"98de11b9a0e4f1e2",
+"2026-11-19"
+],
+"/dsa/trees/inorder-successor-in-bst/": [
+"5d11847ae163e658",
+"2026-11-19"
+],
+"/dsa/trees/insert-into-a-binary-search-tree/": [
+"950d385498f37eea",
+"2026-11-20"
+],
+"/dsa/trees/invert-binary-tree/": [
+"bcb891182ce33957",
+"2026-11-19"
+],
+"/dsa/trees/kth-smallest-element-in-a-bst/": [
+"bc8de56b70b2d2f8",
+"2026-11-20"
+],
+"/dsa/trees/leaf-similar-trees/": [
+"934efc9d8cbfa834",
+"2026-11-19"
+],
+"/dsa/trees/longest-univalue-path/": [
+"662c0c677003b0c3",
+"2026-11-19"
+],
+"/dsa/trees/longest-zigzag-path-in-a-binary-tree/": [
+"d227dc55c93c957d",
+"2026-11-20"
+],
+"/dsa/trees/lowest-common-ancestor-of-a-binary-search-tree/": [
+"677bbe358ce3ad1a",
+"2026-11-20"
+],
+"/dsa/trees/lowest-common-ancestor-of-a-binary-tree/": [
+"efe8e02df409e444",
+"2026-11-20"
+],
+"/dsa/trees/maximum-depth-of-binary-tree/": [
+"4a9e754a90bfacb1",
+"2026-11-20"
+],
+"/dsa/trees/maximum-level-sum-of-a-binary-tree/": [
+"4654f8d5f95c203e",
+"2026-11-20"
+],
+"/dsa/trees/maximum-width-of-binary-tree/": [
+"455773e09fa382fd",
+"2026-11-20"
+],
+"/dsa/trees/minimum-absolute-difference-in-bst/": [
+"08d79b9d08b76b34",
+"2026-11-20"
+],
+"/dsa/trees/minimum-depth-of-binary-tree/": [
+"b9ae259da1be05a2",
+"2026-11-20"
+],
+"/dsa/trees/path-sum-ii/": [
+"d1ac58327758211d",
+"2026-11-19"
+],
+"/dsa/trees/path-sum-iii/": [
+"b5b67ec23a9a6b21",
+"2026-11-19"
+],
+"/dsa/trees/path-sum/": [
+"3bdc95a684074022",
+"2026-11-19"
+],
+"/dsa/trees/populating-next-right-pointers-in-each-node-ii/": [
+"027a019dcf0841b2",
+"2026-11-20"
+],
+"/dsa/trees/populating-next-right-pointers-in-each-node/": [
+"0db6ee76c587176d",
+"2026-11-20"
+],
+"/dsa/trees/same-tree/": [
+"50c2c06239c28e78",
+"2026-11-19"
+],
+"/dsa/trees/search-in-a-binary-search-tree/": [
+"74e0e14fd7a4396e",
+"2026-11-20"
+],
+"/dsa/trees/serialize-and-deserialize-binary-tree/": [
+"18816c7c4a684f10",
+"2026-11-20"
+],
+"/dsa/trees/subtree-of-another-tree/": [
+"dde515ff99781fff",
+"2026-11-19"
+],
+"/dsa/trees/sum-root-to-leaf-numbers/": [
+"59c2c03b5773e3cb",
+"2026-11-19"
+],
+"/dsa/trees/symmetric-tree/": [
+"af56bf2ec32aa1e1",
+"2026-11-19"
+],
+"/dsa/trees/validate-binary-search-tree/": [
+"b4c5a73f8e1ba072",
+"2026-11-20"
+],
+"/dsa/trees/vertical-order-traversal-of-a-binary-tree/": [
+"29a2b3f87562063b",
+"2026-11-20"
+],
+"/dsa/tries/": [
+"af2f1678f296401b",
+"2026-11-19"
+],
+"/dsa/tries/design-add-and-search-words-data-structure/": [
+"053dd40840da90e8",
+"2026-11-20"
+],
+"/dsa/tries/implement-trie-prefix-tree/": [
+"890a5be0a09b2a6a",
+"2026-11-20"
+],
+"/dsa/tries/maximum-xor-of-two-numbers-in-an-array/": [
+"1ba2e74e1f221197",
+"2026-11-20"
+],
+"/dsa/tries/palindrome-pairs/": [
+"03f8d3a43a6593e6",
+"2026-11-19"
+],
+"/dsa/tries/prefix-and-suffix-search/": [
+"b07a8ec450de8cf0",
+"2026-11-19"
+],
+"/dsa/tries/replace-words/": [
+"5d10e9ce109448c7",
+"2026-11-19"
+],
+"/dsa/tries/search-suggestions-system/": [
+"54797bc4614416fd",
+"2026-11-20"
+],
+"/dsa/tries/word-search-ii/": [
+"6d505164162a4330",
+"2026-11-19"
+],
+"/dsa/two-pointers/": [
+"bf5193f01d7f7da7",
+"2026-11-19"
+],
+"/dsa/two-pointers/3sum-closest/": [
+"9d0a77c6132dcfdf",
+"2026-11-19"
+],
+"/dsa/two-pointers/3sum/": [
+"61c182acda9475ce",
+"2026-11-19"
+],
+"/dsa/two-pointers/4sum/": [
+"7fd76ddf3e7b8bd9",
+"2026-11-19"
+],
+"/dsa/two-pointers/backspace-string-compare/": [
+"6b0f077bb9a3f04f",
+"2026-11-19"
+],
+"/dsa/two-pointers/boats-to-save-people/": [
+"255d7f21db8e49cf",
+"2026-11-19"
+],
+"/dsa/two-pointers/container-with-most-water/": [
+"aced15635bf69a50",
+"2026-11-19"
+],
+"/dsa/two-pointers/is-subsequence/": [
+"a666ce53073acac5",
+"2026-11-19"
+],
+"/dsa/two-pointers/max-number-of-k-sum-pairs/": [
+"b1450e45f4ec046a",
+"2026-11-20"
+],
+"/dsa/two-pointers/merge-strings-alternately/": [
+"709fe9db9eeb043c",
+"2026-11-20"
+],
+"/dsa/two-pointers/move-zeroes/": [
+"0be20d8d7d616fa8",
+"2026-11-19"
+],
+"/dsa/two-pointers/remove-duplicates-from-sorted-array-ii/": [
+"10c3ea73a6bcae96",
+"2026-11-20"
+],
+"/dsa/two-pointers/remove-element/": [
+"7937ce3eab1a98c6",
+"2026-11-19"
+],
+"/dsa/two-pointers/reverse-string/": [
+"b8142f56255e2c2f",
+"2026-11-19"
+],
+"/dsa/two-pointers/reverse-vowels-of-a-string/": [
+"2bf1d19bb56daa55",
+"2026-11-20"
+],
+"/dsa/two-pointers/reverse-words-in-a-string/": [
+"98b304ab92f006b1",
+"2026-11-20"
+],
+"/dsa/two-pointers/sort-colors/": [
+"e26da3b83f576502",
+"2026-11-19"
+],
+"/dsa/two-pointers/squares-of-a-sorted-array/": [
+"a3fcc5cd8104da1b",
+"2026-11-20"
+],
+"/dsa/two-pointers/string-compression/": [
+"684b77f753f83636",
+"2026-11-19"
+],
+"/dsa/two-pointers/trapping-rain-water/": [
+"f719baff2c62e4e8",
+"2026-11-19"
+],
+"/dsa/two-pointers/two-sum-ii-input-array-is-sorted/": [
+"9c9a450f407a8706",
+"2026-11-20"
+],
+"/dsa/two-pointers/valid-palindrome-ii/": [
+"ebb07833388df23c",
+"2026-11-19"
+],
+"/dsa/two-pointers/valid-palindrome/": [
+"5ea4a01eb92390d5",
+"2026-11-19"
+],
+"/ml/": [
+"9337b205dd438247",
+"2026-11-19"
+],
+"/ml/deep-learning/": [
+"e79c552a12012523",
+"2026-11-20"
+],
+"/ml/deep-learning/activation-functions-vanishing-gradients/": [
+"e0149828efcd7f70",
+"2026-11-20"
+],
+"/ml/deep-learning/attention-transformers/": [
+"b87f15cb6d65906d",
+"2026-11-19"
+],
+"/ml/deep-learning/backpropagation/": [
+"d23cf05abe9ed3fe",
+"2026-11-19"
+],
+"/ml/deep-learning/batch-norm-vs-layer-norm/": [
+"4bfda2c1f798be9f",
+"2026-11-19"
+],
+"/ml/deep-learning/convolutional-neural-networks/": [
+"250d11266485a1c6",
+"2026-11-19"
+],
+"/ml/deep-learning/diffusion-models-in-depth/": [
+"957e461605f1dc3f",
+"2026-11-19"
+],
+"/ml/deep-learning/distributed-training/": [
+"9ce2dd0d47c1b72d",
+"2026-11-20"
+],
+"/ml/deep-learning/embeddings/": [
+"3935736506cd4379",
+"2026-11-19"
+],
+"/ml/deep-learning/generative-models-vae-gan-diffusion/": [
+"7aa1acd2542768a8",
+"2026-11-20"
+],
+"/ml/deep-learning/graph-neural-networks/": [
+"4b8e5993d9ee8ce4",
+"2026-11-19"
+],
+"/ml/deep-learning/mixture-of-experts-moe/": [
+"caa5989b4bdba4cf",
+"2026-11-19"
+],
+"/ml/deep-learning/model-compression-distillation-quantization-pruning/": [
+"10bfab0baaf31c33",
+"2026-11-20"
+],
+"/ml/deep-learning/object-detection-segmentation/": [
+"bfb9704c2ad3a31c",
+"2026-11-19"
+],
+"/ml/deep-learning/regularization-data-augmentation-in-deep-nets/": [
+"c3850cab2c0388e6",
+"2026-11-20"
+],
+"/ml/deep-learning/rnn-lstm-gru/": [
+"11676e8c4c3bbbc4",
+"2026-11-19"
+],
+"/ml/deep-learning/self-supervised-contrastive-learning/": [
+"4af3578aaf266f17",
+"2026-11-19"
+],
+"/ml/deep-learning/training-tricks-debugging/": [
+"1b22fd1959ff8dfb",
+"2026-11-19"
+],
+"/ml/deep-learning/transfer-learning-fine-tuning/": [
+"d6615614cc462e85",
+"2026-11-19"
+],
+"/ml/deep-learning/vision-transformers-clip/": [
+"12074c0928ddf8fc",
+"2026-11-19"
+],
+"/ml/llms/": [
+"9286ed34be9e3cbd",
+"2026-11-20"
+],
+"/ml/llms/agents-tool-use/": [
+"217e5a55bb19692a",
+"2026-11-19"
+],
+"/ml/llms/decoding-strategies/": [
+"9d9690d6521ce364",
+"2026-11-19"
+],
+"/ml/llms/evaluating-llms-hallucinations/": [
+"0afc71d57b462219",
+"2026-11-19"
+],
+"/ml/llms/fine-tuning-sft-lora-peft/": [
+"e5e86df6efb2c73a",
+"2026-11-19"
+],
+"/ml/llms/how-llms-are-trained/": [
+"fa89186c061b57fd",
+"2026-11-19"
+],
+"/ml/llms/inference-kv-cache-batching-quantization/": [
+"1de9893c32f8be3e",
+"2026-11-20"
+],
+"/ml/llms/llm-safety-guardrails/": [
+"880c1315319bf927",
+"2026-11-19"
+],
+"/ml/llms/long-context/": [
+"12510223f81b972e",
+"2026-11-19"
+],
+"/ml/llms/multimodal-llms/": [
+"7ef59ffb391d061f",
+"2026-11-19"
+],
+"/ml/llms/positional-encodings/": [
+"75effc5ea0ff29ab",
+"2026-11-19"
+],
+"/ml/llms/prompt-engineering/": [
+"bb0dfba5e3c480cc",
+"2026-11-19"
+],
+"/ml/llms/reasoning-models-test-time-compute/": [
+"3bcaff0e7420e5f9",
+"2026-11-19"
+],
+"/ml/llms/retrieval-augmented-generation-rag/": [
+"d651a62f718845de",
+"2026-11-19"
+],
+"/ml/llms/rlhf-and-dpo/": [
+"d5ab57a8fabedb0e",
+"2026-11-19"
+],
+"/ml/llms/tokenization/": [
+"af0abff7259ddaec",
+"2026-11-19"
+],
+"/ml/llms/vector-search-ann-indexes/": [
+"41b3881334f4bf7e",
+"2026-11-19"
+],
+"/ml/ml-coding/": [
+"67ab7bb9c849142d",
+"2026-11-19"
+],
+"/ml/ml-coding/adam-optimizer/": [
+"f907d8f802fa7c0c",
+"2026-11-19"
+],
+"/ml/ml-coding/batch-normalization-forward-backward/": [
+"812c5b1413b25362",
+"2026-11-20"
+],
+"/ml/ml-coding/beam-search-decoding/": [
+"bbff70e5f8d72a38",
+"2026-11-19"
+],
+"/ml/ml-coding/byte-pair-encoding-bpe-tokenizer/": [
+"6f38800e06c19b37",
+"2026-11-19"
+],
+"/ml/ml-coding/causal-self-attention-with-a-kv-cache/": [
+"8615a69f5a4beca5",
+"2026-11-19"
+],
+"/ml/ml-coding/conv2d-forward-im2col/": [
+"c738cb671cadf76b",
+"2026-11-19"
+],
+"/ml/ml-coding/decision-tree-split-gini/": [
+"3a9456bb0b74835c",
+"2026-11-19"
+],
+"/ml/ml-coding/dropout-forward-backward/": [
+"9dfdbf9aecf7a519",
+"2026-11-19"
+],
+"/ml/ml-coding/gaussian-naive-bayes/": [
+"387ed9061dd4a5b2",
+"2026-11-19"
+],
+"/ml/ml-coding/iou-non-maximum-suppression/": [
+"ecb3b9a0f0a8c0bc",
+"2026-11-19"
+],
+"/ml/ml-coding/k-means/": [
+"74516acf477f59e3",
+"2026-11-19"
+],
+"/ml/ml-coding/k-nearest-neighbors/": [
+"708d5232c6bb5a1c",
+"2026-11-19"
+],
+"/ml/ml-coding/layernorm-rmsnorm-forward-backward/": [
+"acbd59e2b622dd4d",
+"2026-11-20"
+],
+"/ml/ml-coding/linear-regression-with-gradient-descent/": [
+"16fd0dd82302c9a6",
+"2026-11-20"
+],
+"/ml/ml-coding/logistic-regression/": [
+"6c0de38c01ec216d",
+"2026-11-19"
+],
+"/ml/ml-coding/lora-linear-layer/": [
+"8c1fb2882d551d9e",
+"2026-11-19"
+],
+"/ml/ml-coding/matrix-factorization-als-for-recommendations/": [
+"048197383d45b401",
+"2026-11-20"
+],
+"/ml/ml-coding/pca-via-svd/": [
+"381c384b01128e06",
+"2026-11-19"
+],
+"/ml/ml-coding/positional-encodings-sinusoidal-rope/": [
+"f75a8fb5eaf411c2",
+"2026-11-20"
+],
+"/ml/ml-coding/ranking-metrics-precisionk-map-mrr-ndcg/": [
+"3f57cbe944fb2b39",
+"2026-11-20"
+],
+"/ml/ml-coding/roc-auc-from-scratch/": [
+"be26e770a4c88566",
+"2026-11-19"
+],
+"/ml/ml-coding/sampling-temperature-top-k-top-p/": [
+"7ce19617dd533cc9",
+"2026-11-19"
+],
+"/ml/ml-coding/scaled-dot-product-multi-head-attention/": [
+"c8a334a555081f88",
+"2026-11-20"
+],
+"/ml/ml-coding/softmax-cross-entropy-numerically-stable/": [
+"db853ae27dc2fcd6",
+"2026-11-20"
+],
+"/ml/ml-coding/two-layer-mlp-with-backprop/": [
+"98d8fff2fe6afecc",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/": [
+"dbe64293ee2a8193",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/bandits-exploration/": [
+"9eb945dc8179ee03",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/biasvariance-trade-off/": [
+"80a06d4c22a9aecd",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/collaborative-filtering-matrix-factorization/": [
+"25ce7cd722c6975a",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/decision-trees-random-forests-gradient-boosting/": [
+"1a2a34e251016477",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/ensembles-stacking/": [
+"a2ec30c9df19eb62",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/evaluation-metrics/": [
+"03479b3336588338",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/feature-engineering-missing-data/": [
+"23b686f7bea98f6c",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/generative-vs-discriminative-models/": [
+"7e8590e5ece870ac",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/gradient-descent-optimizers/": [
+"83355aa953b6ce2b",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/handling-class-imbalance/": [
+"b274b7663d4a18cd",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/hyperparameter-tuning/": [
+"546ac531ec1cd251",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/information-theory-entropy-cross-entropy-kl/": [
+"9359dd63ab61993b",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/k-means-clustering/": [
+"c350a6645e3e2931",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/knn-and-the-curse-of-dimensionality/": [
+"c3236a8405bea0a6",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/linear-logistic-regression/": [
+"12e0e7031aee3384",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/loss-functions-cheat-sheet/": [
+"a2dbbb526c8c9419",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/mle-vs-map-and-bayes-theorem/": [
+"0fab2b8b9219a997",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/model-interpretability/": [
+"9b7a684d735df670",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/pca-dimensionality-reduction/": [
+"543573644d13eeec",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/regularization-l1-l2-dropout-early-stopping/": [
+"48bcca1c4c26d3a9",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/statistics-hypothesis-tests-p-values-confidence-intervals/": [
+"63ae35b6dc1271bd",
+"2026-11-20"
+],
+"/ml/ml-fundamentals/svm-kernels/": [
+"48dc5e9086f87b76",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/time-series-forecasting/": [
+"5da8533b0ac410e3",
+"2026-11-19"
+],
+"/ml/ml-fundamentals/train-validation-test-cross-validation-leakage/": [
+"42934bf16dec82b6",
+"2026-11-20"
+],
+"/ml/ml-system-design/": [
+"1f783d9677970157",
+"2026-11-19"
+],
+"/ml/ml-system-design/ab-testing-online-experimentation/": [
+"98cb41009d23af3d",
+"2026-11-19"
+],
+"/ml/ml-system-design/ads-click-through-rate-prediction/": [
+"ffedbda6a957ebbb",
+"2026-11-19"
+],
+"/ml/ml-system-design/eta-prediction-maps-food-delivery/": [
+"6826aafd4d370a0a",
+"2026-11-19"
+],
+"/ml/ml-system-design/feature-stores-trainingserving-skew/": [
+"14002b2e2880a8c9",
+"2026-11-19"
+],
+"/ml/ml-system-design/fraud-detection/": [
+"7a28980f7652d400",
+"2026-11-19"
+],
+"/ml/ml-system-design/gmail-smart-compose-text-autocomplete/": [
+"719c2e94436c135d",
+"2026-11-20"
+],
+"/ml/ml-system-design/harmful-content-moderation/": [
+"8089185e9359298a",
+"2026-11-19"
+],
+"/ml/ml-system-design/llm-powered-support-assistant/": [
+"049c5e0512a19a52",
+"2026-11-19"
+],
+"/ml/ml-system-design/ml-system-design-framework/": [
+"851201636136b0a7",
+"2026-11-19"
+],
+"/ml/ml-system-design/model-monitoring-drift/": [
+"8848c320a651493b",
+"2026-11-19"
+],
+"/ml/ml-system-design/news-feed-ranking-facebook-linkedin/": [
+"3abdad299c593ce1",
+"2026-11-20"
+],
+"/ml/ml-system-design/people-you-may-know-friend-recommendation/": [
+"bb2f84a8f6ed49c0",
+"2026-11-20"
+],
+"/ml/ml-system-design/recommendation-system-youtube-netflix-tiktok/": [
+"e11347fbbacab2e4",
+"2026-11-20"
+],
+"/ml/ml-system-design/search-ranking/": [
+"fe4d6576b91ed925",
+"2026-11-19"
+],
+"/ml/ml-system-design/similar-listings-airbnb-item-to-item-recommendations/": [
+"e87a173196c5c627",
+"2026-11-20"
+],
+"/ml/ml-system-design/street-view-blurring-object-detection-system/": [
+"3d8b3dc50fc7d2bd",
+"2026-11-20"
+],
+"/ml/ml-system-design/text-to-image-generation-service/": [
+"16ff9654e779c194",
+"2026-11-19"
+],
+"/ml/ml-system-design/visual-search-search-by-image/": [
+"ebeed8fff2842c19",
+"2026-11-19"
+],
+"/system-design/": [
+"159c1a048400f2c3",
+"2026-11-19"
+],
+"/system-design/building-blocks/": [
+"70954829eff61db2",
+"2026-11-20"
+],
+"/system-design/building-blocks/api-design/": [
+"44819b1aa8785e14",
+"2026-11-19"
+],
+"/system-design/building-blocks/authentication-authorization/": [
+"50c9ff92ab1a038d",
+"2026-11-19"
+],
+"/system-design/building-blocks/batch-vs-stream-processing/": [
+"e39fe2b0f8d0b515",
+"2026-11-20"
+],
+"/system-design/building-blocks/caching/": [
+"2815b9c13789575f",
+"2026-11-20"
+],
+"/system-design/building-blocks/cap-and-pacelc/": [
+"e1940c3f316c5142",
+"2026-11-19"
+],
+"/system-design/building-blocks/cdn/": [
+"94e55db7338652cc",
+"2026-11-19"
+],
+"/system-design/building-blocks/choosing-a-database/": [
+"d6f414f0917dd6f9",
+"2026-11-20"
+],
+"/system-design/building-blocks/consensus-leader-election/": [
+"4bc2fa3c5a7d2afd",
+"2026-11-19"
+],
+"/system-design/building-blocks/consistency-models/": [
+"175dc5bdb74cd52b",
+"2026-11-19"
+],
+"/system-design/building-blocks/consistent-hashing/": [
+"a49c8facb2753234",
+"2026-11-19"
+],
+"/system-design/building-blocks/database-indexes-b-tree-vs-lsm-tree/": [
+"e80d8c4e76ce675c",
+"2026-11-19"
+],
+"/system-design/building-blocks/distributed-transactions/": [
+"99521a5597d33620",
+"2026-11-19"
+],
+"/system-design/building-blocks/geospatial-indexing/": [
+"e2788f9eeff96508",
+"2026-11-20"
+],
+"/system-design/building-blocks/idempotency-retries-timeouts/": [
+"30276ecf4477cc18",
+"2026-11-19"
+],
+"/system-design/building-blocks/load-balancing/": [
+"eb00643d8ceb7896",
+"2026-11-19"
+],
+"/system-design/building-blocks/message-queues-event-streams/": [
+"541a060faa059686",
+"2026-11-20"
+],
+"/system-design/building-blocks/microservices-api-gateway-service-discovery/": [
+"a79ebcb1fcfeb180",
+"2026-11-20"
+],
+"/system-design/building-blocks/observability-reliability/": [
+"e4a4633f5594baa1",
+"2026-11-19"
+],
+"/system-design/building-blocks/probabilistic-data-structures/": [
+"aab76ad73ef50cc0",
+"2026-11-20"
+],
+"/system-design/building-blocks/rate-limiting-algorithms/": [
+"25b1fb7c75586cf1",
+"2026-11-20"
+],
+"/system-design/building-blocks/real-time-updates-polling-sse-websockets/": [
+"4c8f93101f0adf58",
+"2026-11-20"
+],
+"/system-design/building-blocks/replication/": [
+"fd17efa275d74ba4",
+"2026-11-19"
+],
+"/system-design/building-blocks/scaling-vertical-vs-horizontal/": [
+"98cf001243b8c8c4",
+"2026-11-19"
+],
+"/system-design/building-blocks/search-inverted-indexes/": [
+"eb289d6209f562ea",
+"2026-11-19"
+],
+"/system-design/building-blocks/sharding-partitioning/": [
+"be1e51ef7453e61e",
+"2026-11-19"
+],
+"/system-design/building-blocks/sql-vs-nosql/": [
+"0b30207fc60688de",
+"2026-11-20"
+],
+"/system-design/building-blocks/unique-id-generation/": [
+"c9862489ecd8602e",
+"2026-11-20"
+],
+"/system-design/classic-designs/": [
+"08d2f6012be167a6",
+"2026-11-19"
+],
+"/system-design/classic-designs/chat-system-whatsapp-messenger/": [
+"942305173bc9db0e",
+"2026-11-19"
+],
+"/system-design/classic-designs/distributed-message-queue-kafka/": [
+"1d6caf0849ab2f69",
+"2026-11-19"
+],
+"/system-design/classic-designs/file-sync-dropbox-google-drive/": [
+"37a18c48793c666e",
+"2026-11-19"
+],
+"/system-design/classic-designs/key-value-store-dynamo-style/": [
+"98e0a1f507a61cb3",
+"2026-11-20"
+],
+"/system-design/classic-designs/leaderboard-top-k/": [
+"910b7825e2f36091",
+"2026-11-19"
+],
+"/system-design/classic-designs/news-feed-twitter-instagram-facebook/": [
+"43f459fa7affac91",
+"2026-11-20"
+],
+"/system-design/classic-designs/notification-system/": [
+"f1f66ef502ce6fb1",
+"2026-11-19"
+],
+"/system-design/classic-designs/payment-system/": [
+"8a7d3d2cc51bf332",
+"2026-11-19"
+],
+"/system-design/classic-designs/rate-limiter/": [
+"16f99e78782c9fa4",
+"2026-11-19"
+],
+"/system-design/classic-designs/ride-sharing-uber-lyft/": [
+"a09e8d440e758f2a",
+"2026-11-19"
+],
+"/system-design/classic-designs/search-autocomplete-typeahead/": [
+"a1fd649c7dab1cf5",
+"2026-11-20"
+],
+"/system-design/classic-designs/ticket-booking-ticketmaster/": [
+"d175bcead44ce70c",
+"2026-11-19"
+],
+"/system-design/classic-designs/url-shortener-tinyurl-bitly/": [
+"1f2b136271d06321",
+"2026-11-19"
+],
+"/system-design/classic-designs/video-streaming-youtube-netflix/": [
+"953c08c9d6d2ec8a",
+"2026-11-19"
+],
+"/system-design/classic-designs/web-crawler/": [
+"4c3a8510a44b19eb",
+"2026-11-19"
+],
+"/system-design/framework/": [
+"97564e7ee17b268d",
+"2026-11-20"
+],
+"/system-design/framework/common-mistakes-in-the-interview/": [
+"1adda3409aa91f58",
+"2026-11-19"
+],
+"/system-design/framework/numbers-everyone-should-know/": [
+"bb8ee9decd247ade",
+"2026-11-20"
+],
+"/system-design/framework/requirements-checklist/": [
+"617b8c9ffc0eb855",
+"2026-11-19"
+],
+"/system-design/framework/scaling-from-zero-to-millions-of-users/": [
+"d73339b0988d33c9",
+"2026-11-20"
+],
+"/system-design/framework/the-4-step-framework/": [
+"ff039b7ad87b8aba",
+"2026-11-19"
+],
+"/system-design/framework/worked-estimation-example/": [
+"ca78cbe0bbfcc65d",
+"2026-11-19"
+],
+"/system-design/more-designs/": [
+"9473082149d1b739",
+"2026-11-19"
+],
+"/system-design/more-designs/ad-click-aggregation/": [
+"09527e4e7b0eeb41",
+"2026-11-19"
+],
+"/system-design/more-designs/collaborative-editor-google-docs/": [
+"126b7f19f2c3e14a",
+"2026-11-19"
+],
+"/system-design/more-designs/dating-app-tinder/": [
+"9b0e50defb681f5c",
+"2026-11-19"
+],
+"/system-design/more-designs/digital-wallet-balance-transfers/": [
+"16912cebc97b92a7",
+"2026-11-19"
+],
+"/system-design/more-designs/distributed-cache-redis-cluster-memcached/": [
+"7a01bda25eaf72b5",
+"2026-11-20"
+],
+"/system-design/more-designs/distributed-job-scheduler/": [
+"03c9828a5e02d9d4",
+"2026-11-19"
+],
+"/system-design/more-designs/distributed-lock-service-zookeeper-chubby-etcd/": [
+"3a4097f583e5eb47",
+"2026-11-20"
+],
+"/system-design/more-designs/email-service-gmail/": [
+"355e1f1c1590e3bd",
+"2026-11-19"
+],
+"/system-design/more-designs/food-delivery-doordash-uber-eats/": [
+"49c2cb38ec20aaed",
+"2026-11-19"
+],
+"/system-design/more-designs/google-maps-navigation-routing/": [
+"fcb8b228fcf19f81",
+"2026-11-19"
+],
+"/system-design/more-designs/hotel-reservation-booking-airbnb/": [
+"3511e3675f66815c",
+"2026-11-19"
+],
+"/system-design/more-designs/live-comments-facebook-live-twitch-chat/": [
+"2d9239e8b261f086",
+"2026-11-20"
+],
+"/system-design/more-designs/llm-inference-serving-chatgpt-like/": [
+"3e9023a044a97a5d",
+"2026-11-19"
+],
+"/system-design/more-designs/metrics-monitoring-alerting/": [
+"ec08730b8aab4405",
+"2026-11-20"
+],
+"/system-design/more-designs/nearby-friends/": [
+"aa3ba246d4b2b51e",
+"2026-11-19"
+],
+"/system-design/more-designs/object-storage-amazon-s3/": [
+"a02a7ccbe911f07f",
+"2026-11-19"
+],
+"/system-design/more-designs/online-auction-ebay/": [
+"2c029448ae895ff3",
+"2026-11-19"
+],
+"/system-design/more-designs/online-judge-leetcode/": [
+"ad7d0acf0fdcee78",
+"2026-11-19"
+],
+"/system-design/more-designs/post-search-facebook-twitter-search/": [
+"89f3a20485b2cc37",
+"2026-11-20"
+],
+"/system-design/more-designs/proximity-service-yelp-nearby-places/": [
+"9f2555b703eca6df",
+"2026-11-20"
+],
+"/system-design/more-designs/stock-exchange-order-matching/": [
+"11919c69d689e969",
+"2026-11-19"
+],
+"/system-design/more-designs/top-k-trending-youtube-top-videos-heavy-hitters/": [
+"6a1966610d1bb858",
+"2026-11-20"
+],
+"/system-design/patterns/": [
+"22791e8294e47732",
+"2026-11-19"
+],
+"/system-design/patterns/dealing-with-contention/": [
+"99df739e58a067e1",
+"2026-11-20"
+],
+"/system-design/patterns/handling-large-files-blobs/": [
+"b65d90809735b0b3",
+"2026-11-19"
+],
+"/system-design/patterns/long-running-tasks/": [
+"c221d82fae7182a3",
+"2026-11-19"
+],
+"/system-design/patterns/multi-step-processes-workflows-sagas/": [
+"30f1078c708ed484",
+"2026-11-20"
+],
+"/system-design/patterns/scaling-reads/": [
+"b90212761a66c178",
+"2026-11-19"
+],
+"/system-design/patterns/scaling-writes/": [
+"4457e0ba9e4fe2d7",
+"2026-11-19"
+]
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>740. Delete and Earn – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 740. Delete and Earn (Medium): Taking value v earns v · count[v] and forbids v−1 and v+1 → exactly House Robber over the value axis. Complexity: O(n…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/dp-1d/delete-and-earn/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="740. Delete and Earn – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 740. Delete and Earn (Medium): Taking value v earns v · count[v] and forbids v−1 and v+1 → exactly House Robber over the value axis. Complexity: O(n…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/dp-1d/delete-and-earn/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"1-D DP","item":"https://mleprep.github.io/dsa/dp-1d/"},{"@type":"ListItem","position":3,"name":"740. Delete and Earn","item":"https://mleprep.github.io/dsa/dp-1d/delete-and-earn/"}]},{"@type":"TechArticle","headline":"740. Delete and Earn – LeetCode Solution in Python, Java & Go","name":"740. Delete and Earn","description":"LeetCode 740. Delete and Earn (Medium): Taking value v earns v · count[v] and forbids v−1 and v+1 → exactly House Robber over the value axis. Complexity: O(n…","url":"https://mleprep.github.io/dsa/dp-1d/delete-and-earn/","mainEntityOfPage":"https://mleprep.github.io/dsa/dp-1d/delete-and-earn/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"take-or-skip, reduction","about":"LeetCode problem 740: Delete and Earn","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class="on"><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/dp-1d/">1-D DP</a></div><h1>740. Delete and Earn</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/delete-and-earn/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=take-or-skip" title="Browse problems tagged take-or-skip">take-or-skip</a><a class="tag" href="/browse/?tag=reduction" title="Browse problems tagged reduction">reduction</a><label class="done"><input type="checkbox" data-k="dsa/delete-and-earn"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 12</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 28 all time, 26 in the last 6 months">Amazon<span>28</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 28 all time, 38 in the last 6 months">Microsoft<span>28</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 17 all time, 12 in the last 6 months">Google<span>17</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 14 all time">Bloomberg<span>14</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 12 all time">Meta<span>12</span></a><a class="co hot" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 82 all time, 100 in the last 6 months">Walmart Labs<span>82</span></a><a class="co hot" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 44 all time, 74 in the last 6 months">IBM<span>44</span></a><a class="co" href="/browse/?co=Akuna+Capital&sort=freq" title="Akuna Capital: frequency 97 all time">Akuna Capital<span>97</span></a><a class="co" href="/browse/?co=Morgan+Stanley&sort=freq" title="Morgan Stanley: frequency 86 all time">Morgan Stanley<span>86</span></a><a class="co" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 57 all time">Salesforce<span>57</span></a><a class="co" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 35 all time">TikTok<span>35</span></a><a class="co" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 30 all time">Infosys<span>30</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Taking value <code>v</code> earns <code>v · count[v]</code> and forbids <code>v−1</code> and <code>v+1</code> → exactly House Robber over the value axis.</p><p><strong>Complexity:</strong> O(n + max).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/dp-1d/house-robber/"><i class="dot Medium"></i>198. House Robber</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def deleteAndEarn(self, nums: List[int]) -&gt; int:
+        gain = [0] * (max(nums) + 1)
+        for x in nums:
+            gain[x] += x
+        prev = cur = 0
+        for g in gain:
+            prev, cur = cur, max(cur, prev + g)
+        return cur
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().deleteAndEarn([3, 4, 2]) == 6
+assert Solution().deleteAndEarn([2, 2, 3, 3, 3, 4]) == 9
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int deleteAndEarn(int[] nums) {
+        int mx = 0;
+        for (int x : nums) mx = Math.max(mx, x);
+        int[] gain = new int[mx + 1];
+        for (int x : nums) gain[x] += x;
+        int prev = 0, cur = 0;
+        for (int g : gain) { int nxt = Math.max(cur, prev + g); prev = cur; cur = nxt; }
+        return cur;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func deleteAndEarn(nums []int) int {
+	gain := make([]int, slices.Max(nums)+1) // taking value v earns v * count(v)
+	for _, x := range nums {
+		gain[x] += x
+	}
+	prev, cur := 0, 0 // then it is House Robber over the values
+	for _, g := range gain {
+		prev, cur = cur, max(cur, prev+g)
+	}
+	return cur
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/dp-1d/house-robber-ii/">← House Robber II</a></span><span><a href="/dsa/dp-1d/longest-palindromic-substring/">Longest Palindromic Substring →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

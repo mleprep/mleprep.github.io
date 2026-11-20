@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>729. My Calendar I – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 729. My Calendar I (Medium): Keep booked intervals sorted by start. A new [s, e) is fine iff it ends before the next booking starts and starts after…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/intervals/my-calendar-i/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="729. My Calendar I – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 729. My Calendar I (Medium): Keep booked intervals sorted by start. A new [s, e) is fine iff it ends before the next booking starts and starts after…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/intervals/my-calendar-i/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Intervals","item":"https://mleprep.github.io/dsa/intervals/"},{"@type":"ListItem","position":3,"name":"729. My Calendar I","item":"https://mleprep.github.io/dsa/intervals/my-calendar-i/"}]},{"@type":"TechArticle","headline":"729. My Calendar I – LeetCode Solution in Python, Java & Go","name":"729. My Calendar I","description":"LeetCode 729. My Calendar I (Medium): Keep booked intervals sorted by start. A new [s, e) is fine iff it ends before the next booking starts and starts after…","url":"https://mleprep.github.io/dsa/intervals/my-calendar-i/","mainEntityOfPage":"https://mleprep.github.io/dsa/intervals/my-calendar-i/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"sorted-map, design","about":"LeetCode problem 729: My Calendar I","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class="on"><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/intervals/">Intervals</a></div><h1>729. My Calendar I</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/my-calendar-i/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=sorted-map" title="Browse problems tagged sorted-map">sorted-map</a><a class="tag" href="/browse/?tag=design" title="Browse problems tagged design">design</a><label class="done"><input type="checkbox" data-k="dsa/my-calendar-i"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 8</span><a class="co" href="/browse/?co=Google&sort=freq" title="Google: frequency 27 all time">Google<span>27</span></a><a class="co" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 22 all time">Apple<span>22</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 22 all time, 14 in the last 6 months">Amazon<span>22</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 12 all time">Microsoft<span>12</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 8.5 all time">Meta<span>8.5</span></a><a class="co" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 75 all time">Uber<span>75</span></a><a class="co" href="/browse/?co=Flexport&sort=freq" title="Flexport: frequency 63 all time">Flexport<span>63</span></a><a class="co" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 27 all time">Oracle<span>27</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Keep booked intervals sorted by start. A new <code>[s, e)</code> is fine iff it ends before the next booking starts and starts after the previous booking ends — one binary search (Java <code>TreeMap.floorKey/ceilingKey</code>).</p><p><strong>Complexity:</strong> O(log n) per booking (O(n) insert for a Python list).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/intervals/merge-intervals/"><i class="dot Medium"></i>56. Merge Intervals</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class MyCalendar:
+    def __init__(self):
+        self.starts, self.ends = [], []
+
+    def book(self, start: int, end: int) -&gt; bool:
+        i = bisect.bisect_right(self.starts, start)
+        if i &gt; 0 and self.ends[i - 1] &gt; start:          # previous overlaps
+            return False
+        if i &lt; len(self.starts) and self.starts[i] &lt; end:   # next overlaps
+            return False
+        self.starts.insert(i, start)
+        self.ends.insert(i, end)
+        return True
+</code></pre><pre class="test" hidden><code id="tsrc">c = MyCalendar()
+assert [c.book(10, 20), c.book(15, 25), c.book(20, 30)] == [True, False, True]
+c2 = MyCalendar()
+assert [c2.book(5, 10), c2.book(10, 15), c2.book(9, 11), c2.book(0, 5), c2.book(4, 6)] == [True, True, False, True, False]
+</code></pre><pre hidden><code class="language-java">class MyCalendar {
+    private final TreeMap&lt;Integer, Integer&gt; cal = new TreeMap&lt;&gt;();   // start -&gt; end
+
+    public boolean book(int start, int end) {
+        Integer prev = cal.floorKey(start), next = cal.ceilingKey(start);
+        if (prev != null &amp;&amp; cal.get(prev) &gt; start) return false;
+        if (next != null &amp;&amp; next &lt; end) return false;
+        cal.put(start, end);
+        return true;
+    }
+}
+</code></pre><pre hidden><code class="language-go">type MyCalendar struct {
+	starts, ends []int // bookings sorted by start, never overlapping
+}
+
+func Constructor() MyCalendar {
+	return MyCalendar{}
+}
+
+func (this *MyCalendar) Book(start int, end int) bool {
+	i := sort.SearchInts(this.starts, start+1) // first booking starting after `start`
+	if i &gt; 0 &amp;&amp; this.ends[i-1] &gt; start {       // the previous one runs into us
+		return false
+	}
+	if i &lt; len(this.starts) &amp;&amp; this.starts[i] &lt; end { // we run into the next one
+		return false
+	}
+	this.starts = insertAt(this.starts, i, start)
+	this.ends = insertAt(this.ends, i, end)
+	return true
+}
+
+func insertAt(s []int, i, v int) []int {
+	s = append(s, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = v
+	return s
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/intervals/remove-covered-intervals/">← Remove Covered Intervals</a></span><span><a href="/dsa/intervals/data-stream-as-disjoint-intervals/">Data Stream as Disjoint Intervals →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

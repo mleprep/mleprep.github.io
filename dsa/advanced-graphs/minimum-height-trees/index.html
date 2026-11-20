@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>310. Minimum Height Trees – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 310. Minimum Height Trees (Medium): The best roots are the tree&#x27;s centers (1 or 2 nodes). Peel leaves layer by layer (like Kahn&#x27;s algorithm on degree…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/advanced-graphs/minimum-height-trees/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="310. Minimum Height Trees – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 310. Minimum Height Trees (Medium): The best roots are the tree&#x27;s centers (1 or 2 nodes). Peel leaves layer by layer (like Kahn&#x27;s algorithm on degree…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/advanced-graphs/minimum-height-trees/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Advanced Graphs","item":"https://mleprep.github.io/dsa/advanced-graphs/"},{"@type":"ListItem","position":3,"name":"310. Minimum Height Trees","item":"https://mleprep.github.io/dsa/advanced-graphs/minimum-height-trees/"}]},{"@type":"TechArticle","headline":"310. Minimum Height Trees – LeetCode Solution in Python, Java & Go","name":"310. Minimum Height Trees","description":"LeetCode 310. Minimum Height Trees (Medium): The best roots are the tree's centers (1 or 2 nodes). Peel leaves layer by layer (like Kahn's algorithm on degree…","url":"https://mleprep.github.io/dsa/advanced-graphs/minimum-height-trees/","mainEntityOfPage":"https://mleprep.github.io/dsa/advanced-graphs/minimum-height-trees/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"topological-sort, leaf-trimming","about":"LeetCode problem 310: Minimum Height Trees","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class="on"><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/advanced-graphs/">Advanced Graphs</a></div><h1>310. Minimum Height Trees</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/minimum-height-trees/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=topological-sort" title="Browse problems tagged topological-sort">topological-sort</a><a class="tag" href="/browse/?tag=leaf-trimming" title="Browse problems tagged leaf-trimming">leaf-trimming</a><label class="done"><input type="checkbox" data-k="dsa/minimum-height-trees"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 7</span><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 33 all time, 28 in the last 6 months">Google<span>33</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 22 all time, 21 in the last 6 months">Amazon<span>22</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 18 all time">Bloomberg<span>18</span></a><a class="co" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 12 all time">Microsoft<span>12</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 8.5 all time">Meta<span>8.5</span></a><a class="co" href="/browse/?co=Splunk&sort=freq" title="Splunk: frequency 100 all time">Splunk<span>100</span></a><a class="co" href="/browse/?co=Stackline&sort=freq" title="Stackline: frequency 100 all time">Stackline<span>100</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>The best roots are the tree&#x27;s <strong>centers</strong> (1 or 2 nodes). Peel leaves layer by layer (like Kahn&#x27;s algorithm on degree 1) until ≤ 2 nodes remain.</p><pre class="viz"><code class="language-viz">0 - 1 - 2 - 3 - 4      trim leaves {0,4} -&gt; {1,3} -&gt; remaining {2}  = center
+</code></pre><p><strong>Complexity:</strong> O(n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/graphs/course-schedule/"><i class="dot Medium"></i>207. Course Schedule</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findMinHeightTrees(self, n: int, edges: List[List[int]]) -&gt; List[int]:
+        if n &lt;= 2:
+            return list(range(n))
+        g = defaultdict(set)
+        for a, b in edges:
+            g[a].add(b)
+            g[b].add(a)
+        leaves = [i for i in range(n) if len(g[i]) == 1]
+        remaining = n
+        while remaining &gt; 2:
+            remaining -= len(leaves)
+            nxt = []
+            for leaf in leaves:
+                nb = g[leaf].pop()
+                g[nb].remove(leaf)
+                if len(g[nb]) == 1:
+                    nxt.append(nb)
+            leaves = nxt
+        return sorted(leaves)
+</code></pre><pre class="test" hidden><code id="tsrc">assert sorted(Solution().findMinHeightTrees(4, [[1, 0], [1, 2], [1, 3]])) == sorted([1])
+assert sorted(Solution().findMinHeightTrees(6, [[3, 0], [3, 1], [3, 2], [3, 4], [5, 4]])) == sorted([3, 4])
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public List&lt;Integer&gt; findMinHeightTrees(int n, int[][] edges) {
+        if (n &lt;= 2) { List&lt;Integer&gt; r = new ArrayList&lt;&gt;(); for (int i = 0; i &lt; n; i++) r.add(i); return r; }
+        List&lt;Set&lt;Integer&gt;&gt; g = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) g.add(new HashSet&lt;&gt;());
+        for (int[] e : edges) { g.get(e[0]).add(e[1]); g.get(e[1]).add(e[0]); }
+        List&lt;Integer&gt; leaves = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) if (g.get(i).size() == 1) leaves.add(i);
+        int remaining = n;
+        while (remaining &gt; 2) {
+            remaining -= leaves.size();
+            List&lt;Integer&gt; nxt = new ArrayList&lt;&gt;();
+            for (int leaf : leaves) {
+                int nb = g.get(leaf).iterator().next();
+                g.get(nb).remove(leaf);
+                if (g.get(nb).size() == 1) nxt.add(nb);
+            }
+            leaves = nxt;
+        }
+        Collections.sort(leaves);
+        return leaves;
+    }
+}
+</code></pre><pre hidden><code class="language-go">func findMinHeightTrees(n int, edges [][]int) []int {
+	if n &lt;= 2 {
+		out := []int{}
+		for i := 0; i &lt; n; i++ {
+			out = append(out, i)
+		}
+		return out
+	}
+	adj := make([][]int, n)
+	deg := make([]int, n)
+	for _, e := range edges {
+		adj[e[0]] = append(adj[e[0]], e[1])
+		adj[e[1]] = append(adj[e[1]], e[0])
+		deg[e[0]]++
+		deg[e[1]]++
+	}
+	leaves := []int{}
+	for i := 0; i &lt; n; i++ {
+		if deg[i] == 1 {
+			leaves = append(leaves, i)
+		}
+	}
+	remaining := n
+	for remaining &gt; 2 { // peel leaves layer by layer; the last 1-2 nodes are the centres
+		remaining -= len(leaves)
+		next := []int{}
+		for _, leaf := range leaves {
+			for _, nb := range adj[leaf] {
+				deg[nb]--
+				if deg[nb] == 1 {
+					next = append(next, nb)
+				}
+			}
+		}
+		leaves = next
+	}
+	return leaves
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/advanced-graphs/path-with-minimum-effort/">← Path With Minimum Effort</a></span><span><a href="/dsa/advanced-graphs/critical-connections-in-a-network/">Critical Connections in a Network →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

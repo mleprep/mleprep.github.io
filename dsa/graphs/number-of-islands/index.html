@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>200. Number of Islands – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 200. Number of Islands (Medium): Scan the grid; each unvisited 1 starts a new island — flood-fill it (DFS/BFS) to mark the whole island visited…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/graphs/number-of-islands/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="200. Number of Islands – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 200. Number of Islands (Medium): Scan the grid; each unvisited 1 starts a new island — flood-fill it (DFS/BFS) to mark the whole island visited…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/graphs/number-of-islands/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Graphs","item":"https://mleprep.github.io/dsa/graphs/"},{"@type":"ListItem","position":3,"name":"200. Number of Islands","item":"https://mleprep.github.io/dsa/graphs/number-of-islands/"}]},{"@type":"TechArticle","headline":"200. Number of Islands – LeetCode Solution in Python, Java & Go","name":"200. Number of Islands","description":"LeetCode 200. Number of Islands (Medium): Scan the grid; each unvisited 1 starts a new island — flood-fill it (DFS/BFS) to mark the whole island visited…","url":"https://mleprep.github.io/dsa/graphs/number-of-islands/","mainEntityOfPage":"https://mleprep.github.io/dsa/graphs/number-of-islands/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"blind75, grid-dfs","about":"LeetCode problem 200: Number of Islands","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class="on"><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/graphs/">Graphs</a></div><h1>200. Number of Islands</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/number-of-islands/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag star" href="/browse/?list=blind75" title="Browse problems tagged blind75">★ Blind 75</a><a class="tag" href="/browse/?tag=grid-dfs" title="Browse problems tagged grid-dfs">grid-dfs</a><label class="done"><input type="checkbox" data-k="dsa/number-of-islands"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 81</span><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 85 all time, 74 in the last 6 months">Amazon<span>85</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 84 all time, 63 in the last 6 months">Bloomberg<span>84</span></a><a class="co hot" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 80 all time, 57 in the last 6 months">Apple<span>80</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 72 all time, 57 in the last 6 months">Microsoft<span>72</span></a><a class="co hot" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 65 all time, 52 in the last 6 months">Meta<span>65</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 64 all time, 54 in the last 6 months">Google<span>64</span></a><a class="co hot" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 100 all time, 100 in the last 6 months">Anduril<span>100</span></a><a class="co hot" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 97 all time, 64 in the last 6 months">Walmart Labs<span>97</span></a><a class="co hot" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 96 all time, 95 in the last 6 months">TikTok<span>96</span></a><a class="co hot" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 91 all time, 100 in the last 6 months">Qualcomm<span>91</span></a><a class="co hot" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 89 all time, 75 in the last 6 months">Uber<span>89</span></a><a class="co hot" href="/browse/?co=ByteDance&sort=freq" title="ByteDance: frequency 87 all time, 100 in the last 6 months">ByteDance<span>87</span></a><a class="co extra hot" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 83 all time, 100 in the last 6 months">Oracle<span>83</span></a><a class="co extra hot" href="/browse/?co=Waymo&sort=freq" title="Waymo: frequency 79 all time, 100 in the last 6 months">Waymo<span>79</span></a><a class="co extra hot" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 75 all time, 62 in the last 6 months">LinkedIn<span>75</span></a><a class="co extra hot" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 74 all time, 85 in the last 6 months">Nvidia<span>74</span></a><a class="co extra hot" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 72 all time, 74 in the last 6 months">Visa<span>72</span></a><a class="co extra hot" href="/browse/?co=Yandex&sort=freq" title="Yandex: frequency 63 all time, 65 in the last 6 months">Yandex<span>63</span></a><a class="co extra hot" href="/browse/?co=Infosys&sort=freq" title="Infosys: frequency 61 all time, 75 in the last 6 months">Infosys<span>61</span></a><a class="co extra hot" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 60 all time, 48 in the last 6 months">Goldman Sachs<span>60</span></a><a class="co extra hot" href="/browse/?co=Rippling&sort=freq" title="Rippling: frequency 54 all time, 67 in the last 6 months">Rippling<span>54</span></a><a class="co extra hot" href="/browse/?co=tcs&sort=freq" title="tcs: frequency 36 all time, 43 in the last 6 months">tcs<span>36</span></a><a class="co extra" href="/browse/?co=Hive&sort=freq" title="Hive: frequency 100 all time">Hive<span>100</span></a><a class="co extra" href="/browse/?co=Moloco&sort=freq" title="Moloco: frequency 100 all time">Moloco<span>100</span></a><a class="co extra" href="/browse/?co=OKX&sort=freq" title="OKX: frequency 100 all time">OKX<span>100</span></a><a class="co extra" href="/browse/?co=Rivian&sort=freq" title="Rivian: frequency 100 all time">Rivian<span>100</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 100 all time">Snap<span>100</span></a><a class="co extra" href="/browse/?co=Splunk&sort=freq" title="Splunk: frequency 100 all time">Splunk<span>100</span></a><a class="co extra" href="/browse/?co=Wix&sort=freq" title="Wix: frequency 100 all time">Wix<span>100</span></a><a class="co extra" href="/browse/?co=Zenefits&sort=freq" title="Zenefits: frequency 100 all time">Zenefits<span>100</span></a><a class="co extra" href="/browse/?co=CrowdStrike&sort=freq" title="CrowdStrike: frequency 97 all time">CrowdStrike<span>97</span></a><a class="co extra" href="/browse/?co=Siemens&sort=freq" title="Siemens: frequency 97 all time">Siemens<span>97</span></a><a class="co extra" href="/browse/?co=BitGo&sort=freq" title="BitGo: frequency 89 all time">BitGo<span>89</span></a><a class="co extra" href="/browse/?co=Tesla&sort=freq" title="Tesla: frequency 88 all time">Tesla<span>88</span></a><a class="co extra" href="/browse/?co=Sigmoid&sort=freq" title="Sigmoid: frequency 87 all time">Sigmoid<span>87</span></a><a class="co extra" href="/browse/?co=Samsung&sort=freq" title="Samsung: frequency 86 all time">Samsung<span>86</span></a><a class="co extra" href="/browse/?co=ServiceNow&sort=freq" title="ServiceNow: frequency 84 all time">ServiceNow<span>84</span></a><a class="co extra" href="/browse/?co=eBay&sort=freq" title="eBay: frequency 82 all time">eBay<span>82</span></a><a class="co extra" href="/browse/?co=Zoho&sort=freq" title="Zoho: frequency 81 all time">Zoho<span>81</span></a><a class="co extra" href="/browse/?co=AMD&sort=freq" title="AMD: frequency 79 all time">AMD<span>79</span></a><a class="co extra" href="/browse/?co=SoFi&sort=freq" title="SoFi: frequency 79 all time">SoFi<span>79</span></a><a class="co extra" href="/browse/?co=Lucid&sort=freq" title="Lucid: frequency 78 all time">Lucid<span>78</span></a><a class="co extra" href="/browse/?co=Whatnot&sort=freq" title="Whatnot: frequency 78 all time">Whatnot<span>78</span></a><a class="co extra" href="/browse/?co=Intel&sort=freq" title="Intel: frequency 76 all time">Intel<span>76</span></a><a class="co extra" href="/browse/?co=Tinkoff&sort=freq" title="Tinkoff: frequency 75 all time">Tinkoff<span>75</span></a><a class="co extra" href="/browse/?co=Wells+Fargo&sort=freq" title="Wells Fargo: frequency 75 all time">Wells Fargo<span>75</span></a><a class="co extra" href="/browse/?co=Docusign&sort=freq" title="Docusign: frequency 74 all time">Docusign<span>74</span></a><a class="co extra" href="/browse/?co=Comcast&sort=freq" title="Comcast: frequency 74 all time">Comcast<span>74</span></a><a class="co extra" href="/browse/?co=SAP&sort=freq" title="SAP: frequency 73 all time">SAP<span>73</span></a><a class="co extra" href="/browse/?co=Aon&sort=freq" title="Aon: frequency 71 all time">Aon<span>71</span></a><a class="co extra" href="/browse/?co=PayPal&sort=freq" title="PayPal: frequency 71 all time">PayPal<span>71</span></a><a class="co extra" href="/browse/?co=Adobe&sort=freq" title="Adobe: frequency 69 all time">Adobe<span>69</span></a><a class="co extra" href="/browse/?co=Huawei&sort=freq" title="Huawei: frequency 67 all time">Huawei<span>67</span></a><a class="co extra" href="/browse/?co=Accenture&sort=freq" title="Accenture: frequency 66 all time">Accenture<span>66</span></a><a class="co extra" href="/browse/?co=Squarepoint+Capital&sort=freq" title="Squarepoint Capital: frequency 66 all time">Squarepoint Capital<span>66</span></a><a class="co extra" href="/browse/?co=Cloudflare&sort=freq" title="Cloudflare: frequency 66 all time">Cloudflare<span>66</span></a><a class="co extra" href="/browse/?co=Expedia&sort=freq" title="Expedia: frequency 65 all time">Expedia<span>65</span></a><a class="co extra" href="/browse/?co=Capital+One&sort=freq" title="Capital One: frequency 64 all time">Capital One<span>64</span></a><a class="co extra" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 64 all time">Citadel<span>64</span></a><a class="co extra" href="/browse/?co=Zomato&sort=freq" title="Zomato: frequency 62 all time">Zomato<span>62</span></a><a class="co extra" href="/browse/?co=HashedIn&sort=freq" title="HashedIn: frequency 62 all time">HashedIn<span>62</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 60 all time">Nutanix<span>60</span></a><a class="co extra" href="/browse/?co=Autodesk&sort=freq" title="Autodesk: frequency 59 all time">Autodesk<span>59</span></a><a class="co extra" href="/browse/?co=Coupang&sort=freq" title="Coupang: frequency 58 all time">Coupang<span>58</span></a><a class="co extra" href="/browse/?co=Two+Sigma&sort=freq" title="Two Sigma: frequency 58 all time">Two Sigma<span>58</span></a><a class="co extra" href="/browse/?co=Meesho&sort=freq" title="Meesho: frequency 57 all time">Meesho<span>57</span></a><a class="co extra" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 57 all time">Salesforce<span>57</span></a><a class="co extra" href="/browse/?co=Turing&sort=freq" title="Turing: frequency 55 all time">Turing<span>55</span></a><a class="co extra" href="/browse/?co=PhonePe&sort=freq" title="PhonePe: frequency 53 all time">PhonePe<span>53</span></a><a class="co extra" href="/browse/?co=Barclays&sort=freq" title="Barclays: frequency 53 all time">Barclays<span>53</span></a><a class="co extra" href="/browse/?co=General+Motors&sort=freq" title="General Motors: frequency 52 all time">General Motors<span>52</span></a><a class="co extra" href="/browse/?co=Grammarly&sort=freq" title="Grammarly: frequency 51 all time">Grammarly<span>51</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 50 all time">IBM<span>50</span></a><a class="co extra" href="/browse/?co=DE+Shaw&sort=freq" title="DE Shaw: frequency 47 all time">DE Shaw<span>47</span></a><a class="co extra" href="/browse/?co=Juspay&sort=freq" title="Juspay: frequency 47 all time">Juspay<span>47</span></a><a class="co extra" href="/browse/?co=Cisco&sort=freq" title="Cisco: frequency 45 all time">Cisco<span>45</span></a><a class="co extra" href="/browse/?co=Intuit&sort=freq" title="Intuit: frequency 43 all time">Intuit<span>43</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 39 all time">Snowflake<span>39</span></a><a class="co extra" href="/browse/?co=Pinterest&sort=freq" title="Pinterest: frequency 36 all time">Pinterest<span>36</span></a><a class="co extra" href="/browse/?co=DoorDash&sort=freq" title="DoorDash: frequency 36 all time">DoorDash<span>36</span></a><button id="comore" class="co more">+69 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Scan the grid; each unvisited <code>1</code> starts a new island — flood-fill it (DFS/BFS) to mark the whole island visited.</p><pre class="viz"><code class="language-viz">1 1 0 0 0
+1 1 0 0 0      -&gt; 3 islands
+0 0 1 0 0
+0 0 0 1 1
+</code></pre><p><strong>Complexity:</strong> O(R·C).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/graphs/max-area-of-island/"><i class="dot Medium"></i>695. Max Area of Island</a><a href="/dsa/graphs/surrounded-regions/"><i class="dot Medium"></i>130. Surrounded Regions</a><a href="/dsa/graphs/number-of-connected-components-in-an-undirected-graph/"><i class="dot Medium"></i>323. Number of Connected Components in an Undirected Graph</a><a href="/dsa/graphs/number-of-provinces/"><i class="dot Medium"></i>547. Number of Provinces</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def numIslands(self, grid: List[List[str]]) -&gt; int:
+        R, C = len(grid), len(grid[0])
+
+        def sink(r, c):
+            st = [(r, c)]
+            grid[r][c] = &quot;0&quot;
+            while st:
+                r, c = st.pop()
+                for nr, nc in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+                    if 0 &lt;= nr &lt; R and 0 &lt;= nc &lt; C and grid[nr][nc] == &quot;1&quot;:
+                        grid[nr][nc] = &quot;0&quot;
+                        st.append((nr, nc))
+
+        count = 0
+        for r in range(R):
+            for c in range(C):
+                if grid[r][c] == &quot;1&quot;:
+                    count += 1
+                    sink(r, c)
+        return count
+</code></pre><pre class="test" hidden><code id="tsrc">g = [list(r) for r in [&quot;11000&quot;, &quot;11000&quot;, &quot;00100&quot;, &quot;00011&quot;]]
+assert Solution().numIslands(g) == 3
+assert Solution().numIslands([[&quot;0&quot;]]) == 0
+assert Solution().numIslands([list(r) for r in [&quot;11110&quot;, &quot;11010&quot;, &quot;11000&quot;, &quot;00000&quot;]]) == 1
+assert Solution().numIslands([list(r) for r in [&quot;101&quot;, &quot;010&quot;, &quot;101&quot;]]) == 5
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int numIslands(char[][] grid) {
+        int count = 0;
+        for (int r = 0; r &lt; grid.length; r++)
+            for (int c = 0; c &lt; grid[0].length; c++)
+                if (grid[r][c] == &#x27;1&#x27;) { count++; sink(grid, r, c); }
+        return count;
+    }
+
+    private void sink(char[][] g, int r, int c) {
+        if (r &lt; 0 || c &lt; 0 || r &gt;= g.length || c &gt;= g[0].length || g[r][c] != &#x27;1&#x27;) return;
+        g[r][c] = &#x27;0&#x27;;
+        sink(g, r + 1, c); sink(g, r - 1, c); sink(g, r, c + 1); sink(g, r, c - 1);
+    }
+}
+</code></pre><pre hidden><code class="language-go">func numIslands(grid [][]byte) int {
+	R, C := len(grid), len(grid[0])
+	sink := func(r, c int) { // flood-fill one island with an explicit stack
+		st := [][2]int{{r, c}}
+		grid[r][c] = &#x27;0&#x27;
+		for len(st) &gt; 0 {
+			p := st[len(st)-1]
+			st = st[:len(st)-1]
+			for _, d := range [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}} {
+				nr, nc := p[0]+d[0], p[1]+d[1]
+				if nr &gt;= 0 &amp;&amp; nr &lt; R &amp;&amp; nc &gt;= 0 &amp;&amp; nc &lt; C &amp;&amp; grid[nr][nc] == &#x27;1&#x27; {
+					grid[nr][nc] = &#x27;0&#x27;
+					st = append(st, [2]int{nr, nc})
+				}
+			}
+		}
+	}
+	count := 0
+	for r := 0; r &lt; R; r++ {
+		for c := 0; c &lt; C; c++ {
+			if grid[r][c] == &#x27;1&#x27; {
+				count++
+				sink(r, c)
+			}
+		}
+	}
+	return count
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/backtracking/matchsticks-to-square/">← Matchsticks to Square</a></span><span><a href="/dsa/graphs/max-area-of-island/">Max Area of Island →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

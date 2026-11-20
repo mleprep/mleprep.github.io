@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1851. Minimum Interval to Include Each Query – LeetCode Solution</title>
+<meta name="description" content="LeetCode 1851. Minimum Interval to Include Each Query (Hard): Process queries offline in sorted order. Push every interval with start ≤ q into a min-heap…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/intervals/minimum-interval-to-include-each-query/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="1851. Minimum Interval to Include Each Query – LeetCode Solution">
+<meta property="og:description" content="LeetCode 1851. Minimum Interval to Include Each Query (Hard): Process queries offline in sorted order. Push every interval with start ≤ q into a min-heap…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/intervals/minimum-interval-to-include-each-query/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Intervals","item":"https://mleprep.github.io/dsa/intervals/"},{"@type":"ListItem","position":3,"name":"1851. Minimum Interval to Include Each Query","item":"https://mleprep.github.io/dsa/intervals/minimum-interval-to-include-each-query/"}]},{"@type":"TechArticle","headline":"1851. Minimum Interval to Include Each Query – LeetCode Solution","name":"1851. Minimum Interval to Include Each Query","description":"LeetCode 1851. Minimum Interval to Include Each Query (Hard): Process queries offline in sorted order. Push every interval with start ≤ q into a min-heap…","url":"https://mleprep.github.io/dsa/intervals/minimum-interval-to-include-each-query/","mainEntityOfPage":"https://mleprep.github.io/dsa/intervals/minimum-interval-to-include-each-query/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"offline-queries, heap","about":"LeetCode problem 1851: Minimum Interval to Include Each Query","educationalLevel":"Hard"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class=""><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class="on"><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/intervals/">Intervals</a></div><h1>1851. Minimum Interval to Include Each Query</h1><div class="meta"><a class="badge Hard" href="/browse/?d=Hard" title="All Hard problems">Hard</a><a href="https://leetcode.com/problems/minimum-interval-to-include-each-query/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=offline-queries" title="Browse problems tagged offline-queries">offline-queries</a><a class="tag" href="/browse/?tag=heap" title="Browse problems tagged heap">heap</a><label class="done"><input type="checkbox" data-k="dsa/minimum-interval-to-include-each-query"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 3</span><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 30 all time, 12 in the last 6 months">Google<span>30</span></a><a class="co" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 8.3 all time">Bloomberg<span>8.3</span></a><a class="co" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 5.0 all time">Amazon<span>5.0</span></a></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Process queries <strong>offline</strong> in sorted order. Push every interval with <code>start ≤ q</code> into a min-heap keyed by size; pop intervals whose <code>end &lt; q</code> (they&#x27;re dead for all later queries too). Heap top is the answer.</p><p><strong>Complexity:</strong> O((n + q) log n).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/intervals/meeting-rooms-ii/"><i class="dot Medium"></i>253. Meeting Rooms II</a><a href="/dsa/intervals/merge-intervals/"><i class="dot Medium"></i>56. Merge Intervals</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def minInterval(self, intervals: List[List[int]], queries: List[int]) -&gt; List[int]:
+        intervals.sort()
+        h, i, ans = [], 0, {}
+        for q in sorted(set(queries)):
+            while i &lt; len(intervals) and intervals[i][0] &lt;= q:
+                l, r = intervals[i]
+                heappush(h, (r - l + 1, r))
+                i += 1
+            while h and h[0][1] &lt; q:
+                heappop(h)
+            ans[q] = h[0][0] if h else -1
+        return [ans[q] for q in queries]
+</code></pre><pre class="test" hidden><code id="tsrc">assert Solution().minInterval([[1, 4], [2, 4], [3, 6], [4, 4]], [2, 3, 4, 5]) == [3, 3, 1, 4]
+assert Solution().minInterval([[2, 3], [2, 5], [1, 8], [20, 25]], [2, 19, 5, 22]) == [2, -1, 4, 6]
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int[] minInterval(int[][] intervals, int[] queries) {
+        Arrays.sort(intervals, (a, b) -&gt; Integer.compare(a[0], b[0]));
+        Integer[] qi = new Integer[queries.length];
+        for (int k = 0; k &lt; qi.length; k++) qi[k] = k;
+        Arrays.sort(qi, (a, b) -&gt; Integer.compare(queries[a], queries[b]));
+        PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt; a[0] - b[0]); // {size, end}
+        int[] res = new int[queries.length];
+        int i = 0;
+        for (int k : qi) {
+            int q = queries[k];
+            while (i &lt; intervals.length &amp;&amp; intervals[i][0] &lt;= q) {
+                pq.add(new int[]{intervals[i][1] - intervals[i][0] + 1, intervals[i][1]});
+                i++;
+            }
+            while (!pq.isEmpty() &amp;&amp; pq.peek()[1] &lt; q) pq.poll();
+            res[k] = pq.isEmpty() ? -1 : pq.peek()[0];
+        }
+        return res;
+    }
+}
+</code></pre><pre hidden><code class="language-go">type sizeHeap [][2]int // (size, right end), smallest size first
+
+func (h sizeHeap) Len() int           { return len(h) }
+func (h sizeHeap) Less(i, j int) bool { return h[i][0] &lt; h[j][0] }
+func (h sizeHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *sizeHeap) Push(x any)        { *h = append(*h, x.([2]int)) }
+func (h *sizeHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+func minInterval(intervals [][]int, queries []int) []int {
+	sort.Slice(intervals, func(i, j int) bool { return intervals[i][0] &lt; intervals[j][0] })
+	order := make([]int, len(queries)) // answer queries in increasing order
+	for i := range order {
+		order[i] = i
+	}
+	sort.Slice(order, func(a, b int) bool { return queries[order[a]] &lt; queries[order[b]] })
+	res := make([]int, len(queries))
+	h, i := &amp;sizeHeap{}, 0
+	for _, qi := range order {
+		q := queries[qi]
+		for ; i &lt; len(intervals) &amp;&amp; intervals[i][0] &lt;= q; i++ { // intervals starting by q
+			heap.Push(h, [2]int{intervals[i][1] - intervals[i][0] + 1, intervals[i][1]})
+		}
+		for h.Len() &gt; 0 &amp;&amp; (*h)[0][1] &lt; q { // drop those that ended before q
+			heap.Pop(h)
+		}
+		res[qi] = -1
+		if h.Len() &gt; 0 {
+			res[qi] = (*h)[0][0]
+		}
+	}
+	return res
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/intervals/interval-list-intersections/">← Interval List Intersections</a></span><span><a href="/dsa/intervals/remove-covered-intervals/">Remove Covered Intervals →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

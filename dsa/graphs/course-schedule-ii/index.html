@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>210. Course Schedule II – LeetCode Solution in Python, Java &amp; Go</title>
+<meta name="description" content="LeetCode 210. Course Schedule II (Medium): Same Kahn&#x27;s algorithm, but record the order nodes are taken. If fewer than n are taken → cycle → []. Complexity…">
+<link rel="canonical" href="https://mleprep.github.io/dsa/graphs/course-schedule-ii/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="210. Course Schedule II – LeetCode Solution in Python, Java &amp; Go">
+<meta property="og:description" content="LeetCode 210. Course Schedule II (Medium): Same Kahn&#x27;s algorithm, but record the order nodes are taken. If fewer than n are taken → cycle → []. Complexity…">
+<meta property="og:url" content="https://mleprep.github.io/dsa/graphs/course-schedule-ii/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Algorithms","item":"https://mleprep.github.io/dsa/"},{"@type":"ListItem","position":2,"name":"Graphs","item":"https://mleprep.github.io/dsa/graphs/"},{"@type":"ListItem","position":3,"name":"210. Course Schedule II","item":"https://mleprep.github.io/dsa/graphs/course-schedule-ii/"}]},{"@type":"TechArticle","headline":"210. Course Schedule II – LeetCode Solution in Python, Java & Go","name":"210. Course Schedule II","description":"LeetCode 210. Course Schedule II (Medium): Same Kahn's algorithm, but record the order nodes are taken. If fewer than n are taken → cycle → []. Complexity…","url":"https://mleprep.github.io/dsa/graphs/course-schedule-ii/","mainEntityOfPage":"https://mleprep.github.io/dsa/graphs/course-schedule-ii/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"keywords":"topological-sort","about":"LeetCode problem 210: Course Schedule II","educationalLevel":"Medium"}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="on">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>Algorithms</h4><a href="/browse/" class="all"><span>All problems</span><small>477</small></a><a href="/dsa/arrays-hashing/" title="Arrays &amp; Hashing" class=""><span>Arrays &amp; Hashing</span><small>42</small></a><a href="/dsa/two-pointers/" title="Two Pointers" class=""><span>Two Pointers</span><small>22</small></a><a href="/dsa/sliding-window/" title="Sliding Window" class=""><span>Sliding Window</span><small>20</small></a><a href="/dsa/stack/" title="Stack &amp; Monotonic Stack" class=""><span>Stack &amp; Monotonic Stack</span><small>24</small></a><a href="/dsa/binary-search/" title="Binary Search" class=""><span>Binary Search</span><small>23</small></a><a href="/dsa/linked-list/" title="Linked List" class=""><span>Linked List</span><small>26</small></a><a href="/dsa/trees/" title="Trees" class=""><span>Trees</span><small>52</small></a><a href="/dsa/tries/" title="Tries" class=""><span>Tries</span><small>8</small></a><a href="/dsa/heap/" title="Heap / Priority Queue" class=""><span>Heap / Priority Queue</span><small>24</small></a><a href="/dsa/backtracking/" title="Backtracking" class=""><span>Backtracking</span><small>23</small></a><a href="/dsa/graphs/" title="Graphs" class="on"><span>Graphs</span><small>37</small></a><a href="/dsa/advanced-graphs/" title="Advanced Graphs" class=""><span>Advanced Graphs</span><small>18</small></a><a href="/dsa/dp-1d/" title="1-D DP" class=""><span>1-D DP</span><small>29</small></a><a href="/dsa/dp-2d/" title="2-D DP" class=""><span>2-D DP</span><small>28</small></a><a href="/dsa/greedy/" title="Greedy" class=""><span>Greedy</span><small>22</small></a><a href="/dsa/intervals/" title="Intervals" class=""><span>Intervals</span><small>13</small></a><a href="/dsa/math-geometry/" title="Math &amp; Geometry" class=""><span>Math &amp; Geometry</span><small>22</small></a><a href="/dsa/bit-manipulation/" title="Bit Manipulation" class=""><span>Bit Manipulation</span><small>15</small></a><a href="/dsa/range-queries/" title="Prefix Sums &amp; Range Queries" class=""><span>Prefix Sums &amp; Range Queries</span><small>10</small></a><a href="/dsa/design/" title="Design" class=""><span>Design</span><small>19</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/dsa/">Algorithms</a> › <a href="/dsa/graphs/">Graphs</a></div><h1>210. Course Schedule II</h1><div class="meta"><a class="badge Medium" href="/browse/?d=Medium" title="All Medium problems">Medium</a><a href="https://leetcode.com/problems/course-schedule-ii/" target="_blank" rel="noopener">LeetCode ↗</a><a class="tag" href="/browse/?tag=topological-sort" title="Browse problems tagged topological-sort">topological-sort</a><label class="done"><input type="checkbox" data-k="dsa/course-schedule-ii"> Done</label></div><div class="asked"><span class="flabel" title="Company data: liquidslr/leetcode-company-wise-problems (2026-10-20). Frequency is relative within each company (100 = that company&#x27;s most-asked problem).">Asked at 36</span><a class="co hot" href="/browse/?co=Apple&sort=freq" title="Apple: frequency 74 all time, 73 in the last 6 months">Apple<span>74</span></a><a class="co hot" href="/browse/?co=Amazon&sort=freq" title="Amazon: frequency 65 all time, 51 in the last 6 months">Amazon<span>65</span></a><a class="co hot" href="/browse/?co=Microsoft&sort=freq" title="Microsoft: frequency 50 all time, 25 in the last 6 months">Microsoft<span>50</span></a><a class="co" href="/browse/?co=Meta&sort=freq" title="Meta: frequency 45 all time">Meta<span>45</span></a><a class="co hot" href="/browse/?co=Bloomberg&sort=freq" title="Bloomberg: frequency 42 all time, 34 in the last 6 months">Bloomberg<span>42</span></a><a class="co hot" href="/browse/?co=Google&sort=freq" title="Google: frequency 37 all time, 31 in the last 6 months">Google<span>37</span></a><a class="co hot" href="/browse/?co=Anduril&sort=freq" title="Anduril: frequency 83 all time, 97 in the last 6 months">Anduril<span>83</span></a><a class="co hot" href="/browse/?co=MongoDB&sort=freq" title="MongoDB: frequency 78 all time, 89 in the last 6 months">MongoDB<span>78</span></a><a class="co hot" href="/browse/?co=Citadel&sort=freq" title="Citadel: frequency 69 all time, 67 in the last 6 months">Citadel<span>69</span></a><a class="co hot" href="/browse/?co=Audible&sort=freq" title="Audible: frequency 69 all time, 100 in the last 6 months">Audible<span>69</span></a><a class="co hot" href="/browse/?co=Salesforce&sort=freq" title="Salesforce: frequency 63 all time, 72 in the last 6 months">Salesforce<span>63</span></a><a class="co hot" href="/browse/?co=Walmart+Labs&sort=freq" title="Walmart Labs: frequency 60 all time, 64 in the last 6 months">Walmart Labs<span>60</span></a><a class="co extra hot" href="/browse/?co=Visa&sort=freq" title="Visa: frequency 39 all time, 74 in the last 6 months">Visa<span>39</span></a><a class="co extra" href="/browse/?co=Zenefits&sort=freq" title="Zenefits: frequency 100 all time">Zenefits<span>100</span></a><a class="co extra" href="/browse/?co=instabase&sort=freq" title="instabase: frequency 100 all time">instabase<span>100</span></a><a class="co extra" href="/browse/?co=Snowflake&sort=freq" title="Snowflake: frequency 97 all time">Snowflake<span>97</span></a><a class="co extra" href="/browse/?co=Netflix&sort=freq" title="Netflix: frequency 89 all time">Netflix<span>89</span></a><a class="co extra" href="/browse/?co=Snap&sort=freq" title="Snap: frequency 83 all time">Snap<span>83</span></a><a class="co extra" href="/browse/?co=Roblox&sort=freq" title="Roblox: frequency 82 all time">Roblox<span>82</span></a><a class="co extra" href="/browse/?co=Moloco&sort=freq" title="Moloco: frequency 81 all time">Moloco<span>81</span></a><a class="co extra" href="/browse/?co=Arista+Networks&sort=freq" title="Arista Networks: frequency 78 all time">Arista Networks<span>78</span></a><a class="co extra" href="/browse/?co=Aurora&sort=freq" title="Aurora: frequency 77 all time">Aurora<span>77</span></a><a class="co extra" href="/browse/?co=Nutanix&sort=freq" title="Nutanix: frequency 71 all time">Nutanix<span>71</span></a><a class="co extra" href="/browse/?co=TikTok&sort=freq" title="TikTok: frequency 71 all time">TikTok<span>71</span></a><a class="co extra" href="/browse/?co=Remitly&sort=freq" title="Remitly: frequency 70 all time">Remitly<span>70</span></a><a class="co extra" href="/browse/?co=Uber&sort=freq" title="Uber: frequency 66 all time">Uber<span>66</span></a><a class="co extra" href="/browse/?co=Qualcomm&sort=freq" title="Qualcomm: frequency 58 all time">Qualcomm<span>58</span></a><a class="co extra" href="/browse/?co=Coinbase&sort=freq" title="Coinbase: frequency 51 all time">Coinbase<span>51</span></a><a class="co extra" href="/browse/?co=LinkedIn&sort=freq" title="LinkedIn: frequency 49 all time">LinkedIn<span>49</span></a><a class="co extra" href="/browse/?co=Oracle&sort=freq" title="Oracle: frequency 49 all time">Oracle<span>49</span></a><a class="co extra" href="/browse/?co=DoorDash&sort=freq" title="DoorDash: frequency 48 all time">DoorDash<span>48</span></a><a class="co extra" href="/browse/?co=Intuit&sort=freq" title="Intuit: frequency 43 all time">Intuit<span>43</span></a><a class="co extra" href="/browse/?co=Flipkart&sort=freq" title="Flipkart: frequency 43 all time">Flipkart<span>43</span></a><a class="co extra" href="/browse/?co=Nvidia&sort=freq" title="Nvidia: frequency 39 all time">Nvidia<span>39</span></a><a class="co extra" href="/browse/?co=Goldman+Sachs&sort=freq" title="Goldman Sachs: frequency 36 all time">Goldman Sachs<span>36</span></a><a class="co extra" href="/browse/?co=IBM&sort=freq" title="IBM: frequency 35 all time">IBM<span>35</span></a><button id="comore" class="co more">+24 more</button></div><div class="split"><div class="desc"><div id="body"><div class="md"><p>Same Kahn&#x27;s algorithm, but record the order nodes are taken. If fewer than n are taken → cycle → <code>[]</code>.</p><p><strong>Complexity:</strong> O(V + E).</p></div></div><div class="related"><h3>Related problems</h3><div class="chips"><a href="/dsa/graphs/course-schedule/"><i class="dot Medium"></i>207. Course Schedule</a><a href="/dsa/advanced-graphs/alien-dictionary/"><i class="dot Hard"></i>269. Alien Dictionary</a></div></div></div><div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button><button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div><div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button><button data-l="go">Go</button><span class="sp"></span><button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div><div class="scroll"><pre><code id="src" class="language-python">class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -&gt; List[int]:
+        g, indeg = defaultdict(list), [0] * numCourses
+        for a, b in prerequisites:
+            g[b].append(a)
+            indeg[a] += 1
+        q = deque(i for i in range(numCourses) if indeg[i] == 0)
+        order = []
+        while q:
+            u = q.popleft()
+            order.append(u)
+            for v in g[u]:
+                indeg[v] -= 1
+                if indeg[v] == 0:
+                    q.append(v)
+        return order if len(order) == numCourses else []
+</code></pre><pre class="test" hidden><code id="tsrc"># any valid topological order is accepted
+def valid(n, pre, order):
+    pos = {c: i for i, c in enumerate(order)}
+    return len(order) == n == len(pos) and all(pos[b] &lt; pos[a] for a, b in pre)
+assert valid(4, [[1, 0], [2, 0], [3, 1], [3, 2]], Solution().findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]))
+assert valid(2, [[1, 0]], Solution().findOrder(2, [[1, 0]]))
+assert Solution().findOrder(2, [[0, 1], [1, 0]]) == []
+</code></pre><pre hidden><code class="language-java">class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        List&lt;List&lt;Integer&gt;&gt; g = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; numCourses; i++) g.add(new ArrayList&lt;&gt;());
+        int[] indeg = new int[numCourses], order = new int[numCourses];
+        for (int[] p : prerequisites) { g.get(p[1]).add(p[0]); indeg[p[0]]++; }
+        Deque&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+        for (int i = 0; i &lt; numCourses; i++) if (indeg[i] == 0) q.add(i);
+        int k = 0;
+        while (!q.isEmpty()) {
+            int u = q.poll();
+            order[k++] = u;
+            for (int v : g.get(u)) if (--indeg[v] == 0) q.add(v);
+        }
+        return k == numCourses ? order : new int[0];
+    }
+}
+</code></pre><pre hidden><code class="language-go">func findOrder(numCourses int, prerequisites [][]int) []int {
+	g, indeg := make([][]int, numCourses), make([]int, numCourses)
+	for _, p := range prerequisites {
+		g[p[1]] = append(g[p[1]], p[0])
+		indeg[p[0]]++
+	}
+	q := []int{}
+	for i, d := range indeg {
+		if d == 0 {
+			q = append(q, i)
+		}
+	}
+	order := []int{}
+	for len(q) &gt; 0 {
+		u := q[0]
+		q = q[1:]
+		order = append(order, u)
+		for _, v := range g[u] {
+			if indeg[v]--; indeg[v] == 0 {
+				q = append(q, v)
+			}
+		}
+	}
+	if len(order) &lt; numCourses {
+		return []int{}
+	}
+	return order
+}
+</code></pre></div></div></div></div><div class="pager"><span><a href="/dsa/graphs/course-schedule/">← Course Schedule</a></span><span><a href="/dsa/graphs/redundant-connection/">Redundant Connection →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

@@ -1,14 +1,18 @@
 This repository is released under two licenses: one for code, one for writing.
 
 1. CODE: MIT License (full text below)
-   All source code: build.py, tools/, python/, java/, go/, index.html, assets/app.js,
-   assets/style.css, assets/judge.py, assets/py-worker.js, assets/go-worker.js, and every
-   code block inside the Markdown files in content/.
+   All source code: build.py, tools/, python/, java/, go/, assets/app.js, assets/style.css,
+   assets/judge.py, assets/py-worker.js, assets/go-worker.js, and every code block inside the
+   Markdown files in content/. Also the site icons and preview image (favicon.svg, favicon.ico,
+   apple-touch-icon.png, assets/og.png).
 
 2. WRITING: Creative Commons Attribution 4.0 International (CC BY 4.0)
    The prose in content/: problem explanations, ASCII sketches, system design and ML/DL articles.
    License text: https://creativecommons.org/licenses/by/4.0/legalcode
    Attribute as: "SDE & MLE Prep (https://mleprep.github.io/)".
+
+   The generated pages (index.html, 404.html, dsa/, system-design/, ml/, browse/) combine the
+   two: their prose is CC BY 4.0 and their code is MIT, as in content/.
 
 NOT COVERED BY EITHER LICENSE
 

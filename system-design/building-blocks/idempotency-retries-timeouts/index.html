@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Idempotency, Retries &amp; Timeouts – System Design | SDE &amp; MLE Prep</title>
+<meta name="description" content="Networks fail mid-request → clients retry → servers must make operations idempotent. Idempotency key: client sends a unique key (Idempotency-Key: &lt;uuid&gt;)…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/building-blocks/idempotency-retries-timeouts/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Idempotency, Retries &amp; Timeouts – System Design | SDE &amp; MLE Prep">
+<meta property="og:description" content="Networks fail mid-request → clients retry → servers must make operations idempotent. Idempotency key: client sends a unique key (Idempotency-Key: &lt;uuid&gt;)…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/building-blocks/idempotency-retries-timeouts/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"Building Blocks","item":"https://mleprep.github.io/system-design/building-blocks/"},{"@type":"ListItem","position":3,"name":"Idempotency, Retries & Timeouts","item":"https://mleprep.github.io/system-design/building-blocks/idempotency-retries-timeouts/"}]},{"@type":"TechArticle","headline":"Idempotency, Retries & Timeouts – System Design","name":"Idempotency, Retries & Timeouts","description":"Networks fail mid-request → clients retry → servers must make operations idempotent. Idempotency key: client sends a unique key (Idempotency-Key: <uuid>)…","url":"https://mleprep.github.io/system-design/building-blocks/idempotency-retries-timeouts/","mainEntityOfPage":"https://mleprep.github.io/system-design/building-blocks/idempotency-retries-timeouts/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class=""><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class="on"><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class=""><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class=""><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class=""><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/building-blocks/">Building Blocks</a></div><h1>Idempotency, Retries &amp; Timeouts</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/idempotency-retries-timeouts"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><ul><li>Networks fail mid-request → clients <strong>retry</strong> → servers must make operations <strong>idempotent</strong>.</li><li><strong>Idempotency key</strong>: client sends a unique key (<code>Idempotency-Key: &lt;uuid&gt;</code>); server stores key → result and returns the saved result on repeats. Essential for payments.</li><li>Retries: <strong>exponential back-off + jitter</strong>, cap the number, and only retry idempotent/safe operations.</li><li><strong>Timeouts</strong> everywhere; <strong>circuit breakers</strong> stop hammering a failing dependency; <strong>bulkheads</strong> isolate resources.</li><li>Distributed transactions: avoid 2PC across services; use <strong>sagas</strong> (sequence of local transactions with compensating actions) and the <strong>outbox pattern</strong> (write the event to an outbox table in the same DB transaction, relay it to the queue).</li></ul></div></div><nav class="rail"><h4>In Building Blocks</h4><a href="/system-design/building-blocks/scaling-vertical-vs-horizontal/" class="">Scaling: Vertical vs Horizontal</a><a href="/system-design/building-blocks/load-balancing/" class="">Load Balancing</a><a href="/system-design/building-blocks/caching/" class="">Caching</a><a href="/system-design/building-blocks/cdn/" class="">CDN</a><a href="/system-design/building-blocks/sql-vs-nosql/" class="">SQL vs NoSQL</a><a href="/system-design/building-blocks/replication/" class="">Replication</a><a href="/system-design/building-blocks/sharding-partitioning/" class="">Sharding (Partitioning)</a><a href="/system-design/building-blocks/consistent-hashing/" class="">Consistent Hashing</a><a href="/system-design/building-blocks/cap-and-pacelc/" class="">CAP and PACELC</a><a href="/system-design/building-blocks/consistency-models/" class="">Consistency Models</a><a href="/system-design/building-blocks/message-queues-event-streams/" class="">Message Queues &amp; Event Streams</a><a href="/system-design/building-blocks/rate-limiting-algorithms/" class="">Rate Limiting Algorithms</a><a href="/system-design/building-blocks/database-indexes-b-tree-vs-lsm-tree/" class="">Database Indexes: B-Tree vs LSM-Tree</a><a href="/system-design/building-blocks/unique-id-generation/" class="">Unique ID Generation</a><a href="/system-design/building-blocks/idempotency-retries-timeouts/" class="on">Idempotency, Retries &amp; Timeouts</a><a href="/system-design/building-blocks/observability-reliability/" class="">Observability &amp; Reliability</a><a href="/system-design/building-blocks/real-time-updates-polling-sse-websockets/" class="">Real-Time Updates: Polling, SSE, WebSockets</a><a href="/system-design/building-blocks/api-design/" class="">API Design</a><a href="/system-design/building-blocks/probabilistic-data-structures/" class="">Probabilistic Data Structures</a><a href="/system-design/building-blocks/search-inverted-indexes/" class="">Search &amp; Inverted Indexes</a><a href="/system-design/building-blocks/batch-vs-stream-processing/" class="">Batch vs Stream Processing</a><a href="/system-design/building-blocks/geospatial-indexing/" class="">Geospatial Indexing</a><a href="/system-design/building-blocks/distributed-transactions/" class="">Distributed Transactions</a><a href="/system-design/building-blocks/consensus-leader-election/" class="">Consensus &amp; Leader Election</a><a href="/system-design/building-blocks/microservices-api-gateway-service-discovery/" class="">Microservices, API Gateway &amp; Service Discovery</a><a href="/system-design/building-blocks/authentication-authorization/" class="">Authentication &amp; Authorization</a><a href="/system-design/building-blocks/choosing-a-database/" class="">Choosing a Database</a></nav></div><div class="pager"><span><a href="/system-design/building-blocks/unique-id-generation/">← Unique ID Generation</a></span><span><a href="/system-design/building-blocks/observability-reliability/">Observability &amp; Reliability →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

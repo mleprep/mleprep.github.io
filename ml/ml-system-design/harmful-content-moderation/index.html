@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harmful Content Moderation – ML Interview | SDE &amp; MLE Prep</title>
+<meta name="description" content="Goal: detect policy-violating posts (hate, violence, spam, nudity) across text, images and video at platform scale. Multimodal classifiers (text encoder +…">
+<link rel="canonical" href="https://mleprep.github.io/ml/ml-system-design/harmful-content-moderation/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Harmful Content Moderation – ML Interview | SDE &amp; MLE Prep">
+<meta property="og:description" content="Goal: detect policy-violating posts (hate, violence, spam, nudity) across text, images and video at platform scale. Multimodal classifiers (text encoder +…">
+<meta property="og:url" content="https://mleprep.github.io/ml/ml-system-design/harmful-content-moderation/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ML / Deep Learning","item":"https://mleprep.github.io/ml/"},{"@type":"ListItem","position":2,"name":"ML System Design","item":"https://mleprep.github.io/ml/ml-system-design/"},{"@type":"ListItem","position":3,"name":"Harmful Content Moderation","item":"https://mleprep.github.io/ml/ml-system-design/harmful-content-moderation/"}]},{"@type":"TechArticle","headline":"Harmful Content Moderation – ML Interview","name":"Harmful Content Moderation","description":"Goal: detect policy-violating posts (hate, violence, spam, nudity) across text, images and video at platform scale. Multimodal classifiers (text encoder +…","url":"https://mleprep.github.io/ml/ml-system-design/harmful-content-moderation/","mainEntityOfPage":"https://mleprep.github.io/ml/ml-system-design/harmful-content-moderation/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="">System Design</a><a href="/ml/" class="on">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>ML / Deep Learning</h4><a href="/ml/ml-fundamentals/" title="ML Fundamentals" class=""><span>ML Fundamentals</span><small>24</small></a><a href="/ml/deep-learning/" title="Deep Learning" class=""><span>Deep Learning</span><small>19</small></a><a href="/ml/llms/" title="LLMs &amp; GenAI" class=""><span>LLMs &amp; GenAI</span><small>16</small></a><a href="/ml/ml-coding/" title="ML Coding from Scratch" class=""><span>ML Coding from Scratch</span><small>25</small></a><a href="/ml/ml-system-design/" title="ML System Design" class="on"><span>ML System Design</span><small>18</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/ml/">ML / Deep Learning</a> › <a href="/ml/ml-system-design/">ML System Design</a></div><h1>Harmful Content Moderation</h1><div class="meta"><label class="done"><input type="checkbox" data-k="ml/harmful-content-moderation"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Goal</strong>: detect policy-violating posts (hate, violence, spam, nudity) across text, images and video at platform scale.</p><ul><li><strong>Multimodal</strong> classifiers (text encoder + image/video encoder, fused) with multi-label heads per policy.</li><li><strong>Pipeline</strong>: hash matching for known bad content (PhotoDNA-style perceptual hashes) → fast classifiers on every post → expensive models / LLMs on borderline cases → human review queue prioritized by severity × reach.</li><li>Thresholds per policy and region; precision-focused auto-removal, recall-focused human review.</li><li>Active learning from reviewer decisions; adversarial robustness (text obfuscation, image perturbations); fairness audits across languages and groups.</li><li>Metrics: prevalence (views of violating content per 10k views), proactive detection rate, appeal overturn rate.</li></ul></div></div><nav class="rail"><h4>In ML System Design</h4><a href="/ml/ml-system-design/ml-system-design-framework/" class="">ML System Design Framework</a><a href="/ml/ml-system-design/recommendation-system-youtube-netflix-tiktok/" class="">Recommendation System (YouTube / Netflix / TikTok)</a><a href="/ml/ml-system-design/search-ranking/" class="">Search Ranking</a><a href="/ml/ml-system-design/ads-click-through-rate-prediction/" class="">Ads Click-Through Rate Prediction</a><a href="/ml/ml-system-design/fraud-detection/" class="">Fraud Detection</a><a href="/ml/ml-system-design/harmful-content-moderation/" class="on">Harmful Content Moderation</a><a href="/ml/ml-system-design/feature-stores-trainingserving-skew/" class="">Feature Stores &amp; Training–Serving Skew</a><a href="/ml/ml-system-design/ab-testing-online-experimentation/" class="">A/B Testing &amp; Online Experimentation</a><a href="/ml/ml-system-design/model-monitoring-drift/" class="">Model Monitoring &amp; Drift</a><a href="/ml/ml-system-design/people-you-may-know-friend-recommendation/" class="">People You May Know (Friend Recommendation)</a><a href="/ml/ml-system-design/visual-search-search-by-image/" class="">Visual Search (Search by Image)</a><a href="/ml/ml-system-design/eta-prediction-maps-food-delivery/" class="">ETA Prediction (Maps / Food Delivery)</a><a href="/ml/ml-system-design/llm-powered-support-assistant/" class="">LLM-Powered Support Assistant</a><a href="/ml/ml-system-design/news-feed-ranking-facebook-linkedin/" class="">News Feed Ranking (Facebook / LinkedIn)</a><a href="/ml/ml-system-design/similar-listings-airbnb-item-to-item-recommendations/" class="">Similar Listings (Airbnb / Item-to-Item Recommendations)</a><a href="/ml/ml-system-design/street-view-blurring-object-detection-system/" class="">Street View Blurring (Object Detection System)</a><a href="/ml/ml-system-design/gmail-smart-compose-text-autocomplete/" class="">Gmail Smart Compose (Text Autocomplete)</a><a href="/ml/ml-system-design/text-to-image-generation-service/" class="">Text-to-Image Generation Service</a></nav></div><div class="pager"><span><a href="/ml/ml-system-design/fraud-detection/">← Fraud Detection</a></span><span><a href="/ml/ml-system-design/feature-stores-trainingserving-skew/">Feature Stores &amp; Training–Serving Skew →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

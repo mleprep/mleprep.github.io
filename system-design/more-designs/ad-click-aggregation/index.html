@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad Click Aggregation – System Design | SDE &amp; MLE Prep</title>
+<meta name="description" content="Requirements: count clicks per ad per minute in near real time (for billing and dashboards), ~10 B clicks/day, exact (billing!), handle late and duplicate…">
+<link rel="canonical" href="https://mleprep.github.io/system-design/more-designs/ad-click-aggregation/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SDE &amp; MLE Prep">
+<meta property="og:title" content="Ad Click Aggregation – System Design | SDE &amp; MLE Prep">
+<meta property="og:description" content="Requirements: count clicks per ad per minute in near real time (for billing and dashboards), ~10 B clicks/day, exact (billing!), handle late and duplicate…">
+<meta property="og:url" content="https://mleprep.github.io/system-design/more-designs/ad-click-aggregation/">
+<meta property="og:image" content="https://mleprep.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SDE &amp; MLE Prep: LeetCode, system design and ML interview prep">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Design","item":"https://mleprep.github.io/system-design/"},{"@type":"ListItem","position":2,"name":"More Designs","item":"https://mleprep.github.io/system-design/more-designs/"},{"@type":"ListItem","position":3,"name":"Ad Click Aggregation","item":"https://mleprep.github.io/system-design/more-designs/ad-click-aggregation/"}]},{"@type":"TechArticle","headline":"Ad Click Aggregation – System Design","name":"Ad Click Aggregation","description":"Requirements: count clicks per ad per minute in near real time (for billing and dashboards), ~10 B clicks/day, exact (billing!), handle late and duplicate…","url":"https://mleprep.github.io/system-design/more-designs/ad-click-aggregation/","mainEntityOfPage":"https://mleprep.github.io/system-design/more-designs/ad-click-aggregation/","inLanguage":"en","isAccessibleForFree":true,"image":"https://mleprep.github.io/assets/og.png","license":"https://creativecommons.org/licenses/by/4.0/","author":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"publisher":{"@type":"Organization","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"},"isPartOf":{"@type":"WebSite","name":"SDE & MLE Prep","url":"https://mleprep.github.io/"}}]}</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..750&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<script>try{const t=JSON.parse(localStorage.getItem('lc-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="menu" class="icon" aria-label="Toggle topics">☰</button>
+  <a href="/" class="brand">SDE &amp; MLE <b>Prep</b></a>
+  <nav id="sections"><a href="/dsa/" class="">Algorithms</a><a href="/system-design/" class="on">System Design</a><a href="/ml/" class="">ML / Deep Learning</a></nav>
+  <input id="q" type="search" placeholder="Search  /" autocomplete="off" aria-label="Search">
+  <button id="theme" class="icon" aria-label="Toggle theme">◐</button>
+</header>
+<div class="layout">
+  <aside id="side"><h4>System Design</h4><a href="/system-design/framework/" title="Framework &amp; Estimation" class=""><span>Framework &amp; Estimation</span><small>6</small></a><a href="/system-design/building-blocks/" title="Building Blocks" class=""><span>Building Blocks</span><small>27</small></a><a href="/system-design/patterns/" title="Common Patterns" class=""><span>Common Patterns</span><small>6</small></a><a href="/system-design/classic-designs/" title="Classic Designs" class=""><span>Classic Designs</span><small>15</small></a><a href="/system-design/more-designs/" title="More Designs" class="on"><span>More Designs</span><small>22</small></a></aside>
+  <main id="main"><div class="crumbs"><a href="/system-design/">System Design</a> › <a href="/system-design/more-designs/">More Designs</a></div><h1>Ad Click Aggregation</h1><div class="meta"><label class="done"><input type="checkbox" data-k="system-design/ad-click-aggregation"> Done</label></div><div class="artgrid"><div id="body" class="article"><div class="md"><p><strong>Requirements</strong>: count clicks per ad per minute in near real time (for billing and dashboards), ~10 B clicks/day, exact (billing!), handle late and duplicate events.</p><pre class="viz"><code class="language-viz">click logs -&gt; Kafka (partition by ad_id) -&gt; stream aggregator (Flink): tumbling 1-min windows,
+                                             watermarks for late events, dedupe by click_id
+                                                   |
+                                                   v
+                           aggregated (ad_id, minute, count) -&gt; OLAP store (Druid/ClickHouse/Pinot)
+raw events -&gt; data lake (S3) -&gt; nightly batch recomputation -&gt; reconcile with streaming results
+</code></pre><p><strong>Deep dives</strong>: <strong>exactly-once</strong> = Kafka transactions / checkpointed state (Flink) + idempotent sinks; <strong>event time vs processing time</strong> with watermarks and allowed lateness; <strong>hot ads</strong> → pre-aggregate with key salting then merge; <strong>Lambda vs Kappa</strong> architecture (batch reconciliation for billing correctness); top-N ads per minute with a min-heap per window.</p></div></div><nav class="rail"><h4>In More Designs</h4><a href="/system-design/more-designs/collaborative-editor-google-docs/" class="">Collaborative Editor (Google Docs)</a><a href="/system-design/more-designs/distributed-cache-redis-cluster-memcached/" class="">Distributed Cache (Redis Cluster / Memcached)</a><a href="/system-design/more-designs/proximity-service-yelp-nearby-places/" class="">Proximity Service (Yelp / Nearby Places)</a><a href="/system-design/more-designs/metrics-monitoring-alerting/" class="">Metrics Monitoring &amp; Alerting</a><a href="/system-design/more-designs/distributed-job-scheduler/" class="">Distributed Job Scheduler</a><a href="/system-design/more-designs/ad-click-aggregation/" class="on">Ad Click Aggregation</a><a href="/system-design/more-designs/hotel-reservation-booking-airbnb/" class="">Hotel Reservation (Booking / Airbnb)</a><a href="/system-design/more-designs/stock-exchange-order-matching/" class="">Stock Exchange (Order Matching)</a><a href="/system-design/more-designs/object-storage-amazon-s3/" class="">Object Storage (Amazon S3)</a><a href="/system-design/more-designs/email-service-gmail/" class="">Email Service (Gmail)</a><a href="/system-design/more-designs/live-comments-facebook-live-twitch-chat/" class="">Live Comments (Facebook Live / Twitch Chat)</a><a href="/system-design/more-designs/llm-inference-serving-chatgpt-like/" class="">LLM Inference Serving (ChatGPT-like)</a><a href="/system-design/more-designs/distributed-lock-service-zookeeper-chubby-etcd/" class="">Distributed Lock Service (ZooKeeper / Chubby / etcd)</a><a href="/system-design/more-designs/google-maps-navigation-routing/" class="">Google Maps (Navigation &amp; Routing)</a><a href="/system-design/more-designs/nearby-friends/" class="">Nearby Friends</a><a href="/system-design/more-designs/digital-wallet-balance-transfers/" class="">Digital Wallet (Balance Transfers)</a><a href="/system-design/more-designs/dating-app-tinder/" class="">Dating App (Tinder)</a><a href="/system-design/more-designs/online-judge-leetcode/" class="">Online Judge (LeetCode)</a><a href="/system-design/more-designs/post-search-facebook-twitter-search/" class="">Post Search (Facebook / Twitter Search)</a><a href="/system-design/more-designs/online-auction-ebay/" class="">Online Auction (eBay)</a><a href="/system-design/more-designs/food-delivery-doordash-uber-eats/" class="">Food Delivery (DoorDash / Uber Eats)</a><a href="/system-design/more-designs/top-k-trending-youtube-top-videos-heavy-hitters/" class="">Top-K Trending (YouTube Top Videos / Heavy Hitters)</a></nav></div><div class="pager"><span><a href="/system-design/more-designs/distributed-job-scheduler/">← Distributed Job Scheduler</a></span><span><a href="/system-design/more-designs/hotel-reservation-booking-airbnb/">Hotel Reservation (Booking / Airbnb) →</a></span></div></main>
+  <footer class="foot">
+    <p>Not affiliated with or endorsed by LeetCode. Problem statements belong to LeetCode, and every problem links to its page there. The explanations, solutions and articles on this site are original.</p>
+    <p>Code <a href="https://github.com/mleprep/mleprep.github.io/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a> · Writing <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · <a href="https://github.com/mleprep/mleprep.github.io" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>
