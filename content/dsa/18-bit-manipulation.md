@@ -6,7 +6,7 @@
 | `x & -x` | isolate the lowest set bit |
 | `a ^ a = 0`, `a ^ 0 = a` | XOR cancels pairs → find the unique element |
 | `(x >> i) & 1` | read bit i |
-| `x | (1 << i)`, `x & ~(1 << i)` | set / clear bit i |
+| `x \| (1 << i)`, `x & ~(1 << i)` | set / clear bit i |
 
 **Python caveat:** ints are unbounded — emulate 32-bit with `& 0xFFFFFFFF` and convert back with `x if x < 2**31 else x - 2**32`.
 

@@ -29,7 +29,7 @@ Key facts: gradients of a linear layer `y = xW` are `dW = xᵀ·dy`, `dx = dy·W
 | Leaky ReLU / ELU | small slope for x<0 | avoids dead units |
 | GELU / SiLU (Swish) | `x·Φ(x)`, `x·σ(x)` | smooth; standard in transformers |
 
-Deep chains multiply many Jacobians: norms < 1 → **vanishing**, > 1 → **exploding**. Fixes: ReLU-family activations, careful **initialization** (Xavier/Glorot for tanh, **He/Kaiming** for ReLU), **normalization layers**, **residual connections** (gradient highway), **gradient clipping** (exploding, esp. RNNs), LSTM/GRU gating.
+Deep chains multiply many Jacobians: norms below 1 → **vanishing**, above 1 → **exploding**. Fixes: ReLU-family activations, careful **initialization** (Xavier/Glorot for tanh, **He/Kaiming** for ReLU), **normalization layers**, **residual connections** (gradient highway), **gradient clipping** (exploding, esp. RNNs), LSTM/GRU gating.
 
 ## Batch Norm vs Layer Norm
 
