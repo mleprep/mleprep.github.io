@@ -18,6 +18,14 @@ result: [1,6] [8,10] [15,18]
 related: 57, 435, 986
 tags: blind75, sort-by-start
 
+```problem
+Merge all overlapping intervals (intervals that merely touch, like [1,4] and [4,5], overlap too) and return the non-overlapping intervals that cover the same ranges.
+
+**Example:** `[[1,3],[2,6],[8,10],[15,18]]` → `[[1,6],[8,10],[15,18]]`
+
+**Constraints:** up to 10⁴ intervals.
+```
+
 Sort by start; if an interval starts before the last merged one ends, extend; otherwise start a new block.
 
 **Complexity:** O(n log n).
@@ -75,6 +83,12 @@ assertEq(merge([][]int{{1, 4}, {4, 5}}), [][]int{{1, 5}})
 ## 57. Insert Interval | Medium
 related: 56
 tags: blind75, sweep-line
+
+```problem
+`intervals` are non-overlapping and sorted by start. Insert `newInterval`, merging wherever necessary, and return the list, still sorted and non-overlapping.
+
+**Example:** `intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]` → `[[1,2],[3,10],[12,16]]`
+```
 
 Three phases on the already-sorted list: copy intervals ending before the new one; merge every overlapping interval into it; copy the rest.
 
@@ -140,6 +154,14 @@ assertEq(insert([][]int{}, []int{5, 7}), [][]int{{5, 7}})
 related: 452, 56
 tags: blind75, sort-by-end
 
+```problem
+Return the minimum number of intervals to remove so that the rest don't overlap. Intervals that only touch (like [1,2] and [2,3]) don't overlap.
+
+**Example:** `[[1,2],[2,3],[3,4],[1,3]]` → `1`; `[[1,2],[1,2],[1,2]]` → `2`
+
+**Constraints:** up to 10⁵ intervals.
+```
+
 Min removals = n − (max non-overlapping set). Greedy activity selection: sort by **end**, keep an interval if it starts at/after the last kept end.
 
 **Complexity:** O(n log n).
@@ -195,6 +217,14 @@ assertEq(eraseOverlapIntervals([][]int{{1, 2}, {2, 3}}), 0)
 related: 435
 tags: sort-by-end
 
+```problem
+Balloons are horizontal ranges `[xstart, xend]`. An arrow shot straight up at x bursts every balloon with xstart ≤ x ≤ xend. Return the minimum number of arrows needed to burst them all.
+
+**Example:** `[[10,16],[2,8],[1,6],[7,12]]` → `2` (shoot at x = 6 and x = 11)
+
+**Constraints:** up to 10⁵ balloons; coordinates span the full 32-bit range.
+```
+
 Sort by end; shoot at the first end. Every balloon starting ≤ that point is burst; the next balloon starting after it needs a new arrow at its end.
 
 **Complexity:** O(n log n).
@@ -248,6 +278,12 @@ assertEq(findMinArrowShots([][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}}), 4)
 related: 253, 56
 tags: blind75, premium
 
+```problem
+Given meeting time `intervals` `[start, end]`, decide whether one person could attend all of them. A meeting may start exactly when another ends.
+
+**Example:** `[[0,30],[5,10],[15,20]]` → `false`; `[[7,10],[2,4]]` → `true`
+```
+
 Sort by start; any meeting starting before the previous one ends is a conflict.
 
 **Complexity:** O(n log n).
@@ -293,6 +329,14 @@ assertEq(canAttendMeetings([][]int{{7, 10}, {2, 4}}), true)
 ## 253. Meeting Rooms II | Medium
 related: 252, 1851
 tags: blind75, sweep-line, premium
+
+```problem
+Given meeting time `intervals` `[start, end]`, return the minimum number of conference rooms needed to hold them all. A room freed at time t can host a meeting starting at t.
+
+**Example:** `[[0,30],[5,10],[15,20]]` → `2`; `[[7,10],[2,4]]` → `1`
+
+**Constraints:** up to 10⁴ meetings.
+```
 
 Max overlap at any time. **Sweep**: sort starts and ends separately; walk starts, freeing a room whenever the earliest end ≤ current start. (Equivalent: min-heap of end times.)
 
@@ -368,6 +412,12 @@ assertEq(minMeetingRooms([][]int{{7, 10}, {2, 4}}), 1)
 related: 56
 tags: two-pointers
 
+```problem
+Two lists of closed intervals are each sorted and pairwise disjoint. Return their intersection: every range covered by an interval from both lists.
+
+**Example:** `[[0,2],[5,10],[13,23],[24,25]]` and `[[1,5],[8,12],[15,24],[25,26]]` → `[[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]`
+```
+
 Two pointers over the two sorted lists. Intersection = `[max(starts), min(ends)]` if non-empty. Advance the list whose interval ends first.
 
 **Complexity:** O(m + n).
@@ -441,6 +491,14 @@ assertEq(intervalIntersection([][]int{{1, 7}}, [][]int{{3, 10}}), [][]int{{3, 7}
 ## 1851. Minimum Interval to Include Each Query | Hard
 related: 253, 56
 tags: offline-queries, heap
+
+```problem
+For each query point q, return the size (right − left + 1) of the smallest interval in `intervals` that contains q (left ≤ q ≤ right), or −1 if no interval does.
+
+**Example:** `intervals = [[1,4],[2,4],[3,6],[4,4]], queries = [2,3,4,5]` → `[3,3,1,4]`
+
+**Constraints:** up to 10⁵ intervals and 10⁵ queries.
+```
 
 Process queries **offline** in sorted order. Push every interval with `start ≤ q` into a min-heap keyed by size; pop intervals whose `end < q` (they're dead for all later queries too). Heap top is the answer.
 
@@ -539,6 +597,14 @@ assertEq(minInterval([][]int{{2, 3}, {2, 5}, {1, 8}, {20, 25}}, []int{2, 19, 5, 
 related: 56, 435
 tags: sort-by-start
 
+```problem
+Interval [a, b) is covered by [c, d) if c ≤ a and b ≤ d. Remove every interval covered by another one and return how many remain.
+
+**Example:** `[[1,4],[3,6],[2,8]]` → `2` ([3,6] is covered by [2,8])
+
+**Constraints:** up to 1000 intervals, all distinct.
+```
+
 Sort by start ascending and end **descending** (so a longer interval with the same start comes first). Sweep tracking the max end; an interval whose end ≤ max end is covered.
 
 **Complexity:** O(n log n).
@@ -593,6 +659,14 @@ assertEq(removeCoveredIntervals([][]int{{1, 4}, {2, 3}}), 1)
 ## 729. My Calendar I | Medium
 related: 731, 56
 tags: sorted-map, design
+
+```problem
+Design `MyCalendar` whose `book(start, end)` adds the event [start, end) and returns `true` if it doesn't overlap any booked event; otherwise it books nothing and returns `false`.
+
+**Example:** `book(10,20)` → true, `book(15,25)` → false, `book(20,30)` → true
+
+**Constraints:** up to 1000 calls.
+```
 
 Keep booked intervals sorted by start. A new `[s, e)` is fine iff it ends before the next booking starts and starts after the previous booking ends — one binary search (Java `TreeMap.floorKey/ceilingKey`).
 
@@ -676,6 +750,14 @@ assertEq([]bool{c2.Book(5, 10), c2.Book(10, 15), c2.Book(9, 11), c2.Book(0, 5), 
 ## 352. Data Stream as Disjoint Intervals | Hard
 related: 57, 228
 tags: sorted-map, merging
+
+```problem
+Design `SummaryRanges` for a stream of non-negative integers: `addNum(value)` adds a number and `getIntervals()` returns the numbers seen so far as a sorted list of disjoint intervals `[start, end]`.
+
+**Example:** add 1, 3, 7, 2, 6 → `getIntervals()` = `[[1,3],[6,7]]`
+
+**Constraints:** follow-up: many merges and few distinct intervals compared with the stream length.
+```
 
 Store disjoint intervals keyed by start in a sorted structure. On `addNum(v)`: find the interval ending at or after `v−1` from the left and the one starting at `v+1`; merge with either, both, or create `[v, v]`.
 
@@ -795,6 +877,12 @@ assertEq(out, [][][]int{{{1, 1}}, {{1, 1}, {3, 3}}, {{1, 1}, {3, 3}, {7, 7}}, {{
 related: 56, 986, 253
 tags: sweep-line, sort-by-start, premium
 
+```problem
+`schedule[i]` lists employee i's working intervals, sorted and non-overlapping. Return the finite intervals of positive length during which **all** employees are free, sorted.
+
+**Example:** `[[[1,2],[5,6]],[[1,3]],[[4,10]]]` → `[[3,4]]`
+```
+
 **Problem (Premium):** each employee has a sorted list of non-overlapping working `Interval`s. Return the finite intervals (positive length) when **everyone** is free, sorted.
 
 Nobody's identity matters: flatten all intervals, sort by start and sweep while tracking the furthest end so far. Any start beyond that end leaves a common gap `(end, start)`. (A min-heap k-way merge avoids the full sort: O(N log k).)
@@ -900,6 +988,14 @@ assertEq(free([][][]int{{{1, 2}, {8, 9}}, {{3, 4}}}), [][]int{{2, 3}, {4, 8}})
 ## 2402. Meeting Rooms III | Hard
 related: 253, 1834
 tags: two-heaps, simulation
+
+```problem
+Rooms 0…n − 1 host `meetings[i] = [start, end)` (all starts distinct). Each meeting takes the free room with the lowest number; if none is free, it waits for the earliest-freed room and keeps its duration, and waiting meetings are served in order of original start. Return the room that hosted the most meetings (ties: lowest number).
+
+**Example:** `n = 2, meetings = [[0,10],[1,5],[2,7],[3,4]]` → `0`
+
+**Constraints:** n ≤ 100; up to 10⁵ meetings.
+```
 
 Process meetings by start time with two min-heaps: **free rooms** by number and **busy rooms** by `(end time, room)`. Before each meeting, release rooms that have ended. If a room is free, use the lowest-numbered one; otherwise wait for the earliest-ending room (lowest number on ties) and **delay** the meeting, keeping its duration. Count uses per room.
 

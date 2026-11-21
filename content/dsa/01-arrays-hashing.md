@@ -20,6 +20,14 @@ for x in nums:
 related: 167, 15, 18, 560
 tags: blind75, hash-map
 
+```problem
+Given an integer array `nums` and an integer `target`, return the indices of the two elements that add up to `target`. Exactly one such pair exists, an element can't be paired with itself, and the indices may be returned in any order.
+
+**Example:** `nums = [2,7,11,15], target = 9` → `[0,1]`
+
+**Constraints:** 2 ≤ n ≤ 10⁴. Follow-up: do better than O(n²).
+```
+
 Scan once. For each `x`, the partner we need is `target - x`. If we've already seen it, we're done; otherwise remember `x → index`.
 
 ```viz
@@ -81,6 +89,14 @@ assertUnordered(twoSum([]int{3, 2, 4}, 6), []int{1, 2})
 related: 242, 128
 tags: blind75, hash-set
 
+```problem
+Return `true` if some value appears at least twice in the integer array `nums`, and `false` if all elements are distinct.
+
+**Example:** `[1,2,3,1]` → `true`; `[1,2,3,4]` → `false`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Insert into a set; if an element is already there, it's a duplicate.
 
 **Complexity:** O(n) time, O(n) space (sorting gives O(n log n) / O(1)).
@@ -131,6 +147,14 @@ assertEq(containsDuplicate([]int{1, 2, 3, 4}), false)
 ## 242. Valid Anagram | Easy
 related: 49, 438, 567
 tags: blind75, counting
+
+```problem
+Given two strings `s` and `t`, decide whether `t` is an anagram of `s`: the same letters with the same counts, possibly in a different order.
+
+**Example:** `s = "anagram", t = "nagaram"` → `true`; `s = "rat", t = "car"` → `false`
+
+**Constraints:** lowercase English letters; length ≤ 5·10⁴. Follow-up: what if the input is Unicode?
+```
 
 Anagrams have identical letter counts. Count up for `s`, down for `t`; every bucket must end at 0.
 
@@ -189,6 +213,14 @@ assertEq(isAnagram("rat", "car"), false)
 ## 49. Group Anagrams | Medium
 related: 242, 438
 tags: blind75, hash-map
+
+```problem
+Group the strings in `strs` so that words that are anagrams of each other end up in the same group. Groups and the words inside them may be in any order.
+
+**Example:** `["eat","tea","tan","ate","nat","bat"]` → `[["bat"],["nat","tan"],["ate","eat","tea"]]`
+
+**Constraints:** up to 10⁴ strings of length ≤ 100, lowercase letters.
+```
 
 Every anagram shares a **canonical key**: the sorted word (O(k log k)) or the 26-letter count tuple (O(k)). Group words by key.
 
@@ -262,6 +294,14 @@ assertEq(groupAnagrams([]string{"a"}), [][]string{{"a"}})
 ## 347. Top K Frequent Elements | Medium
 related: 215, 692, 973
 tags: blind75, bucket-sort, heap
+
+```problem
+Return the `k` values that occur most often in `nums`, in any order. The answer is guaranteed to be unique.
+
+**Example:** `nums = [1,1,1,2,2,3], k = 2` → `[1,2]`
+
+**Constraints:** n ≤ 10⁵. Follow-up: beat O(n log n).
+```
 
 Count, then **bucket sort by frequency**: `bucket[f]` holds numbers appearing `f` times (f ≤ n). Walk buckets from high to low until k numbers are collected. (A size-k min-heap gives O(n log k).)
 
@@ -342,6 +382,14 @@ assertEq(topKFrequent([]int{1}, 1), []int{1})
 related: 42, 152
 tags: blind75, prefix-product
 
+```problem
+Return an array `answer` where `answer[i]` is the product of every element of `nums` except `nums[i]`. Do it in O(n) **without using division**.
+
+**Example:** `[1,2,3,4]` → `[24,12,8,6]`
+
+**Constraints:** 2 ≤ n ≤ 10⁵; every prefix/suffix product fits in a 32-bit int. Follow-up: O(1) extra space (the output doesn't count).
+```
+
 `ans[i] = (product of everything left of i) × (product of everything right of i)`. Fill left products in one pass, then multiply by a running right product in a reverse pass. No division needed.
 
 ```viz
@@ -413,6 +461,12 @@ assertEq(productExceptSelf([]int{-1, 1, 0, -3, 3}), []int{0, 0, 9, 0, 0})
 ## 36. Valid Sudoku | Medium
 related: 37
 tags: hash-set, matrix
+
+```problem
+Given a partially filled 9×9 Sudoku `board` (digits `'1'`–`'9'` and `'.'` for empty), decide whether the filled cells are valid so far: no digit repeats within a row, a column, or any of the nine 3×3 boxes. The board doesn't have to be solvable.
+
+**Example:** a standard puzzle with no repeats → `true`; the same board with two `8`s in one 3×3 box → `false`
+```
 
 Keep a set for each row, column and 3×3 box. Box index = `(r // 3) * 3 + c // 3`. Any repeat → invalid.
 
@@ -493,6 +547,12 @@ assertEq(isValidSudoku(board), false)
 ## 271. Encode and Decode Strings | Medium
 related: 49
 tags: blind75, string, premium
+
+```problem
+Design a `Codec` with `encode(strs)`, which turns a list of strings into one string, and `decode(s)`, which recovers the exact original list. Strings may contain any character, including your delimiter, and may be empty.
+
+**Example:** `decode(encode(["neet","code","love","you"]))` → `["neet","code","love","you"]`
+```
 
 Any delimiter could appear inside a string, so prefix each string with its **length** and a separator: `"4#neet4#code"`. To decode, read digits up to `#`, then take exactly that many characters.
 
@@ -580,6 +640,14 @@ for _, data := range [][]string{{"neet", "code", "love", "you"}, {"we", "say", "
 related: 217
 tags: blind75, hash-set
 
+```problem
+Given an unsorted integer array `nums`, return the length of the longest run of consecutive integers (like 1, 2, 3, 4) whose values all appear in `nums`. The values don't need to be adjacent in the array.
+
+**Example:** `[100,4,200,1,3,2]` → `4` (the run 1, 2, 3, 4)
+
+**Constraints:** n ≤ 10⁵; must run in O(n).
+```
+
 Put everything in a set. Only start counting from numbers that begin a run (`x - 1` not in set), then walk `x+1, x+2, …`. Each number is visited at most twice → O(n).
 
 ```viz
@@ -655,6 +723,14 @@ assertEq(longestConsecutive([]int{0, 3, 7, 2, 5, 8, 4, 6, 0, 1}), 9)
 related: 347
 tags: boyer-moore
 
+```problem
+Return the majority element of `nums`, the value that appears more than ⌊n / 2⌋ times. It is guaranteed to exist.
+
+**Example:** `[2,2,1,1,1,2,2]` → `2`
+
+**Constraints:** n ≤ 5·10⁴. Follow-up: O(n) time and O(1) space.
+```
+
 **Boyer–Moore voting:** keep a candidate and a counter. Same value → +1, different → −1; at 0 adopt the current value. The majority (> n/2) can't be cancelled out.
 
 **Complexity:** O(n) time, O(1) space.
@@ -712,6 +788,14 @@ assertEq(majorityElement([]int{2, 2, 1, 1, 1, 2, 2}), 2)
 ## 560. Subarray Sum Equals K | Medium
 related: 1, 525, 437, 209
 tags: prefix-sum, hash-map
+
+```problem
+Count the contiguous, non-empty subarrays of `nums` whose elements sum to exactly `k`. Values may be negative.
+
+**Example:** `nums = [1,2,3], k = 3` → `2` (`[1,2]` and `[3]`)
+
+**Constraints:** n ≤ 2·10⁴; −1000 ≤ nums[i] ≤ 1000.
+```
 
 Subarray `(i, j]` sums to `k` iff `pre[j] - pre[i] = k`. While scanning, count how many earlier prefixes equal `pre - k`. Works with negatives (sliding window doesn't).
 
@@ -779,6 +863,14 @@ assertEq(subarraySum([]int{1, -1, 0}, 0), 3)
 ## 41. First Missing Positive | Hard
 related: 268, 287
 tags: in-place
+
+```problem
+Given an unsorted integer array `nums`, return the smallest positive integer that does not appear in it.
+
+**Example:** `[3,4,-1,1]` → `2`; `[1,2,0]` → `3`
+
+**Constraints:** n ≤ 10⁵; must run in O(n) time with O(1) extra space.
+```
 
 The answer is in `[1, n+1]`. Use the array as a hash table: **cyclic-swap** each value `v ∈ [1, n]` to index `v-1`. Then the first index `i` with `nums[i] != i+1` gives `i+1`.
 
@@ -857,6 +949,14 @@ assertEq(firstMissingPositive([]int{7, 8, 9, 11, 12}), 1)
 related: 48, 61
 tags: reverse-trick
 
+```problem
+Rotate the array `nums` to the right by `k` steps, in place: each element moves `k` positions right, wrapping around the end.
+
+**Example:** `nums = [1,2,3,4,5,6,7], k = 3` → `[5,6,7,1,2,3,4]`
+
+**Constraints:** n ≤ 10⁵; k can be larger than n. Follow-up: O(1) extra space.
+```
+
 Rotating right by k = reverse all, then reverse the first k, then reverse the rest.
 
 ```viz
@@ -931,6 +1031,14 @@ assertEq(b, []int{3, 99, -1, -100})
 related: 21, 977
 tags: two-pointers
 
+```problem
+`nums1` has length `m + n`: its first `m` values are sorted and the last `n` slots are zeros. Merge the sorted array `nums2` (length `n`) into `nums1` in place so that all `m + n` values end up sorted.
+
+**Example:** `nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3` → `nums1 = [1,2,2,3,5,6]`
+
+**Constraints:** follow-up: O(m + n) time.
+```
+
 Fill `nums1` **from the back**: the largest remaining element goes to position `k`. Working backwards never overwrites unread data.
 
 **Complexity:** O(m + n) time, O(1) space.
@@ -994,6 +1102,14 @@ assertEq(b, []int{1})
 ## 26. Remove Duplicates from Sorted Array | Easy
 related: 283, 88
 tags: two-pointers
+
+```problem
+Given a sorted array `nums`, remove the duplicates in place so each value appears once, keeping the original order. Return the number `k` of unique values; the first `k` slots of `nums` must hold them (what's after doesn't matter).
+
+**Example:** `[0,0,1,1,1,2,2,3,3,4]` → `5`, with `nums` starting `[0,1,2,3,4]`
+
+**Constraints:** O(1) extra space.
+```
 
 Slow pointer `k` marks the end of the unique prefix; fast pointer scans. Copy whenever a new value appears.
 
@@ -1061,6 +1177,12 @@ assertEq(c[:k], []int{7})
 related: 208
 tags: string
 
+```problem
+Return the longest string that is a prefix of every string in `strs`, or `""` if they share no common prefix.
+
+**Example:** `["flower","flow","flight"]` → `"fl"`; `["dog","racecar","car"]` → `""`
+```
+
 Vertical scan: compare column `i` of every string with the first string; stop at the first mismatch or end of any string.
 
 **Complexity:** O(total characters).
@@ -1115,6 +1237,12 @@ assertEq(longestCommonPrefix([]string{"ab", "abc"}), "ab")
 ## 205. Isomorphic Strings | Easy
 related: 242
 tags: hash-map
+
+```problem
+Two strings `s` and `t` of equal length are isomorphic if the characters of `s` can be replaced to get `t`, where each character maps to exactly one character, consistently, and no two characters map to the same one. Decide whether `s` and `t` are isomorphic.
+
+**Example:** `s = "egg", t = "add"` → `true`; `s = "foo", t = "bar"` → `false`
+```
 
 Need a **bijection**: map `s→t` and `t→s`. A conflict in either direction → false.
 
@@ -1174,6 +1302,14 @@ assertEq(isIsomorphic("badc", "baba"), false)
 ## 525. Contiguous Array | Medium
 related: 560
 tags: prefix-sum, hash-map
+
+```problem
+Given a binary array `nums`, return the length of the longest contiguous subarray containing equally many 0s and 1s.
+
+**Example:** `[0,1,1,0,1,1]` → `4` (`[0,1,1,0]`)
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Treat 0 as −1. A subarray with equal 0s and 1s has sum 0 ⇔ two equal prefix sums. Store the **first** index of each prefix; the longest span between equal prefixes wins.
 
@@ -1248,6 +1384,14 @@ assertEq(findMaxLength([]int{0, 1, 1, 0, 1, 1}), 4)
 ## 31. Next Permutation | Medium
 related: 46, 47
 tags: array
+
+```problem
+Rearrange `nums` in place into the next lexicographically greater permutation of its values. If it is already the largest permutation, wrap around to the smallest one (ascending order).
+
+**Example:** `[1,2,3]` → `[1,3,2]`; `[3,2,1]` → `[1,2,3]`; `[1,1,5]` → `[1,5,1]`
+
+**Constraints:** O(1) extra space.
+```
 
 From the right, find the first index `i` with `a[i] < a[i+1]` (the "pivot"). Swap it with the rightmost element larger than it, then reverse the suffix (it was descending → make it ascending). No pivot → reverse the whole array.
 
@@ -1329,6 +1473,12 @@ for _, tc := range [][2][]int{{{1, 2, 3}, {1, 3, 2}}, {{3, 2, 1}, {1, 2, 3}}, {{
 related: 62
 tags: dp
 
+```problem
+Return the first `numRows` rows of Pascal's triangle, where every number is the sum of the two numbers diagonally above it and each row starts and ends with 1.
+
+**Example:** `numRows = 5` → `[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]`
+```
+
 Each row starts and ends with 1; inner values are the sum of the two values above.
 
 **Complexity:** O(n²).
@@ -1385,6 +1535,12 @@ assertEq(generate(1), [][]int{{1}})
 related: 1
 tags: custom-sort
 
+```problem
+Arrange the non-negative integers in `nums` so that concatenating them forms the largest possible number, and return it as a string (no leading zeros, so all zeros give `"0"`).
+
+**Example:** `[3,30,34,5,9]` → `"9534330"`
+```
+
 Sort strings with the comparator "`a` before `b` if `a + b > b + a`". This ordering is transitive, so the concatenation is maximal. Edge case: all zeros → `"0"`.
 
 **Complexity:** O(n log n · L).
@@ -1436,6 +1592,12 @@ assertEq(largestNumber([]int{0, 0}), "0")
 ## 228. Summary Ranges | Easy
 related: 128
 tags: array
+
+```problem
+Given a sorted array of distinct integers, cover it exactly with the fewest ranges of consecutive numbers and return them as strings: `"a->b"` for a range with more than one value, `"a"` for a single value.
+
+**Example:** `[0,1,2,4,5,7]` → `["0->2","4->5","7"]`
+```
 
 Extend a run while the next number is consecutive; emit `"a->b"` or `"a"`.
 
@@ -1498,6 +1660,14 @@ assertEq(summaryRanges([]int{}), []string{})
 ## 274. H-Index | Medium
 related: 347
 tags: counting-sort
+
+```problem
+`citations[i]` is the citation count of a researcher's i-th paper. Return their h-index: the largest `h` such that at least `h` papers each have at least `h` citations.
+
+**Example:** `[3,0,6,1,5]` → `3`
+
+**Constraints:** n ≤ 5000.
+```
 
 h ≤ n, so bucket citations into `cnt[min(c, n)]`. Walk h from n down, accumulating papers with ≥ h citations; the first h where that count ≥ h is the answer.
 
@@ -1562,6 +1732,14 @@ assertEq(hIndex([]int{1, 3, 1}), 1)
 ## 289. Game of Life | Medium
 related: 73
 tags: matrix, in-place
+
+```problem
+Advance Conway's Game of Life one generation, in place. Each cell of `board` is live (1) or dead (0). A live cell with 2 or 3 live neighbours (of 8) survives, a dead cell with exactly 3 becomes live, and every other cell is dead next round. All cells update simultaneously.
+
+**Example:** `[[0,1,0],[0,0,1],[1,1,1],[0,0,0]]` → `[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]`
+
+**Constraints:** follow-up: update in place, without a copy of the board.
+```
 
 Update in place by storing the **next** state in bit 1 while bit 0 keeps the current state. Count live neighbours with `cell & 1`, then shift every cell right by one.
 
@@ -1645,6 +1823,14 @@ assertEq(b2, [][]int{{1, 1}, {1, 1}})
 related: 41, 268
 tags: in-place
 
+```problem
+`nums` has `n` values, each in the range [1, n]; some appear twice and others not at all. Return every number in [1, n] that is missing.
+
+**Example:** `[4,3,2,7,8,2,3,1]` → `[5,6]`
+
+**Constraints:** follow-up: O(n) time and no extra space besides the output.
+```
+
 Values are in `[1, n]`: for each value `v`, mark index `v−1` by making it negative. Indices that stay positive are the missing numbers.
 
 **Complexity:** O(n) time, O(1) extra space.
@@ -1706,6 +1892,14 @@ assertEq(findDisappearedNumbers([]int{1, 1}), []int{2})
 ## 523. Continuous Subarray Sum | Medium
 related: 560, 974
 tags: prefix-sum, hash-map
+
+```problem
+Decide whether `nums` has a contiguous subarray of length at least 2 whose sum is a multiple of `k` (0 counts as a multiple).
+
+**Example:** `nums = [23,2,4,6,7], k = 6` → `true` (`[2,4]` sums to 6)
+
+**Constraints:** n ≤ 10⁵; values are non-negative; 1 ≤ k ≤ 2³¹ − 1.
+```
 
 A subarray sum is a multiple of k ⇔ two prefix sums have the same remainder mod k. Store the **first** index of each remainder (seed `0 → −1`); a repeat at least 2 positions later wins.
 
@@ -1775,6 +1969,12 @@ assertEq(checkSubarraySum([]int{5, 0, 0, 0}, 3), true)
 related: 269
 tags: hash-map
 
+```problem
+An alien language uses the lowercase letters in a different order, given as the string `order`. Decide whether `words` is sorted lexicographically in that alphabet (a word sorts before any longer word it is a prefix of).
+
+**Example:** `words = ["hello","leetcode"], order = "hlabcdefgijkmnopqrstuvwxyz"` → `true`
+```
+
 Map each letter to its rank; compare adjacent words at their first differing character. If none differ, the shorter word must come first.
 
 **Complexity:** O(total characters).
@@ -1842,6 +2042,14 @@ assertEq(isAlienSorted([]string{"apple", "app"}, "abcdefghijklmnopqrstuvwxyz"), 
 related: 560, 523
 tags: prefix-sum, counting
 
+```problem
+Count the non-empty contiguous subarrays of `nums` whose sum is divisible by `k`. Values may be negative.
+
+**Example:** `nums = [4,5,0,-2,-3,1], k = 5` → `7`
+
+**Constraints:** n ≤ 3·10⁴; 2 ≤ k ≤ 10⁴.
+```
+
 Count pairs of prefix sums with equal remainder mod k. Normalize negative remainders (`((x % k) + k) % k` in Java).
 
 **Complexity:** O(n) time, O(k) space.
@@ -1900,6 +2108,14 @@ assertEq(subarraysDivByK([]int{5}, 9), 0)
 related: 242, 409
 tags: counting
 
+```problem
+Decide whether `ransomNote` can be spelled with letters cut from `magazine`, using each letter of `magazine` at most once.
+
+**Example:** `ransomNote = "aa", magazine = "aab"` → `true`; `ransomNote = "aa", magazine = "ab"` → `false`
+
+**Constraints:** lowercase English letters.
+```
+
 Count the magazine's letters once; every letter of the note must be available that many times.
 
 **Complexity:** O(m + n) time, O(1) space (26 letters).
@@ -1953,6 +2169,12 @@ assertEq(canConstruct("", "x"), true)
 ## 409. Longest Palindrome | Easy
 related: 383, 5, 266
 tags: counting, greedy
+
+```problem
+Return the length of the longest palindrome that can be built by rearranging (a subset of) the letters of `s`. Letters are case-sensitive, so `"Aa"` is not a palindrome.
+
+**Example:** `"abccccdd"` → `7` (e.g. `"dccaccd"`)
+```
 
 A palindrome uses characters in **pairs** (one on each side) plus at most **one** odd character in the middle. Sum the pairs; add 1 if any character is left over.
 
@@ -2010,6 +2232,12 @@ assertEq(longestPalindrome("bb"), 2)
 ## 58. Length of Last Word | Easy
 related: 151, 14
 tags: string
+
+```problem
+Return the length of the last word in `s`, where words are maximal runs of non-space characters. `s` may have leading, trailing or repeated spaces.
+
+**Example:** `"   fly me   to   the moon  "` → `4`
+```
 
 Scan from the end: skip trailing spaces, then count characters until the next space. No split, O(1) extra space.
 
@@ -2069,6 +2297,12 @@ assertEq(lengthOfLastWord("a"), 1)
 ## 6. Zigzag Conversion | Medium
 related: 54, 498
 tags: simulation, string
+
+```problem
+Write `s` in a zigzag over `numRows` rows (down the rows, then diagonally back up, repeatedly), then read the rows top to bottom and return the result.
+
+**Example:** `s = "PAYPALISHIRING", numRows = 3` → `"PAHNAPLSIIGYIR"` (rows `PAHN`, `APLSIIG`, `YIR`)
+```
 
 Simulate writing the zigzag: keep one buffer per row and a cursor that moves down, bounces at the last row, moves up, bounces at row 0. Reading the rows top to bottom gives the answer.
 
@@ -2163,6 +2397,14 @@ assertEq(convert("ABC", 2), "ACB")
 ## 28. Find the Index of the First Occurrence in a String | Easy
 related: 459, 214, 1392
 tags: string, kmp
+
+```problem
+Return the index of the first occurrence of `needle` in `haystack`, or `-1` if it doesn't occur.
+
+**Example:** `haystack = "sadbutsad", needle = "sad"` → `0`; `haystack = "leetcode", needle = "leeto"` → `-1`
+
+**Constraints:** lengths ≤ 10⁴.
+```
 
 The brute force (try every start, compare up to m chars) is O(n·m) and fine for the given limits — say so, then offer **KMP** for O(n + m): precompute `lps[i]` = length of the longest proper prefix of `needle[:i+1]` that is also its suffix. On a mismatch, fall back to `lps[k-1]` instead of restarting, so the haystack pointer never moves backwards.
 
@@ -2264,6 +2506,12 @@ assertEq(strStr("abc", "c"), 2)
 related: 205, 242
 tags: hash-map, bijection
 
+```problem
+Decide whether the words of `s` follow `pattern`: there must be a one-to-one mapping between pattern letters and words, so equal letters correspond to equal words and different letters to different words.
+
+**Example:** `pattern = "abba", s = "dog cat cat dog"` → `true`; `s = "dog cat cat fish"` → `false`
+```
+
 Same idea as Isomorphic Strings: the mapping letter ↔ word must be a **bijection**, so keep both directions and reject any conflict. Also reject different lengths.
 
 **Complexity:** O(n).
@@ -2339,6 +2587,12 @@ assertEq(wordPattern("aaa", "aa aa aa aa"), false)
 related: 2215
 tags: array
 
+```problem
+`candies[i]` is how many candies kid i has. For each kid, report whether giving them all `extraCandies` would leave them with at least as many candies as every other kid.
+
+**Example:** `candies = [2,3,5,1,3], extraCandies = 3` → `[true,true,true,false,true]`
+```
+
 A kid can become the (tied) maximum iff `candies[i] + extra >= max(candies)`.
 
 **Complexity:** O(n).
@@ -2388,6 +2642,12 @@ assertEq(kidsWithCandies([]int{12, 1, 12}, 10), []bool{true, false, true})
 ## 2215. Find the Difference of Two Arrays | Easy
 related: 349, 1431
 tags: hash-set
+
+```problem
+Return two lists: the distinct values of `nums1` that aren't in `nums2`, and the distinct values of `nums2` that aren't in `nums1`. Order within each list doesn't matter.
+
+**Example:** `nums1 = [1,2,3], nums2 = [2,4,6]` → `[[1,3],[4,6]]`
+```
 
 Set difference both ways: `set1 − set2` and `set2 − set1` (duplicates collapse automatically). Either list may be returned in any order.
 
@@ -2455,6 +2715,12 @@ assertEq(findDifference([]int{-1}, []int{-1}), [][]int{{}, {}})
 related: 1657, 451
 tags: counting
 
+```problem
+Return `true` if every distinct value in `arr` occurs a different number of times than every other value.
+
+**Example:** `[1,2,2,1,1,3]` → `true` (counts 3, 2, 1); `[1,2]` → `false`
+```
+
 Count each value, then check that no two values share a count: the number of distinct counts must equal the number of distinct values.
 
 **Complexity:** O(n).
@@ -2507,6 +2773,12 @@ assertEq(uniqueOccurrences([]int{-3, 0, 1, -3, 1, 1, 1, -3, 10, 0}), true)
 ## 1657. Determine if Two Strings Are Close | Medium
 related: 242, 1207
 tags: counting
+
+```problem
+Two strings are "close" if one can become the other using two operations any number of times: swap any two characters, or pick two letters that both occur and swap every occurrence of one with the other. Decide whether `word1` and `word2` are close.
+
+**Example:** `"cabbba"` and `"abbccc"` → `true`; `"a"` and `"aa"` → `false`
+```
 
 Operation 1 (swap) means order doesn't matter; operation 2 (swap two letters' roles) means the **multiset of counts** can be reassigned among letters already present. So: same **set of letters** and same **sorted list of counts**.
 
@@ -2572,6 +2844,14 @@ assertEq(closeStrings("uau", "ssx"), false)
 related: 36
 tags: hash-map
 
+```problem
+In the n×n matrix `grid`, count the pairs (row r, column c) where row r and column c contain the same values in the same order.
+
+**Example:** `[[3,2,1],[1,7,6],[2,7,7]]` → `1` (row 2 equals column 1)
+
+**Constraints:** n ≤ 200.
+```
+
 Hash every row as a tuple and count; then for each column (as a tuple) add how many rows equal it.
 
 **Complexity:** O(n²).
@@ -2632,6 +2912,12 @@ assertEq(equalPairs([][]int{{1}}), 1)
 related: 217, 1
 tags: array
 
+```problem
+Return an array of length 2n that is `nums` followed by another copy of `nums`.
+
+**Example:** `[1,2,1]` → `[1,2,1,1,2,1]`
+```
+
 Build `nums + nums`: allocate `2n` slots and write each element twice, at `i` and `i + n`.
 
 **Complexity:** O(n).
@@ -2672,6 +2958,14 @@ assertEq(getConcatenation([]int{5}), []int{5, 5})
 ## 912. Sort an Array | Medium
 related: 75, 148, 215
 tags: merge-sort, divide-and-conquer
+
+```problem
+Sort the integer array `nums` in ascending order and return it, without built-in sort functions, in O(n log n) time and with as little extra space as you can.
+
+**Example:** `[5,1,1,2,0,0]` → `[0,0,1,1,2,5]`
+
+**Constraints:** n ≤ 5·10⁴.
+```
 
 Built-in sort is off limits, so implement an O(n log n) sort. **Merge sort**: sort each half recursively, then merge the two sorted halves with two pointers (stable, guaranteed O(n log n), O(n) extra space). Quicksort is in-place but needs a random pivot to avoid O(n²) on sorted/duplicate-heavy input; heap sort is in-place and O(n log n) but not stable.
 
@@ -2763,6 +3057,14 @@ assertEq(sortArray(data), want)
 ## 229. Majority Element II | Medium
 related: 169
 tags: boyer-moore
+
+```problem
+Return every value that appears more than ⌊n / 3⌋ times in `nums` (there can be at most two), in any order.
+
+**Example:** `[3,2,3]` → `[3]`; `[1,2]` → `[1,2]`
+
+**Constraints:** follow-up: O(n) time and O(1) space.
+```
 
 At most **two** values can appear more than n/3 times. Extended Boyer–Moore voting keeps two candidates with counters: a match increments its counter, an empty slot adopts the value, otherwise both counters drop (cancelling a triple of distinct values). A second pass verifies the candidates' real counts.
 

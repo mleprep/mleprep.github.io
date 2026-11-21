@@ -26,6 +26,14 @@ while pq:
 related: 787, 1631
 tags: dijkstra
 
+```problem
+A network has nodes 1…n and directed edges `times[i] = [u, v, w]`: a signal takes `w` time to travel from u to v. Send a signal from node `k` and return how long it takes for every node to receive it, or −1 if some node never does.
+
+**Example:** `times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2` → `2`
+
+**Constraints:** n ≤ 100; up to 6000 edges.
+```
+
 Dijkstra from `k`; answer = max shortest distance, or −1 if some node is unreachable.
 
 **Complexity:** O(E log V).
@@ -132,6 +140,12 @@ assertEq(networkDelayTime([][]int{{1, 2, 1}}, 2, 2), -1)
 related: 743
 tags: bellman-ford
 
+```problem
+`flights[i] = [from, to, price]` are one-way flights between cities 0…n − 1. Return the cheapest price from `src` to `dst` using at most `k` stops (so at most k + 1 flights), or −1 if there is no such route.
+
+**Example:** `n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1` → `700` (0 → 1 → 3)
+```
+
 At most `k` stops = at most `k+1` edges → run `k+1` rounds of Bellman–Ford relaxation, each round relaxing from a **copy** of the previous distances (so one round adds at most one edge).
 
 ```viz
@@ -213,6 +227,14 @@ assertEq(findCheapestPrice(3, [][]int{{0, 1, 100}, {1, 2, 100}, {0, 2, 500}}, 0,
 ## 1584. Min Cost to Connect All Points | Medium
 related: 1135
 tags: mst, prim
+
+```problem
+Connect all `points` on a plane; joining two points costs their Manhattan distance |x₁ − x₂| + |y₁ − y₂|. Return the minimum total cost so that every pair of points is connected (directly or through others).
+
+**Example:** `[[0,0],[2,2],[3,10],[5,2],[7,0]]` → `20`
+
+**Constraints:** up to 1000 points.
+```
 
 Complete graph with Manhattan weights → **Prim's** O(n²) array version (no heap needed for dense graphs): repeatedly add the closest outside point, then update distances.
 
@@ -308,6 +330,12 @@ assertEq(minCostConnectPoints([][]int{{3, 12}, {-2, 5}, {-4, 1}}), 18)
 related: 753
 tags: eulerian-path, hierholzer
 
+```problem
+`tickets[i] = [from, to]` are airline tickets. Rebuild the itinerary that starts at `"JFK"` and uses every ticket exactly once. If several exist, return the one that is lexicographically smallest when read as a sequence of airport codes. At least one valid itinerary exists.
+
+**Example:** `[["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]` → `["JFK","MUC","LHR","SFO","SJC"]`
+```
+
 Use every ticket exactly once = **Eulerian path**. Hierholzer: DFS taking the smallest destination first, **append a node after all its edges are used**, then reverse. Dead ends get placed at the end automatically.
 
 ```viz
@@ -390,6 +418,14 @@ assertEq(findItinerary([][]string{{"JFK", "KUL"}, {"JFK", "NRT"}, {"NRT", "JFK"}
 ## 778. Swim in Rising Water | Hard
 related: 1631, 743
 tags: dijkstra, minimax
+
+```problem
+`grid[i][j]` is the elevation of a cell in an n×n grid (all values distinct, 0…n² − 1). At time `t` the water everywhere is `t` deep, and you can swim between adjacent cells (up, down, left, right) instantly if both elevations are at most `t`. Starting at the top-left, return the least time at which you can reach the bottom-right.
+
+**Example:** `[[0,2],[1,3]]` → `3`
+
+**Constraints:** n ≤ 50.
+```
 
 Cost of a path = the **max** cell on it. Dijkstra where the "distance" is `max(current, grid[next])`: always expand the lowest-elevation frontier cell.
 
@@ -488,6 +524,14 @@ assertEq(swimInWater(G), 16)
 ## 269. Alien Dictionary | Hard
 related: 207, 210, 953
 tags: blind75, topological-sort, premium
+
+```problem
+`words` are sorted lexicographically in an alien language that uses lowercase English letters in an unknown order. Return a string of the letters that appear, in an order consistent with `words` (any valid order), or `""` if the list is inconsistent.
+
+**Example:** `["wrt","wrf","er","ett","rftt"]` → `"wertf"`; `["z","x","z"]` → `""`
+
+**Constraints:** note `["abc","ab"]` is invalid: a word can't come after its own prefix.
+```
 
 Compare adjacent words: the first differing letters give an edge `a → b`. If a word is followed by its own proper prefix, the input is invalid. Topologically sort the letters (Kahn); a cycle → `""`.
 
@@ -625,6 +669,14 @@ assertEq(alienOrder([]string{"abc", "ab"}), "")
 related: 778, 743
 tags: dijkstra, minimax
 
+```problem
+Walk from the top-left to the bottom-right cell of `heights`, moving up, down, left or right. A route's effort is the largest absolute height difference between two consecutive cells on it. Return the minimum effort.
+
+**Example:** `[[1,2,2],[3,8,2],[5,3,5]]` → `2`
+
+**Constraints:** up to 100 × 100.
+```
+
 Effort of a path = max |height difference| along it. Dijkstra with `cost = max(cost, |Δh|)`.
 
 **Complexity:** O(R·C log(R·C)).
@@ -742,6 +794,14 @@ assertEq(minimumEffortPath([][]int{{1, 2, 1, 1, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2
 related: 207
 tags: topological-sort, leaf-trimming
 
+```problem
+A tree has nodes 0…n − 1 and the given undirected `edges`. Rooting it at different nodes gives different heights. Return every root that gives the minimum height, in any order.
+
+**Example:** `n = 6, edges = [[3,0],[3,1],[3,2],[3,4],[5,4]]` → `[3,4]`
+
+**Constraints:** n ≤ 2·10⁴.
+```
+
 The best roots are the tree's **centers** (1 or 2 nodes). Peel leaves layer by layer (like Kahn's algorithm on degree 1) until ≤ 2 nodes remain.
 
 ```viz
@@ -851,6 +911,14 @@ assertUnordered(findMinHeightTrees(6, [][]int{{3, 0}, {3, 1}, {3, 2}, {3, 4}, {5
 ## 1192. Critical Connections in a Network | Hard
 related: 684
 tags: tarjan, bridges
+
+```problem
+Servers 0…n − 1 are joined by undirected `connections`, and the network is connected. A connection is critical if removing it leaves some server unable to reach another. Return all critical connections, in any order.
+
+**Example:** `n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]` → `[[1,3]]`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 **Tarjan's bridge-finding**: DFS assigns discovery time `tin[u]`; `low[u]` = smallest `tin` reachable from u's subtree using at most one back edge. Tree edge `(u, v)` is a bridge iff `low[v] > tin[u]` (v's subtree can't reach u or above without it).
 
@@ -974,6 +1042,14 @@ assertUnorderedDeep(criticalConnections(4, [][]int{{0, 1}, {1, 2}, {2, 3}}), [][
 related: 207
 tags: cycle-detection, three-color-dfs
 
+```problem
+`graph[i]` lists the directed edges out of node i. A terminal node has no outgoing edges; a node is safe if every path starting from it ends at a terminal node. Return all safe nodes in ascending order.
+
+**Example:** `[[1,2],[2,3],[5],[0],[5],[],[]]` → `[2,4,5,6]`
+
+**Constraints:** n ≤ 10⁴.
+```
+
 A node is safe iff no path from it reaches a cycle. **Three-color DFS**: 0 = unvisited, 1 = on stack, 2 = safe. Reaching a node with color 1 means a cycle → unsafe. (Alternatively: Kahn's on the reversed graph.)
 
 **Complexity:** O(V + E).
@@ -1053,6 +1129,14 @@ assertEq(eventualSafeNodes([][]int{{1, 2, 3, 4}, {1, 2}, {3, 4}, {0, 4}, {}}), [
 ## 1514. Path with Maximum Probability | Medium
 related: 743
 tags: dijkstra
+
+```problem
+In an undirected graph, traversing edge `edges[i]` succeeds with probability `succProb[i]`. Return the highest probability of successfully going from `start_node` to `end_node`, or 0 if there's no path.
+
+**Example:** `n = 3, edges = [[0,1],[1,2],[0,2]], succProb = [0.5,0.5,0.2], start = 0, end = 2` → `0.25`
+
+**Constraints:** n ≤ 10⁴; up to 2·10⁴ edges.
+```
 
 Dijkstra with a **max-heap** on probability: probabilities only shrink along a path (multiplying by ≤ 1), so the greedy "best first" argument still holds.
 
@@ -1173,6 +1257,14 @@ assertEq(maxProbability(3, [][]int{{0, 1}}, []float64{0.5}, 0, 2), 0.0)
 related: 743
 tags: dijkstra, counting
 
+```problem
+`roads[i] = [u, v, time]` are two-way roads between intersections 0…n − 1. Return how many different routes take the shortest possible time from intersection 0 to n − 1, modulo 10⁹ + 7.
+
+**Example:** `n = 7, roads = [[0,6,7],[0,1,2],[1,2,3],[1,3,3],[6,3,3],[3,5,1],[6,5,1],[2,5,1],[0,4,5],[4,6,2]]` → `4`
+
+**Constraints:** n ≤ 200; times up to 10⁹.
+```
+
 Dijkstra while counting shortest paths: a strictly shorter distance to `v` resets `ways[v] = ways[u]`; an equal distance adds `ways[u]`.
 
 **Complexity:** O(E log V).
@@ -1291,6 +1383,14 @@ assertEq(countPaths(2, [][]int{{1, 0, 10}}), 1)
 related: 743
 tags: floyd-warshall
 
+```problem
+Cities 0…n − 1 are joined by weighted two-way `edges`. For each city, count the cities reachable through paths of total weight ≤ `distanceThreshold`. Return the city with the smallest count; on a tie, the one with the largest number.
+
+**Example:** `n = 4, edges = [[0,1,3],[1,2,1],[1,3,4],[2,3,1]], distanceThreshold = 4` → `3`
+
+**Constraints:** n ≤ 100.
+```
+
 All-pairs shortest paths with **Floyd–Warshall** (`dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])` for every intermediate k). Count reachable cities within the threshold; ties go to the larger index.
 
 **Complexity:** O(n³).
@@ -1388,6 +1488,12 @@ assertEq(findTheCity(5, [][]int{{0, 1, 2}, {0, 4, 8}, {1, 2, 3}, {1, 4, 2}, {2, 
 ## 685. Redundant Connection II | Hard
 related: 684
 tags: union-find, directed-graph
+
+```problem
+A rooted tree (edges point from parent to child, every node except the root has exactly one parent) on nodes 1…n got one extra directed edge. Given the `edges`, return an edge whose removal leaves a rooted tree; if several qualify, return the one that appears last in the input.
+
+**Example:** `[[1,2],[1,3],[2,3]]` → `[2,3]`; `[[1,2],[2,3],[3,4],[4,1],[1,5]]` → `[4,1]`
+```
 
 A rooted tree plus one extra **directed** edge creates either (a) a node with two parents, (b) a cycle, or both. If some node has two parents, the answer is one of those two edges: skip the later one and check with Union-Find whether a cycle remains — if yes, the earlier edge is the culprit. Otherwise return the edge that closes the cycle.
 
@@ -1508,6 +1614,14 @@ assertEq(findRedundantDirectedConnection([][]int{{2, 1}, {3, 1}, {4, 2}, {1, 4}}
 related: 332
 tags: de-bruijn, eulerian-path
 
+```problem
+A safe's password is `n` digits, each from 0 to k − 1, and the safe opens as soon as the last `n` digits typed match it. Return any shortest string that is guaranteed to open the safe at some point, i.e. contains every possible password as a substring.
+
+**Example:** `n = 2, k = 2` → `"01100"` (or another string of length 5 containing `00`, `01`, `10`, `11`)
+
+**Constraints:** kⁿ ≤ 4096.
+```
+
 The shortest string containing every length-n password is a **De Bruijn sequence** of length `kⁿ + n − 1`. Nodes = length-(n−1) strings, each appended digit = an edge; an Eulerian circuit uses every edge (password) once. Hierholzer's DFS: append the edge digit after exploring it.
 
 **Complexity:** O(kⁿ).
@@ -1603,6 +1717,14 @@ assertEq(covers(crackSafe(3, 3), 3, 3), true)
 ## 1489. Find Critical and Pseudo-Critical Edges in Minimum Spanning Tree | Hard
 related: 1584, 1192
 tags: mst, union-find
+
+```problem
+For a connected weighted undirected graph with nodes 0…n − 1, an edge is **critical** if removing it makes every minimum spanning tree heavier, and **pseudo-critical** if it appears in some minimum spanning trees but not all. Return `[critical edge indices, pseudo-critical edge indices]`, in any order.
+
+**Example:** `n = 5, edges = [[0,1,1],[1,2,1],[2,3,2],[0,3,2],[0,4,3],[3,4,3],[1,4,6]]` → `[[0,1],[2,3,4,5]]`
+
+**Constraints:** n ≤ 100; up to 200 edges.
+```
 
 Compute the MST weight once with Kruskal. Then for each edge: if the MST **without** it is heavier (or the graph disconnects), it's **critical**; otherwise, if an MST **forced to include** it still has the optimal weight, it's **pseudo-critical**. Each check is one Kruskal run.
 
@@ -1756,6 +1878,14 @@ assertEq(findCriticalAndPseudoCriticalEdges(3, [][]int{{0, 1, 1}, {1, 2, 2}, {0,
 ## 2392. Build a Matrix With Conditions | Hard
 related: 210, 269
 tags: topological-sort
+
+```problem
+Build a k×k matrix containing each number 1…k exactly once (the remaining cells are 0) such that for every `[above, below]` in `rowConditions`, `above` is in a strictly higher row than `below`, and for every `[left, right]` in `colConditions`, `left` is in a strictly earlier column than `right`. Return any such matrix, or an empty matrix if none exists.
+
+**Example:** `k = 3, rowConditions = [[1,2],[3,2]], colConditions = [[2,1],[3,2]]` → `[[3,0,0],[0,0,1],[0,2,0]]` (one valid answer)
+
+**Constraints:** k ≤ 400.
+```
 
 Rows and columns are independent. Topologically sort the numbers 1..k by `rowConditions` (gives each number's row) and separately by `colConditions` (its column); a cycle in either means no answer. Place number v at `(row[v], col[v])` — every row and column gets exactly one number. Any valid matrix is accepted.
 
@@ -1922,6 +2052,14 @@ assertEq(valid(4, rc, cc, buildMatrix(4, rc, cc)), true)
 ## 2709. Greatest Common Divisor Traversal | Hard
 related: 952, 547
 tags: union-find, sieve
+
+```problem
+You can move between indices i and j of `nums` if gcd(nums[i], nums[j]) > 1. Decide whether every pair of indices is connected by some sequence of such moves.
+
+**Example:** `[2,3,6]` → `true`; `[3,9,5]` → `false`
+
+**Constraints:** n ≤ 10⁵; values ≤ 10⁵.
+```
 
 Indices i and j are directly connected iff they share a prime factor, so connect each index to its primes: with a **smallest-prime-factor sieve**, factor every number and union the index with the first index seen for each of its primes. Traversal between all pairs ⇔ one connected component. A `1` (no prime factors) is isolated unless it's the only element.
 

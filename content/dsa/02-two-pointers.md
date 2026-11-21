@@ -19,6 +19,12 @@ while l < r:
 related: 680, 5
 tags: blind75
 
+```problem
+After lowercasing `s` and dropping every character that isn't a letter or digit, does it read the same forwards and backwards?
+
+**Example:** `"A man, a plan, a canal: Panama"` → `true`; `"race a car"` → `false`
+```
+
 Pointers from both ends, skip non-alphanumerics, compare lowercase.
 
 **Complexity:** O(n) time, O(1) space.
@@ -93,6 +99,14 @@ assertEq(isPalindrome("race a car"), false)
 related: 1, 15
 tags: opposite-ends
 
+```problem
+`numbers` is sorted in non-decreasing order. Return the **1-based** indices `[i, j]` (i < j) of the two values that add up to `target`; exactly one such pair exists.
+
+**Example:** `numbers = [2,7,11,15], target = 9` → `[1,2]`
+
+**Constraints:** O(1) extra space.
+```
+
 Sorted → if the sum is too small move `l` right, too big move `r` left. Each step discards one element that can't be in any answer.
 
 ```viz
@@ -161,6 +175,14 @@ assertEq(twoSum([]int{-1, 0}, -1), []int{1, 2})
 ## 15. 3Sum | Medium
 related: 1, 167, 16, 18
 tags: blind75, sort
+
+```problem
+Return every distinct triplet `[a, b, c]` of values from `nums`, taken from three different positions, with a + b + c = 0. The answer must not contain duplicate triplets; order doesn't matter.
+
+**Example:** `[-1,0,1,2,-1,-4]` → `[[-1,-1,2],[-1,0,1]]`
+
+**Constraints:** 3 ≤ n ≤ 3000.
+```
 
 Sort. Fix `nums[i]`, then run Two Sum II on the suffix for `-nums[i]`. Skip equal neighbours (for `i` and after a hit) to avoid duplicate triplets. Stop early when `nums[i] > 0`.
 
@@ -266,6 +288,14 @@ assertUnorderedDeep(threeSum([]int{0, 0, 0}), [][]int{{0, 0, 0}})
 related: 42
 tags: blind75, opposite-ends, greedy
 
+```problem
+`height[i]` is the height of a vertical line at x = i. Pick two lines that, together with the x-axis, hold the most water, and return that area: (distance between them) × (the shorter height).
+
+**Example:** `[1,8,6,2,5,4,8,3,7]` → `49` (lines at x = 1 and x = 8: 7 × 7)
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Area = `min(h[l], h[r]) * (r - l)`. Moving the **taller** side can never help (width shrinks, height capped by the shorter one), so always move the shorter side.
 
 ```viz
@@ -327,6 +357,14 @@ assertEq(maxArea([]int{1, 1}), 1)
 ## 42. Trapping Rain Water | Hard
 related: 11, 84, 238
 tags: opposite-ends, prefix-max
+
+```problem
+`height` is an elevation map of bars, each 1 unit wide. Return how many units of rain water it traps after raining.
+
+**Example:** `[0,1,0,2,1,0,1,3,2,1,2,1]` → `6`
+
+**Constraints:** n ≤ 2·10⁴.
+```
 
 Water at `i` = `min(maxLeft, maxRight) - h[i]`. With two pointers, the side with the smaller running max is the bottleneck, so its water is already determined: process that side and move inward.
 
@@ -407,6 +445,14 @@ assertEq(trap([]int{4, 2, 0, 3, 2, 5}), 9)
 related: 26, 75
 tags: fast-slow
 
+```problem
+Move every 0 in `nums` to the end, in place, keeping the non-zero values in their original relative order.
+
+**Example:** `[0,1,0,3,12]` → `[1,3,12,0,0]`
+
+**Constraints:** no copy of the array; follow-up: minimise the number of writes.
+```
+
 Slow pointer `k` = next slot for a non-zero. Swap each non-zero into `k`; zeros drift to the end while relative order is kept.
 
 **Complexity:** O(n) time, O(1) space.
@@ -467,6 +513,14 @@ assertEq(c, []int{1, 2, 0, 0})
 ## 16. 3Sum Closest | Medium
 related: 15
 tags: sort
+
+```problem
+Pick three values from different positions in `nums` whose sum is as close as possible to `target`, and return that sum. Exactly one closest sum exists.
+
+**Example:** `nums = [-1,2,1,-4], target = 1` → `2` (−1 + 2 + 1)
+
+**Constraints:** n ≤ 500.
+```
 
 Same skeleton as 3Sum: sort, fix `i`, two pointers on the rest; track the sum with the smallest `|sum - target|`.
 
@@ -554,6 +608,14 @@ assertEq(threeSumClosest([]int{0, 0, 0}, 1), 0)
 ## 18. 4Sum | Medium
 related: 15, 1
 tags: sort, k-sum
+
+```problem
+Return every distinct quadruplet of values from four different positions of `nums` that sums to `target`, without duplicate quadruplets.
+
+**Example:** `nums = [1,0,-1,0,-2,2], target = 0` → `[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]`
+
+**Constraints:** n ≤ 200; values up to ±10⁹, so sums can overflow 32 bits.
+```
 
 Generalize: **kSum** recursion reduces to 2Sum with two pointers. Skip duplicates at every level. Use `long` sums in Java to avoid overflow.
 
@@ -663,6 +725,14 @@ assertUnorderedDeep(fourSum([]int{2, 2, 2, 2, 2}, 8), [][]int{{2, 2, 2, 2}})
 related: 283
 tags: dutch-flag, three-pointers
 
+```problem
+`nums` holds only 0s, 1s and 2s (red, white, blue). Sort it in place so all 0s come first, then 1s, then 2s, without a library sort.
+
+**Example:** `[2,0,2,1,1,0]` → `[0,0,1,1,2,2]`
+
+**Constraints:** follow-up: one pass with O(1) extra space.
+```
+
 **Dutch national flag**: `lo` = next slot for 0, `hi` = next slot for 2, `i` scans. Swap 0s to the front, 2s to the back (don't advance `i` after swapping with `hi`, since the swapped-in value is unexamined).
 
 ```viz
@@ -748,6 +818,14 @@ assertEq(c, []int{0, 0, 1, 1, 1, 2, 2})
 related: 125
 tags: opposite-ends
 
+```problem
+Decide whether `s` can become a palindrome after deleting at most one character.
+
+**Example:** `"abca"` → `true` (delete `c`); `"abc"` → `false`
+
+**Constraints:** length ≤ 10⁵.
+```
+
 Walk inward; at the first mismatch you may delete one char: check whether `s[l+1..r]` **or** `s[l..r-1]` is a palindrome.
 
 **Complexity:** O(n).
@@ -819,6 +897,14 @@ assertEq(validPalindrome("abc"), false)
 related: 1143, 115
 tags: greedy
 
+```problem
+Decide whether `s` is a subsequence of `t`: can `s` be obtained by deleting zero or more characters of `t` without reordering the rest?
+
+**Example:** `s = "abc", t = "ahbgdc"` → `true`; `s = "axc"` → `false`
+
+**Constraints:** follow-up: many different `s` queried against the same `t`.
+```
+
 Greedy match: advance in `s` whenever `t[j]` equals `s[i]`. Success if all of `s` is consumed.
 *Follow-up (many `s` queries):* index positions of each char in `t`, then binary-search the next position.
 
@@ -870,6 +956,14 @@ assertEq(isSubsequence("axc", "ahbgdc"), false)
 ## 977. Squares of a Sorted Array | Easy
 related: 88
 tags: opposite-ends
+
+```problem
+`nums` is sorted in non-decreasing order and may contain negatives. Return the squares of its values, also sorted.
+
+**Example:** `[-4,-1,0,3,10]` → `[0,1,9,16,100]`
+
+**Constraints:** follow-up: O(n) without sorting again.
+```
 
 The largest square is at one of the ends. Fill the result from the back, taking the larger `|value|` each time.
 
@@ -935,6 +1029,12 @@ assertEq(sortedSquares([]int{-5, -3, -2, -1}), []int{1, 4, 9, 25})
 related: 26, 283
 tags: fast-slow
 
+```problem
+Remove every occurrence of `val` from `nums` in place and return the number `k` of remaining values; the first `k` slots must hold them in any order.
+
+**Example:** `nums = [0,1,2,2,3,0,4,2], val = 2` → `5`, first five slots `0,1,3,0,4` in any order
+```
+
 Copy every element not equal to `val` to the write pointer `k`.
 
 **Complexity:** O(n).
@@ -998,6 +1098,14 @@ assertEq(removeElement([]int{1}, 1), 0)
 related: 26
 tags: fast-slow
 
+```problem
+`nums` is sorted. Remove duplicates in place so each value appears **at most twice**, keeping the order, and return the new length `k`.
+
+**Example:** `[0,0,1,1,1,1,2,3,3]` → `7`, with `nums` starting `[0,0,1,1,2,3,3]`
+
+**Constraints:** O(1) extra space.
+```
+
 Allow at most two copies: keep `x` if `k < 2` or `x != nums[k-2]` (compare with the element two slots back in the *kept* prefix).
 
 **Complexity:** O(n).
@@ -1058,6 +1166,14 @@ assertEq(b[:k], []int{1, 1, 2, 2, 3})
 related: 344
 tags: string
 
+```problem
+Return the words of `s` in reverse order, joined by single spaces. `s` may have leading, trailing or repeated spaces, which must not appear in the output.
+
+**Example:** `"  hello world  "` → `"world hello"`
+
+**Constraints:** follow-up: O(1) extra space if strings are mutable.
+```
+
 Split on whitespace (drops extra spaces), reverse, join. In-place follow-up (char array): reverse the whole string, then reverse each word, then compact spaces.
 
 **Complexity:** O(n).
@@ -1101,6 +1217,14 @@ assertEq(reverseWords("a good   example"), "example good a")
 ## 344. Reverse String | Easy
 related: 151, 125
 tags: opposite-ends
+
+```problem
+Reverse the character array `s` in place.
+
+**Example:** `["h","e","l","l","o"]` → `["o","l","l","e","h"]`
+
+**Constraints:** O(1) extra memory.
+```
 
 Swap from both ends towards the middle.
 
@@ -1155,6 +1279,14 @@ assertEq(string(c), "x")
 ## 881. Boats to Save People | Medium
 related: 167
 tags: greedy, opposite-ends
+
+```problem
+`people[i]` is a person's weight. Every boat carries at most two people with combined weight ≤ `limit`, and nobody is heavier than `limit`. Return the minimum number of boats needed for everyone.
+
+**Example:** `people = [3,2,2,1], limit = 3` → `3` (`(1,2)`, `(2)`, `(3)`)
+
+**Constraints:** n ≤ 5·10⁴.
+```
 
 Sort. The heaviest person always takes a boat; pair them with the lightest if they fit together.
 
@@ -1213,6 +1345,14 @@ assertEq(numRescueBoats([]int{3, 5, 3, 4}, 5), 4)
 ## 844. Backspace String Compare | Easy
 related: 2390, 1047
 tags: two-pointers, reverse-scan
+
+```problem
+In `s` and `t`, the character `#` is a backspace that erases the character before it (if any). Decide whether the two strings are equal after applying the backspaces.
+
+**Example:** `s = "ab#c", t = "ad#c"` → `true`; `s = "a#c", t = "b"` → `false`
+
+**Constraints:** follow-up: O(n) time and O(1) space.
+```
 
 A stack works (O(n) space). For O(1) space walk **both strings from the end**: count pending `#`s and skip that many characters; compare the surviving characters one by one.
 
@@ -1309,6 +1449,12 @@ assertEq(backspaceCompare("ab", "b"), false)
 related: 88
 tags: two-pointers
 
+```problem
+Interleave `word1` and `word2` letter by letter, starting with `word1`; when one runs out, append the rest of the other.
+
+**Example:** `word1 = "ab", word2 = "pqrs"` → `"apbqrs"`
+```
+
 Take one character from each word in turn; when one runs out, append the rest of the other.
 
 **Complexity:** O(n + m).
@@ -1361,6 +1507,12 @@ assertEq(mergeAlternately("abcd", "pq"), "apbqcd")
 ## 345. Reverse Vowels of a String | Easy
 related: 344, 125
 tags: opposite-ends
+
+```problem
+Reverse only the vowels (`a e i o u`, either case) of `s`, leaving every other character where it is.
+
+**Example:** `"IceCreAm"` → `"AceCreIm"`; `"leetcode"` → `"leotcede"`
+```
 
 Opposite-end pointers: advance each pointer past consonants, swap when both sit on vowels (either case).
 
@@ -1431,6 +1583,14 @@ assertEq(reverseVowels("aA"), "Aa")
 ## 443. String Compression | Medium
 related: 38, 271
 tags: read-write-pointers, in-place
+
+```problem
+Compress the character array `chars` in place: each run of a repeated character becomes the character followed by the run length when it is longer than 1 (lengths of 10 or more take several characters). Return the new length.
+
+**Example:** `["a","a","b","b","c","c","c"]` → `6`, with `chars` starting `["a","2","b","2","c","3"]`
+
+**Constraints:** O(1) extra space.
+```
 
 Read pointer finds each run `[i, j)`; write pointer writes the character and, if the run is longer than 1, the digits of its length. The write pointer never overtakes the read pointer, so it works in place.
 
@@ -1517,6 +1677,14 @@ assertEq(string(c[:k]), "ab12")
 ## 1679. Max Number of K-Sum Pairs | Medium
 related: 1, 167
 tags: hash-map, two-sum
+
+```problem
+In one operation, remove two numbers from `nums` whose sum is `k`. Return the maximum number of operations you can perform.
+
+**Example:** `nums = [1,2,3,4], k = 5` → `2`; `nums = [3,1,3,4,3], k = 6` → `1`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Two Sum, counted: scan once; if a waiting partner `k − x` exists, pair them (use it up); otherwise leave `x` waiting. (Sorting + opposite-end pointers also works in O(n log n).)
 

@@ -18,6 +18,14 @@ Locally, Python tests use `make_list([..])` / `list_vals(node)`; Java tests use 
 related: 92, 25, 234
 tags: blind75, reversal
 
+```problem
+Reverse a singly linked list and return the new head.
+
+**Example:** `1→2→3→4→5` → `5→4→3→2→1`
+
+**Constraints:** follow-up: both iteratively and recursively.
+```
+
 Iteratively flip each `next` pointer while walking forward.
 
 **Complexity:** O(n) time, O(1) space (recursive version uses O(n) stack).
@@ -67,6 +75,12 @@ assertEq(reverseList(nil) == nil, true)
 ## 21. Merge Two Sorted Lists | Easy
 related: 23, 88, 148
 tags: blind75, dummy-head
+
+```problem
+Merge two sorted linked lists into one sorted list by splicing their nodes together, and return its head.
+
+**Example:** `1→2→4` and `1→3→4` → `1→1→2→3→4→4`
+```
 
 Dummy head + tail pointer; repeatedly attach the smaller head. Append the leftover list.
 
@@ -138,6 +152,14 @@ assertEq(mergeTwoLists(makeList(5), makeList(1, 2, 4)), []int{1, 2, 4, 5})
 related: 142, 287, 202
 tags: blind75, fast-slow
 
+```problem
+Decide whether a linked list contains a cycle, i.e. following `next` pointers eventually revisits a node.
+
+**Example:** `3→2→0→-4` with the tail pointing back to the node `2` → `true`
+
+**Constraints:** follow-up: O(1) extra memory.
+```
+
 Floyd: slow moves 1, fast moves 2. If there's a cycle they must meet; otherwise fast hits null.
 
 **Complexity:** O(n) time, O(1) space.
@@ -197,6 +219,14 @@ assertEq(hasCycle(makeList(1)), false)
 ## 142. Linked List Cycle II | Medium
 related: 141, 287
 tags: fast-slow
+
+```problem
+Return the node where the cycle in a linked list begins, or `null` if there is no cycle. Don't modify the list.
+
+**Example:** `3→2→0→-4` with the tail pointing back to `2` → the node `2`
+
+**Constraints:** follow-up: O(1) extra memory.
+```
 
 After slow and fast meet, restart one pointer at `head`; moving both one step at a time, they meet at the cycle entrance. (Distance head→entry ≡ distance meet→entry mod cycle length.)
 
@@ -273,6 +303,12 @@ assertEq(detectCycle(makeList(1)) == nil, true)
 ## 143. Reorder List | Medium
 related: 206, 234, 876
 tags: blind75, fast-slow, reversal
+
+```problem
+Reorder the list L0→L1→…→Ln in place into L0→Ln→L1→Ln−1→L2→Ln−2→…, relinking nodes rather than changing their values.
+
+**Example:** `1→2→3→4→5` → `1→5→2→4→3`
+```
 
 `L0 → Ln → L1 → Ln-1 …` = **find middle**, **reverse second half**, **interleave** the halves.
 
@@ -358,6 +394,14 @@ assertEq(h2, []int{1, 4, 2, 3})
 related: 876, 61
 tags: blind75, two-pointers, dummy-head
 
+```problem
+Remove the n-th node from the end of a linked list and return the head.
+
+**Example:** `1→2→3→4→5, n = 2` → `1→2→3→5`
+
+**Constraints:** follow-up: one pass.
+```
+
 Advance `fast` n steps ahead from a dummy, then move both until `fast` is last; `slow.next` is the node to delete.
 
 ```viz
@@ -420,6 +464,12 @@ assertEq(removeNthFromEnd(makeList(1), 1), []int{})
 ## 138. Copy List with Random Pointer | Medium
 related: 133
 tags: hash-map, interleave
+
+```problem
+Each node of a linked list has a `next` pointer and a `random` pointer to any node of the list (or `null`). Return a deep copy: new nodes whose `next` and `random` pointers mirror the original structure, never pointing into the original list.
+
+**Example:** `[[7,null],[13,0],[11,4],[10,2],[1,0]]` (value, index the random pointer targets) → an identical, independent list
+```
 
 Map each original node → its clone (first pass), then wire `next`/`random` through the map (second pass). O(1)-space variant: interleave clones `A A' B B' …`, set `A'.random = A.random.next`, then unweave.
 
@@ -546,6 +596,12 @@ assertEq(describe(copyRandomList(nodes[0])), spec)
 related: 445, 67
 tags: dummy-head, carry
 
+```problem
+Two non-empty linked lists hold non-negative integers with their digits in **reverse** order (ones digit first). Return their sum as a linked list in the same format.
+
+**Example:** `2→4→3` + `5→6→4` → `7→0→8` (342 + 465 = 807)
+```
+
 Digits are stored least-significant first, so add node by node with a carry, like grade-school addition.
 
 ```viz
@@ -621,6 +677,14 @@ assertEq(addTwoNumbers(makeList(9, 9, 9), makeList(1)), []int{0, 0, 0, 1})
 related: 142, 41, 268
 tags: fast-slow, cycle-detection
 
+```problem
+`nums` has n + 1 integers, each in [1, n], so at least one value repeats; exactly one value is repeated (possibly many times). Return it without modifying `nums`, using O(1) extra space.
+
+**Example:** `[1,3,4,2,2]` → `2`; `[3,1,3,4,2]` → `3`
+
+**Constraints:** follow-up: better than O(n²).
+```
+
 Values in `[1, n]` → view `i → nums[i]` as a linked list. The duplicate value is where two arrows enter the same node = **cycle entrance** (Floyd, like 142). No modification, O(1) space.
 
 **Complexity:** O(n) time, O(1) space.
@@ -680,6 +744,14 @@ assertEq(findDuplicate([]int{3, 1, 3, 4, 2}), 3)
 ## 23. Merge k Sorted Lists | Hard
 related: 21, 378, 373
 tags: blind75, heap, divide-and-conquer
+
+```problem
+Merge `k` sorted linked lists into one sorted list and return its head.
+
+**Example:** `[1→4→5, 1→3→4, 2→6]` → `1→1→2→3→4→4→5→6`
+
+**Constraints:** k ≤ 10⁴; at most 10⁴ nodes in total.
+```
 
 Min-heap of the current head of each list; pop the smallest, push its successor. (Or pairwise merge, like merge sort.)
 
@@ -763,6 +835,14 @@ assertEq(mergeKLists([]*ListNode{}) == nil, true)
 ## 25. Reverse Nodes in k-Group | Hard
 related: 206, 92
 tags: reversal, dummy-head
+
+```problem
+Reverse the nodes of a linked list `k` at a time; a final group with fewer than `k` nodes stays as it is. Only relink nodes, don't change values.
+
+**Example:** `1→2→3→4→5, k = 2` → `2→1→4→3→5`; `k = 3` → `3→2→1→4→5`
+
+**Constraints:** follow-up: O(1) extra memory.
+```
 
 For each group: check k nodes exist, reverse them in place, then connect the previous group's tail to the new head and move on. A dummy head keeps the first group uniform.
 
@@ -850,6 +930,14 @@ assertEq(reverseKGroup(makeList(1, 2, 3, 4, 5), 3), []int{3, 2, 1, 4, 5})
 related: 206, 143, 125
 tags: fast-slow, reversal
 
+```problem
+Decide whether the values of a singly linked list read the same forwards and backwards.
+
+**Example:** `1→2→2→1` → `true`; `1→2` → `false`
+
+**Constraints:** follow-up: O(n) time and O(1) space.
+```
+
 Find middle, reverse the second half, compare with the first half.
 
 **Complexity:** O(n) time, O(1) space.
@@ -917,6 +1005,14 @@ assertEq(isPalindrome(makeList(1, 2)), false)
 ## 160. Intersection of Two Linked Lists | Easy
 related: 141
 tags: two-pointers
+
+```problem
+Two singly linked lists may merge at some node and share every node after it. Return the first shared node, or `null` if they never meet. Keep both lists unchanged.
+
+**Example:** `4→1→8→4→5` and `5→6→1→8→4→5`, sharing from the node `8` → that node
+
+**Constraints:** follow-up: O(m + n) time and O(1) memory.
+```
 
 Walk `a` over A then B, `b` over B then A. Both travel `lenA + lenB` steps, so they meet at the intersection (or both reach `null` together).
 
@@ -986,6 +1082,14 @@ assertEq(getIntersectionNode(makeList(1), makeList(2)) == nil, true)
 related: 86
 tags: in-place
 
+```problem
+Regroup a linked list so the nodes at odd positions (1st, 3rd, …) come first, followed by the nodes at even positions, keeping the relative order inside each group.
+
+**Example:** `1→2→3→4→5` → `1→3→5→2→4`
+
+**Constraints:** O(1) extra space and O(n) time.
+```
+
 Build two chains (odd positions, even positions) in one pass, then attach the even chain after the odd chain.
 
 **Complexity:** O(n) time, O(1) space.
@@ -1050,6 +1154,14 @@ assertEq(oddEvenList(makeList(2, 1, 3, 5, 6, 4, 7)), []int{2, 3, 6, 7, 1, 5, 4})
 ## 148. Sort List | Medium
 related: 21, 23
 tags: merge-sort
+
+```problem
+Sort a linked list in ascending order and return its head.
+
+**Example:** `4→2→1→3` → `1→2→3→4`
+
+**Constraints:** up to 5·10⁴ nodes. Follow-up: O(n log n) time with O(1) memory.
+```
 
 Merge sort is natural for lists: split at the middle (fast/slow), sort halves recursively, merge (21).
 
@@ -1138,6 +1250,14 @@ assertEq(sortList(makeList(-1, 5, 3, 4, 0)), []int{-1, 0, 3, 4, 5})
 related: 206, 25
 tags: reversal, dummy-head
 
+```problem
+Reverse the nodes from position `left` to position `right` (1-based, inclusive) and return the head.
+
+**Example:** `1→2→3→4→5, left = 2, right = 4` → `1→4→3→2→5`
+
+**Constraints:** follow-up: one pass.
+```
+
 Walk to the node before `left`. Then repeatedly move the node after `cur` to the front of the sublist (`right − left` times) — "head insertion".
 
 ```viz
@@ -1212,6 +1332,12 @@ assertEq(reverseBetween(makeList(5), 1, 1), []int{5})
 related: 143, 234, 148
 tags: fast-slow
 
+```problem
+Return the middle node of a linked list; when there are two middle nodes, return the second.
+
+**Example:** `1→2→3→4→5` → node `3`; `1→2→3→4→5→6` → node `4`
+```
+
 Fast moves two steps, slow one; when fast runs out, slow is at the middle (the second middle for even lengths).
 
 **Complexity:** O(n) time, O(1) space.
@@ -1256,6 +1382,12 @@ assertEq(middleNode(makeList(1, 2, 3, 4, 5, 6)), []int{4, 5, 6})
 ## 83. Remove Duplicates from Sorted List | Easy
 related: 82, 26
 tags: in-place
+
+```problem
+The linked list is sorted. Delete duplicates so each value appears exactly once, and return the head.
+
+**Example:** `1→1→2→3→3` → `1→2→3`
+```
 
 Sorted → duplicates are adjacent. Skip `cur.next` while it equals `cur`.
 
@@ -1309,6 +1441,12 @@ assertEq(deleteDuplicates(makeList(1, 1, 1)), []int{1})
 ## 82. Remove Duplicates from Sorted List II | Medium
 related: 83
 tags: dummy-head
+
+```problem
+The linked list is sorted. Delete **every** node whose value appears more than once, leaving only values that were unique, and return the head.
+
+**Example:** `1→2→3→3→4→4→5` → `1→2→5`; `1→1→1→2→3` → `2→3`
+```
 
 Remove **every** value that repeats. With a dummy, `prev` points to the last kept node; if the run starting at `prev.next` has length > 1, skip the whole run.
 
@@ -1376,6 +1514,12 @@ assertEq(deleteDuplicates(makeList(1, 1, 1, 2, 3)), []int{2, 3})
 related: 25
 tags: dummy-head
 
+```problem
+Swap every two adjacent nodes of a linked list by relinking them (not by changing values), and return the head.
+
+**Example:** `1→2→3→4` → `2→1→4→3`; `1→2→3` → `2→1→3`
+```
+
 With `prev` before each pair `a → b`: rewire to `prev → b → a → (rest)` and advance `prev = a`.
 
 **Complexity:** O(n).
@@ -1431,6 +1575,14 @@ assertEq(swapPairs(makeList(1, 2, 3)), []int{2, 1, 3})
 ## 61. Rotate List | Medium
 related: 189
 tags: ring
+
+```problem
+Rotate a linked list to the right by `k` places: the last `k` nodes move to the front.
+
+**Example:** `1→2→3→4→5, k = 2` → `4→5→1→2→3`; `0→1→2, k = 4` → `2→0→1`
+
+**Constraints:** k up to 2·10⁹.
+```
 
 Find the length and tail; connect tail → head to form a ring; the new tail is `n − k % n − 1` steps from the head; break the ring after it.
 
@@ -1499,6 +1651,12 @@ assertEq(rotateRight(makeList(0, 1, 2), 4), []int{2, 0, 1})
 related: 75, 328
 tags: two-lists
 
+```problem
+Rearrange a linked list so every node with value less than `x` comes before every node with value ≥ `x`, keeping the original relative order within both groups.
+
+**Example:** `1→4→3→2→5→2, x = 3` → `1→2→2→4→3→5`
+```
+
 Build two chains (`< x` and `≥ x`) with dummy heads, preserving order, then join them. Terminate the second chain!
 
 **Complexity:** O(n).
@@ -1565,6 +1723,14 @@ assertEq(partition(makeList(), 0), []int{})
 ## 445. Add Two Numbers II | Medium
 related: 2
 tags: stack
+
+```problem
+Two non-empty linked lists hold non-negative integers with the **most significant** digit first. Return their sum as a linked list in the same order.
+
+**Example:** `7→2→4→3` + `5→6→4` → `7→8→0→7` (7243 + 564)
+
+**Constraints:** follow-up: without reversing the input lists.
+```
 
 Most-significant digit first → push both lists' digits onto stacks, pop and add from the least significant, **prepending** each result node.
 
@@ -1644,6 +1810,12 @@ assertEq(addTwoNumbers(makeList(5), makeList(5)), []int{1, 0})
 related: 876, 19
 tags: fast-slow
 
+```problem
+Delete the middle node of a linked list of n nodes, the one at 0-based index ⌊n / 2⌋, and return the head (a single node becomes an empty list).
+
+**Example:** `1→3→4→7→1→2→6` → `1→3→4→1→2→6`; `1→2→3→4` → `1→2→4`
+```
+
 Fast/slow pointers, but start `fast` two steps ahead so `slow` stops **just before** the middle (index ⌊n/2⌋), then unlink `slow.next`. A single node list becomes empty.
 
 **Complexity:** O(n) time, O(1) space.
@@ -1702,6 +1874,14 @@ assertEq(deleteMiddle(makeList(1)), []int{})
 ## 2130. Maximum Twin Sum of a Linked List | Medium
 related: 234, 143
 tags: fast-slow, reversal
+
+```problem
+In a linked list of even length n, node i (0-based) and node n − 1 − i are twins. Return the maximum twin sum.
+
+**Example:** `5→4→2→1` → `6`; `4→2→2→3` → `7`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Same toolkit as Palindrome Linked List: find the middle with fast/slow, **reverse the second half**, then walk both halves together summing twins.
 
@@ -1768,6 +1948,12 @@ assertEq(pairSum(makeList(1, 100000)), 100001)
 ## 2807. Insert Greatest Common Divisors in Linked List | Medium
 related: 1071, 2
 tags: linked-list, gcd
+
+```problem
+Between every pair of adjacent nodes, insert a new node holding the greatest common divisor of their two values.
+
+**Example:** `18→6→10→3` → `18→6→6→2→10→1→3`
+```
 
 Walk the list; between each node and its successor splice in a new node holding `gcd(a, b)`, then jump past it.
 

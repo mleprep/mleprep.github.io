@@ -372,29 +372,30 @@ async function viewItem(s, t, slug, stale) {
       <label class="done"><input type="checkbox" data-k="${k}" ${S.done[k] ? 'checked' : ''}> Done</label>
     </div>
     ${dsa ? askedAt(it) : ''}
-    ${dsa ? `<div class="split">
-      <div class="desc"><div id="notes-off" class="notes-off" hidden><b>Solution notes are hidden while you solve.</b>
-          Read the problem on <a href="https://leetcode.com/problems/${it.slug}/" target="_blank" rel="noopener">LeetCode ↗</a>${(it.tags || []).includes('premium') ? ' (Premium)' : ''},
-          write your solution, and run it against this site's tests. <button id="shownotes" class="chip">Show notes</button></div>
-        <div id="body"></div>${relHtml}</div>
-      <div class="codecol">
-        <div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read">Solution</button><button role="tab" data-mode="solve">Solve in browser ▶</button></div>
-        <div class="code" id="readbox">
-          <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button>${it.go ? '<button data-l="go">Go</button>' : ''}<span class="sp"></span>
-            <button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>
-          <div class="scroll"><pre><code id="src"></code></pre><pre class="test" hidden><code id="tsrc"></code></pre></div></div>
-        <div class="code" id="solvebox" hidden>
-          <div class="bar"><button data-sl="python" title="Python 3 via Pyodide (CPython compiled to WebAssembly)">Python</button>${it.go ? '<button data-sl="go" title="Go via Yaegi, a Go interpreter compiled to WebAssembly: Go 1.22 semantics, with min/max and slices.Sort available. LeetCode style: no package clause or imports needed.">Go</button>' : ''}<span class="lbl wide" title="Your code runs on your machine, nothing is sent to a server. Java can't be compiled in the browser, so it isn't judged here.">runs in your browser</span><span class="sp"></span>
-            <button id="viewtests">Tests</button><button id="reset" title="Replace your code with the starter stub (Ctrl+Z undoes)">Reset</button><button id="run" class="go" title="Ctrl+Enter">Run tests ▶</button></div>
-          <pre class="test" id="jtests" hidden><code></code></pre>
-          <div id="editor" class="editor"></div></div>
-        <div id="results" class="results" aria-live="polite" hidden></div>
-      </div>
+    ${dsa ? `${it.problem ? `<section class="prob"><h2>Problem</h2><div id="prob"></div></section>` : ''}
+    <div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read">Solution</button><button role="tab" data-mode="solve">Solve in browser ▶</button></div>
+    <div class="stack">
+      <div id="notes-off" class="notes-off" hidden><b>Solution notes are hidden while you solve.</b>
+        Write your solution below and run it against this site's tests${it.problem ? '' : `; the full statement is on <a href="https://leetcode.com/problems/${it.slug}/" target="_blank" rel="noopener">LeetCode ↗</a>`}.
+        <button id="shownotes" class="chip">Show notes</button></div>
+      <div id="body"></div>
+      <div class="code" id="readbox">
+        <div class="bar"><button data-l="python">Python</button><button data-l="java">Java</button>${it.go ? '<button data-l="go">Go</button>' : ''}<span class="sp"></span>
+          <button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>
+        <pre><code id="src"></code></pre><pre class="test" hidden><code id="tsrc"></code></pre></div>
+      <div class="code" id="solvebox" hidden>
+        <div class="bar"><button data-sl="python" title="Python 3 via Pyodide (CPython compiled to WebAssembly)">Python</button>${it.go ? '<button data-sl="go" title="Go via Yaegi, a Go interpreter compiled to WebAssembly: Go 1.22 semantics, with min/max and slices.Sort available. LeetCode style: no package clause or imports needed.">Go</button>' : ''}<span class="lbl wide" title="Your code runs on your machine, nothing is sent to a server. Java can't be compiled in the browser, so it isn't judged here.">runs in your browser</span><span class="sp"></span>
+          <button id="viewtests">Tests</button><button id="reset" title="Replace your code with the starter stub (Ctrl+Z undoes)">Reset</button><button id="run" class="go" title="Ctrl+Enter">Run tests ▶</button></div>
+        <pre class="test" id="jtests" hidden><code></code></pre>
+        <div id="editor" class="editor"></div></div>
+      <div id="results" class="results" aria-live="polite" hidden></div>
+      ${relHtml}
     </div>` : `<div class="artgrid"><div id="body" class="article"></div>
       <nav class="rail"><h4>In ${esc(t.title)}</h4>${t.items.map(x => `<a href="${href(s.id, t.id, x.slug)}" class="${x.slug === slug ? 'on' : ''}">${esc(x.title)}</a>`).join('')}</nav></div>`}
     <div class="pager"><span>${prev ? `<a href="${href(prev.s, prev.t, prev.it.slug)}">← ${esc(prev.it.title)}</a>` : ''}</span>
       <span>${next ? `<a href="${href(next.s, next.t, next.it.slug)}">${esc(next.it.title)} →</a>` : ''}</span></div>`;
   $('#body').append(md(it.md));
+  if (dsa && it.problem) $('#prob').append(md(it.problem));
   bindChecks(main);
   const more = $('#comore');
   if (more) more.onclick = () => { $('.asked').classList.add('all'); more.remove(); };
@@ -461,7 +462,6 @@ function solveMode(it, k, t, showRead) {
     main.querySelectorAll('[data-mode]').forEach(b => { b.classList.toggle('on', b.dataset.mode === m); b.setAttribute('aria-selected', b.dataset.mode === m); });
     $('#readbox').hidden = solve;
     $('#solvebox').hidden = !solve;
-    $('.codecol').classList.toggle('solving', solve);
     $('#results').hidden = !solve || !$('#results').innerHTML;
     $('#body').hidden = solve && !notes;
     $('#notes-off').hidden = !solve || notes;

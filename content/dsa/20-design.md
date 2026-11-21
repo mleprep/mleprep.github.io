@@ -22,6 +22,14 @@ Other design problems elsewhere: Min Stack (155), Time Map (981), Twitter (355),
 related: 460, 588
 tags: hash-map, linked-list
 
+```problem
+Design `LRUCache(capacity)`: `get(key)` returns the value or −1 if absent; `put(key, value)` inserts or updates a key, and if that pushes the size over `capacity`, it evicts the least recently used key. Both must run in O(1) average time.
+
+**Example:** capacity 2: put(1,1), put(2,2), get(1) → 1, put(3,3) evicts key 2, get(2) → −1
+
+**Constraints:** up to 2·10⁵ calls.
+```
+
 Hash map from key to node of a doubly linked list ordered by recency. `get` moves the node to the front; `put` inserts at the front and evicts the node before the tail when over capacity. Sentinels (`head`, `tail`) remove edge cases. Python's `OrderedDict` packages exactly this.
 
 **Complexity:** O(1) per operation.
@@ -175,6 +183,12 @@ assertEq([]int{c.Get(1), c.Get(3), c.Get(4)}, []int{-1, 3, 4})
 ## 460. LFU Cache | Hard
 related: 146
 tags: hash-map, bucket-sort
+
+```problem
+Design `LFUCache(capacity)` with `get(key)` and `put(key, value)` in O(1) average time. When full, `put` evicts the least frequently used key (counting both gets and puts), breaking ties by evicting the least recently used among them.
+
+**Example:** capacity 2: put(1,1), put(2,2), get(1) → 1, put(3,3) evicts key 2 (used once), get(2) → −1
+```
 
 `key → (value, freq)`, `freq → OrderedDict of keys` (LRU order within a frequency), plus `minFreq`. On access, move the key from bucket `f` to `f+1` (bump `minFreq` if bucket `f` emptied and was the min). On insert, evict the oldest key in `minFreq`'s bucket, then set `minFreq = 1`.
 
@@ -367,6 +381,12 @@ assertEq([]int{c.Get(1), c.Get(3), c.Get(4)}, []int{-1, 3, 4})
 related: 381
 tags: array-plus-map
 
+```problem
+Design `RandomizedSet` with `insert(val)` and `remove(val)` (each returns whether the set changed) and `getRandom()` (a uniformly random current element, never called on an empty set), all in O(1) average time.
+
+**Example:** insert(1) → true, remove(2) → false, insert(2) → true, getRandom() → 1 or 2, remove(1) → true, getRandom() → 2
+```
+
 Values live in an array (O(1) random pick); a map stores each value's index. To delete, **move the last element into the hole** and pop the end.
 
 ```viz
@@ -484,6 +504,14 @@ assertEq(rs.GetRandom(), 2)
 related: 225, 155
 tags: two-stacks
 
+```problem
+Implement a FIFO queue `MyQueue` (`push`, `pop`, `peek`, `empty`) using only two stacks and standard stack operations.
+
+**Example:** push 1, push 2 → peek() = 1, pop() = 1, empty() = false
+
+**Constraints:** follow-up: amortised O(1) per operation.
+```
+
 Push onto `in`. For `pop/peek`, if `out` is empty, pour all of `in` into `out` (reversing order). Each element moves at most once → amortized O(1).
 
 **Complexity:** amortized O(1).
@@ -588,6 +616,12 @@ assertEq([]any{q.Pop(), q.Peek(), q.Pop(), q.Empty()}, []any{2, 3, 3, true})
 ## 622. Design Circular Queue | Medium
 related: 641
 tags: ring-buffer
+
+```problem
+Design `MyCircularQueue(k)`, a fixed-size ring buffer with `enQueue(value)` and `deQueue()` (each returns whether it succeeded), `Front()` and `Rear()` (−1 when empty), `isEmpty()` and `isFull()`. Don't use a built-in queue.
+
+**Example:** k = 3: enQueue 1, 2, 3 → true, enQueue 4 → false, Rear() = 3, deQueue() → true, enQueue 4 → true, Rear() = 4
+```
 
 Fixed array + `head` index + `count`. Tail index = `(head + count − 1) % k`. No need to waste a slot when you track `count`.
 
@@ -722,6 +756,14 @@ assertEq([]any{cq.Rear(), cq.IsFull(), cq.DeQueue(), cq.EnQueue(4), cq.Rear(), c
 related: 981
 tags: versioning, binary-search
 
+```problem
+Design `SnapshotArray(length)`, initially all zeros, with `set(index, val)`, `snap()` (takes a snapshot and returns its id: the number of snaps before it), and `get(index, snap_id)` (the value at `index` when snapshot `snap_id` was taken).
+
+**Example:** `SnapshotArray(3)`: set(0,5), snap() → 0, set(0,6), get(0,0) → 5
+
+**Constraints:** length and number of calls ≤ 5·10⁴.
+```
+
 Don't copy the array on `snap`. Each index keeps a list of `(snap_id, value)` changes; `get(i, s)` = binary search for the last change with `snap_id ≤ s`.
 
 **Complexity:** set O(1), snap O(1), get O(log changes).
@@ -825,6 +867,12 @@ assertEq([]int{sa.Get(0, 0), sa.Get(0, 1), sa.Get(1, 0)}, []int{5, 6, 0})
 ## 535. Encode and Decode TinyURL | Medium
 related: 271
 tags: design, base62
+
+```problem
+Design a URL shortener `Codec`: `encode(longUrl)` returns a short URL, and `decode(shortUrl)` returns the original long URL. Any scheme works as long as decoding an encoded URL gives back the original.
+
+**Example:** `decode(encode("https://example.com/some/long/path"))` → `"https://example.com/some/long/path"`
+```
 
 Assign each new long URL an incrementing id, encode the id in **base62** (`[0-9a-zA-Z]`) for a short code; keep both maps so repeated URLs reuse the same code. (See the URL shortener system design article for scaling this.)
 
@@ -940,6 +988,14 @@ for _, u := range []string{"https://example.com/a?b=c#d", "x"} {
 ## 706. Design HashMap | Easy
 related: 705
 tags: hashing, chaining
+
+```problem
+Design `MyHashMap` without built-in hash tables: `put(key, value)` inserts or updates, `get(key)` returns the value or −1, and `remove(key)` deletes the key if present.
+
+**Example:** put(1,1), put(2,2), get(1) → 1, get(3) → −1, put(2,1), get(2) → 1, remove(2), get(2) → −1
+
+**Constraints:** keys and values ≤ 10⁶; up to 10⁴ calls.
+```
 
 Array of buckets, each a list of `[key, value]` pairs (**separate chaining**). Index = `key % buckets`. Real implementations also resize when the load factor gets high.
 
@@ -1070,6 +1126,12 @@ assertEq([]int{hm.Get(1), hm.Get(1010)}, []int{1, 7})
 related: 155
 tags: array, pointer
 
+```problem
+Design `BrowserHistory(homepage)` for a single tab: `visit(url)` opens url and clears all forward history, `back(steps)` and `forward(steps)` move at most `steps` pages (stopping at either end) and return the current URL.
+
+**Example:** home "a.com", visit b, c, d → back(1) = "c", back(1) = "b", forward(1) = "c", visit e → forward(2) = "e", back(2) = "b", back(7) = "a.com"
+```
+
 Array of pages + `cur` index + `last` (the end of the valid forward history). `visit` overwrites at `cur+1` and truncates forward history by setting `last = cur`.
 
 **Complexity:** O(1) per operation.
@@ -1170,6 +1232,12 @@ assertEq([]string{b.Forward(2), b.Back(2), b.Back(7)}, []string{"linkedin.com", 
 ## 1396. Design Underground System | Medium
 related: 146
 tags: hash-map
+
+```problem
+Design `UndergroundSystem`: `checkIn(id, station, t)` and `checkOut(id, station, t)` record a traveller's trip, and `getAverageTime(start, end)` returns the average duration of all completed trips that went directly from `start` to `end` (at least one exists). A traveller is checked into at most one station at a time.
+
+**Example:** trips Leyton → Waterloo taking 12 and 10 → `getAverageTime("Leyton","Waterloo")` = 11.0
+```
 
 `checkIn` stores `id → (station, time)`; `checkOut` pops it and accumulates `(start, end) → [total time, trips]`.
 
@@ -1282,6 +1350,14 @@ assertEq(u2.GetAverageTime("A", "B"), 3.0)
 related: 238, 303
 tags: prefix-product
 
+```problem
+Design `ProductOfNumbers` for a stream of non-negative integers: `add(num)` appends a number and `getProduct(k)` returns the product of the last `k` numbers (k never exceeds the count so far; products fit in 32 bits).
+
+**Example:** add 3, 0, 2, 5, 4 → getProduct(2) = 20, getProduct(3) = 40, getProduct(4) = 0; add 8 → getProduct(2) = 32
+
+**Constraints:** follow-up: O(1) per call.
+```
+
 Keep prefix products; a 0 resets the list (any window containing it is 0). `getProduct(k)` = `pre[-1] / pre[-1-k]`, or 0 if k reaches past the last reset.
 
 **Complexity:** O(1) per operation.
@@ -1368,6 +1444,14 @@ assertEq(p.GetProduct(2), 32)
 ## 284. Peeking Iterator | Medium
 related: 341, 173
 tags: iterator, design
+
+```problem
+Wrap an iterator (with `next()` and `hasNext()`) in a `PeekingIterator` that also supports `peek()`: return the next element without advancing.
+
+**Example:** over `[1,2,3]`: next() = 1, peek() = 2, next() = 2, next() = 3, hasNext() = false
+
+**Constraints:** follow-up: make it generic over element types.
+```
 
 Cache the next element: `peek` returns the cache; `next` returns it and refills from the underlying iterator.
 
@@ -1486,6 +1570,12 @@ assertEq([]any{pi.next(), pi.peek(), pi.next(), pi.next(), pi.hasNext()}, []any{
 ## 341. Flatten Nested List Iterator | Medium
 related: 284, 385
 tags: stack, iterator
+
+```problem
+Design `NestedIterator` over a nested list in which each element is an integer or another nested list. `next()` returns the integers one by one in left-to-right order, flattening the nesting, and `hasNext()` says whether any remain.
+
+**Example:** `[[1,1],2,[1,1]]` → `1,1,2,1,1`; `[1,[4,[6]]]` → `1,4,6`
+```
 
 Keep a stack of lists in **reverse** order. `hasNext` does the real work: while the top is a list, pop it and push its children reversed; stop when the top is an integer.
 
@@ -1635,6 +1725,12 @@ assertEq(flatten([]any{1, []any{4, []any{6}}, []any{[]any{}}}), []int{1, 4, 6})
 ## 432. All O`one Data Structure | Hard
 related: 460, 146
 tags: linked-list, bucket-sort
+
+```problem
+Design `AllOne`, which stores string counts: `inc(key)` adds 1 (inserting the key with count 1 if new), `dec(key)` subtracts 1 (removing the key at 0; the key always exists), `getMaxKey()` and `getMinKey()` return a key with the highest or lowest count (`""` if empty). Every operation must run in O(1) average time.
+
+**Example:** inc("hello") ×2 → getMaxKey() = "hello"; inc("leet") → getMaxKey() = "hello", getMinKey() = "leet"
+```
 
 Like LFU: a doubly linked list of **count buckets** in increasing order, each holding a set of keys, plus `key → bucket`. `inc`/`dec` move a key to the neighbouring bucket (creating it if the count isn't there), deleting emptied buckets. Min/max = first/last bucket.
 
@@ -1866,6 +1962,14 @@ assertEq([]string{a.GetMaxKey(), a.GetMinKey()}, []string{"", ""})
 related: 460, 155, 716
 tags: design, stack, buckets
 
+```problem
+Design `FreqStack`: `push(val)` pushes a value, and `pop()` removes and returns the most frequent value in the stack; among values tied for most frequent, it pops the one pushed most recently.
+
+**Example:** push 5, 7, 5, 7, 4, 5 → pop() = 5, then 7, then 5, then 4
+
+**Constraints:** up to 2·10⁴ calls.
+```
+
 Keep `freq[val]` and one **stack per frequency level**: when a value reaches frequency f, push it onto `group[f]` (it stays in the lower levels too). `pop` takes from `group[maxFreq]` — the most recent among the most frequent — decrements its frequency, and lowers `maxFreq` when that level empties.
 
 ```viz
@@ -1969,6 +2073,12 @@ assertEq([]int{fs.Pop(), fs.Pop(), fs.Pop()}, []int{9, 7, 5})
 ## 588. Design In-Memory File System | Hard
 related: 208, 71, 1166
 tags: design, trie, premium
+
+```problem
+Design an in-memory `FileSystem`: `ls(path)` returns `[name]` for a file path or the sorted names inside a directory; `mkdir(path)` creates the directory and any missing parents; `addContentToFile(filePath, content)` creates the file or appends to it; `readContentFromFile(filePath)` returns the file's content.
+
+**Example:** `ls("/")` → `[]`; `mkdir("/a/b/c")`; `addContentToFile("/a/b/c/d","hello")` → `ls("/")` = `["a"]`, `readContentFromFile("/a/b/c/d")` = `"hello"`
+```
 
 **Problem (Premium):** implement `ls(path)` (a file path → `[file name]`; a directory → its children's names sorted), `mkdir(path)` (creating missing parents), `addContentToFile(filePath, content)` (create or append) and `readContentFromFile(filePath)`. Paths are absolute, like `/a/b/c`.
 
@@ -2128,6 +2238,14 @@ assertEq(fs.Ls("/a/b"), []string{"aa", "c", "e"})
 related: 933, 359, 1396
 tags: design, queue, premium
 
+```problem
+Design `HitCounter`: `hit(timestamp)` records a hit at that second, and `getHits(timestamp)` returns the number of hits in the past 5 minutes (the 300 seconds up to and including `timestamp`). Timestamps never decrease, and several hits can share one timestamp.
+
+**Example:** hits at 1, 2, 3 → getHits(4) = 3; hit at 300 → getHits(300) = 4, getHits(301) = 3
+
+**Constraints:** follow-up: a huge number of hits per second.
+```
+
 **Problem (Premium):** `hit(timestamp)` records a hit (several may share a timestamp); `getHits(timestamp)` returns the hits in the past 5 minutes — timestamps in `(t − 300, t]`. Calls arrive in non-decreasing time order.
 
 A queue of `[timestamp, count]` buckets (collapsing equal timestamps) plus a running total: expire buckets from the front on read. For huge hit rates, the follow-up answer is a fixed ring of 300 one-second buckets (`times[t % 300]`, `counts[t % 300]`), O(300) memory regardless of traffic.
@@ -2233,6 +2351,12 @@ assertEq([]int{hc2.GetHits(300), hc2.GetHits(301)}, []int{1000, 0})
 related: 362, 346
 tags: queue, design
 
+```problem
+Design `RecentCounter`, whose `ping(t)` records a request at time t (in ms, strictly increasing) and returns the number of requests in the window [t − 3000, t].
+
+**Example:** pings at 1, 100, 3001, 3002 → `1, 2, 3, 3`
+```
+
 Pings arrive in increasing time order, so a queue works: push `t`, pop from the front while it's older than `t − 3000`; the queue length is the answer.
 
 **Complexity:** amortized O(1) per ping.
@@ -2295,6 +2419,14 @@ assertEq([]int{rc2.Ping(1), rc2.Ping(3001), rc2.Ping(3002), rc2.Ping(6003)}, []i
 ## 705. Design HashSet | Easy
 related: 706, 380
 tags: design, hashing
+
+```problem
+Design `MyHashSet` without built-in hash tables: `add(key)`, `remove(key)` and `contains(key)`.
+
+**Example:** add 1, add 2 → contains(1) = true, contains(3) = false; add 2, remove 2 → contains(2) = false
+
+**Constraints:** keys ≤ 10⁶; up to 10⁴ calls.
+```
 
 Separate chaining: an array of buckets (a prime count spreads keys evenly), each a small list; hash = `key % buckets`. Operations scan one bucket. Follow-ups: resize (rehash into 2× buckets) when the load factor grows; open addressing with tombstones as the alternative.
 

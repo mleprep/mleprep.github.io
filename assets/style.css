@@ -123,15 +123,14 @@ pre.viz code { color: var(--fg2); }
 label.done { display: inline-flex; gap: 0.4rem; align-items: center; cursor: pointer; user-select: none; }
 input[type="checkbox"] { width: 1.05rem; height: 1.05rem; accent-color: var(--accent); cursor: pointer; margin: 0; }
 
-/* ---------------------------------------------------------------- problem page: explanation | code */
-.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem 3rem; align-items: start; }
-.split .desc { min-width: 0; }
-@media (min-width: 1280px) {
-  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
-  .split .codecol { position: sticky; top: calc(var(--top) + 1.25rem); }
-  .split .code { margin-top: 0; }
-  .split .code .scroll { max-height: calc(100vh - var(--top) - 7.5rem); overflow: auto; }
-}
+/* ---------------------------------------------------------------- problem page: statement, then notes, then full-width code */
+.prob { max-width: calc(var(--measure) + 3rem); margin: 0 0 1.6rem; padding: 1rem 1.4rem 0.15rem; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0.8rem; background: var(--panel); }
+.prob h2 { margin: 0 0 0.45rem; font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.prob .md { color: var(--fg); }
+.prob .md p { margin: 0 0 0.75em; }
+.prob .md ul { margin: 0 0 0.75em; }
+.stack { min-width: 0; }
+.stack .code { margin-top: 1.75rem; }
 .code { margin: 1.5rem 0; border: 1px solid var(--line); border-radius: 0.8rem; overflow: hidden; background: var(--code-bg); }
 .code .bar { overflow-x: auto; scrollbar-width: none; display: flex; align-items: center; gap: 0.25rem; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); background: var(--panel); }
 .code .bar button { white-space: nowrap; border: 0; background: none; color: var(--muted); font: inherit; font-size: 0.85rem; font-weight: 500; padding: 0.3rem 0.75rem; border-radius: 0.45rem; cursor: pointer; }
@@ -146,11 +145,10 @@ input[type="checkbox"] { width: 1.05rem; height: 1.05rem; accent-color: var(--ac
 .tag.prem { color: var(--hard); }
 
 /* ---------------------------------------------------------------- solve mode: editor + in-browser judge */
-.modes { display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 0.75rem; border: 1px solid var(--line); border-radius: 0.65rem; background: var(--panel); }
+.modes { display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.25rem; border: 1px solid var(--line); border-radius: 0.65rem; background: var(--panel); }
 .modes button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 0.88rem; font-weight: 550; padding: 0.35rem 0.95rem; border-radius: 0.45rem; cursor: pointer; }
 .modes button:hover { color: var(--fg); background: var(--hover); }
 .modes button.on { color: var(--panel); background: var(--fg); }
-@media (min-width: 1280px) { .split .codecol.solving { position: static; } }
 .code .bar .lbl { font-size: 0.8rem; color: var(--muted); padding: 0 0.4rem; white-space: nowrap; }
 button.go, .code .bar button.go { background: var(--accent); color: #fff; font-weight: 600; border: 0; border-radius: 0.45rem; padding: 0.32rem 0.95rem; font: inherit; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
 button.go:hover, .code .bar button.go:hover { background: var(--accent); color: #fff; filter: brightness(1.08); }

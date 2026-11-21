@@ -21,6 +21,12 @@ rotate:  1 2 3     transpose  1 4 7    reverse rows  7 4 1
 related: 54, 189
 tags: blind75, matrix
 
+```problem
+Rotate the n×n `matrix` 90° clockwise **in place**, without allocating another matrix.
+
+**Example:** `[[1,2,3],[4,5,6],[7,8,9]]` → `[[7,4,1],[8,5,2],[9,6,3]]`
+```
+
 Transpose (swap `m[i][j]` with `m[j][i]`), then reverse every row. In place.
 
 **Complexity:** O(n²) time, O(1) space.
@@ -88,6 +94,12 @@ assertEq(m, [][]int{{1}})
 ## 54. Spiral Matrix | Medium
 related: 59, 48
 tags: blind75, matrix, boundaries
+
+```problem
+Return all elements of the m×n `matrix` in clockwise spiral order, starting at the top-left.
+
+**Example:** `[[1,2,3],[4,5,6],[7,8,9]]` → `[1,2,3,6,9,8,7,4,5]`
+```
 
 Walk right along `top`, down along `right`, left along `bottom`, up along `left`, shrinking each boundary after use. Guard the last two walks for single rows/columns.
 
@@ -171,6 +183,14 @@ assertEq(spiralOrder([][]int{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}), []in
 ## 73. Set Matrix Zeroes | Medium
 related: 289
 tags: blind75, matrix, in-place
+
+```problem
+Wherever `matrix` has a 0, set that cell's entire row and column to 0, in place.
+
+**Example:** `[[0,1,2,0],[3,4,5,2],[1,3,1,5]]` → `[[0,0,0,0],[0,4,5,0],[0,3,1,0]]`
+
+**Constraints:** follow-up: O(1) extra space.
+```
 
 Use row 0 and column 0 as zero-flags for their rows/columns; remember separately whether row 0 / col 0 themselves need zeroing.
 
@@ -272,6 +292,12 @@ assertEq(m, [][]int{{1, 0, 1}, {0, 0, 0}, {1, 0, 1}})
 related: 141, 258
 tags: cycle-detection
 
+```problem
+Repeatedly replace `n` by the sum of the squares of its digits. `n` is happy if this reaches 1; otherwise it loops forever in a cycle without 1. Decide whether `n` is happy.
+
+**Example:** `19` → `true` (1 + 81 = 82 → 68 → 100 → 1); `2` → `false`
+```
+
 Repeatedly summing squared digits either reaches 1 or loops. Detect the loop with Floyd (or a seen-set).
 
 **Complexity:** O(log n) per step; the sequence quickly drops below 243.
@@ -334,6 +360,12 @@ assertEq(isHappy(2), false)
 related: 2, 67
 tags: carry
 
+```problem
+`digits` holds a non-negative integer, most significant digit first, without leading zeros. Add one and return the resulting digits.
+
+**Example:** `[1,2,3]` → `[1,2,4]`; `[9,9]` → `[1,0,0]`
+```
+
 Walk from the last digit: a 9 becomes 0 and carries; any other digit increments and we're done. All 9s → prepend 1.
 
 **Complexity:** O(n).
@@ -387,6 +419,14 @@ assertEq(plusOne([]int{9, 9}), []int{1, 0, 0})
 ## 50. Pow(x, n) | Medium
 related: 69, 372
 tags: fast-power
+
+```problem
+Compute xⁿ for a float `x` and an integer `n`, which may be negative.
+
+**Example:** `x = 2.0, n = 10` → `1024.0`; `x = 2.0, n = -2` → `0.25`
+
+**Constraints:** n is a 32-bit integer; aim for O(log n) multiplications.
+```
 
 Binary exponentiation: `x^n = (x²)^(n/2)` (· x if n is odd). Negative n → `1 / x^(−n)` (use a long for `−Integer.MIN_VALUE`).
 
@@ -460,6 +500,14 @@ assertEq(myPow(2.0, -2), 0.25)
 ## 43. Multiply Strings | Medium
 related: 2, 415
 tags: grade-school
+
+```problem
+`num1` and `num2` are non-negative integers written as strings. Return their product as a string, without converting the whole inputs to integers or using big-integer libraries.
+
+**Example:** `"123" × "456"` → `"56088"`
+
+**Constraints:** lengths ≤ 200.
+```
 
 Digit `i` of `a` times digit `j` of `b` lands at positions `i + j` (carry) and `i + j + 1`. Accumulate into an array of length `m + n`, then strip leading zeros.
 
@@ -544,6 +592,14 @@ assertEq(multiply("0", "52"), "0")
 related: 12
 tags: string
 
+```problem
+Convert a Roman numeral to an integer. The symbols are I = 1, V = 5, X = 10, L = 50, C = 100, D = 500, M = 1000, and a smaller symbol written before a larger one is subtracted (IV = 4, IX = 9, XL = 40, XC = 90, CD = 400, CM = 900).
+
+**Example:** `"LVIII"` → `58`; `"MCMXCIV"` → `1994`
+
+**Constraints:** 1 ≤ value ≤ 3999.
+```
+
 Add each symbol's value, but **subtract** it when a larger symbol follows (IV, IX, XL, …).
 
 **Complexity:** O(n).
@@ -609,6 +665,12 @@ assertEq(romanToInt("MCMXCIV"), 1994)
 related: 13
 tags: greedy
 
+```problem
+Convert an integer from 1 to 3999 to a Roman numeral, using the subtractive forms IV, IX, XL, XC, CD and CM where they apply.
+
+**Example:** `58` → `"LVIII"`; `3749` → `"MMMDCCXLIX"`
+```
+
 Greedy over the 13 symbol values in descending order, **including** the subtractive pairs (900 CM, 400 CD, 90 XC, …).
 
 **Complexity:** O(1) (bounded output).
@@ -666,6 +728,14 @@ assertEq(intToRoman(1994), "MCMXCIV")
 ## 204. Count Primes | Medium
 related: 263
 tags: sieve
+
+```problem
+Return how many prime numbers are strictly less than `n`.
+
+**Example:** `10` → `4` (2, 3, 5, 7)
+
+**Constraints:** n ≤ 5·10⁶.
+```
 
 Sieve of Eratosthenes: for each prime `p` with `p² < n`, cross out `p², p²+p, …`.
 
@@ -734,6 +804,14 @@ assertEq(countPrimes(100), 25)
 ## 149. Max Points on a Line | Hard
 related: 2013
 tags: geometry, hash-map, gcd
+
+```problem
+Given distinct `points` on a plane, return the largest number of them that lie on one straight line.
+
+**Example:** `[[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]` → `4`
+
+**Constraints:** up to 300 points.
+```
 
 For each anchor point, group all other points by **reduced slope** `(dy/g, dx/g)` with a normalized sign. The largest group + 1 (the anchor) is the best line through that anchor.
 
@@ -823,6 +901,14 @@ assertEq(maxPoints([][]int{{1, 1}, {3, 2}, {5, 3}, {4, 1}, {2, 3}, {1, 4}}), 4)
 ## 2013. Detect Squares | Medium
 related: 149
 tags: design, hash-map
+
+```problem
+Design `DetectSquares`: `add(point)` records a point (duplicates allowed), and `count(point)` returns how many ways you can pick three recorded points that form, together with the query point, an axis-aligned square of positive area.
+
+**Example:** add `[3,10]`, `[11,2]`, `[3,2]` → `count([11,10])` = 1; `count([14,8])` = 0
+
+**Constraints:** coordinates ≤ 1000; up to 3000 calls.
+```
 
 Count points. For a query `(x, y)`, each stored point `(px, py)` with `|px − x| = |py − y| ≠ 0` is a diagonal corner; the square count is `cnt[diag] · cnt[(x, py)] · cnt[(px, y)]`.
 
@@ -936,6 +1022,14 @@ assertEq(ds.Count([]int{11, 10}), 2)
 related: 125, 7
 tags: math
 
+```problem
+Decide whether the integer `x` reads the same forwards and backwards.
+
+**Example:** `121` → `true`; `-121` → `false`; `10` → `false`
+
+**Constraints:** follow-up: without converting to a string.
+```
+
 Negative numbers and numbers ending in 0 (except 0) aren't palindromes. Reverse only the **second half** of the digits and compare with the first half — no overflow risk.
 
 **Complexity:** O(log x).
@@ -993,6 +1087,12 @@ assertEq(isPalindrome(1221), true)
 ## 67. Add Binary | Easy
 related: 2, 415
 tags: carry
+
+```problem
+Return the sum of two binary strings `a` and `b` as a binary string.
+
+**Example:** `"11" + "1"` → `"100"`; `"1010" + "1011"` → `"10101"`
+```
 
 Add from the right with a carry, like decimal addition in base 2.
 
@@ -1057,6 +1157,14 @@ assertEq(addBinary("1010", "1011"), "10101")
 related: 204
 tags: math
 
+```problem
+Return how many trailing zeros n! has.
+
+**Example:** `3` → `0`; `5` → `1` (5! = 120)
+
+**Constraints:** n ≤ 10⁴. Follow-up: logarithmic time.
+```
+
 Each trailing zero needs a factor 10 = 2 · 5, and 2s are plentiful, so count factors of 5: `n/5 + n/25 + n/125 + …`.
 
 **Complexity:** O(log n).
@@ -1105,6 +1213,12 @@ assertEq(trailingZeroes(100), 24)
 ## 59. Spiral Matrix II | Medium
 related: 54
 tags: matrix, boundaries
+
+```problem
+Return an n×n matrix filled with 1…n² in clockwise spiral order, starting at the top-left.
+
+**Example:** `n = 3` → `[[1,2,3],[8,9,4],[7,6,5]]`
+```
 
 Same four boundaries as Spiral Matrix, but write `1..n²` instead of reading.
 
@@ -1193,6 +1307,12 @@ assertEq(generateMatrix(1), [][]int{{1}})
 related: 7, 65
 tags: parsing, overflow
 
+```problem
+Implement `myAtoi(s)`: skip leading spaces, read an optional `+` or `-`, then read digits until the first non-digit (leading zeros are fine). No digits gives 0. Clamp the result to the 32-bit signed range [−2³¹, 2³¹ − 1].
+
+**Example:** `"42"` → `42`; `"   -042"` → `-42`; `"1337c0d3"` → `1337`; `"words 987"` → `0`
+```
+
 Skip spaces, read an optional sign, read digits until a non-digit; clamp to `[−2³¹, 2³¹−1]` (check before multiplying in Java).
 
 **Complexity:** O(n).
@@ -1273,6 +1393,14 @@ assertEq(myAtoi("-91283472332"), -2147483648)
 ## 29. Divide Two Integers | Medium
 related: 50, 371
 tags: bit-shifting
+
+```problem
+Divide two 32-bit integers without using multiplication, division or the modulo operator, truncating toward zero. If the result is outside [−2³¹, 2³¹ − 1], return the nearest bound.
+
+**Example:** `10 / 3` → `3`; `7 / -3` → `-2`
+
+**Constraints:** divisor ≠ 0; assume only 32-bit integers are available.
+```
 
 No `*`, `/`, `%`: subtract the **largest doubled divisor** (`divisor << k`) that fits, adding `1 << k` to the quotient. Work with negatives (or longs) to dodge the `−2³¹` overflow; the only overflow case is `−2³¹ / −1`.
 
@@ -1356,6 +1484,14 @@ assertEq(divide(-2147483648, 2), -1073741824)
 related: 528
 tags: rejection-sampling
 
+```problem
+Using only the given API `rand7()`, which returns a uniform random integer from 1 to 7, implement `rand10()`, which returns a uniform random integer from 1 to 10.
+
+**Example:** many calls to `rand10()` → each of 1…10 about 10% of the time
+
+**Constraints:** follow-up: minimise the expected number of `rand7()` calls.
+```
+
 `(rand7() − 1) · 7 + rand7()` is uniform on 1..49. Accept values ≤ 40 (a multiple of 10) and return `(v − 1) % 10 + 1`; otherwise retry. Expected ~2.45 calls to rand7 per rand10.
 
 **Complexity:** O(1) expected.
@@ -1428,6 +1564,12 @@ assertEq(ok, true)
 related: 459, 914
 tags: gcd, string
 
+```problem
+String t divides s if s is t repeated one or more times. Return the longest string that divides both `str1` and `str2`, or `""` if none does.
+
+**Example:** `"ABCABC", "ABC"` → `"ABC"`; `"ABABAB", "ABAB"` → `"AB"`; `"LEET", "CODE"` → `""`
+```
+
 If some string `x` divides both, then `str1 + str2 == str2 + str1` (both are repetitions of `x`); conversely, when that holds both are repetitions of a common block, and the longest divisor has length **gcd(len1, len2)**.
 
 **Complexity:** O(n + m).
@@ -1482,6 +1624,14 @@ assertEq(gcdOfStrings("AAAA", "AA"), "AA")
 ## 168. Excel Sheet Column Title | Easy
 related: 171
 tags: base-conversion
+
+```problem
+Return the spreadsheet column title for `columnNumber`: 1 → A, …, 26 → Z, 27 → AA, 28 → AB, and so on.
+
+**Example:** `28` → `"AB"`; `701` → `"ZY"`
+
+**Constraints:** columnNumber ≤ 2³¹ − 1.
+```
 
 Bijective base 26: digits are 1..26 (A..Z), there is no zero. Subtract 1 before each `% 26` / `// 26` step so `Z` (26) maps to the last letter without a carry.
 
@@ -1546,6 +1696,12 @@ assertEq(convertToTitle(2147483647), "FXSHRXW")
 ## 867. Transpose Matrix | Easy
 related: 48, 54
 tags: matrix
+
+```problem
+Return the transpose of `matrix`: flip it over its main diagonal, turning rows into columns.
+
+**Example:** `[[1,2,3],[4,5,6]]` → `[[1,4],[2,5],[3,6]]`
+```
 
 Element `(i, j)` moves to `(j, i)`, so an `R × C` matrix becomes `C × R` (a new matrix unless it's square).
 

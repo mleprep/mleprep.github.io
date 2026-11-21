@@ -17,6 +17,12 @@ for i, x in enumerate(a):
 related: 22, 32, 394
 tags: blind75
 
+```problem
+`s` contains only the brackets `()[]{}`. Decide whether it is valid: every opening bracket is closed by the same type of bracket, in the correct (properly nested) order.
+
+**Example:** `"()[]{}"` → `true`; `"(]"` → `false`; `"([)]"` → `false`
+```
+
 Push expected closers; on a closer, it must match the top.
 
 **Complexity:** O(n).
@@ -84,6 +90,12 @@ assertEq(isValid("{[]}"), true)
 ## 155. Min Stack | Medium
 related: 239, 716
 tags: design
+
+```problem
+Design a `MinStack` supporting `push(val)`, `pop()`, `top()` and `getMin()` (the smallest value currently on the stack), each in O(1) time. `pop`, `top` and `getMin` are only called on a non-empty stack.
+
+**Example:** push −2, push 0, push −3 → `getMin()` = −3; `pop()` → `top()` = 0, `getMin()` = −2
+```
 
 Store `(value, min so far)` pairs; the minimum is always at the top in O(1).
 
@@ -176,6 +188,12 @@ assertEq(m.GetMin(), -2)
 related: 224, 227
 tags: expression
 
+```problem
+Evaluate an arithmetic expression given in Reverse Polish (postfix) notation as a list of `tokens`: integers and the operators `+ - * /`. Division truncates toward zero. The expression is always valid.
+
+**Example:** `["2","1","+","3","*"]` → `9` (= (2 + 1) × 3)
+```
+
 Push numbers; an operator pops `b` then `a` and pushes `a op b`. Division truncates toward zero.
 
 **Complexity:** O(n).
@@ -253,6 +271,14 @@ assertEq(evalRPN([]string{"10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", 
 related: 496, 503, 901
 tags: monotonic-stack
 
+```problem
+For each day, return how many days you must wait after it for a strictly warmer temperature, or 0 if none comes.
+
+**Example:** `[73,74,75,71,69,72,76,73]` → `[1,1,4,2,1,1,0,0]`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Decreasing stack of indices. A warmer day pops every colder index and fills its wait = `i − j`.
 
 ```viz
@@ -321,6 +347,14 @@ assertEq(dailyTemperatures([]int{60, 50, 40}), []int{0, 0, 0})
 related: 739
 tags: monotonic-stack, sort
 
+```problem
+`n` cars drive toward `target` on a one-lane road; car i starts at `position[i]` with `speed[i]`. A car can't pass the one ahead: when it catches up, they continue together at the slower speed as one fleet. Return how many fleets arrive at `target` (a car catching up exactly at `target` joins that fleet).
+
+**Example:** `target = 12, position = [10,8,0,5,3], speed = [2,4,1,1,3]` → `3`
+
+**Constraints:** n ≤ 10⁵; positions are distinct.
+```
+
 Sort cars by position, closest to target first. Compute arrival time. A car behind that would arrive **earlier or equal** catches up and merges into the fleet ahead; otherwise it starts a new fleet.
 
 **Complexity:** O(n log n).
@@ -385,6 +419,14 @@ assertEq(carFleet(100, []int{0, 2, 4}, []int{4, 2, 1}), 1)
 ## 84. Largest Rectangle in Histogram | Hard
 related: 85, 42, 739
 tags: monotonic-stack
+
+```problem
+`heights` are the bar heights of a histogram with bars of width 1. Return the area of the largest rectangle that fits entirely inside the histogram.
+
+**Example:** `[2,1,5,6,2,3]` → `10` (height 5 across the bars 5 and 6)
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Increasing stack of indices. When bar `i` is lower than the top, the top bar's rectangle is bounded: right edge `i`, left edge = new top after popping. Append a sentinel 0 to flush the stack.
 
@@ -463,6 +505,14 @@ assertEq(largestRectangleArea([]int{2, 4}), 4)
 ## 85. Maximal Rectangle | Hard
 related: 84, 221
 tags: monotonic-stack, matrix
+
+```problem
+Given a binary `matrix` of `'0'`/`'1'` characters, return the area of the largest rectangle containing only `'1'`s.
+
+**Example:** `["10100","10111","11111","10010"]` → `6`
+
+**Constraints:** up to 200 × 200.
+```
 
 Treat each row as the floor of a histogram: `h[c]` = consecutive 1s ending at this row. Run **Largest Rectangle in Histogram** on every row.
 
@@ -570,6 +620,14 @@ assertEq(maximalRectangle(byteGrid("0110", "1111", "1110")), 6)
 related: 503, 739
 tags: monotonic-stack
 
+```problem
+`nums1` is a subset of `nums2` (all values distinct). For each value x of `nums1`, find x in `nums2` and return the first greater value to its right, or −1 if there is none.
+
+**Example:** `nums1 = [4,1,2], nums2 = [1,3,4,2]` → `[-1,3,-1]`
+
+**Constraints:** follow-up: O(len(nums1) + len(nums2)).
+```
+
 Compute next-greater for every value of `nums2` with a decreasing stack and store it in a map; answer queries from `nums1`.
 
 **Complexity:** O(n + m).
@@ -634,6 +692,14 @@ assertEq(nextGreaterElement([]int{2, 4}, []int{1, 2, 3, 4}), []int{3, -1})
 ## 503. Next Greater Element II | Medium
 related: 496, 739
 tags: monotonic-stack, circular
+
+```problem
+`nums` is circular (after the last element comes the first). For every element return the first greater value found by walking forward around the circle, or −1 if none exists.
+
+**Example:** `[1,2,1]` → `[2,-1,2]`
+
+**Constraints:** n ≤ 10⁴.
+```
 
 Circular array → iterate `2n` indices using `i % n`; only push during the first pass.
 
@@ -702,6 +768,12 @@ assertEq(nextGreaterElements([]int{1, 2, 3, 4, 3}), []int{2, 3, 4, -1, 4})
 ## 394. Decode String | Medium
 related: 20, 224
 tags: nesting
+
+```problem
+Decode `s`, where `k[text]` means `text` repeated `k` times; brackets can be nested. The input is always well formed and digits only appear as repeat counts.
+
+**Example:** `"3[a]2[bc]"` → `"aaabcbc"`; `"3[a2[c]]"` → `"accaccacc"`
+```
 
 On `[` push `(current string, repeat count)` and reset; on `]` pop and set `cur = prev + cur * k`.
 
@@ -796,6 +868,12 @@ assertEq(decodeString("2[abc]3[cd]ef"), "abcabccdcdcdef")
 related: 20
 tags: string
 
+```problem
+Convert an absolute Unix-style `path` to its canonical form: `.` means the current directory, `..` goes up one level (staying at the root if already there), repeated slashes count as one, and any other name (including `...`) is a directory. The result starts with a single `/`, has single slashes between names and no trailing slash.
+
+**Example:** `"/home//foo/"` → `"/home/foo"`; `"/../"` → `"/"`; `"/a/./b/../../c/"` → `"/c"`
+```
+
 Split on `/`. Skip `""` and `"."`; `".."` pops; anything else pushes. Join with `/`.
 
 **Complexity:** O(n).
@@ -860,6 +938,14 @@ assertEq(simplifyPath("/a/./b/../../c/"), "/c")
 ## 224. Basic Calculator | Hard
 related: 227, 150, 394
 tags: expression
+
+```problem
+Evaluate the expression `s` containing non-negative integers, `+`, `-`, parentheses and spaces, without `eval`. `-` can also be unary (as in `-(2+3)`), but never directly after another operator.
+
+**Example:** `"(1+(4+5+2)-3)+(6+8)"` → `23`
+
+**Constraints:** length ≤ 3·10⁵.
+```
 
 Only `+ - ( )`. Keep running `res` and `sign`. On `(`, push `(res, sign)` and restart; on `)`, `res = saved_res + saved_sign * res`.
 
@@ -950,6 +1036,12 @@ assertEq(calculate("-(2+3)"), -5)
 ## 227. Basic Calculator II | Medium
 related: 224, 150
 tags: expression
+
+```problem
+Evaluate the expression `s` containing non-negative integers, `+ - * /` and spaces (no parentheses), with the usual precedence. Division truncates toward zero.
+
+**Example:** `"3+2*2"` → `7`; `" 3/2 "` → `1`
+```
 
 No parentheses, but `* /` bind tighter. When an operator (or the end) is reached, apply the **previous** operator: `+x` / `-x` push, `*` / `/` combine with the top. Sum the stack.
 
@@ -1042,6 +1134,14 @@ assertEq(calculate("14-3/2"), 13)
 related: 739, 496
 tags: monotonic-stack, design
 
+```problem
+Design `StockSpanner`, whose `next(price)` receives a stock's daily price and returns its span: how many consecutive days, ending today and going back, had a price ≤ today's.
+
+**Example:** prices `100, 80, 60, 70, 60, 75, 85` → spans `1, 1, 1, 2, 1, 4, 6`
+
+**Constraints:** up to 10⁴ calls.
+```
+
 Stack of `(price, span)` with decreasing prices. A new price absorbs (pops) all smaller-or-equal prices and adds their spans.
 
 **Complexity:** amortized O(1) per call.
@@ -1119,6 +1219,14 @@ assertEq(got2, []int{1, 2, 3, 4, 5})
 ## 1249. Minimum Remove to Make Valid Parentheses | Medium
 related: 20, 301, 921
 tags: stack
+
+```problem
+Remove the fewest parentheses from `s` (letters plus `(` and `)`) so the parentheses become valid, and return any valid result.
+
+**Example:** `"lee(t(c)o)de)"` → `"lee(t(c)o)de"`; `"))(("` → `""`
+
+**Constraints:** length ≤ 10⁵.
+```
 
 Stack the indices of unmatched `(`; a `)` with an empty stack is invalid. Afterwards, every index still on the stack is an invalid `(`. Remove all invalid indices.
 
@@ -1199,6 +1307,12 @@ assertEq(minRemoveToMakeValid("))(("), "")
 ## 735. Asteroid Collision | Medium
 related: 20
 tags: stack, simulation
+
+```problem
+Asteroids move along a line: |value| is the size, the sign is the direction (positive right, negative left), all at the same speed. When two collide the smaller one explodes; equal sizes both explode. Asteroids moving the same way never meet. Return the state after all collisions.
+
+**Example:** `[5,10,-5]` → `[5,10]`; `[8,-8]` → `[]`; `[10,2,-5]` → `[10]`
+```
 
 Only a right-mover (stack top > 0) followed by a left-mover (x < 0) collide. While that happens, the smaller explodes; equal sizes both explode.
 
@@ -1282,6 +1396,14 @@ assertEq(asteroidCollision([]int{-2, -1, 1, 2}), []int{-2, -1, 1, 2})
 related: 316, 321
 tags: monotonic-stack, greedy
 
+```problem
+`num` is a non-negative integer as a string. Remove exactly `k` digits to make the remaining number as small as possible, and return it without leading zeros (`"0"` if nothing remains).
+
+**Example:** `num = "1432219", k = 3` → `"1219"`; `num = "10200", k = 1` → `"200"`
+
+**Constraints:** length ≤ 10⁵.
+```
+
 To minimize the number, a larger digit followed by a smaller one should go. Keep an **increasing** stack; pop while the top is bigger than the incoming digit and removals remain. Remove leftovers from the end; strip leading zeros.
 
 ```viz
@@ -1355,6 +1477,12 @@ assertEq(removeKdigits("10", 2), "0")
 ## 316. Remove Duplicate Letters | Medium
 related: 402, 1081
 tags: monotonic-stack, greedy
+
+```problem
+Remove letters from `s` so that every distinct letter appears exactly once, and return the lexicographically smallest such result (letters keep their relative order).
+
+**Example:** `"bcabc"` → `"abc"`; `"cbacdcbc"` → `"acdb"`
+```
 
 Smallest lexicographic result with each letter once. Keep an increasing stack; pop the top if it's larger than the current letter **and appears again later** (we can re-add it). Skip letters already in the stack.
 
@@ -1434,6 +1562,14 @@ assertEq(removeDuplicateLetters("cbacdcbc"), "acdb")
 related: 496
 tags: monotonic-stack
 
+```problem
+Decide whether `nums` contains a "132 pattern": indices i < j < k with `nums[i] < nums[k] < nums[j]`.
+
+**Example:** `[3,1,4,2]` → `true` (1, 4, 2); `[1,2,3,4]` → `false`
+
+**Constraints:** n ≤ 2·10⁵.
+```
+
 Scan from the right keeping a decreasing stack of candidates for "3" and `two` = the best "2" (largest value popped, i.e. smaller than some later-left "3"). If the current number is less than `two`, it's a valid "1".
 
 **Complexity:** O(n).
@@ -1498,6 +1634,14 @@ assertEq(find132pattern([]int{-1, 3, 2, 0}), true)
 ## 907. Sum of Subarray Minimums | Medium
 related: 84, 2104
 tags: monotonic-stack, contribution
+
+```problem
+Return the sum of `min(b)` over every contiguous subarray `b` of `arr`, modulo 10⁹ + 7.
+
+**Example:** `[3,1,2,4]` → `17`
+
+**Constraints:** n ≤ 3·10⁴.
+```
 
 Count, for each element, how many subarrays it is the minimum of: `left[i]` = distance to the previous **smaller** element, `right[i]` = distance to the next **smaller-or-equal** (asymmetric to avoid double-counting ties). Contribution = `arr[i] · left · right`.
 
@@ -1593,6 +1737,12 @@ assertEq(sumSubarrayMins([]int{11, 81, 94, 43, 3}), 444)
 related: 1209, 20
 tags: stack
 
+```problem
+Repeatedly delete two adjacent equal letters from `s` until no such pair remains, and return the final string (it is unique).
+
+**Example:** `"abbaca"` → `"ca"`
+```
+
 Use the output as a stack: if the incoming char equals the top, pop; else push.
 
 **Complexity:** O(n).
@@ -1647,6 +1797,14 @@ assertEq(removeDuplicates("azxxzy"), "ay")
 ## 225. Implement Stack using Queues | Easy
 related: 232
 tags: design, queue
+
+```problem
+Implement a LIFO stack `MyStack` (`push`, `pop`, `top`, `empty`) using only queue operations: push to back, peek/pop from front, size and is-empty.
+
+**Example:** push 1, push 2 → `top()` = 2, `pop()` = 2, `empty()` = false
+
+**Constraints:** follow-up: use a single queue.
+```
 
 One queue: after pushing `x`, rotate the previous `n−1` elements behind it so `x` is at the front. Push O(n), pop/top O(1).
 
@@ -1749,6 +1907,12 @@ assertEq(s2.Empty(), false)
 related: 844, 1047
 tags: stack
 
+```problem
+Each `*` in `s` removes itself and the closest non-star character to its left. Return the string after processing every star (this is always possible).
+
+**Example:** `"leet**cod*e"` → `"lecoe"`
+```
+
 Each `*` deletes the closest non-star character to its left — exactly a stack pop. Push letters, pop on `*`.
 
 **Complexity:** O(n).
@@ -1806,6 +1970,12 @@ assertEq(removeStars("abc"), "abc")
 ## 682. Baseball Game | Easy
 related: 150, 155
 tags: stack
+
+```problem
+Keep a baseball score record from `operations`: an integer records that score, `"+"` records the sum of the previous two scores, `"D"` doubles the previous score, and `"C"` removes the previous score. Return the sum of the final record.
+
+**Example:** `["5","2","C","D","+"]` → `30` (record 5, 10, 15)
+```
 
 The record is a stack of scores: a number pushes, `C` pops, `D` pushes double the top, `+` pushes the sum of the top two. Answer = sum of the stack.
 

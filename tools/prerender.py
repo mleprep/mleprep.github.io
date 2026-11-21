@@ -436,15 +436,16 @@ class Site:
                 f'<a href="{href(f["s"], f["t"], f["it"]["slug"])}"><i class="dot {f["it"]["difficulty"]}"></i>{f["it"]["id"]}. {esc(f["it"]["title"])}</a>'
                 for f in related) + "</div></div>") if related else ""
             other = "".join(f'<pre hidden><code class="language-{lang}">{esc(it[lang])}</code></pre>' for lang in ("java", "go") if it.get(lang))
-            h += (self.asked_at(it) +
-                  f'<div class="split"><div class="desc"><div id="body">{md_html(it["md"])}</div>{rel}</div>'
-                  '<div class="codecol"><div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button>'
+            prob = f'<section class="prob"><h2>Problem</h2><div id="prob">{md_html(it["problem"])}</div></section>' if it.get("problem") else ""
+            h += (self.asked_at(it) + prob +
+                  '<div class="modes" role="tablist" aria-label="Mode"><button role="tab" data-mode="read" class="on" aria-selected="true">Solution</button>'
                   '<button role="tab" data-mode="solve" aria-selected="false">Solve in browser ▶</button></div>'
+                  f'<div class="stack"><div id="body">{md_html(it["md"])}</div>'
                   '<div class="code" id="readbox"><div class="bar"><button data-l="python" class="on">Python</button><button data-l="java">Java</button>'
                   + ('<button data-l="go">Go</button>' if it.get("go") else "") + '<span class="sp"></span>'
                   '<button id="tests">Tests</button><button id="copy">Copy</button><button id="file" title="Open the runnable file on GitHub">Run locally ↗</button></div>'
-                  f'<div class="scroll"><pre><code id="src" class="language-python">{esc(it["py"])}</code></pre>'
-                  f'<pre class="test" hidden><code id="tsrc">{esc(it["pyTest"])}</code></pre>{other}</div></div></div></div>')
+                  f'<pre><code id="src" class="language-python">{esc(it["py"])}</code></pre>'
+                  f'<pre class="test" hidden><code id="tsrc">{esc(it["pyTest"])}</code></pre>{other}</div>{rel}</div>')
         else:
             rail = "".join(f'<a href="{href(s["id"], t["id"], x["slug"])}" class="{"on" if x["slug"] == it["slug"] else ""}">{esc(x["title"])}</a>'
                            for x in t["items"])
@@ -456,7 +457,7 @@ class Site:
 
     # ---- descriptions + structured data
     def desc_item(self, s, it):
-        body = plain(it["md"])
+        body = plain(it.get("problem") or it["md"])
         if s["id"] != "dsa":
             return clip(body if len(body) >= 100 else f"{it['title']}: {body}" if body else f"{it['title']}: {s['title']} interview notes.")
         d = clip(f"LeetCode {it['id']}. {it['title']} ({it['difficulty']}): {body}")

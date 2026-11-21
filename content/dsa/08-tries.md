@@ -15,6 +15,14 @@ insert "app", "apple", "bat"
 related: 211, 212, 14
 tags: blind75, design
 
+```problem
+Implement a `Trie` (prefix tree) with `insert(word)`, `search(word)` (was this exact word inserted?) and `startsWith(prefix)` (was any word with this prefix inserted?).
+
+**Example:** `insert("apple")` → `search("apple")` = true, `search("app")` = false, `startsWith("app")` = true
+
+**Constraints:** lowercase letters; up to 3·10⁴ calls.
+```
+
 Walk/create child nodes char by char. `search` needs `end` at the last node; `startsWith` only needs the path to exist.
 
 **Complexity:** O(L) per operation.
@@ -132,6 +140,14 @@ assertEq(t.Search("app"), true)
 ## 211. Design Add and Search Words Data Structure | Medium
 related: 208, 212
 tags: blind75, design, dfs
+
+```problem
+Design `WordDictionary` with `addWord(word)` and `search(word)`, where the search pattern may contain `.`, which matches any single letter.
+
+**Example:** add `"bad"`, `"dad"`, `"mad"` → `search("pad")` = false, `search(".ad")` = true, `search("b..")` = true
+
+**Constraints:** at most 2 dots per search; word length ≤ 25.
+```
 
 Trie + DFS: on `.`, try every child.
 
@@ -252,6 +268,14 @@ assertEq([]bool{wd.Search("..."), wd.Search("."), wd.Search("ba"), wd.Search("ba
 ## 212. Word Search II | Hard
 related: 79, 208
 tags: blind75, backtracking
+
+```problem
+Given an m×n `board` of letters and a list of `words`, return every word that can be traced on the board through horizontally or vertically adjacent cells, using each cell at most once per word.
+
+**Example:** `board = ["oaan","etae","ihkr","iflv"], words = ["oath","pea","eat","rain"]` → `["eat","oath"]`
+
+**Constraints:** board up to 12 × 12; up to 3·10⁴ words of length ≤ 10.
+```
 
 Put all words in a trie, then DFS from every cell **following the trie** — one traversal finds all words. Store the full word at its end node; clear it after finding (dedupe) and prune empty branches.
 
@@ -403,6 +427,14 @@ assertUnordered(findWords(byteGrid("ab", "cd"), []string{"ab", "cb", "ad", "bd",
 related: 208, 136
 tags: bit-trie, greedy
 
+```problem
+Return the maximum of `nums[i] XOR nums[j]` over all pairs i ≤ j.
+
+**Example:** `[3,10,5,25,2,8]` → `28` (5 XOR 25)
+
+**Constraints:** n ≤ 2·10⁵; values < 2³¹.
+```
+
 Insert numbers as 31-bit binary strings into a trie (high bit first). For each number, walk greedily toward the **opposite** bit at every level to maximize XOR.
 
 ```viz
@@ -504,6 +536,12 @@ assertEq(findMaximumXOR([]int{14, 70, 53, 83, 49, 91, 36, 80, 92, 51, 66, 70}), 
 ## 648. Replace Words | Medium
 related: 208
 tags: trie
+
+```problem
+Replace every word of `sentence` that starts with one of the `dictionary` roots by the shortest such root; other words stay unchanged.
+
+**Example:** `dictionary = ["cat","bat","rat"], sentence = "the cattle was rattled by the battery"` → `"the cat was rat by the bat"`
+```
 
 Insert the roots into a trie. For each word, walk the trie and stop at the **first** end-of-root marker; replace the word with that prefix.
 
@@ -609,6 +647,12 @@ assertEq(replaceWords([]string{"a", "b", "c"}, "aadsfasf absbs bbab cadsfafs"), 
 related: 208, 642
 tags: sort, binary-search, trie
 
+```problem
+As each character of `searchWord` is typed, suggest up to three `products` that start with the prefix typed so far, choosing the lexicographically smallest ones. Return the suggestion list after every character.
+
+**Example:** `products = ["mobile","mouse","moneypot","monitor","mousepad"], searchWord = "mouse"` → `[["mobile","moneypot","monitor"],["mobile","moneypot","monitor"],["mouse","mousepad"],["mouse","mousepad"],["mouse","mousepad"]]`
+```
+
 Sort the products once. For each typed prefix, binary-search its lower bound; the next 3 products that start with the prefix are the suggestions. (A trie storing the top-3 at each node is the alternative.)
 
 **Complexity:** O(n log n + L log n).
@@ -684,6 +728,14 @@ assertEq(suggestedProducts([]string{"bags", "baggage", "banner", "box", "cloths"
 ## 745. Prefix and Suffix Search | Hard
 related: 208, 211
 tags: trie, hashing
+
+```problem
+Design `WordFilter(words)` whose `f(pref, suff)` returns the largest index of a word that starts with `pref` and ends with `suff`, or −1 if there is none.
+
+**Example:** `WordFilter(["apple"])` → `f("a","e")` = 0
+
+**Constraints:** up to 10⁴ words of length ≤ 7; up to 10⁴ calls to `f`.
+```
 
 Words are short (≤ 7 chars), so precompute every `(prefix, suffix)` combination per word into a map `prefix + "#" + suffix → index` (later words overwrite → largest index wins). Queries become O(1). Trie alternative: insert `suffix + "#" + word` for every suffix and store the max index at each node.
 
@@ -763,6 +815,14 @@ assertEq(wf3.F("a", "c"), 1)
 ## 336. Palindrome Pairs | Hard
 related: 214, 5, 131
 tags: hash-map, palindrome
+
+```problem
+`words` holds distinct strings. Return every pair of indices `[i, j]` (i ≠ j) for which `words[i] + words[j]` is a palindrome.
+
+**Example:** `["bat","tab","cat"]` → `[[0,1],[1,0]]`
+
+**Constraints:** up to 5000 words of length ≤ 300; aim for better than checking every pair.
+```
 
 Map each **reversed** word to its index. For every word `w` and every split `w = pre + suf`:
 - if `pre` is some other word reversed and `suf` is a palindrome → `w + that word` is a palindrome;

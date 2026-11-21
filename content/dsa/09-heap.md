@@ -19,6 +19,14 @@ for x in nums:
 related: 215, 295
 tags: min-heap
 
+```problem
+Design `KthLargest(k, nums)`, initialised with a stream's first values; each `add(val)` appends a value and returns the k-th largest value seen so far.
+
+**Example:** `KthLargest(3, [4,5,8,2])` → `add(3)` = 4, `add(5)` = 5, `add(10)` = 5, `add(9)` = 8, `add(4)` = 8
+
+**Constraints:** up to 10⁴ calls to `add`.
+```
+
 Min-heap of the k largest seen so far; its root is the answer.
 
 **Complexity:** O(log k) per add.
@@ -117,6 +125,12 @@ assertEq(got2, []int{-3, -2, -2, 0, 4})
 related: 215
 tags: max-heap
 
+```problem
+Each turn, smash the two heaviest stones x ≤ y together: if they weigh the same both are destroyed, otherwise only a stone of weight y − x remains. Return the weight of the last stone, or 0 if none is left.
+
+**Example:** `[2,7,4,1,8,1]` → `1`
+```
+
 Simulate with a max-heap: smash the two heaviest, push back the difference.
 
 **Complexity:** O(n log n).
@@ -189,6 +203,14 @@ assertEq(lastStoneWeight([]int{1}), 1)
 related: 215, 347
 tags: max-heap, quickselect
 
+```problem
+Return the `k` points closest to the origin (by Euclidean distance), in any order. The answer is unique up to order.
+
+**Example:** `points = [[3,3],[5,-1],[-2,4]], k = 2` → `[[3,3],[-2,4]]`
+
+**Constraints:** up to 10⁴ points.
+```
+
 Keep a **max-heap of size k** on squared distance; evict the farthest. (Quickselect gives average O(n).)
 
 **Complexity:** O(n log k).
@@ -259,6 +281,14 @@ assertUnordered(kClosest([][]int{{3, 3}, {5, -1}, {-2, 4}}, 2), [][]int{{-2, 4},
 ## 215. Kth Largest Element in an Array | Medium
 related: 703, 347, 973
 tags: min-heap, quickselect
+
+```problem
+Return the k-th largest element of `nums` (in sorted order, so duplicates count; not the k-th distinct value).
+
+**Example:** `nums = [3,2,1,5,6,4], k = 2` → `5`; `nums = [3,2,3,1,2,4,5,5,6], k = 4` → `4`
+
+**Constraints:** n ≤ 10⁵. Can you do it without sorting?
+```
 
 Min-heap of size k → root is the k-th largest. Interview follow-up: **quickselect** (partition around a pivot, recurse into one side) for average O(n).
 
@@ -338,6 +368,14 @@ assertEq(findKthLargest([]int{3, 2, 3, 1, 2, 4, 5, 5, 6}, 4), 4)
 related: 767, 358
 tags: greedy, counting
 
+```problem
+`tasks` are letters, each taking one time unit. Two runs of the same letter must be separated by at least `n` units; in each unit the CPU runs one task or stays idle, and tasks can run in any order. Return the minimum number of units needed for all tasks.
+
+**Example:** `tasks = ["A","A","A","B","B","B"], n = 2` → `8` (A B idle A B idle A B)
+
+**Constraints:** up to 10⁴ tasks; 0 ≤ n ≤ 100.
+```
+
 The most frequent task(s) dictate the frame: `(maxf − 1)` full blocks of size `n + 1`, plus one slot per task tied at `maxf`. If there are more tasks than slots, no idle is needed → answer is `len(tasks)`.
 
 ```viz
@@ -401,6 +439,12 @@ assertEq(leastInterval([]byte("AAABBB"), 3), 10)
 ## 355. Design Twitter | Medium
 related: 23
 tags: design, k-way-merge
+
+```problem
+Design a mini `Twitter`: `postTweet(userId, tweetId)`, `follow(followerId, followeeId)`, `unfollow(followerId, followeeId)`, and `getNewsFeed(userId)`, which returns the ids of the 10 most recent tweets posted by the user or anyone they follow, newest first.
+
+**Example:** user 1 posts 5; user 1 follows 2; user 2 posts 6 → `getNewsFeed(1)` = `[6,5]`; after user 1 unfollows 2 → `[5]`
+```
 
 Store each user's tweets as `(time, id)` lists. `getNewsFeed` = k-way merge of the followees' lists (newest first) with a heap, stopping at 10.
 
@@ -582,6 +626,14 @@ assertEq(tw.GetNewsFeed(1), []int{5})
 related: 4, 480, 703
 tags: blind75, two-heaps, design
 
+```problem
+Design `MedianFinder` with `addNum(num)`, which adds a number from a data stream, and `findMedian()`, which returns the median of all numbers so far (the mean of the two middle ones when the count is even).
+
+**Example:** add 1, add 2 → `findMedian()` = 1.5; add 3 → `findMedian()` = 2.0
+
+**Constraints:** up to 5·10⁴ calls. Follow-up: what if all numbers are in [0, 100]?
+```
+
 `lo` = max-heap of the smaller half, `hi` = min-heap of the larger half, `len(lo) ∈ {len(hi), len(hi)+1}`. Push into `lo`, move its max to `hi`, rebalance. Median = top of `lo`, or the average of both tops.
 
 ```viz
@@ -688,6 +740,14 @@ assertEq(mf.FindMedian(), 2.0)
 related: 23, 373, 240
 tags: k-way-merge, binary-search
 
+```problem
+In the n×n `matrix`, every row and every column is sorted ascending. Return the k-th smallest element in sorted order (duplicates count), using less than O(n²) memory.
+
+**Example:** `[[1,5,9],[10,11,13],[12,13,15]], k = 8` → `13`
+
+**Constraints:** n ≤ 300.
+```
+
 Rows are sorted lists → k-way merge: heap seeded with each row's first element; pop k−1 times, pushing the next in the same row. (Alt: binary search on value + count ≤ mid staircase, O(n log range).)
 
 **Complexity:** O(k log n).
@@ -762,6 +822,14 @@ assertEq(kthSmallest([][]int{{-5}}, 1), -5)
 ## 767. Reorganize String | Medium
 related: 621, 358
 tags: greedy, max-heap
+
+```problem
+Rearrange the letters of `s` so that no two adjacent characters are equal, and return any such arrangement, or `""` if it's impossible.
+
+**Example:** `"aab"` → `"aba"`; `"aaab"` → `""`
+
+**Constraints:** length ≤ 500.
+```
 
 Greedy: always place the most frequent char that isn't the previous one. With a max-heap, pop the top, append it, then push back the *previous* char (held out for one turn). Impossible if any count > ⌈n/2⌉.
 
@@ -865,6 +933,14 @@ assertEq(reorganizeString("aaab"), "")
 related: 630
 tags: greedy, two-heaps
 
+```problem
+You start with capital `w` and may finish at most `k` projects. Project i needs at least `capital[i]` to start and adds `profits[i]` to your capital when done (the capital isn't spent). Return the largest capital you can end with.
+
+**Example:** `k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]` → `4`
+
+**Constraints:** up to 10⁵ projects.
+```
+
 Sort projects by capital. Each round, push every newly affordable project's profit into a max-heap and take the best one. Repeat k times.
 
 **Complexity:** O(n log n + k log n).
@@ -950,6 +1026,14 @@ assertEq(findMaximizedCapital(3, 0, []int{1, 2, 3}, []int{0, 1, 2}), 6)
 related: 378, 23
 tags: k-way-merge
 
+```problem
+`nums1` and `nums2` are sorted ascending. Return the `k` pairs `[u, v]`, with `u` from `nums1` and `v` from `nums2`, that have the smallest sums.
+
+**Example:** `nums1 = [1,7,11], nums2 = [2,4,6], k = 3` → `[[1,2],[1,4],[1,6]]`
+
+**Constraints:** arrays up to 10⁵ long; k ≤ 10⁴.
+```
+
 Think of an implicit sorted matrix `nums1[i] + nums2[j]`. Seed the heap with `(i, 0)` for the first k rows; each pop pushes `(i, j+1)`.
 
 **Complexity:** O(k log k).
@@ -1029,6 +1113,14 @@ assertUnordered(kSmallestPairs([]int{1, 1, 2}, []int{1, 2, 3}, 2), [][]int{{1, 1
 related: 347
 tags: heap, sort
 
+```problem
+Return the `k` most frequent words, ordered by frequency from highest to lowest; words with equal frequency go in lexicographic order.
+
+**Example:** `words = ["i","love","leetcode","i","love","coding"], k = 2` → `["i","love"]`
+
+**Constraints:** follow-up: O(n log k) time.
+```
+
 Count, then order by `(−count, word)`. A size-k heap needs the *reverse* order (min count, then larger word evicted first).
 
 **Complexity:** O(n log k).
@@ -1093,6 +1185,12 @@ assertEq(topKFrequent([]string{"the", "day", "is", "sunny", "the", "the", "the",
 related: 347, 692
 tags: bucket-sort, counting
 
+```problem
+Sort the characters of `s` by decreasing frequency (case-sensitive). Any order among characters with equal counts is fine.
+
+**Example:** `"tree"` → `"eert"` (or `"eetr"`); `"Aabb"` → `"bbAa"` (or `"bbaA"`)
+```
+
 Count characters, then emit them from most to least frequent (bucket sort by count, or sort the ≤ 62 distinct chars).
 
 **Complexity:** O(n).
@@ -1155,6 +1253,14 @@ assertEq(r2 == "bbAa" || r2 == "bbaA", true)
 related: 973, 35
 tags: binary-search, fixed-window
 
+```problem
+`arr` is sorted. Return the `k` values closest to `x`, sorted ascending. `a` is closer than `b` if |a − x| < |b − x|, or if the distances are equal and a < b.
+
+**Example:** `arr = [1,2,3,4,5], k = 4, x = 3` → `[1,2,3,4]`
+
+**Constraints:** n ≤ 10⁴.
+```
+
 The answer is a window `arr[i .. i+k)`. Binary search its start `i ∈ [0, n−k]`: if `x − arr[mid] > arr[mid+k] − x`, the window should move right.
 
 **Complexity:** O(log(n − k) + k).
@@ -1215,6 +1321,14 @@ assertEq(findClosestElements([]int{1, 3}, 1, 2), []int{1})
 ## 1642. Furthest Building You Can Reach | Medium
 related: 871, 630
 tags: greedy, min-heap
+
+```problem
+Walk from building 0 to the right. Stepping down or level is free; stepping up by `d` costs either one ladder or `d` bricks. Using your `bricks` and `ladders` optimally, return the furthest building index you can reach.
+
+**Example:** `heights = [4,2,7,6,9,14,12], bricks = 5, ladders = 1` → `4`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Use ladders for the **largest** climbs. Push every climb into a min-heap; when the heap exceeds `ladders`, the smallest climb gets paid with bricks instead. Stop when bricks go negative.
 
@@ -1298,6 +1412,14 @@ assertEq(furthestBuilding([]int{14, 3, 19, 3}, 17, 0), 3)
 related: 1642, 134
 tags: greedy, max-heap
 
+```problem
+A car drives toward `target` miles away, starting with `startFuel` litres and burning 1 litre per mile. `stations[i] = [position, fuel]` lists gas stations in order of position; at a station you may take all of its fuel. Return the minimum number of refuelling stops to reach the target, or −1 if it's unreachable. Arriving anywhere with 0 fuel left still counts.
+
+**Example:** `target = 100, startFuel = 10, stations = [[10,60],[20,30],[30,30],[60,40]]` → `2`
+
+**Constraints:** up to 500 stations.
+```
+
 Drive as far as the fuel allows, pushing every station passed into a max-heap. When stuck, retroactively refuel at the **biggest** station passed (one stop). Fail if the heap is empty.
 
 **Complexity:** O(n log n).
@@ -1379,6 +1501,14 @@ assertEq(minRefuelStops(100, 10, [][]int{{10, 60}, {20, 30}, {30, 30}, {60, 40}}
 related: 1642, 502
 tags: greedy, max-heap
 
+```problem
+`courses[i] = [duration, lastDay]`: the course takes `duration` consecutive days and must be finished by day `lastDay`. You take one course at a time, starting on day 1. Return the maximum number of courses you can complete.
+
+**Example:** `[[100,200],[200,1300],[1000,1250],[2000,3200]]` → `3`
+
+**Constraints:** up to 10⁴ courses.
+```
+
 Sort by deadline and take courses greedily, tracking total time. If the deadline is exceeded, drop the **longest** course taken so far (max-heap): the count stays the same but the time used shrinks.
 
 **Complexity:** O(n log n).
@@ -1452,6 +1582,14 @@ assertEq(scheduleCourse([][]int{{3, 2}, {4, 3}}), 0)
 ## 1834. Single-Threaded CPU | Medium
 related: 621
 tags: simulation, min-heap
+
+```problem
+`tasks[i] = [enqueueTime, processingTime]`. A single-threaded CPU, whenever idle, starts the available task with the shortest processing time (ties: smallest index) and runs it to completion; if nothing is available it waits. Return the order in which the tasks are processed.
+
+**Example:** `[[1,2],[2,4],[3,2],[4,1]]` → `[0,2,3,1]`
+
+**Constraints:** up to 10⁵ tasks.
+```
 
 Sort tasks by enqueue time. At each step, push all tasks that have arrived by `time` into a heap keyed by `(processing time, index)`; run the top. If the heap is empty, jump `time` to the next arrival.
 
@@ -1552,6 +1690,14 @@ assertEq(getOrder([][]int{{7, 10}, {7, 12}, {7, 5}, {7, 4}, {7, 2}}), []int{4, 3
 related: 295, 239
 tags: sorted-window, two-heaps
 
+```problem
+A window of size `k` slides over `nums` from left to right. Return the median of every window (the mean of the two middle values when `k` is even).
+
+**Example:** `nums = [1,3,-1,-3,5,3,6,7], k = 3` → `[1.0,-1.0,-1.0,3.0,5.0,6.0]`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Maintain the current window **sorted**: insert the new value and delete the outgoing one with binary search; the median is the middle element(s). Optimal alternative: the two-heap median finder (295) with lazy deletion, or two balanced `TreeSet`s (Java, below), for O(n log k).
 
 **Complexity:** O(n log k) with balanced trees; O(n·k) with a plain sorted list (fine in practice for Python).
@@ -1622,6 +1768,14 @@ assertEq(medianSlidingWindow([]int{1, 2, 3, 4, 2, 3, 1, 4, 2}, 3), []float64{2, 
 ## 632. Smallest Range Covering Elements from K Lists | Hard
 related: 23, 76
 tags: k-way-merge, min-heap
+
+```problem
+Given `k` sorted lists, return the smallest range `[a, b]` that contains at least one number from every list. A range is smaller if it is narrower, or equally wide and starts lower.
+
+**Example:** `[[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]` → `[20,24]`
+
+**Constraints:** k ≤ 3500; lists up to 50 long.
+```
 
 K-way merge with a min-heap holding one element from each list, plus the current **maximum** of those elements. The heap top and the max form a range containing one element of every list. Advance the list that holds the minimum (the only move that can shrink the range); stop when that list runs out.
 
@@ -1721,6 +1875,14 @@ assertEq(smallestRange([][]int{{10, 10}, {11, 11}}), []int{10, 11})
 ## 2336. Smallest Number in Infinite Set | Medium
 related: 1845, 703
 tags: min-heap, design
+
+```problem
+Design `SmallestInfiniteSet`, which starts out containing every positive integer: `popSmallest()` removes and returns the smallest number in it, and `addBack(num)` puts `num` back if it is missing.
+
+**Example:** `addBack(2)`, then `popSmallest()` ×3 → 1, 2, 3; `addBack(1)` → `popSmallest()` = 1, then 4
+
+**Constraints:** up to 1000 calls; num ≤ 1000.
+```
 
 Every integer `≥ nxt` is still present — no need to store them. Numbers added back **below** `nxt` go into a min-heap (with a set to avoid duplicates). Pop from the heap if it's non-empty, otherwise hand out `nxt` and increment it.
 
@@ -1831,6 +1993,14 @@ assertEq([]int{s2.PopSmallest(), s2.PopSmallest()}, []int{1, 3})
 related: 857, 1383
 tags: min-heap, sort, greedy
 
+```problem
+Choose `k` indices. Their score is (sum of `nums1` at those indices) × (minimum of `nums2` at those indices). Return the maximum possible score.
+
+**Example:** `nums1 = [1,3,3,2], nums2 = [2,1,3,4], k = 3` → `12` (indices 0, 2, 3: (1 + 3 + 2) × 2)
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Sort pairs by `nums2` **descending**. When we reach pair `i`, `nums2[i]` is the minimum of everything seen so far — so fix it as the multiplier and pair it with the **k largest `nums1`** among the seen pairs, kept in a size-k min-heap with a running sum.
 
 **Complexity:** O(n log n).
@@ -1918,6 +2088,14 @@ assertEq(maxScore([]int{2, 1, 14, 12}, []int{11, 7, 13, 6}, 3), 168)
 ## 2462. Total Cost to Hire K Workers | Medium
 related: 2542, 1046
 tags: two-heaps
+
+```problem
+Hire `k` workers in `k` rounds. Each round, pick the cheapest worker among the first `candidates` and the last `candidates` workers still available (ties go to the smaller index); hired workers leave the line. Return the total cost.
+
+**Example:** `costs = [17,12,10,2,7,2,11,20,8], k = 3, candidates = 4` → `11` (2 + 2 + 7)
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Two min-heaps: the first `candidates` workers and the last `candidates` workers (never overlapping — the pointers `i ≤ j` guarantee each worker is in at most one heap). Each round hire the cheaper top (front wins ties: smaller index), then refill that side from the middle.
 
@@ -2012,6 +2190,12 @@ assertEq(totalCost([]int{2, 2, 2, 2}, 2, 1), 4)
 ## 1405. Longest Happy String | Medium
 related: 767, 621
 tags: max-heap, greedy
+
+```problem
+Build the longest possible string from at most `a` letters `'a'`, `b` letters `'b'` and `c` letters `'c'` such that it never contains `"aaa"`, `"bbb"` or `"ccc"`. Return any longest one (possibly `""`).
+
+**Example:** `a = 1, b = 1, c = 7` → `"ccaccbcc"` (or another valid string of length 8)
+```
 
 Greedy with a max-heap of remaining counts: append the most plentiful letter unless the last two characters are already that letter — then append the second most plentiful instead (and stop if there is none). Using the largest pile whenever allowed is what keeps the string as long as possible.
 

@@ -13,6 +13,10 @@ Problem format (content/dsa/*.md):
     related: 15, 167
     tags: blind75, hash-map
 
+    ```problem                    (a short statement in our own words, never LeetCode's text: shown as the
+    Given an array `nums`...       "Problem" card above the notes, and kept visible in solve mode)
+    ```
+
     Markdown explanation, ```viz blocks for ASCII diagrams, **Complexity** line...
 
     ```python
@@ -224,7 +228,7 @@ def parse_item(section, topic, head, body, src):
 
         def grab(mm):
             lang = mm.group(1)
-            if lang in ("python", "java", "go") and lang not in code:
+            if lang in ("python", "java", "go", "problem") and lang not in code:
                 code[lang] = mm.group(2)
                 return ""
             return mm.group(0)
@@ -236,6 +240,7 @@ def parse_item(section, topic, head, body, src):
         item["py"], item["pyTest"] = split_test(code["python"], "# test")
         item["java"], item["javaTest"] = split_test(code["java"], "// test")
         item["pyStub"] = py_stub(item["py"], item["pyTest"])
+        item["problem"] = code.get("problem", "").strip()
         if "go" in code:
             item["go"], item["goTest"] = split_test(code["go"], "// test")
             item["goStub"] = go_stub(item["go"], item["goTest"])

@@ -35,6 +35,14 @@ prefix: 0  10  15  15   5   0      <- final values
 related: 304, 307, 560
 tags: prefix-sum
 
+```problem
+Design `NumArray(nums)` whose `sumRange(left, right)` returns the sum of `nums[left..right]` (inclusive). The array never changes, and there are many queries.
+
+**Example:** `NumArray([-2,0,3,-5,2,-1])` → `sumRange(0,2)` = 1, `sumRange(2,5)` = −1, `sumRange(0,5)` = −3
+
+**Constraints:** up to 10⁴ queries.
+```
+
 Precompute `pre[i] = a[0] + … + a[i−1]`; then `sum(l, r) = pre[r+1] − pre[l]`.
 
 **Complexity:** O(n) build, O(1) query.
@@ -96,6 +104,14 @@ assertEq(one.SumRange(0, 0), 5)
 ## 304. Range Sum Query 2D - Immutable | Medium
 related: 303, 221
 tags: prefix-sum, 2d
+
+```problem
+Design `NumMatrix(matrix)` whose `sumRegion(row1, col1, row2, col2)` returns the sum of the rectangle with those top-left and bottom-right corners (inclusive), in O(1) per query. The matrix never changes.
+
+**Example:** for the 5×5 matrix `[[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]]`, `sumRegion(2,1,4,3)` → `8`
+
+**Constraints:** up to 200 × 200; up to 10⁴ queries.
+```
 
 `P[r][c]` = sum of the rectangle above-left of `(r, c)` (exclusive). Inclusion–exclusion: `sum = P[r2+1][c2+1] − P[r1][c2+1] − P[r2+1][c1] + P[r1][c1]`.
 
@@ -183,6 +199,14 @@ assertEq(small.SumRegion(1, 1, 1, 1), 4)
 ## 307. Range Sum Query - Mutable | Medium
 related: 303, 315
 tags: fenwick-tree, segment-tree
+
+```problem
+Design `NumArray(nums)` with `update(index, val)`, which sets `nums[index] = val`, and `sumRange(left, right)`, which returns the sum of `nums[left..right]`. Both kinds of calls are frequent.
+
+**Example:** `NumArray([1,3,5])` → `sumRange(0,2)` = 9; `update(1,2)` → `sumRange(0,2)` = 8
+
+**Constraints:** n ≤ 3·10⁴; up to 3·10⁴ calls.
+```
 
 Point updates break plain prefix sums (O(n) per update). A **Fenwick tree** stores partial sums over power-of-two ranges: both update and prefix query walk O(log n) nodes. `update` adds the delta `val − nums[i]`.
 
@@ -295,6 +319,14 @@ assertEq([]int{na.SumRange(0, 2), na.SumRange(1, 1)}, []int{8, 2})
 related: 1094, 370
 tags: difference-array
 
+```problem
+Flights are numbered 1…n. `bookings[i] = [first, last, seats]` reserves `seats` seats on every flight from `first` to `last`. Return the total number of seats reserved on each flight.
+
+**Example:** `bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5` → `[10,55,45,25,25]`
+
+**Constraints:** n and the number of bookings ≤ 2·10⁴.
+```
+
 Each booking adds `seats` to a range of flights: `d[first] += seats`, `d[last + 1] -= seats`. One prefix-sum pass produces all totals.
 
 **Complexity:** O(n + bookings).
@@ -349,6 +381,14 @@ assertEq(corpFlightBookings([][]int{{1, 2, 10}, {2, 2, 15}}, 2), []int{10, 25})
 ## 1094. Car Pooling | Medium
 related: 1109, 253
 tags: difference-array, sweep-line
+
+```problem
+A car with `capacity` empty seats drives east only. `trips[i] = [passengers, from, to]` picks up `passengers` at kilometre `from` and drops them off at `to`. Decide whether every trip can be served without ever exceeding capacity.
+
+**Example:** `trips = [[2,1,5],[3,3,7]]`: `capacity = 4` → `false`; `capacity = 5` → `true`
+
+**Constraints:** up to 1000 trips; locations ≤ 1000.
+```
 
 Passengers board at `from` and leave at `to`: `d[from] += n`, `d[to] −= n`. Sweep the locations; if the running load ever exceeds capacity → false.
 
@@ -413,6 +453,14 @@ assertEq(carPooling([][]int{{2, 1, 5}, {3, 5, 7}}, 3), true)
 ## 315. Count of Smaller Numbers After Self | Hard
 related: 493, 307
 tags: fenwick-tree, coordinate-compression
+
+```problem
+For each `nums[i]`, count how many elements to its right are strictly smaller, and return these counts.
+
+**Example:** `[5,2,6,1]` → `[2,1,1,0]`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Scan from the right. Compress values to ranks `1..m`; a Fenwick tree counts how many already-seen (i.e. to the right) values have a smaller rank: `query(rank − 1)`, then `add(rank, 1)`.
 
@@ -500,6 +548,14 @@ assertEq(countSmaller([]int{-1, -1}), []int{0, 0})
 ## 493. Reverse Pairs | Hard
 related: 315
 tags: merge-sort, divide-and-conquer
+
+```problem
+Count the pairs (i, j) with i < j and nums[i] > 2 × nums[j].
+
+**Example:** `[1,3,2,3,1]` → `2`; `[2,4,3,5,1]` → `3`
+
+**Constraints:** n ≤ 5·10⁴; values span the full 32-bit range.
+```
 
 Merge sort: after sorting both halves, count pairs `i` in the left, `j` in the right with `a[i] > 2·a[j]` using a single moving pointer (both halves sorted), then merge normally.
 
@@ -602,6 +658,14 @@ assertEq(reversePairs([]int{2147483647, 2147483647, 2147483647}), 0)
 ## 218. The Skyline Problem | Hard
 related: 253, 850
 tags: sweep-line, max-heap
+
+```problem
+`buildings[i] = [left, right, height]` are rectangles standing on flat ground. Return the skyline (the outer contour of the union) as a list of key points `[x, y]` sorted by x: each marks the left end of a horizontal segment, and the last point has y = 0. Consecutive points must not have equal heights.
+
+**Example:** `[[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]` → `[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]`
+
+**Constraints:** up to 10⁴ buildings.
+```
 
 Sweep x-coordinates of all building edges. At each x, add buildings starting here to a max-heap of `(height, right)`, lazily pop buildings whose `right ≤ x`. The skyline changes whenever the current max height differs from the last output height.
 
@@ -709,6 +773,12 @@ assertEq(getSkyline([][]int{{0, 2, 3}, {2, 5, 3}}), [][]int{{0, 3}, {5, 0}})
 related: 724, 303
 tags: prefix-sum
 
+```problem
+A biker starts at altitude 0; `gain[i]` is the net altitude change between points i and i + 1. Return the highest altitude reached.
+
+**Example:** `[-5,1,5,0,-7]` → `1` (altitudes 0, −5, −4, 1, 1, −6)
+```
+
 The altitudes are the prefix sums of `gain`, starting from 0; return the largest one (including the starting 0).
 
 **Complexity:** O(n).
@@ -754,6 +824,14 @@ assertEq(largestAltitude([]int{3}), 3)
 ## 724. Find Pivot Index | Easy
 related: 1732, 238, 560
 tags: prefix-sum
+
+```problem
+Return the leftmost index where the sum of the elements strictly to its left equals the sum of the elements strictly to its right (an empty side sums to 0), or −1 if there is none.
+
+**Example:** `[1,7,3,6,5,6]` → `3` (1 + 7 + 3 = 5 + 6); `[1,2,3]` → `-1`
+
+**Constraints:** n ≤ 10⁴.
+```
 
 With `total` known, the right sum at `i` is `total − left − nums[i]`. Scan once, maintaining `left`; return the first `i` where both sides match.
 

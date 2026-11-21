@@ -35,6 +35,14 @@ subsets of [1,2,3]               []
 related: 90, 77, 46
 tags: subsets
 
+```problem
+`nums` holds distinct integers. Return every subset (the power set), in any order, with no duplicate subsets.
+
+**Example:** `[1,2,3]` → `[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]`
+
+**Constraints:** n ≤ 10.
+```
+
 Every node of the decision tree is a subset — record the path on entry.
 
 **Complexity:** O(n · 2ⁿ).
@@ -102,6 +110,14 @@ assertUnorderedDeep(subsets([]int{0}), [][]int{{}, {0}})
 ## 90. Subsets II | Medium
 related: 78, 40, 47
 tags: subsets, dedupe
+
+```problem
+`nums` may contain duplicates. Return every distinct subset, in any order, without listing the same subset twice.
+
+**Example:** `[1,2,2]` → `[[],[1],[1,2],[1,2,2],[2],[2,2]]`
+
+**Constraints:** n ≤ 10.
+```
 
 Sort; at the same depth skip a value equal to its left neighbour (`i > start`), so each distinct choice branches once.
 
@@ -182,6 +198,14 @@ assertUnorderedDeep(subsetsWithDup([]int{4, 4, 1, 4}), [][]int{{}, {1}, {1, 4}, 
 related: 40, 216, 377, 322
 tags: blind75, combinations
 
+```problem
+`candidates` are distinct positive integers. Return every unique combination that sums to `target`, where each candidate may be used **any number of times**. Two combinations differ if some number is used a different number of times.
+
+**Example:** `candidates = [2,3,6,7], target = 7` → `[[2,2,3],[7]]`
+
+**Constraints:** up to 30 candidates; target ≤ 40.
+```
+
 Unlimited reuse → recurse with the **same** `i`. Sorting lets us break as soon as a candidate exceeds the remainder.
 
 **Complexity:** exponential, bounded by O(n^(target/min)).
@@ -260,6 +284,14 @@ assertUnorderedDeep(combinationSum([]int{2, 3, 5}, 8), [][]int{{2, 2, 2, 2}, {2,
 ## 40. Combination Sum II | Medium
 related: 39, 90
 tags: combinations, dedupe
+
+```problem
+`candidates` may contain duplicates. Return every unique combination that sums to `target`, using each array element **at most once**, with no duplicate combinations.
+
+**Example:** `candidates = [10,1,2,7,6,1,5], target = 8` → `[[1,1,6],[1,2,5],[1,7],[2,6]]`
+
+**Constraints:** up to 100 candidates; target ≤ 30.
+```
 
 Each number used once (`i + 1`) and the input has duplicates → sort and skip equal neighbours at the same depth.
 
@@ -347,6 +379,14 @@ assertEq(combinationSum2([]int{1}, 2), [][]int{})
 related: 47, 78
 tags: permutations
 
+```problem
+Return every permutation of the distinct integers in `nums`, in any order.
+
+**Example:** `[1,2,3]` → `[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`
+
+**Constraints:** n ≤ 6.
+```
+
 Each level picks any unused element (`used[]` array), depth n = one permutation.
 
 **Complexity:** O(n · n!).
@@ -430,6 +470,14 @@ assertEq(permute([]int{1}), [][]int{{1}})
 ## 47. Permutations II | Medium
 related: 46, 90
 tags: permutations, dedupe
+
+```problem
+`nums` may contain duplicates. Return every **distinct** permutation, in any order.
+
+**Example:** `[1,1,2]` → `[[1,1,2],[1,2,1],[2,1,1]]`
+
+**Constraints:** n ≤ 8.
+```
 
 Sort; skip `nums[i]` if it equals `nums[i-1]` **and `nums[i-1]` is not used** — i.e. only the first copy of a value may start a branch at each depth.
 
@@ -520,6 +568,12 @@ assertEq(permuteUnique([]int{2, 2}), [][]int{{2, 2}})
 related: 78, 39
 tags: combinations, pruning
 
+```problem
+Return every combination of `k` distinct numbers chosen from 1…n, in any order.
+
+**Example:** `n = 4, k = 2` → `[[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]`
+```
+
 Choose k of `1..n`. Prune: only start values that leave enough numbers to finish (`i ≤ n − (k − len(path)) + 1`).
 
 **Complexity:** O(k · C(n, k)).
@@ -592,6 +646,14 @@ assertUnorderedDeep(combine(1, 1), [][]int{{1}})
 ## 17. Letter Combinations of a Phone Number | Medium
 related: 22, 78
 tags: cartesian-product
+
+```problem
+On a phone keypad, 2 maps to `abc`, 3 to `def`, …, 7 to `pqrs`, 8 to `tuv`, 9 to `wxyz`. Given a string of digits 2–9, return every letter string it could spell, in any order (an empty input gives an empty list).
+
+**Example:** `"23"` → `["ad","ae","af","bd","be","bf","cd","ce","cf"]`
+
+**Constraints:** at most 4 digits.
+```
 
 Depth = digit index; branch over that digit's letters.
 
@@ -670,6 +732,14 @@ assertEq(letterCombinations(""), []string{})
 ## 22. Generate Parentheses | Medium
 related: 20, 17
 tags: constrained-generation
+
+```problem
+Return every well-formed string of `n` pairs of parentheses.
+
+**Example:** `n = 3` → `["((()))","(()())","(())()","()(())","()()()"]`
+
+**Constraints:** n ≤ 8.
+```
 
 Add `(` while `open < n`; add `)` while `close < open`. These two rules generate exactly the valid strings.
 
@@ -751,6 +821,14 @@ assertUnordered(generateParenthesis(4), []string{"(((())))", "((()()))", "((())(
 ## 79. Word Search | Medium
 related: 212, 200
 tags: blind75, grid-dfs
+
+```problem
+Decide whether `word` can be traced on the letter grid `board` through horizontally or vertically adjacent cells, using each cell at most once.
+
+**Example:** `board = ["ABCE","SFCS","ADEE"]`: `"ABCCED"` → `true`; `"ABCB"` → `false`
+
+**Constraints:** board up to 6 × 6; word length ≤ 15. Follow-up: prune the search.
+```
 
 DFS from every cell matching `word[0]`; mark the cell visited (overwrite with `#`) while it's on the path, restore on return.
 
@@ -839,6 +917,14 @@ assertEq(exist(B, "ABCB"), false)
 ## 131. Palindrome Partitioning | Medium
 related: 132, 5, 93
 tags: partition
+
+```problem
+Split `s` into pieces that are all palindromes, and return every possible way to do so.
+
+**Example:** `"aab"` → `[["a","a","b"],["aa","b"]]`
+
+**Constraints:** length ≤ 16.
+```
 
 At index `i`, try every end `j` where `s[i..j]` is a palindrome, recurse from `j+1`. (Precompute a palindrome table to make checks O(1).)
 
@@ -933,6 +1019,12 @@ assertUnordered(partition("aba"), [][]string{{"a", "b", "a"}, {"aba"}})
 related: 131
 tags: partition
 
+```problem
+`s` contains only digits. Insert three dots to form every valid IPv4 address: four parts, each from 0 to 255, with no leading zeros (`"0"` is fine, `"01"` isn't). Don't reorder or remove digits.
+
+**Example:** `"25525511135"` → `["255.255.11.135","255.255.111.35"]`; `"0000"` → `["0.0.0.0"]`
+```
+
 Split into exactly 4 parts, each 1–3 digits, value ≤ 255, no leading zeros. Prune when the remaining length can't fit the remaining parts.
 
 **Complexity:** O(3⁴) — constant.
@@ -1025,6 +1117,14 @@ assertUnordered(restoreIpAddresses("101023"), []string{"1.0.10.23", "1.0.102.3",
 ## 51. N-Queens | Hard
 related: 52, 37
 tags: constraint-search
+
+```problem
+Place `n` queens on an n×n chessboard so that no two attack each other (same row, column or diagonal). Return every distinct solution as a board of strings, `'Q'` for a queen and `'.'` for empty.
+
+**Example:** `n = 4` → `[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]`
+
+**Constraints:** n ≤ 9.
+```
 
 Place one queen per row. Track used columns and both diagonals (`r − c` and `r + c`) in sets for O(1) conflict checks.
 
@@ -1135,6 +1235,12 @@ assertEq(len(solveNQueens(8)), 92)
 ## 37. Sudoku Solver | Hard
 related: 36, 51
 tags: constraint-search
+
+```problem
+Fill the empty cells (`'.'`) of a 9×9 Sudoku `board` in place so that every row, column and 3×3 box contains the digits 1–9 exactly once. The puzzle has exactly one solution.
+
+**Example:** a standard puzzle → its unique completed grid
+```
 
 Track used digits per row/col/box (bitmasks or sets). Find an empty cell, try every allowed digit, recurse; undo on failure. (Heuristic: fill the cell with the fewest candidates first.)
 
@@ -1263,6 +1369,12 @@ assertEq(board, byteGrid("534678912", "672195348", "198342567", "859761423", "42
 related: 39, 40, 77
 tags: combinations
 
+```problem
+Return every combination of `k` distinct numbers from 1–9 that adds up to `n`, each number used at most once.
+
+**Example:** `k = 3, n = 9` → `[[1,2,6],[1,3,5],[2,3,4]]`
+```
+
 Choose k distinct digits from 1–9 summing to n: combinations with `i + 1` and pruning when the remainder goes negative.
 
 **Complexity:** O(C(9, k)).
@@ -1343,6 +1455,14 @@ assertEq(combinationSum3(4, 1), [][]int{})
 related: 78, 17
 tags: branching
 
+```problem
+Change the case of any of the letters in `s` (digits stay as they are) and return every string you can get, in any order.
+
+**Example:** `"a1b2"` → `["a1b2","a1B2","A1b2","A1B2"]`
+
+**Constraints:** length ≤ 12.
+```
+
 Each letter branches into lower/upper; digits don't branch. Building iteratively: for each letter, double the result list.
 
 **Complexity:** O(2^L · n).
@@ -1407,6 +1527,14 @@ assertEq(letterCasePermutation("3z4"), []string{"3z4", "3Z4"})
 ## 52. N-Queens II | Hard
 related: 51
 tags: bitmask, constraint-search
+
+```problem
+Return the number of distinct ways to place `n` non-attacking queens on an n×n chessboard.
+
+**Example:** `n = 4` → `2`; `n = 1` → `1`
+
+**Constraints:** n ≤ 9.
+```
 
 Count placements only. Bitmasks for columns and both diagonals: `free = ~(cols | d1 | d2) & full`; take the lowest bit each time; shift the diagonals by one when moving to the next row.
 
@@ -1485,6 +1613,14 @@ assertEq(totalNQueens(8), 92)
 ## 140. Word Break II | Hard
 related: 139, 472
 tags: memoization, backtracking
+
+```problem
+Insert spaces into `s` to split it into words from `wordDict` (words may be reused), and return every possible sentence, in any order.
+
+**Example:** `s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]` → `["cats and dog","cat sand dog"]`
+
+**Constraints:** length ≤ 20; at most 10⁵ answers.
+```
 
 `sentences(i)` = all segmentations of `s[i:]`: for every dictionary word starting at `i`, prepend it to each sentence of the rest. Memoize by `i`.
 
@@ -1582,6 +1718,14 @@ assertEq(wordBreak("catsandog", []string{"cats", "dog", "sand", "and", "cat"}), 
 ## 282. Expression Add Operators | Hard
 related: 224, 227
 tags: backtracking, expression
+
+```problem
+`num` is a string of digits. Insert the operators `+`, `-` or `*` between some of its digits so that the expression evaluates to `target`, and return all such expressions. Operands can't have leading zeros.
+
+**Example:** `num = "123", target = 6` → `["1*2*3","1+2+3"]`; `num = "232", target = 8` → `["2*3+2","2+3*2"]`
+
+**Constraints:** length ≤ 10.
+```
 
 Try every split of the digits and every operator. Track the running `value` and the last **operand** `prev`, so `*` can undo it: `value − prev + prev·cur`. Disallow numbers with leading zeros.
 
@@ -1694,6 +1838,14 @@ assertUnordered(addOperators("105", 5), []string{"1*0+5", "10-5"})
 related: 1249, 20
 tags: bfs, backtracking
 
+```problem
+Remove the minimum number of parentheses from `s` (which may also contain letters) to make it valid, and return every distinct result.
+
+**Example:** `"()())()"` → `["(())()","()()()"]`; `")("` → `[""]`
+
+**Constraints:** length ≤ 25; at most 20 parentheses.
+```
+
 **BFS by number of removals**: level 0 = the string, level d = all strings with d characters removed. The first level that contains valid strings is the answer (minimum removals); collect all of them, deduped with a set.
 
 **Complexity:** exponential worst case; fine for n ≤ 25.
@@ -1801,6 +1953,14 @@ assertEq(removeInvalidParentheses(")("), []string{""})
 ## 698. Partition to K Equal Sum Subsets | Medium
 related: 416, 473
 tags: backtracking, pruning
+
+```problem
+Decide whether `nums` can be split into `k` non-empty subsets with equal sums.
+
+**Example:** `nums = [4,3,2,3,5,2,1], k = 4` → `true` (`(5)`, `(1,4)`, `(2,3)`, `(2,3)`)
+
+**Constraints:** n ≤ 16.
+```
 
 Target = total / k. Place numbers (sorted **descending**, so failures happen early) into k buckets. Prune: never put a number into a bucket that would overflow, and if placing into an **empty** bucket failed, other empty buckets will fail too.
 
@@ -1912,6 +2072,14 @@ assertEq(canPartitionKSubsets([]int{1, 2, 3, 4}, 3), false)
 related: 78, 136
 tags: subsets, bit-trick
 
+```problem
+The XOR total of a subset is the XOR of all its elements (0 for the empty set). Return the sum of the XOR totals of every subset of `nums`; equal values at different positions count as different subsets.
+
+**Example:** `[1,3]` → `6` (0 + 1 + 3 + 2)
+
+**Constraints:** n ≤ 12.
+```
+
 Backtracking over all 2ⁿ subsets works (n ≤ 12). The elegant O(n) answer: a bit that is set in **any** element is set in exactly half of all subset XORs, so the sum is `(OR of all nums) · 2^(n−1)`.
 
 **Complexity:** O(n).
@@ -1972,6 +2140,14 @@ assertEq(subsetXORSum(nums), brute)
 ## 473. Matchsticks to Square | Medium
 related: 698, 416
 tags: backtracking, pruning
+
+```problem
+Decide whether all the `matchsticks` (given by length) can form a square, using every stick exactly once without breaking any.
+
+**Example:** `[1,1,2,2,2]` → `true`; `[3,3,3,3,4]` → `false`
+
+**Constraints:** up to 15 sticks.
+```
 
 Each side must equal `total / 4`. Place sticks **longest first** into one of four sides, backtracking on failure. Two prunings make it fast: skip a side if the stick overflows it, and if a stick doesn't work on an **empty** side, don't try the other empty sides (they're interchangeable).
 

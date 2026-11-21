@@ -24,6 +24,12 @@ Pitfalls: in Java use `lo + (hi - lo) / 2`; make sure each branch shrinks the ra
 related: 35, 34
 tags: 
 
+```problem
+`nums` is sorted ascending with distinct values. Return the index of `target`, or −1 if it is absent, in O(log n).
+
+**Example:** `nums = [-1,0,3,5,9,12], target = 9` → `4`
+```
+
 Classic closed interval `[lo, hi]`.
 
 **Complexity:** O(log n).
@@ -88,6 +94,12 @@ assertEq(search([]int{-1, 0, 3, 5, 9, 12}, 2), -1)
 related: 704, 34
 tags: lower-bound
 
+```problem
+`nums` is sorted with distinct values. Return the index of `target` if present, otherwise the index where it would be inserted to keep the order, in O(log n).
+
+**Example:** `nums = [1,3,5,6]`: `target = 5` → `2`; `target = 2` → `1`; `target = 7` → `4`
+```
+
 First index with `nums[i] >= target` (lower bound). Uses the template with `hi = n`.
 
 **Complexity:** O(log n).
@@ -147,6 +159,12 @@ assertEq(searchInsert([]int{1, 3, 5, 6}, 7), 4)
 ## 34. Find First and Last Position of Element in Sorted Array | Medium
 related: 35, 704
 tags: lower-bound
+
+```problem
+`nums` is sorted in non-decreasing order. Return the first and last index of `target`, or `[-1,-1]` if it doesn't occur, in O(log n).
+
+**Example:** `nums = [5,7,7,8,8,10], target = 8` → `[3,4]`
+```
 
 `first = lowerBound(target)`, `last = lowerBound(target + 1) − 1`. Check `first` actually holds `target`.
 
@@ -227,6 +245,12 @@ assertEq(searchRange([]int{}, 0), []int{-1, -1})
 related: 704, 240
 tags: matrix
 
+```problem
+In the m×n `matrix`, each row is sorted ascending and each row's first value is greater than the previous row's last value. Decide whether `target` is in the matrix, in O(log(m·n)).
+
+**Example:** `[[1,3,5,7],[10,11,16,20],[23,30,34,60]]`, `target = 3` → `true`
+```
+
 Rows are sorted and each row starts after the previous ends → it's one sorted array of length `m·n`. Index `k` ↦ `(k // n, k % n)`.
 
 **Complexity:** O(log(m·n)).
@@ -297,6 +321,14 @@ assertEq(searchMatrix(M, 13), false)
 ## 875. Koko Eating Bananas | Medium
 related: 1011, 410
 tags: search-on-answer
+
+```problem
+Koko eats bananas from `piles` at `k` bananas per hour: each hour she picks one pile and eats `k` from it (or the whole pile if it has fewer, then waits out the hour). Return the minimum integer `k` that lets her finish everything within `h` hours.
+
+**Example:** `piles = [3,6,7,11], h = 8` → `4`
+
+**Constraints:** n ≤ h ≤ 10⁹; piles up to 10⁹.
+```
 
 `hours(speed)` is decreasing in speed → find the smallest speed in `[1, max(piles)]` with `hours ≤ h`.
 
@@ -374,6 +406,12 @@ assertEq(minEatingSpeed([]int{30, 11, 23, 4, 20}, 6), 23)
 related: 33, 154
 tags: blind75, rotated
 
+```problem
+A sorted array of distinct values was rotated some number of times (e.g. `[0,1,2,4,5,6,7]` → `[4,5,6,7,0,1,2]`). Return its minimum element in O(log n).
+
+**Example:** `[3,4,5,1,2]` → `1`
+```
+
 Compare `nums[mid]` with `nums[hi]`: if `mid` is bigger, the drop (minimum) is to the right; otherwise `mid` could be the min, so `hi = mid`.
 
 ```viz
@@ -439,6 +477,12 @@ assertEq(findMin([]int{11, 13, 15, 17}), 11)
 ## 33. Search in Rotated Sorted Array | Medium
 related: 153, 81
 tags: blind75, rotated
+
+```problem
+`nums` is a sorted array of distinct values that may have been rotated at an unknown pivot. Return the index of `target`, or −1, in O(log n).
+
+**Example:** `nums = [4,5,6,7,0,1,2], target = 0` → `4`; `target = 3` → `-1`
+```
 
 At least one half around `mid` is sorted. If `nums[lo] ≤ nums[mid]` the left half is sorted: target in `[nums[lo], nums[mid])` → go left, else right. Mirror for the right half.
 
@@ -524,6 +568,12 @@ assertEq(search([]int{1}, 0), -1)
 related: 852
 tags: slope
 
+```problem
+A peak is an element strictly greater than its neighbours, and positions outside the array count as −∞. Adjacent values in `nums` are never equal. Return the index of any peak, in O(log n).
+
+**Example:** `[1,2,3,1]` → `2`; `[1,2,1,3,5,6,4]` → `1` or `5`
+```
+
 If `nums[mid] < nums[mid+1]` we're on an uphill slope → a peak exists to the right; else a peak is at `mid` or left. (Edges count as −∞.)
 
 **Complexity:** O(log n).
@@ -581,6 +631,12 @@ assertEq(p == 1 || p == 5, true)
 ## 981. Time Based Key-Value Store | Medium
 related: 704
 tags: design, upper-bound
+
+```problem
+Design `TimeMap`, a key-value store that keeps every version: `set(key, value, timestamp)` stores a value at a time, and `get(key, timestamp)` returns the value set at the largest timestamp ≤ `timestamp`, or `""` if there is none. Timestamps of `set` calls are strictly increasing.
+
+**Example:** `set("foo","bar",1)`; `get("foo",3)` → `"bar"`; `set("foo","bar2",4)`; `get("foo",4)` → `"bar2"`
+```
 
 Timestamps per key arrive increasing → append to a list. `get` = binary search for the **last** timestamp ≤ t.
 
@@ -668,6 +724,12 @@ assertEq([]string{tm.Get("foo", 4), tm.Get("foo", 5), tm.Get("foo", 0)}, []strin
 ## 4. Median of Two Sorted Arrays | Hard
 related: 295
 tags: partition
+
+```problem
+Return the median of the union of two sorted arrays `nums1` and `nums2` (the mean of the two middle values when the total count is even). Aim for O(log(m + n)).
+
+**Example:** `[1,3]` and `[2]` → `2.0`; `[1,2]` and `[3,4]` → `2.5`
+```
 
 Binary search a **cut** in the shorter array `A` at `i`, with cut `j = half − i` in `B`. The cut is correct when `A[i-1] ≤ B[j]` and `B[j-1] ≤ A[i]`; then the median comes from the four border values.
 
@@ -776,6 +838,14 @@ assertEq(findMedianSortedArrays([]int{}, []int{1}), 1.0)
 related: 875, 410
 tags: search-on-answer
 
+```problem
+Packages with `weights` must ship in the given order. Each day the ship is loaded with consecutive packages up to its capacity. Return the smallest capacity that ships everything within `days` days.
+
+**Example:** `weights = [1,2,3,4,5,6,7,8,9,10], days = 5` → `15`
+
+**Constraints:** n ≤ 5·10⁴.
+```
+
 Capacity in `[max(w), sum(w)]`. `days(cap)` (greedy fill) decreases with cap → smallest cap with `days ≤ D`.
 
 **Complexity:** O(n log sum).
@@ -865,6 +935,14 @@ assertEq(shipWithinDays([]int{3, 2, 2, 4, 1, 4}, 3), 6)
 related: 1011, 875
 tags: search-on-answer
 
+```problem
+Split `nums` (non-negative) into `k` non-empty contiguous parts so that the largest part sum is as small as possible. Return that minimal largest sum.
+
+**Example:** `nums = [7,2,5,10,8], k = 2` → `18` (`[7,2,5]` and `[10,8]`)
+
+**Constraints:** n ≤ 1000; k ≤ min(50, n).
+```
+
 Same as shipping packages: minimize the largest piece sum when splitting into `k` parts. Binary search the answer; greedily count parts needed.
 
 **Complexity:** O(n log sum).
@@ -951,6 +1029,14 @@ assertEq(splitArray([]int{1, 2, 3, 4, 5}, 2), 9)
 related: 367, 50
 tags: search-on-answer
 
+```problem
+Return ⌊√x⌋ for a non-negative integer `x`, without any built-in power or square-root function.
+
+**Example:** `4` → `2`; `8` → `2`
+
+**Constraints:** x ≤ 2³¹ − 1.
+```
+
 Largest `m` with `m*m ≤ x`. Search for the first `m` with `m*m > x`, answer `m − 1`.
 
 **Complexity:** O(log x).
@@ -1012,6 +1098,14 @@ assertEq(mySqrt(2147395599), 46339)
 ## 278. First Bad Version | Easy
 related: 35, 704
 tags: lower-bound
+
+```problem
+Versions 1…n were released in order and every version after a bad one is also bad. Using the provided API `isBadVersion(version)`, return the first bad version while calling the API as few times as possible.
+
+**Example:** `n = 5`, first bad = 4 → `4`
+
+**Constraints:** n ≤ 2³¹ − 1.
+```
 
 `isBadVersion` is monotonic (F…F T…T) → find the first `true` with the lower-bound template, using as few API calls as possible.
 
@@ -1089,6 +1183,12 @@ assertEq(firstBadVersion(2126753390), 1702766719)
 related: 162, 1095
 tags: slope
 
+```problem
+`arr` is a mountain: strictly increasing up to one peak, then strictly decreasing. Return the peak's index in O(log n).
+
+**Example:** `[0,10,5,2]` → `1`
+```
+
 Find the first index where the array starts descending: `arr[mid] > arr[mid + 1]`.
 
 **Complexity:** O(log n).
@@ -1147,6 +1247,14 @@ assertEq(peakIndexInMountainArray([]int{3, 5, 3, 2, 0}), 1)
 ## 81. Search in Rotated Sorted Array II | Medium
 related: 33, 154
 tags: rotated, duplicates
+
+```problem
+Like Search in Rotated Sorted Array, but `nums` may contain duplicates: decide whether `target` is in the rotated sorted array.
+
+**Example:** `nums = [2,5,6,0,0,1,2], target = 0` → `true`; `target = 3` → `false`
+
+**Constraints:** follow-up: how do duplicates affect the running time?
+```
 
 Like 33, but duplicates can hide which half is sorted: when `nums[lo] == nums[mid] == nums[hi]`, shrink both ends by one. Worst case degrades to O(n).
 
@@ -1238,6 +1346,14 @@ assertEq(search([]int{1, 0, 1, 1, 1}, 0), true)
 related: 74, 378
 tags: staircase
 
+```problem
+In the m×n `matrix`, every row is sorted left to right and every column is sorted top to bottom. Decide whether `target` is in it.
+
+**Example:** `[[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]]`, `target = 5` → `true`, `target = 20` → `false`
+
+**Constraints:** up to 300 × 300.
+```
+
 Rows and columns sorted (but rows don't continue each other). Start at the **top-right**: if bigger than target move left (the whole column below is bigger too), if smaller move down.
 
 ```viz
@@ -1309,6 +1425,14 @@ assertEq(searchMatrix(M, 20), false)
 ## 528. Random Pick with Weight | Medium
 related: 384, 380
 tags: prefix-sum, upper-bound
+
+```problem
+`Solution(w)` gets positive weights. `pickIndex()` returns a random index `i` with probability `w[i] / sum(w)`.
+
+**Example:** `w = [1,3]` → `pickIndex()` returns 0 about 25% of the time and 1 about 75%
+
+**Constraints:** n ≤ 10⁴; up to 10⁴ calls.
+```
 
 Prefix sums turn weights into intervals on `[0, total)`. Draw `r` uniformly, binary-search the first prefix sum **greater than** `r`.
 
@@ -1397,6 +1521,14 @@ assertEq(s2.PickIndex(), 0)
 related: 41, 268
 tags: binary-search
 
+```problem
+`arr` is a strictly increasing array of positive integers. Return the `k`-th positive integer that is missing from it.
+
+**Example:** `arr = [2,3,4,7,11], k = 5` → `9` (missing: 1, 5, 6, 8, 9, …)
+
+**Constraints:** follow-up: better than O(n).
+```
+
 Missing count before index `i` is `arr[i] − (i + 1)` (monotonic). Find the first index where it is ≥ k; the answer is `lo + k`.
 
 **Complexity:** O(log n).
@@ -1453,6 +1585,14 @@ assertEq(findKthPositive([]int{1, 2, 3, 4}, 2), 6)
 ## 1482. Minimum Number of Days to Make m Bouquets | Medium
 related: 875, 1011
 tags: search-on-answer
+
+```problem
+Flower i blooms on day `bloomDay[i]`. A bouquet needs `k` **adjacent** bloomed flowers, and each flower can be used once. Return the minimum number of days until you can make `m` bouquets, or −1 if it's impossible.
+
+**Example:** `bloomDay = [1,10,3,10,2], m = 3, k = 1` → `3`; with `k = 2` → `-1`
+
+**Constraints:** n ≤ 10⁵; days up to 10⁹.
+```
 
 `canMake(day)` (count runs of `k` adjacent bloomed flowers ≥ m) is monotonic in `day` → binary search the day between `min` and `max` bloom day.
 
@@ -1552,6 +1692,14 @@ assertEq(minDays([]int{7, 7, 7, 7, 12, 7, 7}, 2, 3), 12)
 related: 278, 704
 tags: binary-search
 
+```problem
+A number was picked from 1…n. The provided API `guess(num)` returns −1 if the pick is lower than `num`, 1 if it is higher, and 0 if it's correct. Return the picked number.
+
+**Example:** `n = 10`, pick = 6 → `6`
+
+**Constraints:** n ≤ 2³¹ − 1.
+```
+
 Classic binary search where the comparison is the provided `guess(num)` API: `-1` means the pick is lower than `num`, `1` higher, `0` found.
 
 **Complexity:** O(log n) calls.
@@ -1638,6 +1786,14 @@ for _, tc := range [][2]int{{10, 6}, {1, 1}, {2, 1}, {2, 2}, {2126753390, 170276
 related: 35, 1855
 tags: lower-bound, sort
 
+```problem
+A spell and a potion form a successful pair when the product of their strengths is at least `success`. For each spell, return how many potions it pairs successfully with.
+
+**Example:** `spells = [5,1,3], potions = [1,2,3,4,5], success = 7` → `[4,0,3]`
+
+**Constraints:** up to 10⁵ spells and potions.
+```
+
 Sort the potions once. A pair succeeds when `potion ≥ ⌈success / spell⌉`, so the count for each spell is `m − lower_bound(⌈success / spell⌉)`. Integer ceiling avoids floating-point trouble.
 
 **Complexity:** O((n + m) log m).
@@ -1697,6 +1853,14 @@ assertEq(successfulPairs([]int{100000}, []int{100000}, 10000000000), []int{1})
 ## 1095. Find in Mountain Array | Hard
 related: 852, 33, 162
 tags: binary-search
+
+```problem
+A mountain array (strictly increasing, then strictly decreasing) is hidden behind an interface with `get(index)` and `length()`. Return the **smallest** index whose value equals `target`, or −1, using at most 100 `get` calls.
+
+**Example:** `array = [1,2,3,4,5,3,1], target = 3` → `2`
+
+**Constraints:** length ≤ 10⁴.
+```
 
 Only ~100 `get` calls are allowed, so three binary searches: (1) find the **peak** (first `i` with `a[i] > a[i+1]`), (2) search the **ascending** left part, (3) if not found, search the **descending** right part (comparison flipped). Checking the left side first returns the minimum index.
 

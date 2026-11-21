@@ -26,6 +26,12 @@ Local tests build trees from LeetCode's level-order format: Python `make_tree([3
 related: 101, 100
 tags: blind75, dfs
 
+```problem
+Mirror a binary tree, swapping the left and right child of every node, and return its root. (Trees are written in level order, with `null` for a missing child.)
+
+**Example:** `[4,2,7,1,3,6,9]` → `[4,7,2,9,6,3,1]`
+```
+
 Swap the children of every node (any traversal order works).
 
 ```viz
@@ -79,6 +85,12 @@ assertEq(invertTree(makeTree(2, 1, 3)), []any{2, 3, 1})
 related: 110, 543, 111
 tags: blind75, dfs
 
+```problem
+Return the maximum depth of a binary tree: the number of nodes on the longest path from the root down to a leaf.
+
+**Example:** `[3,9,20,null,null,15,7]` → `3`
+```
+
 `depth(node) = 1 + max(depth(left), depth(right))`, `depth(None) = 0`.
 
 **Complexity:** O(n).
@@ -119,6 +131,12 @@ assertEq(maxDepth(nil), 0)
 ## 543. Diameter of Binary Tree | Easy
 related: 124, 104
 tags: dfs, global-answer
+
+```problem
+Return the diameter of a binary tree: the number of **edges** on the longest path between any two nodes. The path doesn't have to pass through the root.
+
+**Example:** `[1,2,3,4,5]` → `3` (path 4 → 2 → 1 → 3)
+```
 
 The longest path *through* a node = `height(left) + height(right)`. Return height upward, update a global best on the way.
 
@@ -188,6 +206,12 @@ assertEq(diameterOfBinaryTree(makeTree(1, 2)), 1)
 related: 104
 tags: dfs
 
+```problem
+Decide whether a binary tree is height-balanced: at every node, the heights of the left and right subtrees differ by at most 1.
+
+**Example:** `[3,9,20,null,null,15,7]` → `true`; `[1,2,2,3,3,null,null,4,4]` → `false`
+```
+
 Return height, or `-1` as soon as any subtree is unbalanced (children heights differ by > 1). Single pass, O(n).
 
 **Complexity:** O(n).
@@ -249,6 +273,12 @@ assertEq(isBalanced(makeTree(1, 2, 2, 3, 3, nil, nil, 4, 4)), false)
 related: 101, 572
 tags: blind75, dfs
 
+```problem
+Decide whether two binary trees `p` and `q` are identical: the same shape with the same value in every corresponding node.
+
+**Example:** `[1,2,3]` and `[1,2,3]` → `true`; `[1,2]` and `[1,null,2]` → `false`
+```
+
 Both null → true; one null or values differ → false; else recurse on both sides.
 
 **Complexity:** O(n).
@@ -291,6 +321,14 @@ assertEq(isSameTree(makeTree(1, 2), makeTree(1, nil, 2)), false)
 ## 101. Symmetric Tree | Easy
 related: 100, 226
 tags: dfs
+
+```problem
+Decide whether a binary tree is a mirror image of itself around its centre.
+
+**Example:** `[1,2,2,3,4,4,3]` → `true`; `[1,2,2,null,3,null,3]` → `false`
+
+**Constraints:** follow-up: both recursively and iteratively.
+```
 
 A tree is symmetric if left and right subtrees are **mirrors**: `mirror(a, b) = a.val == b.val && mirror(a.left, b.right) && mirror(a.right, b.left)`.
 
@@ -343,6 +381,12 @@ assertEq(isSymmetric(makeTree(1, 2, 2, nil, 3, nil, 3)), false)
 ## 572. Subtree of Another Tree | Easy
 related: 100
 tags: blind75, dfs
+
+```problem
+Decide whether `subRoot` appears in `root` as a subtree: some node of `root` together with **all** of its descendants is identical to `subRoot`.
+
+**Example:** `root = [3,4,5,1,2], subRoot = [4,1,2]` → `true`; with an extra `0` under the `2` in `root` → `false`
+```
 
 For every node of `root`, check `isSameTree(node, subRoot)`. (O(m+n) alternative: serialize both and do substring search / hashing.)
 
@@ -402,6 +446,12 @@ assertEq(isSubtree(makeTree(3, 4, 5, 1, 2, nil, nil, nil, nil, 0), makeTree(4, 1
 ## 235. Lowest Common Ancestor of a Binary Search Tree | Medium
 related: 236
 tags: blind75, bst
+
+```problem
+Given a binary search tree and two of its nodes `p` and `q`, return their lowest common ancestor: the deepest node that has both as descendants (a node counts as its own descendant).
+
+**Example:** `[6,2,8,0,4,7,9,null,null,3,5]`, `p = 2, q = 8` → `6`; `p = 2, q = 4` → `2`
+```
 
 Use BST ordering: if both `p, q` are smaller go left, both larger go right; otherwise the current node splits them → LCA.
 
@@ -464,6 +514,14 @@ assertEq(lowestCommonAncestor(t, findNode(t, 2), findNode(t, 4)).Val, 2)
 related: 235, 863
 tags: dfs
 
+```problem
+Given a binary tree (not a BST) and two of its nodes `p` and `q`, return their lowest common ancestor: the deepest node that has both as descendants (a node counts as its own descendant).
+
+**Example:** `[3,5,1,6,2,0,8,null,null,7,4]`, `p = 5, q = 1` → `3`; `p = 5, q = 4` → `5`
+
+**Constraints:** up to 10⁵ nodes; values are unique.
+```
+
 DFS returns `p` or `q` if found in the subtree (else null). If both sides return non-null, the current node is the LCA; otherwise bubble up whichever side is non-null.
 
 **Complexity:** O(n).
@@ -520,6 +578,12 @@ assertEq(lowestCommonAncestor(t, findNode(t, 5), findNode(t, 4)).Val, 5)
 ## 102. Binary Tree Level Order Traversal | Medium
 related: 103, 199, 637
 tags: blind75, bfs
+
+```problem
+Return the values of a binary tree level by level, each level from left to right.
+
+**Example:** `[3,9,20,null,null,15,7]` → `[[3],[9,20],[15,7]]`
+```
 
 BFS; process the queue in chunks of its current size = one level.
 
@@ -598,6 +662,12 @@ assertEq(levelOrder(nil), [][]int{})
 ## 103. Binary Tree Zigzag Level Order Traversal | Medium
 related: 102
 tags: bfs
+
+```problem
+Return the values of a binary tree level by level, alternating direction: the first level left to right, the next right to left, and so on.
+
+**Example:** `[3,9,20,null,null,15,7]` → `[[3],[20,9],[15,7]]`
+```
 
 Level-order BFS; reverse every other level (or append to the front of a deque).
 
@@ -687,6 +757,12 @@ assertEq(zigzagLevelOrder(makeTree(1, 2, 3, 4, nil, nil, 5)), [][]int{{1}, {3, 2
 related: 102
 tags: bfs
 
+```problem
+Imagine standing to the right of a binary tree. Return the values you can see, from top to bottom: the rightmost node of each level.
+
+**Example:** `[1,2,3,null,5,null,4]` → `[1,3,4]`; `[1,2,3,4]` → `[1,3,4]`
+```
+
 Level-order BFS; the last node of each level is visible from the right. (DFS alternative: visit right first, record first node at each new depth.)
 
 **Complexity:** O(n).
@@ -758,6 +834,14 @@ assertEq(rightSideView(makeTree(1, 2, 3, 4)), []int{1, 3, 4})
 related: 98
 tags: dfs
 
+```problem
+A node is "good" if no node on the path from the root to it has a greater value. Count the good nodes of a binary tree.
+
+**Example:** `[3,1,4,3,null,1,5]` → `4`
+
+**Constraints:** up to 10⁵ nodes.
+```
+
 Pass down the max value on the path from the root; a node is good if `node.val ≥ pathMax`.
 
 **Complexity:** O(n).
@@ -817,6 +901,14 @@ assertEq(goodNodes(makeTree(3, 3, nil, 4, 2)), 3)
 ## 98. Validate Binary Search Tree | Medium
 related: 230, 1448
 tags: blind75, bst, boundaries
+
+```problem
+Decide whether a binary tree is a valid binary search tree: for every node, all values in its left subtree are strictly smaller and all values in its right subtree strictly larger.
+
+**Example:** `[2,1,3]` → `true`; `[5,1,4,null,null,3,6]` → `false` (3 sits in 5's right subtree)
+
+**Constraints:** values span the full 32-bit range.
+```
 
 Each node must lie strictly within `(lo, hi)` inherited from ancestors — checking only direct children is the classic bug.
 
@@ -882,6 +974,14 @@ assertEq(isValidBST(makeTree(5, 1, 6, nil, nil, 3, 7)), false)
 related: 98, 173
 tags: blind75, bst, inorder
 
+```problem
+Return the k-th smallest value (1-indexed) in a binary search tree.
+
+**Example:** `[3,1,4,null,2], k = 1` → `1`; `[5,3,6,2,4,null,null,1], k = 3` → `3`
+
+**Constraints:** follow-up: the BST is modified often and k-th smallest is queried often.
+```
+
 In-order traversal of a BST is sorted; stop at the k-th visited node (iterative stack makes early exit easy).
 
 **Complexity:** O(h + k).
@@ -945,6 +1045,14 @@ assertEq(kthSmallest(makeTree(5, 3, 6, 2, 4, nil, nil, 1), 3), 3)
 ## 105. Construct Binary Tree from Preorder and Inorder Traversal | Medium
 related: 106, 297
 tags: blind75, divide-and-conquer
+
+```problem
+Rebuild a binary tree from its `preorder` and `inorder` traversals (all values are unique) and return the root.
+
+**Example:** `preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]` → `[3,9,20,null,null,15,7]`
+
+**Constraints:** up to 3000 nodes.
+```
 
 `preorder[0]` is the root; its position `m` in inorder splits left/right subtrees (left size = `m − inLo`). A value→index map makes each split O(1).
 
@@ -1031,6 +1139,12 @@ assertEq(buildTree([]int{1, 2, 3}, []int{3, 2, 1}), []any{1, 2, nil, 3})
 related: 543, 687
 tags: blind75, dfs, global-answer
 
+```problem
+A path is any sequence of nodes connected by parent-child edges, using each node at most once; it doesn't need to pass through the root and may bend at one node. Return the largest sum of node values over all non-empty paths. Values can be negative.
+
+**Example:** `[-10,9,20,null,null,15,7]` → `42` (15 → 20 → 7)
+```
+
 Each node returns the best **downward** path gain (`max(0, left, right) + val`, negatives dropped). The best path *through* the node uses both sides: `val + max(0,L) + max(0,R)` → update global answer.
 
 ```viz
@@ -1109,6 +1223,14 @@ assertEq(maxPathSum(makeTree(-3)), -3)
 ## 297. Serialize and Deserialize Binary Tree | Hard
 related: 105, 449
 tags: blind75, design, preorder
+
+```problem
+Design a `Codec` whose `serialize(root)` turns a binary tree into a string and `deserialize(data)` rebuilds exactly the same tree from that string. Any format works as long as the round trip is exact.
+
+**Example:** `deserialize(serialize([1,2,3,null,null,4,5]))` → `[1,2,3,null,null,4,5]`
+
+**Constraints:** up to 10⁴ nodes; values in [−1000, 1000].
+```
 
 Preorder with explicit null markers (`#`) uniquely identifies a tree. Deserialize by consuming tokens in the same preorder.
 
@@ -1247,6 +1369,12 @@ assertEq(c.serialize(c.deserialize(c.serialize(nil))), "#")
 related: 113, 437
 tags: dfs
 
+```problem
+Decide whether the binary tree has a root-to-leaf path whose node values add up to `targetSum`.
+
+**Example:** `[5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22` → `true` (5 → 4 → 11 → 2)
+```
+
 Subtract node values on the way down; at a **leaf**, check the remainder equals the leaf value.
 
 **Complexity:** O(n).
@@ -1298,6 +1426,12 @@ assertEq(hasPathSum(makeTree(1, 2, 3), 5), false)
 ## 113. Path Sum II | Medium
 related: 112, 437, 257
 tags: dfs, backtracking
+
+```problem
+Return every root-to-leaf path (as a list of node values) whose values add up to `targetSum`.
+
+**Example:** `[5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22` → `[[5,4,11,2],[5,8,4,5]]`
+```
 
 DFS with a path list; at a leaf with the right remainder, copy the path. Pop on the way back (backtracking).
 
@@ -1383,6 +1517,14 @@ assertEq(pathSum(makeTree(-2, nil, -3), -5), [][]int{{-2, -3}})
 related: 560, 112, 113
 tags: prefix-sum, dfs
 
+```problem
+Count the paths whose node values add up to `targetSum`. A path may start and end at any nodes but must go downwards (parent to child only).
+
+**Example:** `[10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8` → `3`
+
+**Constraints:** up to 1000 nodes; sums can exceed 32 bits.
+```
+
 Paths go downward but can start anywhere → **prefix sums on the root-to-node path** (like 560). Count earlier prefixes equal to `cur − target`; undo the count when backtracking.
 
 **Complexity:** O(n).
@@ -1456,6 +1598,14 @@ assertEq(pathSum(makeTree(5, 4, 8, 11, nil, 13, 4, 7, 2, nil, nil, 5, 1), 22), 3
 ## 114. Flatten Binary Tree to Linked List | Medium
 related: 430
 tags: morris, in-place
+
+```problem
+Flatten a binary tree in place into a "linked list" that follows preorder: each node's `right` points to the next node in preorder and every `left` is `null`.
+
+**Example:** `[1,2,5,3,4,null,6]` → `1 → 2 → 3 → 4 → 5 → 6` along `right` pointers
+
+**Constraints:** follow-up: O(1) extra space.
+```
 
 For each node with a left child: find the rightmost node of the left subtree, hook the right subtree there, move left to right. Walk right. O(1) space (Morris-style).
 
@@ -1535,6 +1685,14 @@ flatten(nil)
 ## 116. Populating Next Right Pointers in Each Node | Medium
 related: 117, 102
 tags: bfs, perfect-tree
+
+```problem
+In a **perfect** binary tree (every level full), set each node's `next` pointer to the node immediately to its right on the same level, or `null` for the rightmost node.
+
+**Example:** `[1,2,3,4,5,6,7]` → levels linked as `1→null`, `2→3→null`, `4→5→6→7→null`
+
+**Constraints:** follow-up: O(1) extra space (recursion stack doesn't count).
+```
 
 Perfect tree → use the already-built `next` pointers of level *i* to wire level *i+1*: `left.next = right`, `right.next = node.next.left`. O(1) extra space.
 
@@ -1626,6 +1784,12 @@ assertEq(connect(nil) == nil, true)
 related: 109, 98
 tags: divide-and-conquer
 
+```problem
+Turn a sorted array into a height-balanced binary search tree (subtree depths differ by at most 1 at every node). Any such tree is accepted.
+
+**Example:** `[-10,-3,0,5,9]` → `[0,-3,9,-10,null,5]` (or another balanced BST)
+```
+
 Middle element as root keeps the tree height-balanced; recurse on both halves.
 
 **Complexity:** O(n).
@@ -1704,6 +1868,14 @@ for _, vals := range [][]int{{-10, -3, 0, 5, 9}, {1, 3}, {0}, {1, 2, 3, 4, 5, 6,
 ## 173. Binary Search Tree Iterator | Medium
 related: 230, 94
 tags: design, inorder, stack
+
+```problem
+Design `BSTIterator(root)`, which walks a BST in sorted (in-order) order: `next()` returns the next smallest value and `hasNext()` says whether any remain.
+
+**Example:** `[7,3,15,null,null,9,20]` → `next()` returns 3, 7, 9, 15, 20
+
+**Constraints:** follow-up: O(1) amortised per call using O(h) memory.
+```
 
 Controlled in-order traversal: stack holds the path of left children. `next()` pops, then pushes the left spine of its right child. Amortized O(1), O(h) memory.
 
@@ -1803,6 +1975,12 @@ assertEq(it2.HasNext(), false)
 ## 863. All Nodes Distance K in Binary Tree | Medium
 related: 236, 102
 tags: bfs, graph
+
+```problem
+Given a binary tree, a `target` node and an integer `k`, return the values of all nodes exactly `k` edges away from `target` (up through parents as well as down), in any order.
+
+**Example:** `[3,5,1,6,2,0,8,null,null,7,4]`, `target = 5, k = 2` → `[7,4,1]`
+```
 
 Turn the tree into an undirected graph by recording each node's **parent**, then BFS from `target` for exactly `k` steps.
 
@@ -1914,6 +2092,14 @@ assertEq(distanceK(t1, t1, 3), []int{})
 related: 230, 173, 144
 tags: inorder, stack
 
+```problem
+Return the in-order traversal (left subtree, node, right subtree) of a binary tree.
+
+**Example:** `[1,null,2,3]` → `[1,3,2]`
+
+**Constraints:** follow-up: iteratively.
+```
+
 Iterative in-order: push the left spine, pop a node, visit it, then continue with its right subtree. (Morris traversal does it in O(1) space by threading.)
 
 **Complexity:** O(n) time, O(h) space.
@@ -1977,6 +2163,12 @@ assertEq(inorderTraversal(makeTree(1, 2, 3, 4, 5, nil, 8, nil, nil, 6, 7, 9)), [
 ## 111. Minimum Depth of Binary Tree | Easy
 related: 104
 tags: bfs
+
+```problem
+Return the minimum depth of a binary tree: the number of nodes on the shortest path from the root to a **leaf** (a node with no children).
+
+**Example:** `[3,9,20,null,null,15,7]` → `2`; `[2,null,3,null,4,null,5,null,6]` → `5`
+```
 
 BFS level by level; the first **leaf** reached gives the minimum depth (DFS must be careful: a node with one child isn't a leaf).
 
@@ -2043,6 +2235,12 @@ assertEq(minDepth(makeTree(2, nil, 3, nil, 4, nil, 5, nil, 6)), 5)
 ## 106. Construct Binary Tree from Inorder and Postorder Traversal | Medium
 related: 105
 tags: divide-and-conquer
+
+```problem
+Rebuild a binary tree from its `inorder` and `postorder` traversals (all values are unique) and return the root.
+
+**Example:** `inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]` → `[3,9,20,null,null,15,7]`
+```
 
 Mirror of 105: the **last** postorder element is the root. Consume postorder from the end and build the **right** subtree first.
 
@@ -2123,6 +2321,14 @@ assertEq(buildTree([]int{2, 1}, []int{2, 1}), []any{1, 2})
 ## 109. Convert Sorted List to Binary Search Tree | Medium
 related: 108
 tags: inorder-simulation
+
+```problem
+Turn a sorted singly linked list into a height-balanced binary search tree. Any balanced BST with the same values is accepted.
+
+**Example:** `-10→-3→0→5→9` → `[0,-3,9,-10,null,5]` (or another balanced BST)
+
+**Constraints:** up to 2·10⁴ nodes.
+```
 
 Count the nodes, then build the tree **in in-order**: recursively build the left half, consume the current list node as root, build the right half. The list pointer advances exactly in sorted order → O(n).
 
@@ -2236,6 +2442,14 @@ assertEq(sortedListToBST(nil) == nil, true)
 related: 116, 102
 tags: bfs, level-linking
 
+```problem
+In any binary tree, set each node's `next` pointer to the node immediately to its right on the same level, or `null` if it is the rightmost.
+
+**Example:** `[1,2,3,4,5,null,7]` → levels linked as `1→null`, `2→3→null`, `4→5→7→null`
+
+**Constraints:** follow-up: O(1) extra space.
+```
+
 Arbitrary tree. Walk the current level through its `next` pointers while building the next level's chain with a **dummy head + tail** pointer. O(1) extra space.
 
 **Complexity:** O(n) time, O(1) space.
@@ -2334,6 +2548,12 @@ assertEq(connect(nil) == nil, true)
 related: 112, 257
 tags: dfs
 
+```problem
+Every node holds a digit 0–9, and each root-to-leaf path spells a number (root digit first). Return the sum of all these numbers.
+
+**Example:** `[1,2,3]` → `25` (12 + 13); `[4,9,0,5,1]` → `1026` (495 + 491 + 40)
+```
+
 Carry the number built so far: `cur = cur·10 + val`; at a leaf, add it to the total.
 
 **Complexity:** O(n).
@@ -2393,6 +2613,12 @@ assertEq(sumNumbers(makeTree(4, 9, 0, 5, 1)), 1026)
 ## 257. Binary Tree Paths | Easy
 related: 113, 129
 tags: dfs, backtracking
+
+```problem
+Return every root-to-leaf path of a binary tree as a string of values joined by `"->"`, in any order.
+
+**Example:** `[1,2,3,null,5]` → `["1->2->5","1->3"]`
+```
 
 DFS with the path so far; at a leaf, join it with `->`.
 
@@ -2467,6 +2693,14 @@ assertEq(binaryTreePaths(makeTree(1)), []string{"1"})
 related: 958
 tags: binary-search, complete-tree
 
+```problem
+Count the nodes of a **complete** binary tree (every level full except possibly the last, whose nodes are packed to the left) in less than O(n) time.
+
+**Example:** `[1,2,3,4,5,6]` → `6`
+
+**Constraints:** up to 5·10⁴ nodes.
+```
+
 Compare the leftmost and rightmost depths. Equal ⇒ the subtree is perfect: `2^h − 1` nodes. Otherwise recurse into both children — only one side is non-perfect at each level.
 
 **Complexity:** O(log² n).
@@ -2537,6 +2771,12 @@ assertEq(countNodes(nil), 0)
 related: 198, 213
 tags: tree-dp
 
+```problem
+Houses form a binary tree; each node holds the money in that house. Robbing two houses joined by an edge (parent and child) sets off the alarm. Return the most money you can rob.
+
+**Example:** `[3,2,3,null,3,null,1]` → `7` (3 + 3 + 1); `[3,4,5,1,3,null,1]` → `9` (4 + 5)
+```
+
 Each node returns a pair `(rob this node, skip this node)`. Rob → children must be skipped; skip → each child takes its best.
 
 **Complexity:** O(n).
@@ -2596,6 +2836,14 @@ assertEq(rob(makeTree(3, 4, 5, 1, 3, nil, 1)), 9)
 ## 450. Delete Node in a BST | Medium
 related: 701, 98
 tags: bst
+
+```problem
+Delete the node with value `key` from a BST, if it exists, and return the root of a valid BST. Any valid result is accepted.
+
+**Example:** `[5,3,6,2,4,null,7], key = 3` → `[5,4,6,2,null,null,7]`
+
+**Constraints:** follow-up: O(height) time.
+```
 
 Find the node. 0 or 1 child → replace it with that child. 2 children → copy the **in-order successor** (min of the right subtree) into it, then delete the successor from the right subtree.
 
@@ -2680,6 +2928,12 @@ assertEq(deleteNode(makeTree(5, 3, 6, 2, 4, nil, 7), 0), []any{5, 3, 6, 2, 4, ni
 related: 98, 230
 tags: inorder
 
+```problem
+Return the minimum absolute difference between the values of any two different nodes of a BST.
+
+**Example:** `[4,2,6,1,3]` → `1`
+```
+
 In-order visits values in sorted order, so the minimum difference is between consecutive visited values.
 
 **Complexity:** O(n).
@@ -2755,6 +3009,12 @@ assertEq(getMinimumDifference(makeTree(1, 0, 48, nil, nil, 12, 49)), 1)
 related: 102
 tags: bfs
 
+```problem
+Return the average node value of each level of a binary tree, top to bottom.
+
+**Example:** `[3,9,20,null,null,15,7]` → `[3.0,14.5,11.0]`
+```
+
 Level-order BFS; average each level's values.
 
 **Complexity:** O(n).
@@ -2828,6 +3088,14 @@ assertEq(averageOfLevels(makeTree(2147483647, 2147483647, 2147483647)), []float6
 ## 662. Maximum Width of Binary Tree | Medium
 related: 102, 958
 tags: bfs, heap-indexing
+
+```problem
+The width of a level is the number of positions between its leftmost and rightmost non-null nodes, counting the null positions in between as if the tree were complete. Return the maximum width over all levels.
+
+**Example:** `[1,3,2,5,3,null,9]` → `4`; `[1,3,2,5,null,null,9,6,null,7]` → `7`
+
+**Constraints:** up to 3000 nodes; the answer fits in 32 bits.
+```
 
 Give nodes heap indices (`left = 2i`, `right = 2i+1`). Width of a level = last index − first index + 1. Re-base indices per level to avoid huge numbers.
 
@@ -2911,6 +3179,12 @@ assertEq(widthOfBinaryTree(makeTree(1, 3, 2, 5, nil, nil, 9, 6, nil, 7)), 7)
 related: 543, 124
 tags: dfs, global-answer
 
+```problem
+Return the number of **edges** in the longest path in which every node has the same value. The path need not pass through the root.
+
+**Example:** `[5,4,5,1,1,null,5]` → `2`; `[1,4,5,4,4,null,5]` → `2`
+```
+
 Like the diameter: each node returns the longest downward arm with its own value. Arms from children count only if the child has the same value; update the global with `left + right`.
 
 **Complexity:** O(n).
@@ -2993,6 +3267,12 @@ assertEq(longestUnivaluePath(makeTree(1, 4, 5, 4, 4, nil, 5)), 2)
 related: 222, 662
 tags: bfs
 
+```problem
+Decide whether a binary tree is complete: every level is full except possibly the last, whose nodes are all as far left as possible.
+
+**Example:** `[1,2,3,4,5,6]` → `true`; `[1,2,3,4,5,null,7]` → `false`
+```
+
 BFS including null children. In a complete tree, once you see a null, every later node in BFS order must also be null.
 
 **Complexity:** O(n).
@@ -3062,6 +3342,12 @@ assertEq(isCompleteTree(makeTree(1, 2, 3, 4, 5, nil, 7)), false)
 ## 987. Vertical Order Traversal of a Binary Tree | Hard
 related: 102, 199
 tags: dfs, sort
+
+```problem
+Put the root at (row 0, column 0); a node at (r, c) has children at (r + 1, c − 1) and (r + 1, c + 1). Return the values column by column, left to right. Within a column, list them top to bottom, and sort nodes sharing the same row and column by value.
+
+**Example:** `[1,2,3,4,6,5,7]` → `[[4],[2],[1,5,6],[3],[7]]`
+```
 
 Record `(col, row, val)` for every node (left child col−1, right col+1), sort, then group by column. Sorting by `(row, val)` within a column handles same-position ties.
 
@@ -3159,6 +3445,12 @@ assertEq(verticalTraversal(makeTree(1, 2, 3, 4, 6, 5, 7)), [][]int{{4}, {2}, {1,
 related: 100, 257
 tags: dfs
 
+```problem
+Decide whether two binary trees have the same leaf value sequence (their leaves read left to right).
+
+**Example:** two trees whose leaves both read `6,7,4,9,8` → `true`
+```
+
 Collect each tree's leaves left-to-right with a DFS and compare the sequences.
 
 **Complexity:** O(n + m).
@@ -3238,6 +3530,14 @@ assertEq(leafSimilar(makeTree(1), makeTree(2, 1)), true)
 related: 124, 543
 tags: tree-dp
 
+```problem
+A zigzag path starts at any node, picks a direction (left or right), and alternates direction at every step down. Return the length (in edges) of the longest zigzag path.
+
+**Example:** `[1,1,1,null,1,null,null,1,1,null,1]` → `4`
+
+**Constraints:** up to 5·10⁴ nodes.
+```
+
 For every node compute two values: the longest zigzag **starting here going left** (= 1 + the left child's "going right" value) and **going right** (= 1 + the right child's "going left"). A missing child contributes −1 so the step to it counts 0. The answer is the maximum over all nodes.
 
 **Complexity:** O(n).
@@ -3310,6 +3610,12 @@ assertEq(longestZigZag(makeTree(1)), 0)
 ## 1161. Maximum Level Sum of a Binary Tree | Medium
 related: 102, 637
 tags: bfs
+
+```problem
+The root is on level 1, its children on level 2, and so on. Return the smallest level whose node values have the maximal sum.
+
+**Example:** `[1,7,0,7,-8,null,null]` → `2` (level sums 1, 7, −1)
+```
 
 Level-order BFS, summing each level; keep the first (smallest) level with the strictly largest sum. Values can be negative, so start from −∞.
 
@@ -3392,6 +3698,12 @@ assertEq(maxLevelSum(makeTree(-1, -2, -3)), 1)
 related: 701, 98
 tags: bst
 
+```problem
+Find the node with value `val` in a BST and return the subtree rooted there, or `null` if it doesn't exist.
+
+**Example:** `[4,2,7,1,3], val = 2` → `[2,1,3]`
+```
+
 Walk down from the root: go left if the target is smaller, right if larger. No recursion needed.
 
 **Complexity:** O(h).
@@ -3440,6 +3752,12 @@ assertEq(searchBST(makeTree(4, 2, 7, 1, 3), 7), []any{7})
 ## 285. Inorder Successor in BST | Medium
 related: 230, 173, 98
 tags: bst, premium
+
+```problem
+Given a BST and one of its nodes `p`, return the in-order successor of `p` (the node with the smallest value greater than `p.val`), or `null` if `p` holds the largest value.
+
+**Example:** `[5,3,6,2,4,null,null,1]`, `p = 6` → `null`; `p = 4` → `5`
+```
 
 **Problem (Premium):** given a BST and one of its nodes `p`, return the node with the smallest key greater than `p.val`, or null.
 
@@ -3509,6 +3827,12 @@ assertEq(inorderSuccessor(t2, findNode(t2, 3)).Val, 4)
 ## 427. Construct Quad Tree | Medium
 related: 108, 54
 tags: divide-and-conquer
+
+```problem
+Represent an n×n grid of 0s and 1s (n a power of 2) as a quad tree. If a region is uniform, it becomes a leaf holding that value; otherwise it becomes an internal node with four children for its top-left, top-right, bottom-left and bottom-right quarters. Return the root.
+
+**Example:** `[[0,1],[1,0]]` → an internal root with four leaves `0, 1, 1, 0`
+```
 
 Recursively build the four quadrants of an `n × n` square. If all four children are leaves with the same value, collapse them into one leaf; otherwise return an internal node holding the four children. (Internal nodes' `val` can be anything.)
 
@@ -3656,6 +3980,14 @@ assertEq(quad(construct([][]int{{1, 1, 0, 0}, {1, 0, 0, 0}, {1, 1, 1, 1}, {1, 1,
 related: 94, 145, 589
 tags: preorder, stack
 
+```problem
+Return the pre-order traversal (node, left subtree, right subtree) of a binary tree.
+
+**Example:** `[1,null,2,3]` → `[1,2,3]`
+
+**Constraints:** follow-up: iteratively.
+```
+
 Iterative preorder: pop a node, record it, push its **right** child then its **left** child (so the left is processed first).
 
 **Complexity:** O(n) time, O(h) stack.
@@ -3725,6 +4057,14 @@ assertEq(preorderTraversal(makeTree()), []int{})
 ## 145. Binary Tree Postorder Traversal | Easy
 related: 94, 144
 tags: stack, reverse-trick
+
+```problem
+Return the post-order traversal (left subtree, right subtree, node) of a binary tree.
+
+**Example:** `[1,null,2,3]` → `[3,2,1]`
+
+**Constraints:** follow-up: iteratively.
+```
 
 Postorder (left, right, root) is the **reverse** of a modified preorder (root, right, left): run preorder pushing left before right, then reverse the output.
 
@@ -3798,6 +4138,12 @@ assertEq(postorderTraversal(makeTree()), []int{})
 ## 701. Insert into a Binary Search Tree | Medium
 related: 700, 450, 98
 tags: bst
+
+```problem
+Insert `val` (not already present) into a BST and return the root of a valid BST. Any valid result is accepted.
+
+**Example:** `[4,2,7,1,3], val = 5` → `[4,2,7,1,3,5]`
+```
 
 Walk down as in a search until you fall off the tree; attach the new node there as a leaf. (Any valid BST is accepted; leaf insertion is the simplest.)
 
@@ -3897,6 +4243,12 @@ for _, tc := range []struct {
 ## 1325. Delete Leaves With a Given Value | Medium
 related: 814, 450
 tags: postorder
+
+```problem
+Delete every leaf whose value is `target`. If that turns a parent into a leaf with value `target`, delete it too, and keep going until no such leaf remains.
+
+**Example:** `[1,2,3,2,null,2,4], target = 2` → `[1,null,3,null,4]`
+```
 
 Post-order: clean both subtrees first, **then** decide about the node — after its children are deleted it may have become a target leaf itself, which cascades upward naturally.
 

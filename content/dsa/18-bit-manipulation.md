@@ -20,6 +20,12 @@ x&(x-1) = 1 0 1 0 0 0      lowest 1 removed
 related: 137, 268, 260
 tags: xor
 
+```problem
+Every value in `nums` appears twice except one, which appears once. Return that one, in O(n) time and O(1) extra space.
+
+**Example:** `[4,1,2,1,2]` → `4`
+```
+
 XOR everything: pairs cancel, the single number remains.
 
 **Complexity:** O(n) time, O(1) space.
@@ -63,6 +69,12 @@ assertEq(singleNumber([]int{1}), 1)
 ## 137. Single Number II | Medium
 related: 136
 tags: bit-counting
+
+```problem
+Every value in `nums` appears three times except one, which appears once. Return that one, in O(n) time and O(1) extra space.
+
+**Example:** `[2,2,3,2]` → `3`; `[0,1,0,1,0,1,99]` → `99`
+```
 
 Every other number appears 3 times → for each bit position, the count of set bits mod 3 is the single number's bit. (Handle the sign bit for negatives in Python.)
 
@@ -123,6 +135,14 @@ assertEq(singleNumber([]int{-2, -2, 1, 1, 4, 1, 4, 4, -4, -2}), -4)
 related: 338, 190
 tags: blind75, brian-kernighan
 
+```problem
+Return the number of 1 bits in the binary form of the positive integer `n` (its Hamming weight).
+
+**Example:** `11` (`1011`) → `3`; `2147483645` → `30`
+
+**Constraints:** follow-up: the function is called many times.
+```
+
 Repeatedly clear the lowest set bit with `n &= n − 1`; count iterations.
 
 **Complexity:** O(number of set bits).
@@ -170,6 +190,14 @@ assertEq(hammingWeight(2147483645), 30)
 related: 191
 tags: blind75, dp
 
+```problem
+For every i from 0 to `n`, count the 1 bits in i's binary form, and return the counts as a list.
+
+**Example:** `n = 5` → `[0,1,1,2,1,2]`
+
+**Constraints:** follow-up: O(n) without a built-in popcount.
+```
+
 `bits[i] = bits[i >> 1] + (i & 1)` — drop the last bit, reuse the answer.
 
 **Complexity:** O(n).
@@ -216,6 +244,14 @@ assertEq(countBits(2), []int{0, 1, 1})
 ## 190. Reverse Bits | Easy
 related: 191, 7
 tags: blind75
+
+```problem
+Reverse the bits of a 32-bit unsigned integer.
+
+**Example:** `43261596` (`00000010100101000001111010011100`) → `964176192` (`00111001011110000010100101000000`)
+
+**Constraints:** follow-up: the function is called many times.
+```
 
 Shift the result left and append the lowest bit of `n`, 32 times. Java: use `>>>` (unsigned shift).
 
@@ -268,6 +304,14 @@ assertEq(reverseBits(4294967293), 3221225471)
 related: 41, 136, 287
 tags: blind75, xor
 
+```problem
+`nums` contains n distinct numbers from the range [0, n], so exactly one is missing. Return it.
+
+**Example:** `[3,0,1]` → `2`; `[9,6,4,2,3,5,7,0,1]` → `8`
+
+**Constraints:** follow-up: O(1) extra space and O(n) time.
+```
+
 XOR all indices `0..n` with all values; everything pairs up except the missing number. (Or `n(n+1)/2 − sum`.)
 
 **Complexity:** O(n) time, O(1) space.
@@ -312,6 +356,14 @@ assertEq(missingNumber([]int{9, 6, 4, 2, 3, 5, 7, 0, 1}), 8)
 ## 371. Sum of Two Integers | Medium
 related: 67, 2
 tags: blind75, adder
+
+```problem
+Return the sum of integers `a` and `b` without using the `+` or `-` operators.
+
+**Example:** `a = 2, b = 3` → `5`
+
+**Constraints:** −1000 ≤ a, b ≤ 1000.
+```
 
 Without `+`: `a ^ b` is the sum without carries, `(a & b) << 1` the carries. Repeat until no carry. Python needs a 32-bit mask.
 
@@ -373,6 +425,12 @@ assertEq(getSum(-12, -8), -20)
 ## 7. Reverse Integer | Medium
 related: 190, 8
 tags: overflow
+
+```problem
+Reverse the digits of a 32-bit signed integer `x`, keeping its sign. Return 0 if the result falls outside [−2³¹, 2³¹ − 1], and assume 64-bit integers aren't available.
+
+**Example:** `123` → `321`; `-123` → `-321`; `120` → `21`
+```
 
 Pop digits with `% 10` and push with `* 10`. Before pushing, check that the result stays within `[−2³¹, 2³¹−1]`.
 
@@ -436,6 +494,14 @@ assertEq(reverse(1534236469), 0)
 related: 191, 338
 tags: bit-trick
 
+```problem
+Decide whether the integer `n` is a power of two (2ˣ for some integer x ≥ 0).
+
+**Example:** `16` → `true`; `3` → `false`; `1` → `true`
+
+**Constraints:** follow-up: without loops or recursion.
+```
+
 A power of two has exactly one set bit: `n > 0 and n & (n − 1) == 0`.
 
 **Complexity:** O(1).
@@ -473,6 +539,12 @@ assertEq(isPowerOfTwo(-16), false)
 related: 191
 tags: xor, popcount
 
+```problem
+Return the Hamming distance between `x` and `y`: the number of bit positions in which they differ.
+
+**Example:** `x = 1, y = 4` → `2` (`001` vs `100`)
+```
+
 Differing bits = set bits of `x ^ y`.
 
 **Complexity:** O(1).
@@ -506,6 +578,12 @@ assertEq(hammingDistance(3, 1), 1)
 ## 260. Single Number III | Medium
 related: 136, 137
 tags: xor, partition
+
+```problem
+In `nums`, exactly two values appear once and every other value appears exactly twice. Return the two single values, in any order, using O(n) time and O(1) extra space.
+
+**Example:** `[1,2,1,3,2,5]` → `[3,5]`
+```
 
 XOR all → `a ^ b` (non-zero). Its lowest set bit `diff = x & −x` is a bit where a and b differ: split numbers by that bit and XOR each group separately.
 
@@ -564,6 +642,12 @@ assertUnordered(singleNumber([]int{-1, 0}), []int{-1, 0})
 related: 191
 tags: common-prefix
 
+```problem
+Return the bitwise AND of every integer in the range [left, right], inclusive.
+
+**Example:** `left = 5, right = 7` → `4`; `left = 1, right = 2147483647` → `0`
+```
+
 Any bit that flips somewhere in `[left, right]` becomes 0. The result is the **common binary prefix** of left and right: shift both right until equal, then shift back.
 
 **Complexity:** O(32).
@@ -611,6 +695,14 @@ assertEq(rangeBitwiseAnd(1, 2147483647), 0)
 ## 89. Gray Code | Medium
 related: 784
 tags: bit-trick
+
+```problem
+Return an n-bit Gray code: a sequence of all 2ⁿ integers in [0, 2ⁿ − 1], starting at 0, in which consecutive values (including the last and the first) differ in exactly one bit. Any valid sequence is accepted.
+
+**Example:** `n = 2` → `[0,1,3,2]`
+
+**Constraints:** n ≤ 16.
+```
 
 The i-th Gray code is `i ^ (i >> 1)`: consecutive values differ in exactly one bit, and the sequence wraps around.
 
@@ -670,6 +762,12 @@ for n := 1; n <= 4; n++ {
 ## 1318. Minimum Flips to Make a OR b Equal to c | Medium
 related: 191, 461
 tags: bit-trick
+
+```problem
+Return the minimum number of single-bit flips in `a` and `b` that make `a OR b == c`.
+
+**Example:** `a = 2, b = 6, c = 5` → `3`; `a = 4, b = 2, c = 7` → `1`
+```
 
 Bits are independent. For each position: if `c`'s bit is 1 we need at least one of `a`, `b` set (1 flip if both are 0); if it's 0, every set bit among `a`, `b` must be flipped. Equivalently `popcount((a | b) ^ c) + popcount(a & b & ~c)`.
 
@@ -737,6 +835,14 @@ assertEq(ok, true)
 ## 3133. Minimum Array End | Medium
 related: 1318, 201
 tags: bit-trick
+
+```problem
+Build a strictly increasing array of `n` positive integers whose bitwise AND is exactly `x`. Return the smallest possible value of its last element.
+
+**Example:** `n = 3, x = 4` → `6` (`[4,5,6]`); `n = 2, x = 7` → `15`
+
+**Constraints:** n, x ≤ 10⁸.
+```
 
 Every element must contain all of x's set bits, so elements are x with some of its **zero bits** filled in. The n-th smallest such number puts the binary digits of `n − 1` into x's zero-bit positions (low to high) — "deposit" `n − 1` into the free bits.
 

@@ -19,6 +19,14 @@ for r, x in enumerate(a):
 related: 122, 309, 123, 53
 tags: blind75, running-min
 
+```problem
+`prices[i]` is a stock's price on day i. Buy on one day and sell on a later day; return the maximum profit, or 0 if no profit is possible.
+
+**Example:** `[7,1,5,3,6,4]` → `5` (buy at 1, sell at 6); `[7,6,4,3,1]` → `0`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Track the cheapest price so far; each day, profit = price − min so far.
 
 **Complexity:** O(n) time, O(1) space.
@@ -69,6 +77,14 @@ assertEq(maxProfit([]int{7, 6, 4, 3, 1}), 0)
 ## 3. Longest Substring Without Repeating Characters | Medium
 related: 424, 76, 159
 tags: blind75, variable-window
+
+```problem
+Return the length of the longest substring of `s` that contains no repeated character.
+
+**Example:** `"abcabcbb"` → `3` (`"abc"`); `"bbbbb"` → `1`
+
+**Constraints:** length ≤ 5·10⁴; letters, digits, symbols and spaces.
+```
 
 Keep the last index of each char. When `s[r]` was seen inside the window, jump `l` past that index.
 
@@ -143,6 +159,14 @@ assertEq(lengthOfLongestSubstring("abba"), 2)
 related: 3, 1004
 tags: blind75, variable-window
 
+```problem
+You may change at most `k` characters of `s` (uppercase letters) to any other uppercase letter. Return the length of the longest substring that can then consist of a single repeated letter.
+
+**Example:** `s = "AABABBA", k = 1` → `4`
+
+**Constraints:** length ≤ 10⁵.
+```
+
 A window is fixable if `len − (count of its most frequent char) ≤ k`. Grow `r`; if invalid, slide `l` by one. `maxf` never needs to decrease: the answer only improves when a larger `maxf` appears.
 
 **Complexity:** O(n) time, O(26) space.
@@ -203,6 +227,14 @@ assertEq(characterReplacement("AABABBA", 1), 4)
 ## 567. Permutation in String | Medium
 related: 438, 76, 242
 tags: fixed-window, counting
+
+```problem
+Decide whether some permutation of `s1` appears as a contiguous substring of `s2`.
+
+**Example:** `s1 = "ab", s2 = "eidbaooo"` → `true` (`"ba"`); `s2 = "eidboaoo"` → `false`
+
+**Constraints:** lowercase letters; lengths ≤ 10⁴.
+```
 
 Slide a window of size `len(s1)` over `s2` and compare letter counts. Track `matches` = number of letters whose counts agree (0..26) to make each slide O(1).
 
@@ -284,6 +316,14 @@ assertEq(checkInclusion("ab", "eidboaoo"), false)
 ## 76. Minimum Window Substring | Hard
 related: 3, 567, 438
 tags: blind75, variable-window
+
+```problem
+Return the shortest substring of `s` that contains every character of `t`, duplicates included (two `a`s in `t` need two `a`s in the window). Return `""` if there is none; the answer is unique when it exists.
+
+**Example:** `s = "ADOBECODEBANC", t = "ABC"` → `"BANC"`
+
+**Constraints:** lengths ≤ 10⁵. Follow-up: O(m + n).
+```
 
 Expand `r` until the window covers all of `t` (`missing == 0`), then shrink `l` as far as possible while still covering, recording the smallest window.
 
@@ -378,6 +418,14 @@ assertEq(minWindow("a", "aa"), "")
 related: 155, 1438, 862
 tags: monotonic-deque
 
+```problem
+A window of size `k` slides over `nums` one step at a time from the left. Return the maximum of each window position.
+
+**Example:** `nums = [1,3,-1,-3,5,3,6,7], k = 3` → `[3,3,5,5,6,7]`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Keep a deque of indices with **decreasing** values. New element pops smaller ones from the back (they can never be a max again). Front is the max; drop it when it leaves the window.
 
 ```viz
@@ -451,6 +499,14 @@ assertEq(maxSlidingWindow([]int{1}, 1), []int{1})
 related: 76, 560, 862
 tags: variable-window
 
+```problem
+Given positive integers `nums`, return the minimal length of a contiguous subarray whose sum is at least `target`, or 0 if none exists.
+
+**Example:** `target = 7, nums = [2,3,1,2,4,3]` → `2` (`[4,3]`)
+
+**Constraints:** n ≤ 10⁵. Follow-up: also an O(n log n) solution.
+```
+
 All positive → expand `r`, and while `sum ≥ target` record the length and shrink from `l`.
 
 **Complexity:** O(n) time, O(1) space.
@@ -514,6 +570,14 @@ assertEq(minSubArrayLen(11, []int{1, 1, 1, 1, 1, 1, 1, 1}), 0)
 ## 438. Find All Anagrams in a String | Medium
 related: 567, 242, 49
 tags: fixed-window, counting
+
+```problem
+Return the start indices of every substring of `s` that is an anagram of `p`, in any order.
+
+**Example:** `s = "cbaebabacd", p = "abc"` → `[0,6]`
+
+**Constraints:** lowercase letters; lengths ≤ 3·10⁴.
+```
 
 Fixed window of size `len(p)`; compare 26-letter counts at every position (O(26) per step), collecting start indices that match.
 
@@ -585,6 +649,14 @@ assertUnordered(findAnagrams("abab", "ab"), []int{0, 1, 2})
 related: 424, 487
 tags: variable-window
 
+```problem
+`nums` is a binary array. If you may flip at most `k` zeros to ones, what is the longest run of consecutive 1s you can get?
+
+**Example:** `nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2` → `6`
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Longest window containing at most `k` zeros. Grow `r`; when zeros exceed `k`, move `l` until one zero leaves.
 
 **Complexity:** O(n) time, O(1) space.
@@ -646,6 +718,14 @@ assertEq(longestOnes([]int{0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1,
 ## 713. Subarray Product Less Than K | Medium
 related: 209, 560
 tags: variable-window, counting
+
+```problem
+Given positive integers `nums`, count the contiguous subarrays whose product is strictly less than `k`.
+
+**Example:** `nums = [10,5,2,6], k = 100` → `8`
+
+**Constraints:** n ≤ 3·10⁴; 1 ≤ nums[i] ≤ 1000; 0 ≤ k ≤ 10⁶.
+```
 
 For each right end `r`, shrink until `product < k`; then every subarray ending at `r` and starting in `[l, r]` qualifies → add `r − l + 1`.
 
@@ -712,6 +792,12 @@ assertEq(numSubarrayProductLessThanK([]int{1, 2, 3}, 0), 0)
 related: 209
 tags: fixed-window
 
+```problem
+Return the largest average of any contiguous subarray of exactly length `k`.
+
+**Example:** `nums = [1,12,-5,-6,50,3], k = 4` → `12.75`
+```
+
 Fixed window of size k: add the new element, subtract the one leaving, track the max sum.
 
 **Complexity:** O(n).
@@ -768,6 +854,14 @@ assertEq(findMaxAverage([]int{-1, -2, -3}, 3), -2.0)
 ## 904. Fruit Into Baskets | Medium
 related: 3, 992
 tags: variable-window
+
+```problem
+Trees stand in a row; `fruits[i]` is the type of fruit tree i grows. With two baskets that each hold one fruit type (any amount), start at any tree and pick one fruit from every tree moving right, stopping when a fruit fits no basket. Return the most fruit you can pick, i.e. the longest subarray with at most two distinct values.
+
+**Example:** `[1,2,3,2,2]` → `4` (`[2,3,2,2]`)
+
+**Constraints:** n ≤ 10⁵.
+```
 
 = longest window with **at most 2 distinct** values. Count fruits in the window; shrink while more than 2 types.
 
@@ -839,6 +933,14 @@ assertEq(totalFruit([]int{1, 2, 3, 2, 2}), 4)
 ## 992. Subarrays with K Different Integers | Hard
 related: 904, 713
 tags: variable-window, at-most-trick
+
+```problem
+Count the contiguous subarrays of `nums` that contain exactly `k` distinct values.
+
+**Example:** `nums = [1,2,1,2,3], k = 2` → `7`
+
+**Constraints:** n ≤ 2·10⁴.
+```
 
 "Exactly k" is not monotonic, but "**at most** k" is: `exactly(k) = atMost(k) − atMost(k−1)`. `atMost` counts, for each right end, the `r − l + 1` valid windows.
 
@@ -915,6 +1017,14 @@ assertEq(subarraysWithKDistinct([]int{1, 2, 1, 3, 4}, 3), 3)
 ## 30. Substring with Concatenation of All Words | Hard
 related: 76, 438
 tags: fixed-window, hash-map
+
+```problem
+`words` are strings of equal length. Return every start index in `s` of a substring that is some concatenation of all the words, each used exactly once, in any order.
+
+**Example:** `s = "barfoothefoobarman", words = ["foo","bar"]` → `[0,9]`
+
+**Constraints:** length of `s` ≤ 10⁴; up to 5000 words of length ≤ 30.
+```
 
 All words have length `L`. For each of the `L` offsets, slide a window **word by word**, counting words; when a word is over-used, drop words from the left. A window with exactly `len(words)` words is a match.
 
@@ -1021,6 +1131,14 @@ assertUnordered(findSubstring("barfoofoobarthefoobarman", []string{"bar", "foo",
 related: 209
 tags: fixed-window, complement
 
+```problem
+Cards lie in a row with `cardPoints[i]` points. Take exactly `k` cards, each from either the left or the right end of the row. Return the maximum total points.
+
+**Example:** `cardPoints = [1,2,3,4,5,6,1], k = 3` → `12` (take 6, 5, 1 from the right)
+
+**Constraints:** n ≤ 10⁵.
+```
+
 Taking k cards from the ends leaves a **contiguous** window of `n − k` cards in the middle. Minimize that window's sum; answer = total − min window.
 
 **Complexity:** O(n).
@@ -1079,6 +1197,14 @@ assertEq(maxScore([]int{9, 7, 7, 9, 7, 7, 9}, 7), 55)
 ## 1838. Frequency of the Most Frequent Element | Medium
 related: 424
 tags: sort, variable-window
+
+```problem
+One operation adds 1 to any element of `nums`. With at most `k` operations, return the highest possible frequency of a single value.
+
+**Example:** `nums = [1,2,4], k = 5` → `3` (raise 1 and 2 to 4); `nums = [1,4,8,13], k = 5` → `2`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 Sort. A window `[l, r]` can all be raised to `nums[r]` iff `nums[r]·len − sum ≤ k`. Shrink when it isn't.
 
@@ -1142,6 +1268,12 @@ assertEq(maxFrequency([]int{1, 4, 8, 13}, 5), 2)
 related: 217, 220
 tags: fixed-window, hash-set
 
+```problem
+Decide whether there are two indices `i ≠ j` with `nums[i] == nums[j]` and |i − j| ≤ k.
+
+**Example:** `nums = [1,2,3,1], k = 3` → `true`; `nums = [1,2,3,1,2,3], k = 2` → `false`
+```
+
 Keep a set of the **last k values**. A value already in the set is a duplicate within distance k. Evict `nums[i − k]` once the window holds more than k values.
 
 **Complexity:** O(n) time, O(k) space.
@@ -1204,6 +1336,12 @@ assertEq(containsNearbyDuplicate([]int{1, 1}, 0), false)
 ## 1456. Maximum Number of Vowels in a Substring of Given Length | Medium
 related: 643, 1004
 tags: fixed-window
+
+```problem
+Return the maximum number of vowels in any substring of `s` of length exactly `k`.
+
+**Example:** `s = "abciiidef", k = 3` → `3` (`"iii"`)
+```
 
 Fixed window of size k: add the entering character, subtract the leaving one, track the maximum.
 
@@ -1272,6 +1410,12 @@ assertEq(maxVowels("tryhard", 4), 1)
 related: 1004, 487
 tags: variable-window
 
+```problem
+Delete exactly one element from the binary array `nums`, then return the length of the longest non-empty subarray of only 1s (0 if there is none).
+
+**Example:** `[0,1,1,1,0,1,1,0,1]` → `5`; `[1,1,1]` → `2` (you must delete one)
+```
+
 Longest window containing **at most one zero**; the deleted element is inside it, so the answer is `window length − 1` (which also handles the all-ones case, where a 1 must be deleted).
 
 **Complexity:** O(n).
@@ -1338,6 +1482,14 @@ assertEq(longestSubarray([]int{0, 0, 0}), 0)
 ## 978. Longest Turbulent Subarray | Medium
 related: 376, 53
 tags: kadane, state-machine
+
+```problem
+A subarray is turbulent if the comparison sign flips between every pair of adjacent elements (bigger, smaller, bigger… or the reverse). Return the length of the longest turbulent subarray of `arr`.
+
+**Example:** `[9,4,2,10,7,8,8,1,9]` → `5` (`[4,2,10,7,8]`)
+
+**Constraints:** n ≤ 4·10⁴.
+```
 
 Track the length of the turbulent run ending here whose **last step goes up** and whose **last step goes down**. An up step extends a run that last went down (and vice versa); an equal pair resets both to 1.
 

@@ -14,6 +14,14 @@ If you can't argue why greedy is safe, fall back to DP.
 related: 152, 918, 121
 tags: blind75, kadane
 
+```problem
+Return the largest sum of any non-empty contiguous subarray of `nums`.
+
+**Example:** `[-2,1,-3,4,-1,2,1,-5,4]` → `6` (`[4,-1,2,1]`); `[-1]` → `-1`
+
+**Constraints:** n ≤ 10⁵. Follow-up: a divide-and-conquer solution.
+```
+
 **Kadane**: the best subarray ending at `i` either extends the previous one or starts fresh at `i`.
 
 ```viz
@@ -70,6 +78,14 @@ assertEq(maxSubArray([]int{-1}), -1)
 ## 918. Maximum Sum Circular Subarray | Medium
 related: 53
 tags: kadane
+
+```problem
+`nums` is circular: its end wraps around to its start. Return the largest sum of a non-empty subarray that uses each element at most once.
+
+**Example:** `[1,-2,3,-2]` → `3`; `[5,-3,5]` → `10` (5 + 5 across the wrap)
+
+**Constraints:** n ≤ 3·10⁴.
+```
 
 A wrap-around subarray = total − (a minimum subarray in the middle). Answer = `max(maxKadane, total − minKadane)`, except when all numbers are negative (then the "wrap" would be empty) → `maxKadane`.
 
@@ -140,6 +156,14 @@ assertEq(maxSubarraySumCircular([]int{-3, -2, -3}), -2)
 related: 45
 tags: blind75, reach
 
+```problem
+You start at index 0, and `nums[i]` is the maximum jump length from index i. Decide whether you can reach the last index.
+
+**Example:** `[2,3,1,1,4]` → `true`; `[3,2,1,0,4]` → `false`
+
+**Constraints:** n ≤ 10⁴.
+```
+
 Track the farthest reachable index; if you ever stand beyond it, you're stuck.
 
 **Complexity:** O(n) time, O(1) space.
@@ -194,6 +218,14 @@ assertEq(canJump([]int{3, 2, 1, 0, 4}), false)
 ## 45. Jump Game II | Medium
 related: 55
 tags: reach, implicit-bfs
+
+```problem
+You start at index 0, and `nums[i]` is the maximum jump length from index i. Return the minimum number of jumps to reach the last index (always possible).
+
+**Example:** `[2,3,1,1,4]` → `2` (0 → 1 → 4)
+
+**Constraints:** n ≤ 10⁴.
+```
 
 BFS by "levels": the current jump covers `[.., end]`; while scanning it, track the farthest next reach. When you hit `end`, you must jump: `jumps += 1`, `end = farthest`.
 
@@ -259,6 +291,12 @@ assertEq(jump([]int{0}), 0)
 related: 121, 309, 714
 tags: greedy
 
+```problem
+`prices[i]` is a stock's price on day i. Buy and sell as often as you like, holding at most one share at a time (you may sell and buy again on the same day). Return the maximum profit.
+
+**Example:** `[7,1,5,3,6,4]` → `7` (buy 1 sell 5, buy 3 sell 6); `[1,2,3,4,5]` → `4`
+```
+
 Unlimited transactions → collect every positive day-to-day increase.
 
 **Complexity:** O(n).
@@ -301,6 +339,14 @@ assertEq(maxProfit([]int{1, 2, 3, 4, 5}), 4)
 ## 134. Gas Station | Medium
 related: 55
 tags: greedy
+
+```problem
+Gas stations stand on a circular route; station i has `gas[i]` fuel, and driving from it to station i + 1 costs `cost[i]`. Starting with an empty tank, return the station from which you can drive around the whole circuit once, or −1 if none works. The answer is unique when it exists.
+
+**Example:** `gas = [1,2,3,4,5], cost = [3,4,5,1,2]` → `3`
+
+**Constraints:** n ≤ 10⁵.
+```
 
 If total gas < total cost → impossible. Otherwise, scan with a running tank; whenever it drops below 0, no station in the current segment can be the start → restart from `i + 1`.
 
@@ -362,6 +408,14 @@ assertEq(canCompleteCircuit([]int{2, 3, 4}, []int{3, 4, 3}), -1)
 ## 135. Candy | Hard
 related: 42
 tags: two-pass
+
+```problem
+Children stand in a line with `ratings`. Give each child at least one candy, and a child with a higher rating than a neighbour must get more candies than that neighbour. Return the minimum total candies.
+
+**Example:** `[1,0,2]` → `5` (2, 1, 2); `[1,2,2]` → `4` (1, 2, 1)
+
+**Constraints:** n ≤ 2·10⁴.
+```
 
 Left→right pass satisfies "higher than left neighbour"; right→left pass satisfies "higher than right neighbour" while keeping the max.
 
@@ -437,6 +491,14 @@ assertEq(candy([]int{1, 2, 2}), 4)
 ## 846. Hand of Straights | Medium
 related: 659
 tags: sorted-counter
+
+```problem
+Decide whether the cards in `hand` can be split into groups of `groupSize` cards whose values are consecutive (like 2, 3, 4).
+
+**Example:** `hand = [1,2,3,6,2,3,4,7,8], groupSize = 3` → `true` (`[1,2,3]`, `[2,3,4]`, `[6,7,8]`)
+
+**Constraints:** up to 10⁴ cards.
+```
 
 Always start a group at the **smallest** remaining card (it can't belong anywhere else). Consume `x, x+1, …, x+k−1` from the counter.
 
@@ -523,6 +585,14 @@ assertEq(isNStraightHand([]int{1, 2, 3, 4, 5}, 4), false)
 related: 55
 tags: greedy
 
+```problem
+You may repeatedly pick two triplets and replace the second with their element-wise maximum. Decide whether `target` can end up as one of the `triplets`.
+
+**Example:** `triplets = [[2,5,3],[1,8,4],[1,7,5]], target = [2,7,5]` → `true`
+
+**Constraints:** up to 10⁵ triplets.
+```
+
 Ignore any triplet with a value exceeding the target in some coordinate (it would poison the max). Among the rest, check that each target coordinate is matched by at least one.
 
 **Complexity:** O(n).
@@ -579,6 +649,12 @@ assertEq(mergeTriplets([][]int{{3, 4, 5}, {4, 5, 6}}, []int{3, 2, 5}), false)
 ## 763. Partition Labels | Medium
 related: 56
 tags: last-occurrence
+
+```problem
+Split `s` into as many parts as possible so that each letter appears in at most one part. Return the part sizes in order.
+
+**Example:** `"ababcbacadefegdehijhklij"` → `[9,7,8]`
+```
 
 Record each letter's last index. Extend the current part's end to the max last-index of letters seen; when `i == end`, cut.
 
@@ -649,6 +725,14 @@ assertEq(partitionLabels("eccbbbbdec"), []int{10})
 ## 678. Valid Parenthesis String | Medium
 related: 20, 32
 tags: range-tracking
+
+```problem
+`s` contains `(`, `)` and `*`, where each `*` can act as `(`, as `)` or as nothing. Decide whether `s` can be a valid parentheses string.
+
+**Example:** `"(*)"` → `true`; `"(*))"` → `true`; `")("` → `false`
+
+**Constraints:** length ≤ 100.
+```
 
 Track the **range** `[lo, hi]` of possible open counts. `(` → both +1; `)` → both −1; `*` → `lo−1, hi+1`. If `hi < 0` fail; clamp `lo ≥ 0`. Valid iff `lo == 0` at the end.
 
@@ -726,6 +810,14 @@ assertEq(checkValidString("(((*)"), false)
 related: 315
 tags: sort-then-insert
 
+```problem
+People in a queue were shuffled; `people[i] = [h, k]` says person i has height `h` and exactly `k` people in front of them are at least as tall. Reconstruct and return the queue.
+
+**Example:** `[[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]` → `[[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]`
+
+**Constraints:** up to 2000 people.
+```
+
 Sort by height **descending**, then `k` ascending. Insert each person at index `k`: everyone already placed is taller or equal, so exactly `k` of them are in front, and shorter people inserted later don't affect it.
 
 ```viz
@@ -794,6 +886,12 @@ assertEq(reconstructQueue([][]int{{6, 0}, {5, 0}, {4, 0}, {3, 2}, {2, 2}, {1, 4}
 related: 881
 tags: sort, two-pointers
 
+```problem
+Child i is content with a cookie of size at least `g[i]`; cookie j has size `s[j]`. Each child gets at most one cookie. Return the maximum number of content children.
+
+**Example:** `g = [1,2,3], s = [1,1]` → `1`; `g = [1,2], s = [1,2,3]` → `2`
+```
+
 Sort both. Give the smallest cookie that satisfies the least greedy child; a cookie too small for this child is too small for everyone after.
 
 **Complexity:** O(n log n).
@@ -846,6 +944,12 @@ assertEq(findContentChildren([]int{1, 2}, []int{1, 2, 3}), 2)
 ## 860. Lemonade Change | Easy
 related: 455
 tags: simulation
+
+```problem
+Lemonade costs $5. Customers in line each pay with a $5, $10 or $20 bill, and you start with no change. Decide whether you can give every customer correct change, in order.
+
+**Example:** `[5,5,5,10,20]` → `true`; `[5,5,10,10,20]` → `false`
+```
 
 Track 5s and 10s. For a 20, prefer giving `10 + 5` (keeps 5s, which are more flexible) over `5 + 5 + 5`.
 
@@ -920,6 +1024,12 @@ assertEq(lemonadeChange([]int{5, 5, 10, 10, 20}), false)
 related: 406
 tags: sort, exchange-argument
 
+```problem
+A company will interview 2n people; `costs[i] = [aCost, bCost]` is the cost of flying person i to city A or city B. Send exactly n people to each city at minimum total cost.
+
+**Example:** `[[10,20],[30,200],[400,50],[30,20]]` → `110`
+```
+
 Send everyone to A, then switch the n people with the most negative `costB − costA` to B. Equivalently, sort by `costA − costB`: first half → A, second half → B.
 
 **Complexity:** O(n log n).
@@ -972,6 +1082,14 @@ assertEq(twoCitySchedCost([][]int{{259, 770}, {448, 54}, {926, 667}, {184, 139},
 ## 649. Dota2 Senate | Medium
 related: 1834
 tags: queue, simulation
+
+```problem
+Senators from two parties, `'R'` (Radiant) and `'D'` (Dire), act in the order of the string, round after round. On their turn, a senator still in play either removes one opposing senator's rights for good or, if only their own party is left, declares victory. Assuming everyone plays optimally, return `"Radiant"` or `"Dire"`.
+
+**Example:** `"RD"` → `"Radiant"`; `"RDD"` → `"Dire"`
+
+**Constraints:** length ≤ 10⁴.
+```
 
 Two queues of senator indices. The earlier senator bans the other; the winner re-enters with index `+ n` (next round).
 
@@ -1046,6 +1164,14 @@ assertEq(predictPartyVictory("RDD"), "Dire")
 ## 659. Split Array into Consecutive Subsequences | Medium
 related: 846
 tags: greedy, hash-map
+
+```problem
+`nums` is sorted. Decide whether it can be split into subsequences that each consist of consecutive integers (each one more than the previous) and have length at least 3.
+
+**Example:** `[1,2,3,3,4,5]` → `true` (1,2,3 and 3,4,5); `[1,2,3,4,4,5]` → `false`
+
+**Constraints:** n ≤ 10⁴.
+```
 
 Greedy: each number first tries to **extend** a sequence ending at `x−1` (`ends[x−1] > 0`); otherwise it must **start** a new sequence `x, x+1, x+2` (needs those available). If neither works → false.
 
@@ -1135,6 +1261,14 @@ assertEq(isPossible([]int{1, 2, 3, 4, 4, 5}), false)
 related: 45, 1024
 tags: greedy, reach
 
+```problem
+A garden spans [0, n] on a line, with taps at points 0…n; tap i waters [i − ranges[i], i + ranges[i]]. Return the fewest taps that must be open to water the entire garden, or −1 if it can't be done.
+
+**Example:** `n = 5, ranges = [3,4,1,1,0,0]` → `1` (tap 1 covers [−3, 5])
+
+**Constraints:** n ≤ 10⁴.
+```
+
 Convert each tap to an interval and record, for every left end, the farthest right reach. Then it's **Jump Game II** over `[0, n]`: greedily extend the covered range level by level; a gap → −1.
 
 **Complexity:** O(n).
@@ -1217,6 +1351,12 @@ assertEq(minTaps(7, []int{1, 2, 1, 0, 2, 1, 0, 1}), 3)
 related: 495
 tags: greedy
 
+```problem
+`flowerbed` holds 0 (empty) and 1 (planted), and no two flowers may be adjacent. Decide whether `n` new flowers can be planted without breaking the rule.
+
+**Example:** `flowerbed = [1,0,0,0,1]`: `n = 1` → `true`; `n = 2` → `false`
+```
+
 Planting as **early** as possible never hurts (an earlier flower blocks at most what a later one would). Pad both ends with 0 and plant wherever a spot and both neighbours are empty.
 
 **Complexity:** O(n).
@@ -1277,6 +1417,14 @@ assertEq(canPlaceFlowers([]int{1, 0, 1, 0, 1}, 0), true)
 ## 334. Increasing Triplet Subsequence | Medium
 related: 300
 tags: greedy, lis
+
+```problem
+Decide whether there are indices i < j < k with nums[i] < nums[j] < nums[k].
+
+**Example:** `[2,1,5,0,4,6]` → `true`; `[5,4,3,2,1]` → `false`
+
+**Constraints:** n ≤ 5·10⁵. Follow-up: O(n) time and O(1) space.
+```
 
 Keep the smallest possible **first** element and the smallest possible **second** element of an increasing pair seen so far. Any number bigger than both completes a triplet. (Updating `first` after `second` is set is fine: `second` still certifies that some smaller element came before it.)
 
@@ -1347,6 +1495,12 @@ assertEq(increasingTriplet([]int{1, 5, 0, 4, 1, 3}), true)
 ## 68. Text Justification | Hard
 related: 6, 1592
 tags: simulation, string
+
+```problem
+Format `words` into lines of exactly `maxWidth` characters. Pack as many words per line as fit (greedily), then pad with spaces so each line is fully justified, giving extra spaces to the leftmost gaps first. The last line, and any line with a single word, is left-justified and padded with spaces on the right.
+
+**Example:** `["This","is","an","example","of","text","justification."], maxWidth = 16` → `["This    is    an","example  of text","justification.  "]`
+```
 
 Greedy line packing: a word fits if `letters + len(word) + (number of words already on the line)` ≤ maxWidth (one space minimum per gap). When the line is full, distribute `maxWidth − letters` spaces over the gaps **round-robin from the left** (left gaps get the extras); a single-word line is left-justified. The last line is left-justified and padded.
 
@@ -1451,6 +1605,14 @@ assertEq(fullJustify([]string{"a"}, 1), []string{"a"})
 ## 1871. Jump Game VII | Medium
 related: 55, 45, 1696
 tags: sliding-window, prefix-sum
+
+```problem
+`s` is a binary string starting with `'0'`. From index i you can jump to any j with i + minJump ≤ j ≤ i + maxJump and `s[j] == '0'`. Decide whether you can reach the last index from index 0.
+
+**Example:** `s = "011010", minJump = 2, maxJump = 3` → `true`
+
+**Constraints:** length ≤ 10⁵.
+```
 
 `i` is reachable iff `s[i] == '0'` and **some** reachable index lies in `[i − maxJump, i − minJump]`. Keep a running count of reachable indices inside that window (add the index entering at `i − minJump`, drop the one leaving at `i − maxJump − 1`) — O(1) per position instead of scanning the window.
 

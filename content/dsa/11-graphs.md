@@ -35,6 +35,14 @@ def union(a, b):
 related: 695, 130, 323, 547
 tags: blind75, grid-dfs
 
+```problem
+In a grid of `'1'` (land) and `'0'` (water), an island is a group of land cells connected horizontally or vertically. Count the islands; everything outside the grid is water.
+
+**Example:** `["11000","11000","00100","00011"]` → `3`
+
+**Constraints:** up to 300 × 300.
+```
+
 Scan the grid; each unvisited `1` starts a new island — flood-fill it (DFS/BFS) to mark the whole island visited.
 
 ```viz
@@ -137,6 +145,12 @@ assertEq(numIslands(byteGrid("101", "010", "101")), 5)
 related: 200
 tags: grid-dfs
 
+```problem
+In a grid of 1s (land) and 0s (water), an island is a group of land cells connected horizontally or vertically, and its area is its cell count. Return the largest island's area, or 0 if there is no land.
+
+**Example:** `[[0,0,1,0,0],[1,1,1,0,0],[0,0,0,1,1],[0,0,0,1,0]]` → `4`
+```
+
 Same flood fill, but each fill returns the island size; keep the max.
 
 **Complexity:** O(R·C).
@@ -207,6 +221,14 @@ assertEq(maxAreaOfIsland([][]int{{1}}), 1)
 ## 133. Clone Graph | Medium
 related: 138
 tags: blind75, dfs, hash-map
+
+```problem
+Given a reference to one node of a connected undirected graph, where each node has a `val` and a list of `neighbors`, return a deep copy of the whole graph.
+
+**Example:** the 4-cycle 1–2–3–4–1 → an identical, independent 4-cycle
+
+**Constraints:** up to 100 nodes; values are unique.
+```
 
 DFS with a map `original → clone`. Create the clone before recursing into neighbours so cycles resolve through the map.
 
@@ -309,6 +331,12 @@ assertEq(c.Neighbors[0].Neighbors[0] == c, true) // cycle preserved
 ## 994. Rotting Oranges | Medium
 related: 542, 286
 tags: multi-source-bfs
+
+```problem
+In the grid, 0 is empty, 1 is a fresh orange and 2 is a rotten one. Every minute, each fresh orange next to a rotten one (up, down, left or right) rots. Return the minutes until no fresh orange remains, or −1 if some never rot.
+
+**Example:** `[[2,1,1],[1,1,0],[0,1,1]]` → `4`; `[[2,1,1],[0,1,1],[1,0,1]]` → `-1`
+```
 
 Multi-source BFS from all rotten oranges at once; each BFS layer = 1 minute. At the end, any fresh orange left → −1.
 
@@ -418,6 +446,14 @@ assertEq(orangesRotting([][]int{{0, 2}}), 0)
 ## 417. Pacific Atlantic Water Flow | Medium
 related: 130, 200
 tags: blind75, reverse-search
+
+```problem
+`heights` is an island's height map. The Pacific touches its top and left edges, the Atlantic its bottom and right edges. Rain flows from a cell to a neighbour (up, down, left, right) of equal or lower height, and from edge cells into the adjacent ocean. Return every cell from which water can reach both oceans.
+
+**Example:** `[[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]` → `[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]`
+
+**Constraints:** up to 200 × 200.
+```
 
 Reverse the flow: from each ocean's border, walk **uphill** (to neighbours ≥ current). Cells reachable from both oceans are the answer.
 
@@ -534,6 +570,12 @@ assertUnordered(pacificAtlantic([][]int{{2, 1}, {1, 2}}), [][]int{{0, 0}, {0, 1}
 related: 200, 417
 tags: border-dfs
 
+```problem
+In a board of `'X'` and `'O'`, flip to `'X'` (in place) every region of `'O'`s that is completely surrounded by `'X'`s. A region connected (horizontally or vertically) to an `'O'` on the border is not surrounded.
+
+**Example:** `["XXXX","XOOX","XXOX","XOXX"]` → `["XXXX","XXXX","XXXX","XOXX"]`
+```
+
 An `O` survives only if connected to the border. Mark border-connected `O`s as safe (`S`) via DFS, then flip remaining `O → X` and `S → O`.
 
 **Complexity:** O(R·C).
@@ -639,6 +681,12 @@ assertEq(b4, byteGrid("OO", "OO"))
 related: 994, 542
 tags: multi-source-bfs, premium
 
+```problem
+In the grid `rooms`, −1 is a wall, 0 is a gate and 2147483647 (INF) is an empty room. Fill every empty room, in place, with the number of steps to its nearest gate (moving up, down, left, right); rooms that can't reach a gate stay INF.
+
+**Example:** `[[INF,-1,0,INF],[INF,INF,INF,-1],[INF,-1,INF,-1],[0,-1,INF,INF]]` → `[[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]`
+```
+
 Multi-source BFS from every gate (0). The first time BFS reaches an empty room is its shortest distance.
 
 **Complexity:** O(R·C).
@@ -734,6 +782,14 @@ assertEq(g3, [][]int{{1, 0}})
 related: 210, 269, 802
 tags: blind75, topological-sort
 
+```problem
+There are `numCourses` courses, 0 to n − 1. `prerequisites[i] = [a, b]` means course `b` must be taken before course `a`. Decide whether all courses can be finished.
+
+**Example:** `numCourses = 2, prerequisites = [[1,0]]` → `true`; `[[1,0],[0,1]]` → `false`
+
+**Constraints:** up to 2000 courses and 5000 prerequisites.
+```
+
 Courses are a directed graph; finishable ⇔ no cycle. **Kahn's algorithm**: repeatedly take nodes with in-degree 0; if all n get taken, there's no cycle.
 
 ```viz
@@ -823,6 +879,12 @@ assertEq(canFinish(2, [][]int{{1, 0}, {0, 1}}), false)
 ## 210. Course Schedule II | Medium
 related: 207, 269
 tags: topological-sort
+
+```problem
+Same setting as Course Schedule: `prerequisites[i] = [a, b]` means `b` before `a`. Return any order in which all `numCourses` courses can be taken, or `[]` if it's impossible.
+
+**Example:** `numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]` → `[0,1,2,3]` (or `[0,2,1,3]`)
+```
 
 Same Kahn's algorithm, but record the order nodes are taken. If fewer than n are taken → cycle → `[]`.
 
@@ -933,6 +995,14 @@ assertEq(findOrder(2, [][]int{{0, 1}, {1, 0}}), []int{})
 related: 323, 261, 685
 tags: union-find
 
+```problem
+A tree with nodes 1…n had one extra edge added, creating a cycle. Given the `edges`, return an edge whose removal leaves a tree; if several qualify, return the one that appears last in the input.
+
+**Example:** `[[1,2],[1,3],[2,3]]` → `[2,3]`
+
+**Constraints:** 3 ≤ n ≤ 1000.
+```
+
 Process edges in order with Union-Find; the first edge whose endpoints are already connected closes a cycle → return it.
 
 **Complexity:** O(E · α(V)).
@@ -1014,6 +1084,12 @@ assertEq(findRedundantConnection([][]int{{1, 2}, {2, 3}, {3, 4}, {1, 4}, {1, 5}}
 related: 200, 547, 684
 tags: blind75, union-find, premium
 
+```problem
+Count the connected components of an undirected graph with nodes 0…n − 1 and the given `edges`.
+
+**Example:** `n = 5, edges = [[0,1],[1,2],[3,4]]` → `2`
+```
+
 Start with n components; every successful union merges two → decrement.
 
 **Complexity:** O(E · α(V)).
@@ -1093,6 +1169,12 @@ assertEq(countComponents(5, [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 4}}), 1)
 ## 261. Graph Valid Tree | Medium
 related: 684, 323
 tags: blind75, union-find, premium
+
+```problem
+Decide whether the undirected `edges` over nodes 0…n − 1 form a valid tree: connected, with no cycles.
+
+**Example:** `n = 5, edges = [[0,1],[0,2],[0,3],[1,4]]` → `true`; `n = 5, edges = [[0,1],[1,2],[2,3],[1,3],[1,4]]` → `false`
+```
 
 A tree on n nodes has exactly `n − 1` edges **and** no cycle (equivalently: connected). Union-Find: any union of already-connected nodes → cycle.
 
@@ -1180,6 +1262,14 @@ assertEq(validTree(5, [][]int{{0, 1}, {1, 2}, {2, 3}, {1, 3}, {1, 4}}), false)
 related: 200, 323
 tags: dfs, union-find
 
+```problem
+`isConnected[i][j] = 1` means cities i and j are directly connected. A province is a group of cities connected directly or indirectly. Return the number of provinces.
+
+**Example:** `[[1,1,0],[1,1,0],[0,0,1]]` → `2`
+
+**Constraints:** n ≤ 200.
+```
+
 Adjacency-matrix connected components: DFS from each unvisited city, count starts.
 
 **Complexity:** O(n²).
@@ -1257,6 +1347,14 @@ assertEq(findCircleNum([][]int{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}), 3)
 ## 127. Word Ladder | Hard
 related: 126, 433
 tags: bfs, implicit-graph
+
+```problem
+Transform `beginWord` into `endWord` by changing one letter at a time, where every intermediate word and `endWord` must be in `wordList`. Return the number of words in the shortest such sequence (including both ends), or 0 if none exists.
+
+**Example:** `beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]` → `5` (hit → hot → dot → dog → cog)
+
+**Constraints:** up to 5000 words of length ≤ 10.
+```
 
 Words are nodes; edges connect words differing by one letter. BFS from `beginWord`. Generate neighbours by trying all 26 letters at each position (O(26·L) per word) and only keep words in the dictionary set.
 
@@ -1365,6 +1463,12 @@ assertEq(ladderLength("hit", "cog", []string{"hot", "dot", "dog", "lot", "log"})
 ## 399. Evaluate Division | Medium
 related: 990
 tags: weighted-graph, dfs
+
+```problem
+`equations[i] = [A, B]` with `values[i]` means A / B = values[i]. For each query `[C, D]`, return C / D, or −1.0 if it can't be determined (including any variable that never appears). The equations never contradict each other.
+
+**Example:** `a / b = 2.0, b / c = 3.0`; queries `a/c, b/a, a/e, a/a, x/x` → `[6.0, 0.5, -1.0, 1.0, -1.0]`
+```
 
 `a / b = 2` ⇒ edges `a→b (2)` and `b→a (0.5)`. A query `x / y` = product of weights along any path from x to y (DFS/BFS). Unknown variable or no path → −1.
 
@@ -1484,6 +1588,12 @@ assertEq(calcEquation([][]string{{"a", "b"}}, []float64{0.5}, [][]string{{"a", "
 related: 886
 tags: bfs, coloring
 
+```problem
+`graph[u]` lists the neighbours of node u in an undirected graph (no self-loops or duplicate edges; it may be disconnected). Decide whether its nodes can be split into two sets so that every edge joins nodes from different sets.
+
+**Example:** `[[1,3],[0,2],[1,3],[0,2]]` → `true`; `[[1,2,3],[0,2],[0,1,3],[0,2]]` → `false`
+```
+
 Two-color each component with BFS; an edge between same colors → not bipartite (odd cycle).
 
 **Complexity:** O(V + E).
@@ -1571,6 +1681,14 @@ assertEq(isBipartite([][]int{{1, 3}, {0, 2}, {1, 3}, {0, 2}}), true)
 ## 542. 01 Matrix | Medium
 related: 994, 286
 tags: multi-source-bfs
+
+```problem
+For every cell of the binary matrix `mat`, return the distance to the nearest 0, moving up, down, left or right one step at a time. There is at least one 0.
+
+**Example:** `[[0,0,0],[0,1,0],[1,1,1]]` → `[[0,0,0],[0,1,0],[1,2,1]]`
+
+**Constraints:** up to 10⁴ cells.
+```
 
 Distance to the nearest 0 for each cell: multi-source BFS starting from **all zeros** (not from each 1!).
 
@@ -1667,6 +1785,14 @@ assertEq(updateMatrix([][]int{{1, 1, 1}, {1, 1, 1}, {1, 1, 0}}), [][]int{{4, 3, 
 related: 542, 994
 tags: bfs
 
+```problem
+In an n×n binary grid, find the shortest clear path from the top-left to the bottom-right cell: it visits only 0 cells and moves in any of the 8 directions. Return its length in cells, or −1 if there is none.
+
+**Example:** `[[0,1],[1,0]]` → `2`; `[[0,0,0],[1,1,0],[1,1,0]]` → `4`
+
+**Constraints:** n ≤ 100.
+```
+
 BFS over 8 directions from `(0,0)` to `(n−1,n−1)`; path length counts cells.
 
 **Complexity:** O(n²).
@@ -1758,6 +1884,12 @@ assertEq(shortestPathBinaryMatrix([][]int{{1, 0, 0}, {1, 1, 0}, {1, 1, 0}}), -1)
 ## 721. Accounts Merge | Medium
 related: 684, 547
 tags: union-find
+
+```problem
+Each account is `[name, email1, email2, …]`. Two accounts belong to the same person if they share any email (people with the same name may be different people). Merge the accounts and return each as `[name, ...emails sorted]`; the accounts themselves can be in any order.
+
+**Example:** `[["John","js@m","jny@m"],["John","js@m","j00@m"],["Mary","mary@m"]]` → `[["John","j00@m","jny@m","js@m"],["Mary","mary@m"]]`
+```
 
 Union all emails within an account (to the account's first email). Then group emails by root, sort, and prefix the owner name.
 
@@ -1878,6 +2010,14 @@ assertEq(accountsMerge([][]string{{"Bo", "b@x.com", "a@x.com", "b@x.com"}}), [][
 related: 300, 417
 tags: dfs, memoization
 
+```problem
+Return the length of the longest strictly increasing path in `matrix`, moving up, down, left or right (no diagonals, no wrapping).
+
+**Example:** `[[9,9,4],[6,6,8],[2,1,1]]` → `4` (1 → 2 → 6 → 9)
+
+**Constraints:** up to 200 × 200.
+```
+
 Strictly increasing paths can't cycle, so the grid is a DAG: `best(r, c) = 1 + max(best(neighbor) for larger neighbours)`, memoized.
 
 **Complexity:** O(R·C).
@@ -1969,6 +2109,14 @@ assertEq(longestIncreasingPath([][]int{{3, 4, 5}, {3, 2, 6}, {2, 2, 1}}), 4)
 related: 323, 547
 tags: union-find, bfs
 
+```problem
+Decide whether there is a path from `source` to `destination` in an undirected graph with nodes 0…n − 1 and the given `edges`.
+
+**Example:** `n = 3, edges = [[0,1],[1,2],[2,0]], source = 0, destination = 2` → `true`
+
+**Constraints:** up to 2·10⁵ nodes and edges.
+```
+
 Union every edge, then check whether `source` and `destination` share a root (or BFS from the source).
 
 **Complexity:** O(E · α(V)).
@@ -2037,6 +2185,12 @@ assertEq(validPath(6, [][]int{{0, 1}, {0, 2}, {3, 5}, {5, 4}, {4, 3}}, 0, 5), fa
 related: 547, 1971
 tags: dfs
 
+```problem
+Rooms 0…n − 1 are all locked except room 0. `rooms[i]` lists the keys found in room i (each key opens the room with that number). Decide whether you can visit every room.
+
+**Example:** `[[1],[2],[3],[]]` → `true`; `[[1,3],[3,0,1],[2],[0]]` → `false`
+```
+
 Rooms are nodes, keys are edges. DFS from room 0; all rooms visited ⇔ true.
 
 **Complexity:** O(V + E).
@@ -2096,6 +2250,12 @@ assertEq(canVisitAllRooms([][]int{{1, 3}, {3, 0, 1}, {2}, {0}}), false)
 ## 886. Possible Bipartition | Medium
 related: 785
 tags: bfs, coloring
+
+```problem
+Split people 1…n into two groups (of any size) such that no pair in `dislikes` ends up in the same group. Decide whether that's possible.
+
+**Example:** `n = 4, dislikes = [[1,2],[1,3],[2,4]]` → `true`; `n = 3, dislikes = [[1,2],[1,3],[2,3]]` → `false`
+```
 
 "Dislike" edges must cross groups → is the dislike graph bipartite? 2-color each component with BFS.
 
@@ -2193,6 +2353,12 @@ assertEq(possibleBipartition(3, [][]int{{1, 2}, {1, 3}, {2, 3}}), false)
 related: 399, 684
 tags: union-find
 
+```problem
+Each equation is a 4-character string `"x==y"` or `"x!=y"` over single lowercase-letter variables. Decide whether integers can be assigned to the variables so that every equation holds.
+
+**Example:** `["a==b","b!=a"]` → `false`; `["b==a","a==b"]` → `true`
+```
+
 First union all `a==b`; then every `a!=b` must have different roots.
 
 **Complexity:** O(n · α(26)).
@@ -2273,6 +2439,14 @@ assertEq(equationsPossible([]string{"a==b", "b==c", "a==c"}), true)
 related: 207
 tags: dfs, directed-graph
 
+```problem
+Cities 0…n − 1 are joined by n − 1 one-way roads that would form a tree if undirected; `connections[i] = [a, b]` is a road from a to b. Return the minimum number of roads to reverse so every city can reach city 0.
+
+**Example:** `n = 6, connections = [[0,1],[1,3],[2,3],[4,0],[4,5]]` → `3`
+
+**Constraints:** n ≤ 5·10⁴.
+```
+
 Treat roads as undirected but remember direction: an original edge `a → b` costs 1 when traversed away from 0 (it must be reversed), its reverse costs 0. DFS from 0 summing costs.
 
 **Complexity:** O(n).
@@ -2348,6 +2522,12 @@ assertEq(minReorder(5, [][]int{{1, 0}, {1, 2}, {3, 2}, {3, 4}}), 2)
 ## 752. Open the Lock | Medium
 related: 127, 433
 tags: bfs, implicit-graph
+
+```problem
+A lock has 4 wheels with digits 0–9; one move turns one wheel by one step, wrapping 9 ↔ 0. It starts at `"0000"`, and reaching any combination in `deadends` jams it. Return the minimum moves to reach `target`, or −1 if impossible.
+
+**Example:** `deadends = ["0201","0101","0102","1212","2002"], target = "0202"` → `6`
+```
 
 States are 4-digit strings; each move turns one wheel ±1 → 8 neighbours. BFS from `"0000"`, skipping deadends.
 
@@ -2452,6 +2632,12 @@ assertEq(openLock([]string{"8887", "8889", "8878", "8898", "8788", "8988", "7888
 related: 127, 752
 tags: bfs
 
+```problem
+A gene is an 8-character string over `A`, `C`, `G`, `T`; one mutation changes one character. Every gene you pass through (including the end) must be in `bank`. Return the minimum mutations from `startGene` to `endGene`, or −1 if impossible.
+
+**Example:** `startGene = "AACCGGTT", endGene = "AAACGGTA", bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]` → `2`
+```
+
 Same as Word Ladder with a 4-letter alphabet: BFS over valid genes in the bank.
 
 **Complexity:** O(B · 8 · 4).
@@ -2546,6 +2732,14 @@ assertEq(minMutation("AAAAACCC", "AACCCCCC", []string{"AAAACCCC", "AAACCCCC", "A
 ## 909. Snakes and Ladders | Medium
 related: 752
 tags: bfs, board-mapping
+
+```problem
+The squares of an n×n board are numbered 1…n² starting at the bottom-left, snaking left-to-right then right-to-left row by row going up. `board[r][c]` is −1 or the destination of a snake/ladder starting there. From square s, a die roll moves you to any of s + 1 … s + 6; if that square has a snake or ladder you must take it (but not a second one in the same move). Return the fewest moves from 1 to n², or −1.
+
+**Example:** the 6×6 board with ladders 2 → 15 and 14 → 35 and snake 17 → 13 → `4`
+
+**Constraints:** n ≤ 20.
+```
 
 BFS over squares 1..n². The only tricky part is mapping square `s` to `(row, col)` on a boustrophedon board: `r = (s−1) // n`, `c = (s−1) % n`, reversed on odd rows, and rows counted from the bottom.
 
@@ -2651,6 +2845,14 @@ assertEq(snakesAndLadders([][]int{{-1, -1}, {-1, 3}}), 1)
 ## 934. Shortest Bridge | Medium
 related: 200, 542
 tags: dfs, multi-source-bfs
+
+```problem
+The n×n binary grid contains exactly two islands (groups of 1s connected up, down, left, right). Return the fewest 0s you must flip to 1 to join them into one island.
+
+**Example:** `[[0,1,0],[0,0,0],[0,0,1]]` → `2`
+
+**Constraints:** n ≤ 100.
+```
 
 Find one island with DFS and mark it; then multi-source BFS from all its cells across water. The BFS level at which you first touch the other island is the number of flips.
 
@@ -2780,6 +2982,12 @@ assertEq(shortestBridge([][]int{{1, 1, 1, 1, 1}, {1, 0, 0, 0, 1}, {1, 0, 1, 0, 1
 related: 200, 695, 463
 tags: grid-dfs
 
+```problem
+Starting at pixel `(sr, sc)`, recolour it and every pixel connected to it (up, down, left, right) through pixels of the same original colour with `color`, and return the image.
+
+**Example:** `image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, color = 2` → `[[2,2,2],[2,2,0],[2,0,1]]`
+```
+
 DFS/BFS from the start cell through 4-neighbours that have the **original** color, recoloring as you go. If the new color equals the original, return immediately — otherwise the search never terminates (recolored cells still match).
 
 **Complexity:** O(R·C).
@@ -2861,6 +3069,14 @@ assertEq(floodFill([][]int{{1}}, 0, 0, 3), [][]int{{3}})
 ## 1730. Shortest Path to Get Food | Medium
 related: 1926, 994, 1091
 tags: bfs, grid, premium
+
+```problem
+In the grid, `'*'` is your position (exactly one), `'#'` is food, `'O'` is free space and `'X'` is an obstacle. Moving up, down, left or right, return the length of the shortest path to any food cell, or −1 if none is reachable.
+
+**Example:** `["XXXXXX","X*OOOX","XOO#OX","XXXXXX"]` → `3`
+
+**Constraints:** up to 200 × 200.
+```
 
 **Problem (Premium):** a grid has exactly one `'*'` (you), any number of `'#'` (food), `'O'` (free) and `'X'` (wall). Moving up/down/left/right, return the length of the shortest path to **any** food cell, or −1.
 
@@ -2962,6 +3178,14 @@ assertEq(getFood(byteGrid("*#")), 1)
 ## 1197. Minimum Knight Moves | Medium
 related: 1730, 752
 tags: bfs, premium
+
+```problem
+On an infinite chessboard a knight starts at `[0, 0]`. Return the minimum number of knight moves to reach `[x, y]` (always possible).
+
+**Example:** `x = 2, y = 1` → `1`; `x = 5, y = 5` → `4`
+
+**Constraints:** |x| + |y| ≤ 300.
+```
 
 **Problem (Premium):** on an infinite chessboard a knight starts at `(0, 0)`. Return the minimum number of moves to reach `(x, y)` (`|x| + |y| ≤ 300`).
 
@@ -3065,6 +3289,14 @@ assertEq(minKnightMoves(300, 0), 150)
 ## 815. Bus Routes | Hard
 related: 127, 1730
 tags: bfs, implicit-graph
+
+```problem
+`routes[i]` lists the stops of bus i, which loops through them forever. Starting at stop `source` (not on any bus), return the fewest buses you must ride to reach stop `target`, or −1 if you can't.
+
+**Example:** `routes = [[1,2,7],[3,6,7]], source = 1, target = 6` → `2`
+
+**Constraints:** up to 500 routes and 10⁵ stops per route.
+```
 
 BFS where one "step" is **riding one bus**: from the current stops, board every not-yet-used route through them and reach all of that route's stops. Index `stop → routes` first; mark routes as used so each route is expanded once.
 
@@ -3184,6 +3416,12 @@ assertEq(numBusesToDestination([][]int{{1, 7}, {3, 5}}, 5, 5), 0)
 related: 1730, 286
 tags: bfs, grid
 
+```problem
+In the `maze`, `'.'` is open and `'+'` is a wall. Starting at `entrance`, moving up, down, left or right, return the fewest steps to the nearest exit: an open cell on the border other than the entrance itself. Return −1 if none is reachable.
+
+**Example:** `maze = ["++.+","...+","+++."], entrance = [1,2]` → `1`
+```
+
 BFS from the entrance; the first **border** empty cell reached (other than the entrance itself) is the nearest exit.
 
 **Complexity:** O(R·C).
@@ -3274,6 +3512,12 @@ assertEq(nearestExit(byteGrid(".+"), []int{0, 0}), -1)
 related: 200, 695
 tags: grid, counting
 
+```problem
+The grid has exactly one island of 1s (connected up, down, left, right) and no lakes inside it. Return the island's perimeter, with every cell a 1×1 square.
+
+**Example:** `[[0,1,0,0],[1,1,1,0],[0,1,0,0],[1,1,0,0]]` → `16`
+```
+
 Every land cell contributes 4 edges; every pair of adjacent land cells hides 2 of them. Count land cells and right/down land neighbours: `4·land − 2·adjacent`.
 
 **Complexity:** O(R·C).
@@ -3342,6 +3586,12 @@ assertEq(islandPerimeter([][]int{{1, 1}, {1, 1}}), 8)
 related: 277, 1971
 tags: graph, degree
 
+```problem
+In a town of people 1…n, the judge (if any) trusts nobody and is trusted by everyone else, and at most one person fits. `trust[i] = [a, b]` means a trusts b. Return the judge's label, or −1.
+
+**Example:** `n = 3, trust = [[1,3],[2,3]]` → `3`; `n = 3, trust = [[1,3],[2,3],[3,1]]` → `-1`
+```
+
 The judge is trusted by everyone else (in-degree n − 1) and trusts nobody (out-degree 0). One score per person, `in − out`, equals n − 1 only for the judge.
 
 **Complexity:** O(n + |trust|).
@@ -3399,6 +3649,14 @@ assertEq(findJudge(1, [][]int{}), 1)
 ## 1462. Course Schedule IV | Medium
 related: 207, 210, 399
 tags: transitive-closure, floyd-warshall
+
+```problem
+`prerequisites[i] = [a, b]` means course a must be taken before course b, and prerequisites are transitive. For each query `[u, v]`, answer whether u is a (direct or indirect) prerequisite of v.
+
+**Example:** `numCourses = 2, prerequisites = [[1,0]], queries = [[0,1],[1,0]]` → `[false,true]`
+
+**Constraints:** up to 100 courses and 10⁴ queries.
+```
 
 Many reachability queries on a small graph (n ≤ 100) → precompute the **transitive closure** once: Floyd–Warshall on booleans (`reach[i][j] |= reach[i][k] and reach[k][j]`), then answer each query in O(1). (A BFS from every node or a topological pass with bitsets also works.)
 
